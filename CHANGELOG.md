@@ -7,6 +7,52 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.14.0] - 2025-12-05
+
+### Added - Documentation Excellence & Community Contributions
+
+- **A2A Samples Reference Implementation**
+  - Contributed Bob's Brain foreman-worker pattern to a2a-samples repository (PR #419)
+  - Implemented full production pattern: Bob → Foreman → Worker with LLM reasoning
+  - Added memory integration (Session + Memory Bank) for Bob and Foreman agents
+  - Created comprehensive documentation showing demo vs. production architecture
+  - Transformed initial flawed sample into production-grade reference implementation
+
+- **Linux Foundation AI Card Submission**
+  - Successfully submitted Bob's Brain as reference implementation (PR #7)
+  - Complete AAR documenting submission process and acceptance
+  - First ADK-based multi-agent system in AI Card repository
+
+- **CTO Strategic Documentation**
+  - 179-PP-PLAN: Community recognition through transparency initiative
+  - 180-AA-REPT: Full production pattern implementation AAR (700 lines)
+  - Strategic roadmap for thought leadership and community impact
+
+- **Phase 26: Repository Cleanup**
+  - Created `scripts/maintenance/cleanup_branches.sh` for safe branch archival
+  - Added `000-docs/ARCHIVED_BRANCHES.md` index and documentation
+  - Established branch management policy (main as only long-lived branch)
+  - Created Phase 26 planning and AAR documentation (181-182)
+
+### Changed
+
+- **Documentation Organization**
+  - Fixed document numbering sequence (677-691 renumbered to 173-177)
+  - Archived 11 old/duplicate documents to maintain clean structure
+  - Restored chronological order after Phase 25
+
+- **Repository Structure**
+  - Validated alignment with canonical 6767-style scaffold
+  - Confirmed single docs root at `000-docs/` (R6 compliance)
+  - Maintained clean separation of production agents, services, and infrastructure
+
+### Repository Metrics
+- **Documentation:** 182 docs total (+2 new planning/AAR docs, +1 ARCHIVED_BRANCHES.md)
+- **Quality Score:** 95/100 (maintained)
+- **Test Coverage:** 65.8% (unchanged)
+- **External Contributions:** 2 major PRs (Linux Foundation AI Card, A2A Samples)
+- **Architecture:** No runtime changes, structure-only improvements
+
 ## [0.13.0] - 2025-12-03
 
 ### Added - Linux Foundation AI Card PR Preparation

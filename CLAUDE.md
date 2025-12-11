@@ -10,11 +10,11 @@ This is the **live** guide for Claude Code when working in the `bobs-brain` repo
 
 ## 📋 TL;DR for DevOps (Quick Reference)
 
-**Current Status (v0.10.0):**
-- **Version**: v0.10.0 – Agent Engine / A2A Preview (Dev-Ready, Not Deployed)
-- **Phase**: Phase 25 - Slack Bob Hardening (lock gateway to Terraform+CI only)
-- **Deployment**: Infrastructure ready, awaiting first dev deployment to Agent Engine
-- **Roadmap**: See `000-docs/170-PP-PLAN-cto-roadmap-canonical-iam-template.md` for Phases 25-30
+**Current Status (v0.14.0):**
+- **Version**: v0.14.0 – Documentation Excellence & Community Contributions
+- **Phase**: Phase 26 Complete - Repository Cleanup & Release
+- **Deployment**: Infrastructure ready, Terraform + GitHub Actions for all deployments (R4 compliance)
+- **Community**: Linux Foundation AI Card PR #7, A2A Samples PR #419 (production patterns shared)
 
 **Key Documents:**
 - **6767 Global Catalog**: `000-docs/6767-000-DR-INDEX-bobs-brain-standards-catalog.md` (START HERE for all 6767 standards)
@@ -322,15 +322,17 @@ ls 000-docs/127-*
 
 ## 6. Changelog / Maintenance
 
-**Last Update:** 2025-11-29
+**Last Update:** 2025-12-05
 
 **Recent Changes:**
-- Added comprehensive three-tier architecture documentation (Section 2)
-- Updated current status to reflect Phase 25 (Slack Bob Hardening)
-- Added reference to 170-PP-PLAN-cto-roadmap-canonical-iam-template.md
-- Clarified Bob's conversational role vs specialists' strict function interfaces
-- Added example flow showing User → Bob → Foreman → Specialist interaction
-- Previous: Added 127-DR-STND-agent-engine-entrypoints.md (canonical entrypoints reference)
+- **Phase 26 (v0.14.0)**: Repository cleanup, branch archival tooling, and release
+  - Created `scripts/maintenance/cleanup_branches.sh` for safe branch archival
+  - Added `000-docs/ARCHIVED_BRANCHES.md` branch management index
+  - Updated version to v0.14.0 with comprehensive CHANGELOG
+  - Validated canonical scaffold alignment (single docs root, clear separation)
+- **Community Contributions**: Linux Foundation AI Card PR #7, A2A Samples PR #419
+- **Documentation**: Added docs 179-182 (CTO strategy, A2A implementation, Phase 26 planning/AAR)
+- Previous: Phase 25 (Slack Bob Hardening), three-tier architecture documentation
 
 **Maintenance Policy:**
 - **DON'T overcrowd CLAUDE.md** - it's a pointer doc, not a knowledge base
