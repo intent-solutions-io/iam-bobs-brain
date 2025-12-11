@@ -98,8 +98,8 @@ jobs:
         if: inputs.deploy_mode == 'apply'
         uses: google-github-actions/auth@v2
         with:
-          workload_identity_provider: ${{ secrets.WIF_PROVIDER }}
-          service_account: ${{ secrets.WIF_SERVICE_ACCOUNT }}
+          workload_identity_provider: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: ${{ secrets.GCP_SERVICE_ACCOUNT }}
 
       - name: Deploy Bob (Dry-Run)
         if: inputs.deploy_mode == 'dry-run'
@@ -152,8 +152,8 @@ jobs:
         if: inputs.deploy_mode == 'apply'
         uses: google-github-actions/auth@v2
         with:
-          workload_identity_provider: ${{ secrets.WIF_PROVIDER }}
-          service_account: ${{ secrets.WIF_SERVICE_ACCOUNT }}
+          workload_identity_provider: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: ${{ secrets.GCP_SERVICE_ACCOUNT }}
 
       - name: Deploy Foreman (Dry-Run)
         if: inputs.deploy_mode == 'dry-run'
@@ -213,8 +213,8 @@ jobs:
         if: inputs.deploy_mode == 'apply' && inputs.smoke_tests_enabled == true
         uses: google-github-actions/auth@v2
         with:
-          workload_identity_provider: ${{ secrets.WIF_PROVIDER }}
-          service_account: ${{ secrets.WIF_SERVICE_ACCOUNT }}
+          workload_identity_provider: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: ${{ secrets.GCP_SERVICE_ACCOUNT }}
 
       - name: Smoke Tests (Live)
         if: inputs.deploy_mode == 'apply' && inputs.smoke_tests_enabled == true
@@ -258,7 +258,7 @@ jobs:
             echo "To perform a real deployment:" >> $GITHUB_STEP_SUMMARY
             echo "1. Go to Actions → Deploy to Agent Engine (Inline Source - Dev)" >> $GITHUB_STEP_SUMMARY
             echo "2. Select \`deploy_mode: apply\`" >> $GITHUB_STEP_SUMMARY
-            echo "3. Ensure WIF_PROVIDER and WIF_SERVICE_ACCOUNT secrets are configured" >> $GITHUB_STEP_SUMMARY
+            echo "3. Ensure GCP_WORKLOAD_IDENTITY_PROVIDER and GCP_SERVICE_ACCOUNT secrets are configured" >> $GITHUB_STEP_SUMMARY
           else
             echo "### 🚀 Real Deployment" >> $GITHUB_STEP_SUMMARY
             echo "Agents were deployed to Vertex AI Agent Engine." >> $GITHUB_STEP_SUMMARY
