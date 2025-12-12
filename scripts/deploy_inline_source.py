@@ -66,11 +66,15 @@ def validate_config(args: argparse.Namespace) -> Dict:
         sys.exit(2)
 
     # Validate environment
-    valid_envs = ["dev", "staging", "prod"]
+    valid_envs = ["dev", "stage", "staging", "prod"]
     if args.env not in valid_envs:
         print(f"❌ Error: Invalid environment '{args.env}'")
         print(f"Valid environments: {', '.join(valid_envs)}")
         sys.exit(2)
+
+    # Normalize 'stage' to 'staging' for consistency
+    if args.env == "stage":
+        args.env = "staging"
 
     # For non-dry-run, require project and region
     if not args.dry_run:
@@ -256,8 +260,8 @@ Examples:
     parser.add_argument(
         "--env",
         required=True,
-        choices=["dev", "staging", "prod"],
-        help="Environment to deploy to"
+        choices=["dev", "stage", "staging", "prod"],
+        help="Environment to deploy to (stage is alias for staging)"
     )
 
     parser.add_argument(

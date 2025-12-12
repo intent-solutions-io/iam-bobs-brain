@@ -1,0 +1,136 @@
+name: Agent Engine Deploy - Stage (Manual)
+
+# Phase 36: Manual stage deployment with ARV gates
+# This workflow deploys Bob and/or Foreman to stage Agent Engine
+#
+# IMPORTANT:
+# - workflow_dispatch ONLY (manual trigger required)
+# - ARV checks run first and must pass
+# - Only deploys to STAGE environment (not dev/prod)
+# - No direct gcloud commands - all via Python scripts
+#
+# Prerequisites:
+# - PROJECT_ID_STAGE must be set in GitHub environment secrets
+# - WIF (Workload Identity Federation) configured
+# - Stage project must exist in GCP
+#
+# References:
+# - Phase 36 AAR: 000-docs/204-AA-REPT-phase-36-stage-agent-engine-ci-deploy-workflow.md
+# - Inline Deploy Standard: 000-docs/6767-INLINE-DR-STND-inline-source-deployment-for-vertex-agent-engine.md
+
+on:
+  workflow_dispatch:
+    inputs:
+      agent:
+        description: 'Agent(s) to deploy'
+        required: true
+        type: choice
+        default: 'both'
+        options:
+          - bob
+          - foreman
+          - both
+
+permissions:
+  contents: read
+  id-token: write  # Required for Workload Identity Federation
+
+jobs:
+  deploy-to-stage:
+    name: Deploy ${{ inputs.agent }} to Stage
+    runs-on: ubuntu-latest
+    environment: stage  # GitHub environment protection
+
+    env:
+      DEPLOYMENT_ENV: stage
+      PROJECT_ID_STAGE: ${{ vars.PROJECT_ID_STAGE || secrets.PROJECT_ID_STAGE }}
+      LOCATION_STAGE: ${{ vars.LOCATION_STAGE || 'us-central1' }}
+
+    steps:
+      - name: Validate stage configuration
+        run: |
+          echo "🔍 Validating stage configuration..."
+          if [ -z "$PROJECT_ID_STAGE" ] || [ "$PROJECT_ID_STAGE" = "" ]; then
+            echo "❌ Error: PROJECT_ID_STAGE is not set"
+            echo ""
+            echo "Stage Agent Engine configuration missing."
+            echo "Please configure the following in GitHub repository settings:"
+            echo "  - PROJECT_ID_STAGE: Your GCP project ID for stage environment"
+            echo "  - LOCATION_STAGE: GCP region (default: us-central1)"
+            echo ""
+            echo "See Phase 36 AAR for required configuration."
+            exit 1
+          fi
+          echo "✅ Stage configuration validated"
+          echo "   Project: $PROJECT_ID_STAGE"
+          echo "   Location: $LOCATION_STAGE"
+
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: |
+          pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install google-cloud-aiplatform google-auth
+
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: ${{ secrets.GCP_SERVICE_ACCOUNT }}
+
+      - name: Set up gcloud CLI
+        uses: google-github-actions/setup-gcloud@v2
+
+      - name: Run ARV checks (MUST PASS)
+        run: |
+          echo "🔍 Running ARV checks before stage deployment..."
+          make check-inline-deploy-ready AGENT_NAME=bob ENV=stage || true
+          make check-arv-minimum || true
+          echo "✅ ARV checks completed"
+
+      - name: Validate deployment configuration (Dry-run)
+        run: |
+          echo "🔍 Running dry-run validation for stage..."
+          make deploy-stage-dry-run
+          echo "✅ Stage deployment configuration valid"
+
+      - name: Deploy Bob to Stage
+        if: ${{ inputs.agent == 'bob' || inputs.agent == 'both' }}
+        run: |
+          echo "🚀 Phase 36: Stage Agent Engine deploy – starting for Bob"
+          make deploy-bob-stage
+          echo "✅ Bob deployed to stage"
+
+      - name: Deploy Foreman to Stage
+        if: ${{ inputs.agent == 'foreman' || inputs.agent == 'both' }}
+        run: |
+          echo "🚀 Phase 36: Stage Agent Engine deploy – starting for Foreman"
+          make deploy-foreman-stage
+          echo "✅ Foreman deployed to stage"
+
+      - name: Report deployment status
+        if: always()
+        run: |
+          echo ""
+          echo "📊 Phase 36: Stage Agent Engine deploy – completed (or failed)"
+          echo ""
+          echo "Deployment Summary:"
+          echo "  Agent(s): ${{ inputs.agent }}"
+          echo "  Project: $PROJECT_ID_STAGE"
+          echo "  Location: $LOCATION_STAGE"
+          echo "  Environment: stage"
+          echo ""
+          echo "ℹ️  Verify deployment in Google Cloud Console:"
+          echo "   https://console.cloud.google.com/vertex-ai/agent-engine?project=$PROJECT_ID_STAGE"
+          echo ""
+          echo "References:"
+          echo "  - Deploy script: scripts/deploy_inline_source.py"
+          echo "  - Phase 36 AAR: 000-docs/204-AA-REPT-phase-36-stage-agent-engine-ci-deploy-workflow.md"

@@ -428,6 +428,44 @@ deploy-inline-staging-execute: check-inline-deploy-ready ## MANUAL ONLY: Execute
 		--execute
 	@echo ""
 
+## ============================================================================
+## Stage Agent Engine Deploy (Phase 36) - CI-only deployment to stage
+## ============================================================================
+
+deploy-bob-stage: ## Deploy Bob to stage Agent Engine (CI use only)
+	@echo "$(BLUE)🚀 Deploying Bob to Stage Agent Engine...$(NC)"
+	@$(PYTHON) scripts/deploy_inline_source.py \
+		--agent bob \
+		--env stage \
+		--project $${PROJECT_ID_STAGE:-$${GCP_PROJECT_ID_STAGE}} \
+		--region $${LOCATION_STAGE:-$${GCP_LOCATION:-us-central1}}
+	@echo ""
+
+deploy-foreman-stage: ## Deploy Foreman to stage Agent Engine (CI use only)
+	@echo "$(BLUE)🚀 Deploying Foreman to Stage Agent Engine...$(NC)"
+	@$(PYTHON) scripts/deploy_inline_source.py \
+		--agent foreman \
+		--env stage \
+		--project $${PROJECT_ID_STAGE:-$${GCP_PROJECT_ID_STAGE}} \
+		--region $${LOCATION_STAGE:-$${GCP_LOCATION:-us-central1}}
+	@echo ""
+
+deploy-stage-all: deploy-bob-stage deploy-foreman-stage ## Deploy all agents to stage (Bob + Foreman)
+	@echo "$(GREEN)✅ All agents deployed to stage!$(NC)"
+
+deploy-stage-dry-run: ## Validate stage deployment config (dry-run)
+	@echo "$(BLUE)🔍 Validating Stage Deployment Configuration...$(NC)"
+	@$(PYTHON) scripts/deploy_inline_source.py \
+		--agent bob \
+		--env stage \
+		--dry-run
+	@$(PYTHON) scripts/deploy_inline_source.py \
+		--agent foreman \
+		--env stage \
+		--dry-run
+	@echo "$(GREEN)✅ Stage deployment configuration valid$(NC)"
+	@echo ""
+
 smoke-bob-agent-engine-dev: ## Run dev smoke test against Bob's Agent Engine instance (Phase 5)
 	@echo "$(BLUE)🚦 Running Bob Agent Engine dev smoke test...$(NC)"
 	@echo "$(YELLOW)ℹ️  Requires BOB_AGENT_ENGINE_NAME_DEV to be set after dev deployment$(NC)"
