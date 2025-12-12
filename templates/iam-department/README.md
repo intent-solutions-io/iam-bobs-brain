@@ -1,6 +1,6 @@
 # IAM Department Template
 
-**Version:** 1.0.0
+**Version:** 1.1.0
 **Source:** bobs-brain reference implementation
 **Purpose:** Reusable ADK-based multi-agent software engineering department template
 
@@ -8,12 +8,35 @@
 
 ## Quick Start
 
-### 1. Copy Template to New Repo
+### Option A: Automated Installation (Recommended)
+
+Use the installation script for guided setup:
+
+```bash
+# From bobs-brain repo root
+cd templates/iam-department
+./install.sh /path/to/target/repo
+```
+
+The script will:
+1. Prompt for all required parameters
+2. Copy template files to target
+3. Replace placeholders automatically
+4. Provide next steps
+
+After installation, validate:
+```bash
+./validate.sh /path/to/target/repo
+```
+
+### Option B: Manual Installation
+
+#### 1. Copy Template to New Repo
 ```bash
 cp -r templates/iam-department/* /path/to/new-repo/
 ```
 
-### 2. Replace Parameters
+#### 2. Replace Parameters
 
 **Required Parameters** (must replace these):
 ```bash
@@ -34,19 +57,19 @@ find . -type f \( -name "*.py" -o -name "*.md" -o -name "*.yaml" \) | \
   xargs sed -i 's/{{PRODUCT_NAME}}/diagnosticpro/g'
 ```
 
-### 3. Remove .template Extensions
+#### 3. Remove .template Extensions
 ```bash
 find . -type f -name "*.template" | \
   while read f; do mv "$f" "${f%.template}"; done
 ```
 
-### 4. Customize Product-Specific Logic
+#### 4. Customize Product-Specific Logic
 - Update agent system prompts for your product domain
 - Implement product-specific tools
 - Configure `repos.yaml` with your repositories
 - Update RAG config with your knowledge sources
 
-### 5. Validate
+#### 5. Validate
 ```bash
 make check-arv-minimum
 make test-swe-pipeline
