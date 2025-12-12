@@ -14,7 +14,7 @@ terraform {
 
 # Conditional resource creation based on enable flag
 locals {
-  enabled = var.enable ? 1 : 0
+  enabled      = var.enable ? 1 : 0
   service_name = "${var.app_name}-slack-webhook-${var.environment}"
 }
 

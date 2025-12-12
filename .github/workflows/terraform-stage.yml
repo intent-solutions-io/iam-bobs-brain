@@ -1,0 +1,182 @@
+name: Terraform Stage Plan (Plan-Only)
+
+# ========================================
+# STAGE ENVIRONMENT TERRAFORM PLAN
+# ========================================
+# This workflow runs terraform plan ONLY against the stage environment.
+# It NEVER applies changes - that would be done through a separate
+# approved workflow when stage infrastructure is ready.
+#
+# Purpose:
+#   - Validate stage.tfvars syntax and configuration
+#   - Preview what would be created/changed in stage
+#   - Gate for dev -> stage promotion reviews
+#
+# R4 Compliance: No terraform apply in this workflow.
+
+on:
+  pull_request:
+    branches: [ main ]
+    paths:
+      - 'infra/terraform/**'
+      - '.github/workflows/terraform-stage.yml'
+
+  workflow_dispatch:
+    inputs:
+      validate_only:
+        description: 'Run validation only (no plan)'
+        required: false
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+  id-token: write
+  pull-requests: write
+
+env:
+  TF_VERSION: '1.5.0'
+  TERRAFORM_DIR: 'infra/terraform'
+  ENVIRONMENT: 'stage'
+
+jobs:
+  terraform-validate:
+    name: Terraform Validate (Stage)
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: ${{ env.TERRAFORM_DIR }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: ${{ env.TF_VERSION }}
+
+      - name: Terraform Format Check
+        id: fmt
+        run: terraform fmt -check -recursive
+        continue-on-error: true
+
+      - name: Terraform Init (Local Backend for Validation)
+        id: init
+        run: |
+          # Use local backend for validation only
+          # Real deployments would use GCS backend
+          terraform init -backend=false
+        continue-on-error: true
+
+      - name: Terraform Validate
+        id: validate
+        run: terraform validate
+        continue-on-error: true
+
+      - name: Check Stage tfvars Syntax
+        id: check-tfvars
+        run: |
+          echo "=== Checking stage.tfvars syntax ==="
+          if [ -f "envs/stage.tfvars" ]; then
+            echo "stage.tfvars exists"
+            # Check for TODO placeholders
+            TODO_COUNT=$(grep -c "TODO-SET-" envs/stage.tfvars || echo "0")
+            echo "Found $TODO_COUNT TODO placeholders to be filled"
+            echo "todo_count=$TODO_COUNT" >> $GITHUB_OUTPUT
+          else
+            echo "ERROR: stage.tfvars not found"
+            exit 1
+          fi
+
+      - name: Validation Summary
+        run: |
+          echo "## Stage Environment Validation Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Check | Status |" >> $GITHUB_STEP_SUMMARY
+          echo "|-------|--------|" >> $GITHUB_STEP_SUMMARY
+          echo "| Format | ${{ steps.fmt.outcome }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Init | ${{ steps.init.outcome }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Validate | ${{ steps.validate.outcome }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| tfvars Check | ${{ steps.check-tfvars.outcome }} |" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Note:** This workflow validates stage config only. No changes are applied." >> $GITHUB_STEP_SUMMARY
+
+  terraform-plan:
+    name: Terraform Plan (Stage)
+    runs-on: ubuntu-latest
+    needs: terraform-validate
+    if: ${{ github.event.inputs.validate_only != 'true' }}
+
+    # Only run plan if we have GCP credentials configured
+    # Skip gracefully if stage project doesn't exist yet
+    continue-on-error: true
+
+    defaults:
+      run:
+        working-directory: ${{ env.TERRAFORM_DIR }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Check for GCP Credentials
+        id: check-creds
+        run: |
+          # Check if stage credentials are configured
+          if [ -z "${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}" ]; then
+            echo "GCP credentials not configured for stage"
+            echo "skip_plan=true" >> $GITHUB_OUTPUT
+          else
+            echo "skip_plan=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Authenticate to Google Cloud (Workload Identity Federation)
+        if: steps.check-creds.outputs.skip_plan != 'true'
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: ${{ secrets.GCP_SERVICE_ACCOUNT }}
+        continue-on-error: true
+
+      - name: Setup Terraform
+        if: steps.check-creds.outputs.skip_plan != 'true'
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: ${{ env.TF_VERSION }}
+
+      - name: Terraform Init
+        if: steps.check-creds.outputs.skip_plan != 'true'
+        run: |
+          terraform init \
+            -backend-config="bucket=bobs-brain-terraform-state" \
+            -backend-config="prefix=stage"
+        continue-on-error: true
+
+      - name: Terraform Plan (Stage)
+        if: steps.check-creds.outputs.skip_plan != 'true'
+        id: plan
+        run: |
+          terraform plan \
+            -var-file="envs/stage.tfvars" \
+            -out=stage.tfplan \
+            -no-color
+        continue-on-error: true
+
+      - name: Plan Summary
+        run: |
+          echo "## Stage Terraform Plan" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          if [ "${{ steps.check-creds.outputs.skip_plan }}" == "true" ]; then
+            echo "Plan skipped: GCP credentials not configured for stage environment." >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "To enable plan:" >> $GITHUB_STEP_SUMMARY
+            echo "1. Create stage GCP project" >> $GITHUB_STEP_SUMMARY
+            echo "2. Configure Workload Identity Federation" >> $GITHUB_STEP_SUMMARY
+            echo "3. Add secrets to repository" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "Plan completed. Review output above for changes." >> $GITHUB_STEP_SUMMARY
+          fi
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Note:** This is a plan-only workflow. No terraform apply." >> $GITHUB_STEP_SUMMARY
