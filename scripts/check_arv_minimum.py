@@ -213,8 +213,12 @@ class ARVMinimumChecker:
             with open(orchestrator_path) as f:
                 content = f.read()
 
-            # Check for logging imports
-            if "from utils.logging import" not in content:
+            # Check for logging imports (accept both relative and absolute paths)
+            has_logging_import = (
+                "from utils.logging import" in content or
+                "from agents.utils.logging import" in content
+            )
+            if not has_logging_import:
                 self.failed.append("Orchestrator doesn't import logging helper")
                 return False
 

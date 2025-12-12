@@ -14,10 +14,14 @@ from datetime import datetime
 # Import shared contracts
 import sys
 from pathlib import Path
-sys.path.insert(0, str(Path(__file__).parent.parent))
+
+# Add agents directory to path for consistent imports
+_agents_dir = str(Path(__file__).parent.parent.parent)
+if _agents_dir not in sys.path:
+    sys.path.insert(0, _agents_dir)
 
 # Import structured logging (Phase RC2)
-from utils.logging import (
+from agents.utils.logging import (
     get_logger,
     log_pipeline_start,
     log_pipeline_complete,
@@ -25,7 +29,7 @@ from utils.logging import (
     log_github_operation
 )
 
-from shared_contracts import (
+from agents.shared_contracts import (
     PipelineRequest, PipelineResult,
     AnalysisReport, IssueSpec, FixPlan, CodeChange,
     QAVerdict, DocumentationUpdate, CleanupTask, IndexEntry,
@@ -34,19 +38,16 @@ from shared_contracts import (
 )
 
 # Import repo registry (Phase GH1)
-from config.repos import get_repo_by_id, RepoConfig, get_registry
+from agents.config.repos import get_repo_by_id, RepoConfig, get_registry
 
 # Import GitHub client (Phase GH2)
-from tools.github_client import get_client, GitHubClientError, RepoTree
+from agents.tools.github_client import get_client, GitHubClientError, RepoTree
 
 # Import GitHub issue adapter (Phase GH3)
-# Import directly to avoid triggering iam_issue/__init__.py which imports ADK
-import sys
-sys.path.insert(0, str(Path(__file__).parent.parent / "iam_issue"))
-from github_issue_adapter import issue_spec_to_github_payload, preview_issue_payload
+from agents.iam_issue.github_issue_adapter import issue_spec_to_github_payload, preview_issue_payload
 
 # Import GitHub feature flags (Phase GHC)
-from config.github_features import can_create_issues_for_repo, get_feature_status_summary
+from agents.config.github_features import can_create_issues_for_repo, get_feature_status_summary
 
 # Create logger for orchestrator (Phase RC2)
 logger = get_logger(__name__)

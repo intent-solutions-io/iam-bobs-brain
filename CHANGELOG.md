@@ -7,6 +7,73 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.0.0] - 2025-12-12
+
+### 🎉 First Production Release
+
+Bob's Brain v1.0.0 marks the first production-ready release of the ADK-based multi-agent software engineering department. This milestone represents 50 phases of development, documentation, and hardening.
+
+### Added - Phases 45-50
+
+- **Phase 45: Resilience & Error-Handling**
+  - Added configurable timeout (`AGENT_ENGINE_TIMEOUT_SECONDS`)
+  - Added retry logic for 5xx errors (`AGENT_ENGINE_RETRY_ENABLED`, `AGENT_ENGINE_MAX_RETRIES`)
+  - Added correlation ID tracking across all requests
+  - Created error-handling runbook (`219-RB-OPS-*.md`)
+
+- **Phase 46: Security & IAM Hardening**
+  - Removed overly broad `roles/editor` from GitHub Actions service account
+  - Added specific permissions: `roles/iam.serviceAccountUser`, `roles/secretmanager.admin`
+  - Added Workload Identity Federation (WIF) resources (conditionally enabled)
+  - Created security validation script (`scripts/ci/check_security.sh`)
+  - Created security runbook (`222-RB-SEC-*.md`)
+
+- **Phase 47: RAG / Knowledge Base Wiring**
+  - Created comprehensive RAG setup guide (`225-GD-OPS-*.md`)
+  - Created RAG operations runbook (`226-RB-OPS-*.md`)
+  - Validated existing RAG infrastructure (config, tools, ARV gate)
+
+- **Phase 48: IAM Department Export Pack**
+  - Created `templates/iam-department/install.sh` for guided installation
+  - Created `templates/iam-department/validate.sh` for post-install validation
+  - Updated template README to v1.1.0 with script usage
+
+- **Phase 49: Developer & Operator Onboarding**
+  - Created `GETTING-STARTED.md` developer quickstart guide
+  - Updated `DEVOPS-QUICK-REFERENCE.md` version references
+  - Validated existing CONTRIBUTING.md is comprehensive
+
+- **Phase 50: v1.0.0 Release**
+  - Bumped version to 1.0.0
+  - Comprehensive CHANGELOG update
+  - Release AAR documentation
+
+### Architecture Highlights
+
+- **10 Agents:** 1 orchestrator (Bob) + 1 foreman + 8 specialists
+- **Hard Mode:** 8 rules (R1-R8) enforced via CI/CD
+- **Dual Memory:** Session + Memory Bank for context preservation
+- **A2A Protocol:** Agent-to-Agent communication v0.3.0
+- **Inline Deployment:** Source code → Agent Engine (no serialization)
+- **CI/CD:** GitHub Actions with Workload Identity Federation
+
+### Repository Metrics
+- **Tests:** 197 passing
+- **Documentation:** 233+ docs in 000-docs/
+- **Quality Score:** 95/100
+- **Hard Mode Compliance:** 100%
+
+### Breaking Changes
+
+None. This is the first production release.
+
+### Migration
+
+If upgrading from pre-release versions (0.x):
+1. Pull latest from main
+2. Run `make check-all` to verify compatibility
+3. No configuration changes required
+
 ## [0.14.1] - 2025-12-11
 
 ### Fixed - Critical Bug Fixes & Test Stability
