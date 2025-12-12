@@ -434,6 +434,44 @@ smoke-bob-agent-engine-dev: ## Run dev smoke test against Bob's Agent Engine ins
 	@$(PYTHON) -m scripts.smoke_test_bob_agent_engine_dev
 	@echo ""
 
+smoke-foreman-agent-engine-dev: ## Run dev smoke test against Foreman's Agent Engine instance (Phase 42)
+	@echo "$(BLUE)🚦 Running Foreman Agent Engine dev smoke test...$(NC)"
+	@echo "$(YELLOW)ℹ️  Requires FOREMAN_AGENT_ENGINE_NAME_DEV to be set after dev deployment$(NC)"
+	@$(PYTHON) -m scripts.smoke_test_foreman_agent_engine_dev
+	@echo ""
+
+smoke-agent-engine-dev: smoke-bob-agent-engine-dev smoke-foreman-agent-engine-dev ## Run all dev smoke tests (Phase 42)
+	@echo "$(GREEN)✅ All dev Agent Engine smoke tests completed$(NC)"
+
+#################################
+# Phase 42: Dev Deployment Targets
+#################################
+
+deploy-bob-dev: ## Deploy Bob to dev Agent Engine (CI use only, Phase 42)
+	@echo "$(BLUE)🚀 Deploying Bob to Dev Agent Engine...$(NC)"
+	@$(PYTHON) scripts/deploy_inline_source.py \
+		--agent bob \
+		--env dev \
+		--project $${GCP_PROJECT_ID:-$${PROJECT_ID}} \
+		--region $${GCP_LOCATION:-us-central1}
+
+deploy-foreman-dev: ## Deploy Foreman to dev Agent Engine (CI use only, Phase 42)
+	@echo "$(BLUE)🚀 Deploying Foreman to Dev Agent Engine...$(NC)"
+	@$(PYTHON) scripts/deploy_inline_source.py \
+		--agent foreman \
+		--env dev \
+		--project $${GCP_PROJECT_ID:-$${PROJECT_ID}} \
+		--region $${GCP_LOCATION:-us-central1}
+
+deploy-dev-all: deploy-bob-dev deploy-foreman-dev ## Deploy Bob + Foreman to dev (Phase 42)
+	@echo "$(GREEN)✅ All dev deployments completed$(NC)"
+
+deploy-dev-dry-run: ## Validate dev deployment config without deploying (Phase 42)
+	@echo "$(BLUE)🔍 Validating dev deployment configuration...$(NC)"
+	@$(PYTHON) scripts/deploy_inline_source.py --agent bob --env dev --dry-run
+	@$(PYTHON) scripts/deploy_inline_source.py --agent foreman --env dev --dry-run
+	@echo "$(GREEN)✅ Dev deployment configuration is valid$(NC)"
+
 ## ============================================================================
 
 arv-department: ## Run comprehensive ARV for IAM/ADK department (ARIV-DEPT)
@@ -701,3 +739,4 @@ deploy-help: ## Show deployment help and requirements
 .PHONY: live3-dev-smoke live3-dev-smoke-verbose live3-dev-smoke-all
 .PHONY: slack-dev-smoke slack-dev-smoke-verbose slack-dev-smoke-health slack-dev-smoke-cloud
 .PHONY: deploy-dev deploy-staging deploy-prod deploy-status deploy-logs deploy-list deploy-help
+.PHONY: smoke-foreman-agent-engine-dev smoke-agent-engine-dev deploy-bob-dev deploy-foreman-dev deploy-dev-all deploy-dev-dry-run

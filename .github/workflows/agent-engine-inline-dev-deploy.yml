@@ -1,31 +1,32 @@
-name: Agent Engine Inline Deploy - Dev (Manual)
+name: Agent Engine Inline Deploy - Dev
 
-# Phase 4: Manual dev deployment with ARV gates
+# Phase 42: CI-based dev deployment with ARV gates and smoke tests
 # This workflow performs REAL deployment to dev environment with safety checks
 #
 # IMPORTANT:
-# - This is workflow_dispatch ONLY (manual trigger required)
+# - Supports both manual trigger (workflow_dispatch) and optional auto-deploy on push
 # - ARV checks run first and must pass
 # - Dry-run validation runs before actual deployment
+# - Smoke tests run after deployment (non-blocking)
 # - Only deploys to DEV environment (not staging/prod)
 #
 # References:
+# - Phase 42: 000-docs/211-AA-PLAN-phase-42-agent-engine-dev-ci-deploy.md
 # - Discussion: https://discuss.google.dev/t/deploying-agents-with-inline-source-on-vertex-ai-agent-engine/288935
-# - Tutorial: 000-docs/001-usermanual/tutorial_get_started_with_agent_engine_terraform_deployment.ipynb
 # - Standard: 000-docs/6767-INLINE-DR-STND-inline-source-deployment-for-vertex-agent-engine.md
 
 on:
   workflow_dispatch:
     inputs:
       agent_name:
-        description: 'Agent to deploy (bob, iam-senior-adk-devops-lead, iam-adk)'
+        description: 'Agent to deploy'
         required: true
         type: choice
         default: 'bob'
         options:
           - bob
-          - iam-senior-adk-devops-lead
-          - iam-adk
+          - foreman
+          - both
 
       gcp_project_id:
         description: 'GCP Project ID for deployment'
@@ -38,21 +39,92 @@ on:
         type: string
         default: 'us-central1'
 
+      run_smoke_tests:
+        description: 'Run smoke tests after deployment'
+        required: false
+        type: boolean
+        default: true
+
+  # Optional: Auto-deploy on push to main (disabled by default)
+  # Uncomment below to enable auto-deploy when pushing to main
+  # push:
+  #   branches: [main]
+  #   paths:
+  #     - 'agents/bob/**'
+  #     - 'agents/iam_senior_adk_devops_lead/**'
+
+  # Allow other workflows to call this one
+  workflow_call:
+    inputs:
+      agent_name:
+        description: 'Agent to deploy (bob, foreman, both)'
+        required: true
+        type: string
+      gcp_project_id:
+        description: 'GCP Project ID'
+        required: true
+        type: string
+      gcp_location:
+        description: 'GCP region'
+        required: false
+        type: string
+        default: 'us-central1'
+      run_smoke_tests:
+        description: 'Run smoke tests after deployment'
+        required: false
+        type: boolean
+        default: true
+    secrets:
+      GCP_WORKLOAD_IDENTITY_PROVIDER:
+        required: true
+      GCP_SERVICE_ACCOUNT:
+        required: true
+
 permissions:
   contents: read
   id-token: write  # Required for Workload Identity Federation
 
-jobs:
-  deploy-to-dev:
-    name: Deploy ${{ inputs.agent_name }} to Dev
-    runs-on: ubuntu-latest
-    environment: dev  # GitHub environment protection (optional)
+env:
+  AGENT_NAME: ${{ inputs.agent_name || 'bob' }}
+  GCP_PROJECT_ID: ${{ inputs.gcp_project_id }}
+  GCP_LOCATION: ${{ inputs.gcp_location || 'us-central1' }}
+  ENV: dev
 
-    env:
-      AGENT_NAME: ${{ inputs.agent_name }}
-      GCP_PROJECT_ID: ${{ inputs.gcp_project_id }}
-      GCP_LOCATION: ${{ inputs.gcp_location }}
-      ENV: dev
+jobs:
+  # ARV checks must pass before any deployment
+  arv-checks:
+    name: ARV Checks
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: |
+          pip install --upgrade pip
+          pip install -r requirements.txt 2>/dev/null || pip install google-cloud-aiplatform google-auth
+
+      - name: Run ARV checks (MUST PASS)
+        run: |
+          echo "🔍 Running ARV checks before deployment..."
+          make check-inline-deploy-ready
+          echo "✅ ARV checks passed"
+
+  # Deploy Bob to dev
+  deploy-bob:
+    name: Deploy Bob to Dev
+    needs: arv-checks
+    if: inputs.agent_name == 'bob' || inputs.agent_name == 'both'
+    runs-on: ubuntu-latest
+    environment: dev
+    outputs:
+      resource_name: ${{ steps.deploy.outputs.resource_name }}
 
     steps:
       - name: Checkout repository
@@ -67,8 +139,7 @@ jobs:
       - name: Install dependencies
         run: |
           pip install --upgrade pip
-          # Install full dependencies for deployment
-          pip install google-cloud-aiplatform google-auth
+          pip install google-cloud-aiplatform[adk,agent_engines] google-auth
 
       - name: Authenticate to Google Cloud
         uses: google-github-actions/auth@v2
@@ -79,46 +150,184 @@ jobs:
       - name: Set up gcloud CLI
         uses: google-github-actions/setup-gcloud@v2
 
-      - name: Run ARV checks (Phase 4 - MUST PASS)
+      - name: Run dry-run validation
         run: |
-          echo "🔍 Running ARV checks before deployment..."
-          make check-inline-deploy-ready
-          echo "✅ ARV checks passed"
-
-      - name: Run dry-run validation (Pre-flight check)
-        run: |
-          echo "🔍 Running dry-run validation..."
-          make deploy-inline-dry-run
+          echo "🔍 Running dry-run validation for Bob..."
+          python scripts/deploy_inline_source.py \
+            --agent bob \
+            --env dev \
+            --dry-run
           echo "✅ Dry-run validation passed"
 
-      - name: Deploy agent to dev (REAL DEPLOYMENT)
+      - name: Deploy Bob to dev (REAL DEPLOYMENT)
+        id: deploy
         run: |
-          echo "🚀 Deploying agent to dev environment..."
-          echo "   Agent: $AGENT_NAME"
+          echo "🚀 Deploying Bob to dev environment..."
           echo "   Project: $GCP_PROJECT_ID"
           echo "   Location: $GCP_LOCATION"
           echo ""
-          python -m agents.agent_engine.deploy_inline_source \
-            --agent-name $AGENT_NAME \
-            --project $GCP_PROJECT_ID \
-            --location $GCP_LOCATION \
-            --env dev \
-            --execute
 
-      - name: Report deployment status
-        if: always()
+          # Run deployment and capture output
+          python scripts/deploy_inline_source.py \
+            --agent bob \
+            --env dev \
+            --project $GCP_PROJECT_ID \
+            --region $GCP_LOCATION | tee deploy_output.txt
+
+          # Extract resource name if available
+          RESOURCE_NAME=$(grep -o 'Resource Name: .*' deploy_output.txt | cut -d' ' -f3- || echo "")
+          echo "resource_name=$RESOURCE_NAME" >> $GITHUB_OUTPUT
+
+          echo "✅ Bob deployment complete"
+
+  # Deploy Foreman to dev
+  deploy-foreman:
+    name: Deploy Foreman to Dev
+    needs: arv-checks
+    if: inputs.agent_name == 'foreman' || inputs.agent_name == 'both'
+    runs-on: ubuntu-latest
+    environment: dev
+    outputs:
+      resource_name: ${{ steps.deploy.outputs.resource_name }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: 'pip'
+
+      - name: Install dependencies
         run: |
-          echo "📊 Deployment Summary:"
-          echo "  Agent: $AGENT_NAME"
-          echo "  Project: $GCP_PROJECT_ID"
-          echo "  Location: $GCP_LOCATION"
-          echo "  Environment: dev"
+          pip install --upgrade pip
+          pip install google-cloud-aiplatform[adk,agent_engines] google-auth
+
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: ${{ secrets.GCP_SERVICE_ACCOUNT }}
+
+      - name: Set up gcloud CLI
+        uses: google-github-actions/setup-gcloud@v2
+
+      - name: Run dry-run validation
+        run: |
+          echo "🔍 Running dry-run validation for Foreman..."
+          python scripts/deploy_inline_source.py \
+            --agent foreman \
+            --env dev \
+            --dry-run
+          echo "✅ Dry-run validation passed"
+
+      - name: Deploy Foreman to dev (REAL DEPLOYMENT)
+        id: deploy
+        run: |
+          echo "🚀 Deploying Foreman to dev environment..."
+          echo "   Project: $GCP_PROJECT_ID"
+          echo "   Location: $GCP_LOCATION"
           echo ""
-          echo "ℹ️  This was a REAL DEPLOYMENT to dev environment."
+
+          # Run deployment and capture output
+          python scripts/deploy_inline_source.py \
+            --agent foreman \
+            --env dev \
+            --project $GCP_PROJECT_ID \
+            --region $GCP_LOCATION | tee deploy_output.txt
+
+          # Extract resource name if available
+          RESOURCE_NAME=$(grep -o 'Resource Name: .*' deploy_output.txt | cut -d' ' -f3- || echo "")
+          echo "resource_name=$RESOURCE_NAME" >> $GITHUB_OUTPUT
+
+          echo "✅ Foreman deployment complete"
+
+  # Smoke tests (non-blocking, run after deployment)
+  smoke-tests:
+    name: Smoke Tests
+    needs: [deploy-bob, deploy-foreman]
+    if: |
+      always() &&
+      (inputs.run_smoke_tests == true || inputs.run_smoke_tests == null) &&
+      (needs.deploy-bob.result == 'success' || needs.deploy-foreman.result == 'success')
+    runs-on: ubuntu-latest
+    continue-on-error: true  # Don't fail workflow on smoke test failure
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: |
+          pip install --upgrade pip
+          pip install google-cloud-aiplatform google-auth
+
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: ${{ secrets.GCP_SERVICE_ACCOUNT }}
+
+      - name: Run Bob smoke test
+        if: needs.deploy-bob.result == 'success'
+        continue-on-error: true
+        env:
+          BOB_AGENT_ENGINE_NAME_DEV: ${{ needs.deploy-bob.outputs.resource_name }}
+        run: |
+          echo "🧪 Running Bob smoke test..."
+          if [ -n "$BOB_AGENT_ENGINE_NAME_DEV" ]; then
+            python scripts/smoke_test_bob_agent_engine_dev.py || echo "⚠️ Bob smoke test had issues (non-blocking)"
+          else
+            echo "⚠️ Skipping Bob smoke test - no resource name available"
+          fi
+
+      - name: Run Foreman smoke test
+        if: needs.deploy-foreman.result == 'success'
+        continue-on-error: true
+        env:
+          FOREMAN_AGENT_ENGINE_NAME_DEV: ${{ needs.deploy-foreman.outputs.resource_name }}
+        run: |
+          echo "🧪 Running Foreman smoke test..."
+          if [ -n "$FOREMAN_AGENT_ENGINE_NAME_DEV" ]; then
+            python scripts/smoke_test_foreman_agent_engine_dev.py || echo "⚠️ Foreman smoke test had issues (non-blocking)"
+          else
+            echo "⚠️ Skipping Foreman smoke test - no resource name available"
+          fi
+
+  # Summary job
+  summary:
+    name: Deployment Summary
+    needs: [arv-checks, deploy-bob, deploy-foreman, smoke-tests]
+    if: always()
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Report deployment status
+        run: |
+          echo "📊 Phase 42: Agent Engine Dev Deployment Summary"
+          echo "================================================"
+          echo ""
+          echo "Environment: dev"
+          echo "Project: ${{ inputs.gcp_project_id }}"
+          echo "Location: ${{ inputs.gcp_location || 'us-central1' }}"
+          echo ""
+          echo "Job Results:"
+          echo "  ARV Checks:      ${{ needs.arv-checks.result }}"
+          echo "  Deploy Bob:      ${{ needs.deploy-bob.result || 'skipped' }}"
+          echo "  Deploy Foreman:  ${{ needs.deploy-foreman.result || 'skipped' }}"
+          echo "  Smoke Tests:     ${{ needs.smoke-tests.result || 'skipped' }}"
+          echo ""
           echo "ℹ️  Verify deployment in Google Cloud Console:"
-          echo "     https://console.cloud.google.com/vertex-ai/agent-engine"
+          echo "   https://console.cloud.google.com/vertex-ai/agent-engine?project=${{ inputs.gcp_project_id }}"
           echo ""
           echo "References:"
-          echo "  - ARV script: scripts/check_inline_deploy_ready.py"
-          echo "  - Deploy script: agents/agent_engine/deploy_inline_source.py"
-          echo "  - Discussion: https://discuss.google.dev/t/deploying-agents-with-inline-source-on-vertex-ai-agent-engine/288935"
+          echo "  - Phase 42: 000-docs/211-AA-PLAN-phase-42-agent-engine-dev-ci-deploy.md"
+          echo "  - Standard: 000-docs/6767-INLINE-DR-STND-inline-source-deployment-for-vertex-agent-engine.md"
