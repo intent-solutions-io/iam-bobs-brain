@@ -26,8 +26,8 @@ slack_bob_enabled = true
 
 # Secret Manager references (production best practice)
 # Secrets must exist in Secret Manager before deployment
-slack_bot_token_secret_id      = "slack-bot-token"
-slack_signing_secret_id        = "slack-signing-secret"
+slack_bot_token_secret_id = "slack-bot-token"
+slack_signing_secret_id   = "slack-signing-secret"
 
 # DEPRECATED: Direct token variables (use Secret Manager instead)
 slack_bot_token      = "" # Ignored when slack_bot_token_secret_id is set

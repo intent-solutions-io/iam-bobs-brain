@@ -155,7 +155,7 @@ module "slack_bob_gateway" {
   agent_engine_id   = tostring(google_vertex_ai_reasoning_engine.bob.id)
 
   # Secret Manager references (production best practice)
-  slack_signing_secret_id = var.slack_signing_secret_id
+  slack_signing_secret_id   = var.slack_signing_secret_id
   slack_bot_token_secret_id = var.slack_bot_token_secret_id
 
   # Service account

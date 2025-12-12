@@ -1,0 +1,172 @@
+name: Terraform Stage Plan (Dry-Run Only)
+
+# ========================================
+# STAGE ENVIRONMENT TERRAFORM PLANNING
+# ========================================
+# This workflow runs terraform plan for stage environment.
+# It NEVER runs terraform apply - stage deploys are manual.
+#
+# Safety Features:
+# - workflow_dispatch only (manual trigger)
+# - Placeholder guard (fails if TODO-SET- values remain)
+# - No apply step at all (plan only)
+#
+# Usage:
+#   Trigger manually from GitHub Actions UI to validate stage config.
+
+on:
+  workflow_dispatch:
+    inputs:
+      skip_placeholder_check:
+        description: 'Skip placeholder check (for testing workflow itself)'
+        required: false
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+  id-token: write
+
+env:
+  TF_VERSION: '1.5.0'
+  TERRAFORM_DIR: 'infra/terraform'
+
+jobs:
+  terraform-stage-plan:
+    name: Terraform Plan (Stage)
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: ${{ env.TERRAFORM_DIR }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Check for TODO Placeholders
+        if: ${{ !github.event.inputs.skip_placeholder_check }}
+        run: |
+          echo "🔍 Checking stage.tfvars for TODO placeholders..."
+
+          # Check for stage.tfvars (preferred) or staging.tfvars (legacy)
+          TFVARS_FILE=""
+          if [ -f "envs/stage.tfvars" ]; then
+            TFVARS_FILE="envs/stage.tfvars"
+          elif [ -f "envs/staging.tfvars" ]; then
+            TFVARS_FILE="envs/staging.tfvars"
+            echo "⚠️ Using legacy staging.tfvars (consider renaming to stage.tfvars)"
+          else
+            echo "❌ No stage/staging tfvars file found"
+            exit 1
+          fi
+
+          echo "Using: $TFVARS_FILE"
+
+          # Check for placeholder patterns
+          if grep -qE "(TODO-SET-|CHANGE-ME|PLACEHOLDER|your-project)" "$TFVARS_FILE"; then
+            echo ""
+            echo "❌ Stage tfvars contains placeholder values:"
+            echo "---"
+            grep -n -E "(TODO-SET-|CHANGE-ME|PLACEHOLDER|your-project)" "$TFVARS_FILE" || true
+            echo "---"
+            echo ""
+            echo "Replace these with real values before running terraform plan."
+            echo "See: 000-docs/188-RB-OPER-agent-engine-promotion-playbook.md"
+            exit 1
+          fi
+
+          echo "✅ No TODO placeholders found in $TFVARS_FILE"
+
+      - name: Authenticate to Google Cloud (Workload Identity Federation)
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: ${{ secrets.GCP_SERVICE_ACCOUNT }}
+        continue-on-error: true
+
+      - name: Check Auth Status
+        id: auth_check
+        run: |
+          if [ -n "$GOOGLE_APPLICATION_CREDENTIALS" ] || [ -n "$CLOUDSDK_AUTH_CREDENTIAL_FILE_OVERRIDE" ]; then
+            echo "auth_available=true" >> $GITHUB_OUTPUT
+            echo "✅ GCP authentication available"
+          else
+            echo "auth_available=false" >> $GITHUB_OUTPUT
+            echo "⚠️ GCP authentication not available - running validation only"
+          fi
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: ${{ env.TF_VERSION }}
+
+      - name: Terraform Format Check
+        id: fmt
+        run: terraform fmt -check -recursive
+        continue-on-error: true
+
+      - name: Terraform Init (Validation Mode)
+        id: init
+        run: |
+          if [ "${{ steps.auth_check.outputs.auth_available }}" == "true" ]; then
+            terraform init -backend-config="bucket=bobs-brain-terraform-state"
+          else
+            # Local state for validation only (no backend)
+            terraform init -backend=false
+          fi
+        continue-on-error: true
+
+      - name: Terraform Validate
+        id: validate
+        run: terraform validate -no-color
+        continue-on-error: true
+
+      - name: Terraform Plan (Stage)
+        id: plan
+        if: steps.auth_check.outputs.auth_available == 'true'
+        run: |
+          # Use stage.tfvars if exists, otherwise staging.tfvars
+          TFVARS_FILE="envs/staging.tfvars"
+          if [ -f "envs/stage.tfvars" ]; then
+            TFVARS_FILE="envs/stage.tfvars"
+          fi
+
+          echo "Using: $TFVARS_FILE"
+
+          terraform plan \
+            -var-file="$TFVARS_FILE" \
+            -out=tfplan-stage \
+            -no-color
+        continue-on-error: true
+
+      - name: Plan Summary
+        run: |
+          echo "## Terraform Stage Plan Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Step | Status |" >> $GITHUB_STEP_SUMMARY
+          echo "|------|--------|" >> $GITHUB_STEP_SUMMARY
+          echo "| Format Check | ${{ steps.fmt.outcome }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Initialization | ${{ steps.init.outcome }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Validation | ${{ steps.validate.outcome }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Plan | ${{ steps.plan.outcome || 'skipped (no auth)' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Notes" >> $GITHUB_STEP_SUMMARY
+          echo "- This workflow **never applies** to stage" >> $GITHUB_STEP_SUMMARY
+          echo "- Stage deployment is manual (see promotion playbook)" >> $GITHUB_STEP_SUMMARY
+          if [ "${{ steps.auth_check.outputs.auth_available }}" != "true" ]; then
+            echo "- ⚠️ GCP auth not available - plan step was skipped" >> $GITHUB_STEP_SUMMARY
+          fi
+
+      - name: Final Status
+        run: |
+          echo "🏁 Stage Terraform Plan Complete"
+          echo ""
+          echo "Results:"
+          echo "  Format: ${{ steps.fmt.outcome }}"
+          echo "  Init:   ${{ steps.init.outcome }}"
+          echo "  Validate: ${{ steps.validate.outcome }}"
+          echo "  Plan:   ${{ steps.plan.outcome || 'skipped' }}"
+          echo ""
+          echo "⚠️ REMINDER: This workflow does NOT apply changes."
+          echo "   Stage deployment requires manual approval and execution."
