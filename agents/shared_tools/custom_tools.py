@@ -416,6 +416,58 @@ def get_workflow_tools() -> List[Any]:
     except ImportError as e:
         logger.warning(f"Could not import fix loop tools: {e}")
 
+    # Phase P4: Approval workflow (Human-in-the-Loop)
+    try:
+        from agents.workflows.approval_workflow import create_approval_workflow
+
+        def run_approval_workflow(
+            fix_plan: dict,
+            max_iterations: int = 3,
+        ) -> dict:
+            """
+            Run fix workflow with human-in-the-loop approval gates.
+
+            This workflow adds approval gates for high-risk changes:
+            1. Risk assessment: Classifies fix plan by risk level
+            2. Approval gate: HIGH/CRITICAL triggers human approval
+            3. Fix loop: Runs fix implementation with QA gates
+
+            Args:
+                fix_plan: The FixPlan specification from iam-fix-plan
+                max_iterations: Maximum retry attempts for fix loop (default: 3)
+
+            Returns:
+                dict: Workflow result with risk_assessment, approval_result,
+                      fix_output, and qa_result
+            """
+            return {
+                "status": "workflow_available",
+                "workflow": "approval_workflow",
+                "pattern": "human_in_the_loop",
+                "pipeline": ["risk_assessor", "approval_gate", "fix_loop"],
+                "state_keys": [
+                    "risk_assessment",
+                    "approval_result",
+                    "fix_output",
+                    "qa_result",
+                ],
+                "risk_levels": {
+                    "LOW": "Auto-approved, proceeds immediately",
+                    "MEDIUM": "Auto-approved with logging",
+                    "HIGH": "Requires human approval",
+                    "CRITICAL": "Requires human approval + escalation",
+                },
+                "message": "Use Runner to execute this approval workflow",
+                "input": {
+                    "fix_plan": fix_plan,
+                    "max_iterations": max_iterations,
+                },
+            }
+
+        tools.append(run_approval_workflow)
+    except ImportError as e:
+        logger.warning(f"Could not import approval workflow tools: {e}")
+
     return tools
 
 
