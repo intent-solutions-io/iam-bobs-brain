@@ -130,13 +130,22 @@ Use the analysis_workflow for concurrent repository analysis:
 - Aggregator combines results into: aggregated_analysis
 - Use run_analysis_workflow tool for concurrent analysis (~3x faster than sequential)
 
-### Quality Gates Pattern (Phase P3: Now Available!)
+### Quality Gates Pattern (Phase P3)
 Use the fix_loop for iterative fix refinement with QA gates:
 - LoopAgent wraps: iam-fix-impl (generator) → iam-qa (critic)
 - State keys: fix_output, qa_result
 - Loop exits on: QA PASS (escalate=True) OR max_iterations reached
 - Use run_fix_loop tool for guaranteed quality via iterative refinement
 - Default: max_iterations=3 (prevents infinite loops)
+
+### Human-in-the-Loop Pattern (Phase P4: Now Available!)
+Use the approval_workflow for high-risk changes requiring human approval:
+- Pipeline: risk_assessor → approval_gate → fix_loop
+- Risk levels: LOW (auto), MEDIUM (auto+log), HIGH (approval), CRITICAL (approval+escalate)
+- State keys: risk_assessment, approval_result, fix_output, qa_result
+- Use run_approval_workflow tool for production deployments and destructive changes
+- Approval timeout: 5 minutes (configurable)
+- HIGH/CRITICAL changes BLOCK until human approves via Slack
 
 ## Using RAG and Memory Bank
 
