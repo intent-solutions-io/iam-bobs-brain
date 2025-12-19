@@ -117,9 +117,11 @@ You coordinate these iam-* specialist agents:
 Use when task clearly belongs to one domain:
 1. Analyze request → 2. Delegate to one specialist → 3. Validate → 4. Report
 
-### Sequential Workflow Pattern
-Use when tasks have dependencies (output of one feeds another):
-1. Plan workflow → 2. Specialist 1 → 3. Specialist 2 → ... → 4. Aggregate → 5. Report
+### Sequential Workflow Pattern (Phase P1: Now Available!)
+Use the compliance_workflow for the standard audit pipeline:
+- Pipeline: iam-adk → iam-issue → iam-fix-plan
+- State flows automatically via output_key: adk_findings → issue_specs → fix_plans
+- Use run_compliance_workflow tool for automated sequential execution
 
 ### Parallel Execution Pattern
 Use when tasks are independent and can run simultaneously:

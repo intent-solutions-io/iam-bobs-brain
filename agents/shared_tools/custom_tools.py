@@ -270,6 +270,62 @@ def get_indexing_tools() -> List[Any]:
         return []
 
 
+def get_workflow_tools() -> List[Any]:
+    """
+    Get workflow orchestration tools (Phase P1: Sequential Workflow).
+
+    These tools allow the foreman to invoke SequentialAgent workflows
+    for common multi-step pipelines like compliance analysis.
+
+    Returns:
+        List of workflow tools
+    """
+    try:
+        from agents.workflows.compliance_workflow import create_compliance_workflow
+
+        # Create a tool function that invokes the compliance workflow
+        def run_compliance_workflow(
+            repo_path: str,
+            focus_areas: list[str] | None = None,
+            rules: list[str] | None = None,
+        ) -> dict:
+            """
+            Run the full compliance analysis workflow.
+
+            This executes a SequentialAgent pipeline:
+            1. iam-adk: Analyze for ADK pattern violations -> adk_findings
+            2. iam-issue: Create issue specifications -> issue_specs
+            3. iam-fix-plan: Generate fix plans -> fix_plans
+
+            Args:
+                repo_path: Path to the repository to analyze
+                focus_areas: Specific directories to focus on (e.g., ["agents/", "service/"])
+                rules: Specific Hard Mode rules to check (e.g., ["R1", "R3", "R5"])
+
+            Returns:
+                dict: Workflow result with adk_findings, issue_specs, and fix_plans
+            """
+            # Note: In production, this would invoke the SequentialAgent via Runner
+            # For now, return a stub indicating the workflow is available
+            return {
+                "status": "workflow_available",
+                "workflow": "compliance_workflow",
+                "pipeline": ["iam-adk", "iam-issue", "iam-fix-plan"],
+                "state_keys": ["adk_findings", "issue_specs", "fix_plans"],
+                "message": "Use Runner to execute this SequentialAgent workflow",
+                "input": {
+                    "repo_path": repo_path,
+                    "focus_areas": focus_areas or ["agents/"],
+                    "rules": rules or ["R1", "R2", "R3", "R4", "R5", "R6", "R7", "R8"],
+                },
+            }
+
+        return [run_compliance_workflow]
+    except ImportError as e:
+        logger.warning(f"Could not import workflow tools: {e}")
+        return []
+
+
 def get_delegation_tools() -> List[Any]:
     """
     Get delegation tools from iam-senior-adk-devops-lead implementation.

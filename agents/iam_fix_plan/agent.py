@@ -242,6 +242,7 @@ When planning fixes, be thorough and realistic. A good fix plan:
         name="iam_fix_plan",  # Required: Valid Python identifier (no hyphens)
         tools=IAM_FIX_PLAN_TOOLS,  # Use shared tool profile
         instruction=instruction,
+        output_key="fix_plans",  # State key for SequentialAgent (Phase P1)
         after_agent_callback=auto_save_session_to_memory,  # R5: Save to Memory Bank
     )
 
