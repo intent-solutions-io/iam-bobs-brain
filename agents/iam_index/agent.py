@@ -191,6 +191,7 @@ Remember: You are the **knowledge nexus** - all agents rely on you for accurate,
         name="iam_index",  # Python identifier (no hyphens)
         tools=IAM_INDEX_TOOLS,  # Use shared tools profile
         instruction=instruction,
+        output_key="index_status",  # Phase P2: State key for parallel workflows
         after_agent_callback=auto_save_session_to_memory
     )
 
@@ -251,6 +252,9 @@ def create_runner() -> Runner:
     )
 
     return runner
+
+# Phase P2: Alias for standard pattern
+create_agent = get_agent
 
 # Module-level agent for ADK CLI deployment
 root_agent = get_agent()

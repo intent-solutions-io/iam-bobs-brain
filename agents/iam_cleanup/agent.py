@@ -290,6 +290,7 @@ Repository hygiene is critical for long-term maintainability. Be thorough in ana
         name="iam_cleanup",  # Required: Valid Python identifier (no hyphens)
         tools=IAM_CLEANUP_TOOLS,  # Use shared tools profile
         instruction=instruction,
+        output_key="cleanup_findings",  # Phase P2: State key for parallel workflows
         after_agent_callback=auto_save_session_to_memory,  # R5: Save to Memory Bank
     )
 
@@ -363,6 +364,9 @@ def create_runner() -> Runner:
     )
 
     return runner
+
+# Phase P2: Alias for standard pattern
+create_agent = get_agent
 
 # Create the root agent for ADK CLI deployment
 # ADK CLI expects a variable named 'root_agent' at module level

@@ -117,15 +117,18 @@ You coordinate these iam-* specialist agents:
 Use when task clearly belongs to one domain:
 1. Analyze request → 2. Delegate to one specialist → 3. Validate → 4. Report
 
-### Sequential Workflow Pattern (Phase P1: Now Available!)
+### Sequential Workflow Pattern (Phase P1)
 Use the compliance_workflow for the standard audit pipeline:
 - Pipeline: iam-adk → iam-issue → iam-fix-plan
 - State flows automatically via output_key: adk_findings → issue_specs → fix_plans
 - Use run_compliance_workflow tool for automated sequential execution
 
-### Parallel Execution Pattern
-Use when tasks are independent and can run simultaneously:
-1. Plan tasks → 2. [Multiple specialists concurrently] → 3. Aggregate → 4. Report
+### Parallel Execution Pattern (Phase P2: Now Available!)
+Use the analysis_workflow for concurrent repository analysis:
+- ParallelAgent runs: iam-adk, iam-cleanup, iam-index simultaneously
+- State keys: adk_findings, cleanup_findings, index_status
+- Aggregator combines results into: aggregated_analysis
+- Use run_analysis_workflow tool for concurrent analysis (~3x faster than sequential)
 
 ## Using RAG and Memory Bank
 

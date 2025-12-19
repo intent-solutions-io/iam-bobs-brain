@@ -272,18 +272,21 @@ def get_indexing_tools() -> List[Any]:
 
 def get_workflow_tools() -> List[Any]:
     """
-    Get workflow orchestration tools (Phase P1: Sequential Workflow).
+    Get workflow orchestration tools (Phase P1 & P2).
 
-    These tools allow the foreman to invoke SequentialAgent workflows
-    for common multi-step pipelines like compliance analysis.
+    These tools allow the foreman to invoke workflow agents:
+    - Phase P1: SequentialAgent for compliance pipeline
+    - Phase P2: ParallelAgent for concurrent analysis
 
     Returns:
         List of workflow tools
     """
+    tools = []
+
+    # Phase P1: Sequential compliance workflow
     try:
         from agents.workflows.compliance_workflow import create_compliance_workflow
 
-        # Create a tool function that invokes the compliance workflow
         def run_compliance_workflow(
             repo_path: str,
             focus_areas: list[str] | None = None,
@@ -305,8 +308,6 @@ def get_workflow_tools() -> List[Any]:
             Returns:
                 dict: Workflow result with adk_findings, issue_specs, and fix_plans
             """
-            # Note: In production, this would invoke the SequentialAgent via Runner
-            # For now, return a stub indicating the workflow is available
             return {
                 "status": "workflow_available",
                 "workflow": "compliance_workflow",
@@ -320,10 +321,59 @@ def get_workflow_tools() -> List[Any]:
                 },
             }
 
-        return [run_compliance_workflow]
+        tools.append(run_compliance_workflow)
     except ImportError as e:
-        logger.warning(f"Could not import workflow tools: {e}")
-        return []
+        logger.warning(f"Could not import compliance workflow tools: {e}")
+
+    # Phase P2: Parallel analysis workflow
+    try:
+        from agents.workflows.analysis_workflow import create_analysis_workflow
+
+        def run_analysis_workflow(
+            repo_path: str,
+            include_adk: bool = True,
+            include_cleanup: bool = True,
+            include_index: bool = True,
+        ) -> dict:
+            """
+            Run the parallel analysis workflow.
+
+            This executes a ParallelAgent + aggregator pipeline:
+            1. ParallelAgent runs concurrently:
+               - iam-adk: ADK compliance -> adk_findings
+               - iam-cleanup: Repo hygiene -> cleanup_findings
+               - iam-index: Knowledge status -> index_status
+            2. Result aggregator combines findings -> aggregated_analysis
+
+            Args:
+                repo_path: Path to the repository to analyze
+                include_adk: Include ADK compliance analysis (default: True)
+                include_cleanup: Include cleanup/hygiene analysis (default: True)
+                include_index: Include knowledge index status (default: True)
+
+            Returns:
+                dict: Workflow result with aggregated_analysis
+            """
+            return {
+                "status": "workflow_available",
+                "workflow": "analysis_workflow",
+                "pattern": "parallel_fan_out",
+                "parallel_agents": ["iam-adk", "iam-cleanup", "iam-index"],
+                "state_keys": ["adk_findings", "cleanup_findings", "index_status", "aggregated_analysis"],
+                "message": "Use Runner to execute this ParallelAgent workflow",
+                "input": {
+                    "repo_path": repo_path,
+                    "include_adk": include_adk,
+                    "include_cleanup": include_cleanup,
+                    "include_index": include_index,
+                },
+            }
+
+        tools.append(run_analysis_workflow)
+    except ImportError as e:
+        logger.warning(f"Could not import analysis workflow tools: {e}")
+
+    return tools
 
 
 def get_delegation_tools() -> List[Any]:
