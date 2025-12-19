@@ -5,6 +5,7 @@ This module implements Google's recommended multi-agent patterns using ADK primi
 - SequentialAgent for pipeline workflows
 - ParallelAgent for concurrent execution (Phase 2)
 - LoopAgent for iterative refinement (Phase 3)
+- Human-in-the-Loop approval gates (Phase 4)
 
 Reference: https://developers.googleblog.com/en/developers-guide-to-multi-agent-patterns-in-adk/
 
@@ -16,6 +17,9 @@ Phase 2: Parallel Execution
 
 Phase 3: Quality Gates (Generator-Critic + LoopAgent)
 - fix_loop.py: LoopAgent(iam-fix-impl -> iam-qa) with max_iterations=3
+
+Phase 4: Human-in-the-Loop Approval
+- approval_workflow.py: Risk assessment -> Approval gate -> Fix loop
 """
 
 from agents.workflows.compliance_workflow import (
@@ -37,6 +41,13 @@ from agents.workflows.fix_loop import (
     create_qa_escalation_callback,
 )
 
+from agents.workflows.approval_workflow import (
+    create_risk_assessor,
+    create_approval_gate_callback,
+    create_approval_workflow,
+    create_deployment_gate,
+)
+
 __all__ = [
     # Phase 1: Sequential Workflow
     "create_compliance_workflow",
@@ -51,4 +62,9 @@ __all__ = [
     "create_fix_review",
     "create_fix_loop",
     "create_qa_escalation_callback",
+    # Phase 4: Human-in-the-Loop Approval
+    "create_risk_assessor",
+    "create_approval_gate_callback",
+    "create_approval_workflow",
+    "create_deployment_gate",
 ]
