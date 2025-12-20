@@ -1,10 +1,17 @@
-"""Unit tests for API Registry client."""
+"""Unit tests for API Registry client.
+
+Note: These tests require google-cloud-apihub package and are skipped
+in CI environments where the package is not installed.
+"""
 
 import pytest
 from unittest.mock import patch, MagicMock
 import os
 
+from tests.unit.conftest import requires_apihub
 
+
+@requires_apihub
 class TestGetApiRegistry:
     """Tests for get_api_registry function."""
 
@@ -47,6 +54,7 @@ class TestGetApiRegistry:
                 assert result1 is result2
 
 
+@requires_apihub
 class TestGetToolsForAgent:
     """Tests for get_tools_for_agent function."""
 
@@ -81,6 +89,7 @@ class TestGetToolsForAgent:
         module._registry_instance = None
 
 
+@requires_apihub
 class TestGetMcpToolset:
     """Tests for get_mcp_toolset function."""
 
@@ -135,6 +144,7 @@ class TestGetMcpToolset:
         module._registry_instance = None
 
 
+@requires_apihub
 class TestIsRegistryAvailable:
     """Tests for is_registry_available function."""
 

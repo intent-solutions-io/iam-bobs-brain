@@ -15,7 +15,7 @@ from agents.notifications.slack_sender import (
     send_portfolio_notification,
     _send_via_webhook,
     _send_via_api,
-    test_slack_connection
+    test_slack_connection as check_slack_connection,  # Renamed to avoid pytest collection
 )
 
 
@@ -260,12 +260,12 @@ class TestSendViaApi:
 
 
 class TestSlackConnection:
-    """Tests for test_slack_connection()."""
+    """Tests for check_slack_connection() (aliased from test_slack_connection)."""
 
     def test_returns_false_when_no_destination(self):
         """Test returns False when no destination configured."""
         with patch.dict(os.environ, {}, clear=True):
-            result = test_slack_connection()
+            result = check_slack_connection()
             assert result is False
 
     @patch("agents.notifications.slack_sender._send_via_webhook")
@@ -274,7 +274,7 @@ class TestSlackConnection:
         mock_webhook.return_value = True
 
         dest = SlackDestination(webhook_url="https://hooks.slack.com/services/TEST")
-        result = test_slack_connection(destination=dest)
+        result = check_slack_connection(destination=dest)
         assert result is True
         mock_webhook.assert_called_once()
 
@@ -285,7 +285,7 @@ class TestSlackConnection:
 
         with patch.dict(os.environ, {"SLACK_BOT_TOKEN": "xoxb-test-token"}):
             dest = SlackDestination(channel_id="C12345678")
-            result = test_slack_connection(destination=dest)
+            result = check_slack_connection(destination=dest)
             assert result is True
             mock_api.assert_called_once()
 
@@ -295,5 +295,5 @@ class TestSlackConnection:
         mock_webhook.return_value = False
 
         dest = SlackDestination(webhook_url="https://hooks.slack.com/services/TEST")
-        result = test_slack_connection(destination=dest)
+        result = check_slack_connection(destination=dest)
         assert result is False
