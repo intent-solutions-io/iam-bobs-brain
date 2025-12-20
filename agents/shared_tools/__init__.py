@@ -36,7 +36,6 @@ from .custom_tools import (
     get_cleanup_tools,
     get_indexing_tools,
     get_delegation_tools,
-    get_workflow_tools,  # Phase P1: Sequential workflow tools
 )
 
 # Import org knowledge hub Vertex Search tools
@@ -89,7 +88,6 @@ def get_foreman_tools() -> List[Any]:
 
     Foreman needs:
     - Delegation to specialists
-    - Workflow orchestration (Phase P1: SequentialAgent)
     - Repository analysis
     - Compliance checking
     - RAG access to org knowledge hub
@@ -98,9 +96,6 @@ def get_foreman_tools() -> List[Any]:
 
     # Delegation and management
     tools.extend(get_delegation_tools())
-
-    # Phase P1: Workflow orchestration tools (SequentialAgent)
-    tools.extend(get_workflow_tools())
 
     # Analysis capabilities
     tools.append(get_google_search_tool())
@@ -114,7 +109,7 @@ def get_foreman_tools() -> List[Any]:
     # Future: repo tools when ready
     # tools.append(get_repo_search_tool_stub())
 
-    logger.info(f"Loaded {len(tools)} tools for Foreman (includes workflow tools)")
+    logger.info(f"Loaded {len(tools)} tools for Foreman")
     return tools
 
 

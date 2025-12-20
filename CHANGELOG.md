@@ -7,67 +7,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [1.1.0] - 2025-12-19
-
-### Google Multi-Agent Patterns Rollout
-
-Implements all 8 Google Multi-Agent Patterns from the [Developer's Guide to Multi-Agent Patterns in ADK](https://developers.googleblog.com/en/developers-guide-to-multi-agent-patterns-in-adk/) using native ADK primitives.
-
-### Added - Phase P1-P5: Multi-Agent Workflow Patterns
-
-- **Phase P1: Sequential Workflow Foundation**
-  - Added `SequentialAgent` wrapper for compliance pipeline
-  - Added `output_key` to iam-adk, iam-issue, iam-fix-plan specialists
-  - State flows automatically: `adk_findings` → `issue_specs` → `fix_plans`
-  - Created `run_compliance_workflow` tool for foreman
-
-- **Phase P2: Parallel Execution**
-  - Added `ParallelAgent` for concurrent repository analysis
-  - Added `output_key` to iam-cleanup, iam-index specialists
-  - Created result aggregator for combining parallel outputs
-  - Created `run_analysis_workflow` tool (~3x faster than sequential)
-
-- **Phase P3: Quality Gates (Generator-Critic + LoopAgent)**
-  - Added `LoopAgent` for iterative fix refinement
-  - Added generator-critic pattern: iam-fix-impl (generator) → iam-qa (critic)
-  - Added escalation callback for early exit on QA PASS
-  - Created `run_fix_loop` tool with `max_iterations=3` default
-
-- **Phase P4: Human-in-the-Loop Approval**
-  - Added risk level classification: LOW, MEDIUM, HIGH, CRITICAL
-  - Added approval contracts: `ApprovalRequest`, `ApprovalResponse`
-  - Created approval workflow with risk-gated execution
-  - HIGH/CRITICAL actions block until human approves via Slack
-  - Created `run_approval_workflow` tool with 5-minute timeout
-
-- **Phase P5: Agent Starter Pack Contribution**
-  - Extracted 5 reusable pattern templates in `templates/`
-  - `sequential_workflow/` - SequentialAgent pipeline pattern
-  - `parallel_workflow/` - ParallelAgent fan-out/gather pattern
-  - `quality_gates/` - LoopAgent generator-critic pattern
-  - `foreman_worker/` - Hierarchical delegation pattern
-  - `human_approval/` - Human-in-the-loop approval pattern
-  - Added `PATTERNS.md` decision tree and comparison guide
-  - Added `CONTRIBUTING.md` template standards
-
-### Changed
-
-- **License**: Changed from MIT to Elastic License 2.0 (ELv2)
-
-### Documentation
-
-- Added `6767-DR-STND-sequential-workflow-pattern.md`
-- Added `6767-DR-STND-parallel-execution-pattern.md`
-- Added `6767-DR-STND-quality-gates-pattern.md`
-- Added `6767-DR-STND-human-approval-pattern.md`
-- Updated foreman instruction with all 4 workflow patterns
-
-### Architecture Improvements
-
-- **7/8 Google Patterns Implemented** (was 3/8)
-- **Native ADK Workflows**: 80% of orchestration now uses native ADK primitives
-- **Reusable Templates**: Ready for Agent Starter Pack contribution
-
 ## [1.0.0] - 2025-12-12
 
 ### 🎉 First Production Release
