@@ -11,6 +11,10 @@
 
 # CLAUDE.md – How to Work With Claude in bobs-brain
 
+
+### Beads upgrades
+- After upgrading `bd`, run: `bd info --whats-new`
+- If `bd info` warns about hooks, run: `bd hooks install`
 ## 1. Purpose of This File
 
 This is the **live** guide for Claude Code when working in the `bobs-brain` repository. It provides essential context, patterns, and house rules to help AI assistants work effectively with this ADK-based agent department.
