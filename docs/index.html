@@ -3,11 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Bob's Brain - Production-ready AI assistant built on Vertex AI Agent Engine">
+    <meta name="description" content="Bob's Brain - Open source multi-agent system built on Google ADK and Vertex AI Agent Engine">
     <meta name="author" content="Intent Solutions">
-    <title>Bob's Brain | Vertex AI Agent System</title>
+    <title>Bob's Brain | Multi-Agent ADK Reference</title>
     <link rel="stylesheet" href="style.css">
-    <!-- Mermaid.js for diagrams -->
     <script type="module">
         import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
         mermaid.initialize({
@@ -22,427 +21,230 @@
                 tertiaryColor: '#f7f7f7',
                 background: '#ffffff',
                 mainBkg: '#e8e8e8',
-                secondBkg: '#f7f7f7',
-                border1: '#4d4d4d',
-                border2: '#808080',
-                note: '#f7f7f7',
-                noteBorder: '#808080',
-                noteBkg: '#e8e8e8',
-                noteTextColor: '#1a1a1a',
-                labelBackground: '#e8e8e8',
-                labelBorder: '#808080',
-                labelColor: '#1a1a1a'
+                secondBkg: '#f7f7f7'
             }
         });
     </script>
 </head>
 <body>
-    <!-- Hero Section -->
     <header class="hero">
         <div class="container">
             <div class="hero-content">
-                <div class="hero-icon">🧠</div>
                 <h1>Bob's Brain</h1>
-                <p class="hero-subtitle">Production-ready AI assistant on Vertex AI Agent Engine</p>
-                <p class="hero-description">
-                    Bob started as a personal VA to automate boring, click-heavy workflows.
-                    He's now a full orchestrator on Google Cloud: a Slack-connected assistant
-                    with a dedicated ADK/Vertex engineering department behind him.
-                </p>
+                <p class="hero-subtitle">Open source multi-agent system on Google ADK + Vertex AI Agent Engine</p>
 
-                <!-- Version & Badges -->
                 <div class="badges">
                     <span class="badge badge-version">v1.1.0</span>
-                    <span class="badge">Vertex AI Agent Engine</span>
-                    <span class="badge">Google Cloud</span>
+                    <span class="badge">Google ADK</span>
+                    <span class="badge">Agent Engine</span>
                     <span class="badge">Python 3.12+</span>
-                    <span class="badge">ELv2 License</span>
+                    <span class="badge">ELv2</span>
                 </div>
 
-                <!-- Primary Actions -->
                 <div class="hero-actions">
                     <a href="https://github.com/intent-solutions-io/bobs-brain" class="btn btn-primary" target="_blank" rel="noopener">
-                        View Source on GitHub
+                        GitHub Repository
                     </a>
-                    <a href="https://github.com/intent-solutions-io/bobs-brain/tree/main/000-docs" class="btn btn-secondary" target="_blank" rel="noopener">
-                        Browse Documentation
+                    <a href="https://github.com/intent-solutions-io/bobs-brain/tree/main/templates" class="btn btn-secondary" target="_blank" rel="noopener">
+                        Pattern Templates
                     </a>
                 </div>
             </div>
         </div>
     </header>
 
-    <!-- Main Content -->
     <main class="main-content">
         <div class="container">
 
-            <!-- Section 1: What Bob Is -->
+            <!-- What It Is -->
             <section class="content-section">
-                <h2>What Bob Is</h2>
+                <h2>What This Is</h2>
                 <div class="section-content">
                     <p>
-                        <strong>Bob</strong> is a Slack-first assistant backed by Vertex AI Agent Engine.
-                        He orchestrates a team of specialist agents (the <strong>iam-* department</strong>)
-                        that handle ADK/Vertex-specific work:
+                        A working multi-agent system that audits codebases for ADK/Vertex AI pattern compliance.
+                        Connects to Slack, runs on Vertex AI Agent Engine, uses the A2A protocol for agent coordination.
                     </p>
-                    <ul class="feature-list">
-                        <li>🔍 <strong>iam-adk</strong> - ADK pattern analysis and compliance</li>
-                        <li>🚨 <strong>iam-issue</strong> - GitHub issue creation from findings</li>
-                        <li>🛠️ <strong>iam-fix-plan</strong> - Fix planning and strategy</li>
-                        <li>⚙️ <strong>iam-fix-impl</strong> - Fix implementation</li>
-                        <li>✅ <strong>iam-qa</strong> - Quality assurance validation</li>
-                        <li>📝 <strong>iam-doc</strong> - Documentation generation</li>
-                        <li>🧹 <strong>iam-cleanup</strong> - Code cleanup and optimization</li>
-                        <li>📚 <strong>iam-index</strong> - Knowledge indexing and RAG</li>
+
+                    <h3>Architecture</h3>
+                    <ul class="spec-list">
+                        <li><strong>Bob</strong> - Slack-connected orchestrator agent</li>
+                        <li><strong>iam-senior-adk-devops-lead</strong> - Foreman that coordinates specialist work</li>
+                        <li><strong>8 specialist agents</strong> - iam-adk, iam-issue, iam-fix-plan, iam-fix-impl, iam-qa, iam-doc, iam-cleanup, iam-index</li>
                     </ul>
-                    <p class="highlight-box">
-                        <strong>Designed as a reusable pattern:</strong> The architecture, documentation,
-                        and CI/CD pipeline are built to be copied into other organizations and repositories.
-                    </p>
-                </div>
-            </section>
 
-            <!-- Section 2: How Bob Works -->
-            <section class="content-section">
-                <h2>How Bob Works</h2>
-                <div class="section-content">
-                    <div class="architecture-flow">
-                        <div class="flow-item">
-                            <div class="flow-icon">💬</div>
-                            <div class="flow-text">
-                                <strong>Slack</strong>
-                                <span>User sends command</span>
-                            </div>
-                        </div>
-                        <div class="flow-arrow">→</div>
-                        <div class="flow-item">
-                            <div class="flow-icon">🌐</div>
-                            <div class="flow-text">
-                                <strong>Cloud Run Gateway</strong>
-                                <span>REST proxy</span>
-                            </div>
-                        </div>
-                        <div class="flow-arrow">→</div>
-                        <div class="flow-item">
-                            <div class="flow-icon">🤖</div>
-                            <div class="flow-text">
-                                <strong>Vertex AI Agent Engine</strong>
-                                <span>Bob orchestrator</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <h3>Agent Coordination</h3>
-                    <ul class="feature-list">
-                        <li>Bob delegates complex tasks to <strong>iam-senior-adk-devops-lead</strong> (foreman agent)</li>
-                        <li>Foreman coordinates 8 specialist agents for end-to-end workflows</li>
-                        <li>Dual memory model: Vertex AI Session Service + Memory Bank (ready when enabled)</li>
-                        <li>ARV (Agent Readiness Verification) gates ensure quality and safety</li>
-                        <li>Portfolio-wide audits across multiple repositories</li>
+                    <h3>What It Does</h3>
+                    <ul class="spec-list">
+                        <li>Scans repositories for ADK pattern violations</li>
+                        <li>Detects drift from Vertex AI recommended architecture</li>
+                        <li>Constructs fix plans and generates PRs</li>
+                        <li>Validates memory wiring, gateway separation, import patterns</li>
                     </ul>
                 </div>
             </section>
 
-            <!-- Google Multi-Agent Patterns Section -->
-            <section class="content-section highlight-section">
-                <h2>Google Multi-Agent Patterns (v1.1.0)</h2>
+            <!-- Hard Mode Rules -->
+            <section class="content-section">
+                <h2>Hard Mode Rules (R1-R8)</h2>
+                <div class="section-content">
+                    <p>CI-enforced architectural constraints. These run on every push and block violations.</p>
+
+                    <table class="rules-table">
+                        <thead>
+                            <tr><th>Rule</th><th>What It Enforces</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>R1</td><td>ADK-only. No LangChain, CrewAI, or custom frameworks in agent code.</td></tr>
+                            <tr><td>R2</td><td>Vertex AI Agent Engine runtime. No self-hosted runners.</td></tr>
+                            <tr><td>R3</td><td>Gateway separation. Cloud Run proxies only, no Runner in service/.</td></tr>
+                            <tr><td>R4</td><td>CI-only deployments. GitHub Actions with WIF, no manual gcloud.</td></tr>
+                            <tr><td>R5</td><td>Dual memory wiring. VertexAiSessionService + VertexAiMemoryBankService.</td></tr>
+                            <tr><td>R6</td><td>Single docs folder. All documentation in 000-docs/ with NNN-CC-ABCD naming.</td></tr>
+                            <tr><td>R7</td><td>SPIFFE ID propagation. In AgentCard, logs, and headers.</td></tr>
+                            <tr><td>R8</td><td>Drift detection. Runs first in CI, blocks forbidden imports.</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Multi-Agent Patterns -->
+            <section class="content-section">
+                <h2>Implemented Patterns</h2>
                 <div class="section-content">
                     <p>
-                        Bob's Brain implements <strong>7 of 8 patterns</strong> from
-                        <a href="https://developers.googleblog.com/en/developers-guide-to-multi-agent-patterns-in-adk/" target="_blank" rel="noopener">Google's Developer Blog guide</a>:
+                        7 of 8 patterns from
+                        <a href="https://developers.googleblog.com/en/developers-guide-to-multi-agent-patterns-in-adk/" target="_blank" rel="noopener">Google's multi-agent patterns guide</a>.
+                        Reusable templates in <code>templates/</code>.
                     </p>
-                    <ul class="feature-list">
-                        <li>✅ <strong>Sequential Pipeline</strong> - SequentialAgent with state passing via output_key</li>
-                        <li>✅ <strong>Parallel Fan-Out</strong> - ParallelAgent with unique output_keys per agent</li>
-                        <li>✅ <strong>Quality Gates</strong> - LoopAgent with Generator-Critic iteration</li>
-                        <li>✅ <strong>Human-in-the-Loop</strong> - Callbacks with RiskLevel classification</li>
-                        <li>✅ <strong>Agent-to-Agent (A2A)</strong> - AgentCards and A2A protocol</li>
-                        <li>✅ <strong>Foreman-Worker</strong> - Hierarchical delegation pattern</li>
-                        <li>✅ <strong>Iterative Refinement</strong> - via LoopAgent with escalation</li>
-                        <li>🔜 <strong>Routing/Delegation</strong> - Coming in v1.2.0</li>
-                    </ul>
+
+                    <table class="patterns-table">
+                        <thead>
+                            <tr><th>Pattern</th><th>ADK Primitive</th><th>Status</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>Sequential Pipeline</td><td>SequentialAgent</td><td>Implemented</td></tr>
+                            <tr><td>Parallel Fan-Out</td><td>ParallelAgent</td><td>Implemented</td></tr>
+                            <tr><td>Quality Gates</td><td>LoopAgent</td><td>Implemented</td></tr>
+                            <tr><td>Human-in-the-Loop</td><td>Callbacks</td><td>Implemented</td></tr>
+                            <tr><td>Agent-to-Agent</td><td>A2A Protocol</td><td>Implemented</td></tr>
+                            <tr><td>Foreman-Worker</td><td>LlmAgent + delegation</td><td>Implemented</td></tr>
+                            <tr><td>Iterative Refinement</td><td>LoopAgent + escalate</td><td>Implemented</td></tr>
+                            <tr><td>Routing/Delegation</td><td>-</td><td>Planned</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Community -->
+            <section class="content-section">
+                <h2>Open Source</h2>
+                <div class="section-content">
                     <p>
-                        <strong>Reusable templates available in <code>templates/</code> directory!</strong>
+                        Featured in Google's
+                        <a href="https://github.com/GoogleCloudPlatform/agent-starter-pack/pull/580" target="_blank" rel="noopener">Agent Starter Pack community showcase (PR #580)</a>
+                        as a production ADK reference implementation.
+                    </p>
+
+                    <h3>Repository Stats</h3>
+                    <ul class="spec-list">
+                        <li>169 documentation files in 000-docs/</li>
+                        <li>9 agent implementations</li>
+                        <li>8 reusable pattern templates</li>
+                        <li>Terraform modules for Agent Engine deployment</li>
+                        <li>GitHub Actions CI/CD with ARV gates</li>
+                    </ul>
+
+                    <h3>License</h3>
+                    <p>
+                        <a href="https://github.com/intent-solutions-io/bobs-brain/blob/main/LICENSE" target="_blank" rel="noopener">Elastic License 2.0 (ELv2)</a>.
+                        Use it, learn from it, build on it.
                     </p>
                 </div>
             </section>
 
-            <!-- Architecture Diagrams Section -->
+            <!-- System Flow Diagram -->
             <section class="content-section">
-                <h2>Architecture Diagrams</h2>
+                <h2>System Flow</h2>
                 <div class="section-content">
-
-                    <!-- Repository Structure -->
-                    <h3>Repository Structure (v1.1.0 Agent Factory)</h3>
-                    <p>Canonical directory structure following ADK/Vertex Agent Engine best practices:</p>
-                    <pre class="mermaid">
-graph TB
-    subgraph "bobs-brain/ (v1.1.0 Agent Factory)"
-        A[agents/] --> A1[bob/]
-        A --> A2[iam-senior-adk-devops-lead/]
-        A --> A3[iam-* specialists/]
-
-        B[service/] --> B1[a2a_gateway/]
-        B --> B2[slack_webhook/]
-
-        C[infra/terraform/] --> C1[agent_engine.tf]
-        C --> C2[storage.tf]
-        C --> C3[iam.tf]
-
-        D[000-docs/] --> D1[Plans & AARs]
-        D --> D2[Runbooks]
-        D --> D3[Architecture docs]
-
-        E[scripts/ci/] --> E1[check_nodrift.sh]
-        E --> E2[arv checks]
-
-        F[tests/] --> F1[Unit tests]
-        F --> F2[Integration tests]
-
-        G[templates/] --> G1[sequential_workflow/]
-        G --> G2[parallel_workflow/]
-        G --> G3[quality_gates/]
-        G --> G4[foreman_worker/]
-        G --> G5[human_approval/]
-    end
-
-    style A fill:#808080,color:#fff,stroke:#4d4d4d
-    style B fill:#cccccc,color:#1a1a1a,stroke:#808080
-    style C fill:#cccccc,color:#1a1a1a,stroke:#808080
-    style D fill:#cccccc,color:#1a1a1a,stroke:#808080
-    style E fill:#cccccc,color:#1a1a1a,stroke:#808080
-    style F fill:#cccccc,color:#1a1a1a,stroke:#808080
-    style G fill:#cccccc,color:#1a1a1a,stroke:#808080
-                    </pre>
-
-                    <!-- System Flow -->
-                    <h3>System Flow (Slack → Agent Engine)</h3>
-                    <p>How user requests flow from Slack to Bob and through the iam-* department:</p>
                     <pre class="mermaid">
 sequenceDiagram
-    participant U as User (Slack)
-    participant S as Cloud Run Gateway
-    participant B as Bob (Orchestrator)
-    participant F as Foreman Agent
-    participant I as iam-* Specialists
-    participant V as Vertex AI / GCS
+    participant Slack
+    participant Gateway as Cloud Run Gateway
+    participant Bob as Bob (Agent Engine)
+    participant Foreman as iam-senior-adk-devops-lead
+    participant Specialists as iam-* agents
 
-    U->>S: @Bob message
-    S->>S: Validate webhook & auth
-    S->>B: POST to Agent Engine
-    B->>B: Dual memory: Session + Memory Bank
-    B->>F: Delegate to iam-senior-adk-devops-lead
-    F->>I: Coordinate iam-adk, iam-fix, iam-qa
-    I->>V: Query Vertex AI Search / write to GCS
-    V-->>I: Context & tools response
-    I-->>F: Task results
-    F-->>B: Consolidated report
-    B->>S: Format response
-    S->>U: Reply in Slack thread
-
-    Note over B,F: A2A protocol for agent coordination
-    Note over I,V: RAG with Vertex AI Search + ARV gates
-                    </pre>
-
-                    <!-- Deployment Flow -->
-                    <h3>Deployment Flow (CI/CD with Hard Mode)</h3>
-                    <p>From code push to production via GitHub Actions and Agent Engine:</p>
-                    <pre class="mermaid">
-graph LR
-    A[Git Push to main] --> B[GitHub Actions]
-    B --> C{Drift Check R8}
-    C -->|Violations| D[❌ Block CI]
-    C -->|Pass| E[Run ARV Checks]
-    E --> F{ARV Pass?}
-    F -->|No| G[❌ Report Failures]
-    F -->|Yes| H[ADK CLI Deploy]
-    H --> I[Vertex AI Agent Engine]
-    I --> J{Health Check}
-    J -->|Success| K[✅ Production Live]
-    J -->|Fail| L[🔄 Rollback]
-
-    style A fill:#808080,color:#fff,stroke:#4d4d4d
-    style K fill:#4d4d4d,color:#fff,stroke:#1a1a1a
-    style D fill:#999999,color:#fff,stroke:#4d4d4d
-    style G fill:#999999,color:#fff,stroke:#4d4d4d
-    style L fill:#b3b3b3,color:#1a1a1a,stroke:#808080
-                    </pre>
-
-                    <!-- Agent Department Model -->
-                    <h3>Agent Department Model</h3>
-                    <p>How Bob delegates work to the foreman and specialist agents:</p>
-                    <pre class="mermaid">
-graph TD
-    A[Bob - Global Orchestrator] --> B[iam-senior-adk-devops-lead]
-    B --> C[iam-adk]
-    B --> D[iam-issue]
-    B --> E[iam-fix-plan]
-    B --> F[iam-fix-impl]
-    B --> G[iam-qa]
-    B --> H[iam-doc]
-    B --> I[iam-cleanup]
-    B --> J[iam-index]
-
-    C --> C1[ADK pattern analysis]
-    D --> D1[Create GitHub issues]
-    E --> E1[Design fix strategies]
-    F --> F1[Implement fixes]
-    G --> G1[Quality validation]
-    H --> H1[Generate docs & AARs]
-    I --> I1[Code optimization]
-    J --> J1[Knowledge indexing]
-
-    style A fill:#4d4d4d,color:#fff,stroke:#1a1a1a
-    style B fill:#808080,color:#fff,stroke:#4d4d4d
-    style C fill:#cccccc,color:#1a1a1a,stroke:#808080
-    style D fill:#cccccc,color:#1a1a1a,stroke:#808080
-    style E fill:#cccccc,color:#1a1a1a,stroke:#808080
-    style F fill:#cccccc,color:#1a1a1a,stroke:#808080
-    style G fill:#cccccc,color:#1a1a1a,stroke:#808080
-    style H fill:#cccccc,color:#1a1a1a,stroke:#808080
-    style I fill:#cccccc,color:#1a1a1a,stroke:#808080
-    style J fill:#cccccc,color:#1a1a1a,stroke:#808080
+    Slack->>Gateway: @Bob message
+    Gateway->>Bob: POST to Agent Engine
+    Bob->>Foreman: Delegate task
+    Foreman->>Specialists: Coordinate work
+    Specialists-->>Foreman: Results
+    Foreman-->>Bob: Consolidated response
+    Bob->>Gateway: Format reply
+    Gateway->>Slack: Thread response
                     </pre>
                 </div>
             </section>
 
-            <!-- Section 3: Tech Stack -->
+            <!-- Tech Stack -->
             <section class="content-section">
-                <h2>Tech Stack</h2>
+                <h2>Stack</h2>
                 <div class="section-content">
                     <div class="tech-grid">
                         <div class="tech-item">
+                            <h4>Runtime</h4>
+                            <ul>
+                                <li>Vertex AI Agent Engine</li>
+                                <li>Cloud Run (gateway)</li>
+                                <li>Python 3.12</li>
+                            </ul>
+                        </div>
+                        <div class="tech-item">
+                            <h4>Agent Framework</h4>
+                            <ul>
+                                <li>Google ADK</li>
+                                <li>A2A Protocol</li>
+                                <li>Gemini 2.0 Flash</li>
+                            </ul>
+                        </div>
+                        <div class="tech-item">
                             <h4>Infrastructure</h4>
                             <ul>
-                                <li>Google Cloud Run</li>
-                                <li>Vertex AI Agent Engine</li>
-                                <li>Cloud Storage (GCS)</li>
-                                <li>Cloud Logging & Trace</li>
-                            </ul>
-                        </div>
-                        <div class="tech-item">
-                            <h4>AI & Knowledge</h4>
-                            <ul>
-                                <li>Google ADK (Agent Development Kit)</li>
-                                <li>Vertex AI Search (RAG ready)</li>
-                                <li>Gemini 2.0 Flash</li>
-                                <li>Org-wide knowledge hub</li>
-                            </ul>
-                        </div>
-                        <div class="tech-item">
-                            <h4>DevOps & Quality</h4>
-                            <ul>
-                                <li>GitHub Actions CI/CD</li>
-                                <li>ARV readiness verification</li>
-                                <li>Terraform IaC</li>
+                                <li>Terraform</li>
+                                <li>GitHub Actions</li>
                                 <li>Workload Identity Federation</li>
                             </ul>
                         </div>
                     </div>
-
-                    <div class="external-links">
-                        <p><strong>Learn more about the technologies:</strong></p>
-                        <a href="https://cloud.google.com/vertex-ai/docs/agent-development-kit" target="_blank" rel="noopener" class="text-link">
-                            Google ADK Documentation →
-                        </a>
-                        <a href="https://cloud.google.com/vertex-ai/docs/agent-engine" target="_blank" rel="noopener" class="text-link">
-                            Vertex AI Agent Engine →
-                        </a>
-                    </div>
                 </div>
             </section>
 
-            <!-- Section 4: For Teams & Orgs -->
-            <section class="content-section highlight-section">
-                <h2>For Teams & Organizations</h2>
-                <div class="section-content">
-                    <p>
-                        This repository is a reference implementation for building real multi-agent systems
-                        on Vertex AI using Google's ADK. It demonstrates production patterns for:
-                    </p>
-                    <ul class="feature-list">
-                        <li>🏢 <strong>Slack copilots</strong> integrated with your organization's workflows</li>
-                        <li>🔧 <strong>ADK-compliant agent departments</strong> with specialized roles</li>
-                        <li>📊 <strong>Portfolio-wide automation</strong> across multiple GitHub repositories</li>
-                        <li>🔐 <strong>Enterprise-grade security</strong> with WIF and proper IAM</li>
-                        <li>📈 <strong>Scalable architecture</strong> ready for production workloads</li>
-                    </ul>
-                    <div class="cta-box">
-                        <p>
-                            <strong>Need something similar for your organization?</strong><br>
-                            Intent Solutions can help design and implement custom multi-agent systems,
-                            Slack assistants, and AI-powered automation tailored to your needs.
-                        </p>
-                        <a href="https://intentsolutions.io" target="_blank" rel="noopener" class="btn btn-primary">
-                            Learn more at intentsolutions.io →
-                        </a>
-                    </div>
-                </div>
-            </section>
-
-            <!-- Section 5: Docs & Source -->
+            <!-- Links -->
             <section class="content-section">
-                <h2>Documentation & Resources</h2>
+                <h2>Links</h2>
                 <div class="section-content">
                     <div class="doc-grid">
                         <div class="doc-item">
-                            <h4>📖 Core Documentation</h4>
+                            <h4>Repository</h4>
                             <ul class="link-list">
-                                <li>
-                                    <a href="https://github.com/intent-solutions-io/bobs-brain/blob/main/README.md" target="_blank" rel="noopener">
-                                        README - Project Overview
-                                    </a>
-                                </li>
-                                <li>
-                                    <a href="https://github.com/intent-solutions-io/bobs-brain/blob/main/CLAUDE.md" target="_blank" rel="noopener">
-                                        CLAUDE.md - Architecture Details
-                                    </a>
-                                </li>
-                                <li>
-                                    <a href="https://github.com/intent-solutions-io/bobs-brain/blob/main/CHANGELOG.md" target="_blank" rel="noopener">
-                                        CHANGELOG - Version History
-                                    </a>
-                                </li>
+                                <li><a href="https://github.com/intent-solutions-io/bobs-brain" target="_blank" rel="noopener">GitHub</a></li>
+                                <li><a href="https://github.com/intent-solutions-io/bobs-brain/blob/main/CHANGELOG.md" target="_blank" rel="noopener">Changelog</a></li>
+                                <li><a href="https://github.com/intent-solutions-io/bobs-brain/issues" target="_blank" rel="noopener">Issues</a></li>
                             </ul>
                         </div>
                         <div class="doc-item">
-                            <h4>📚 000-docs/ Archive</h4>
+                            <h4>Documentation</h4>
                             <ul class="link-list">
-                                <li>
-                                    <a href="https://github.com/intent-solutions-io/bobs-brain/tree/main/000-docs" target="_blank" rel="noopener">
-                                        Browse All Documentation (100+ docs)
-                                    </a>
-                                </li>
-                                <li>
-                                    <a href="https://github.com/intent-solutions-io/bobs-brain/blob/main/000-docs/120-AA-AUDT-appaudit-devops-playbook.md" target="_blank" rel="noopener">
-                                        DevOps Playbook
-                                    </a>
-                                </li>
-                                <li>
-                                    <a href="https://github.com/intent-solutions-io/bobs-brain/tree/main/templates" target="_blank" rel="noopener">
-                                        Multi-Agent Pattern Templates
-                                    </a>
-                                </li>
+                                <li><a href="https://github.com/intent-solutions-io/bobs-brain/tree/main/000-docs" target="_blank" rel="noopener">000-docs/ (169 files)</a></li>
+                                <li><a href="https://github.com/intent-solutions-io/bobs-brain/blob/main/CLAUDE.md" target="_blank" rel="noopener">CLAUDE.md</a></li>
+                                <li><a href="https://github.com/intent-solutions-io/bobs-brain/tree/main/templates" target="_blank" rel="noopener">Pattern Templates</a></li>
                             </ul>
                         </div>
                         <div class="doc-item">
-                            <h4>🚀 Get Started</h4>
+                            <h4>References</h4>
                             <ul class="link-list">
-                                <li>
-                                    <a href="https://github.com/intent-solutions-io/bobs-brain" target="_blank" rel="noopener">
-                                        View Repository on GitHub
-                                    </a>
-                                </li>
-                                <li>
-                                    <a href="https://github.com/intent-solutions-io/bobs-brain/issues" target="_blank" rel="noopener">
-                                        Report Issues or Feedback
-                                    </a>
-                                </li>
-                                <li>
-                                    <a href="https://github.com/intent-solutions-io/bobs-brain/blob/main/LICENSE" target="_blank" rel="noopener">
-                                        Elastic License 2.0 (ELv2)
-                                    </a>
-                                </li>
+                                <li><a href="https://cloud.google.com/vertex-ai/docs/agent-development-kit" target="_blank" rel="noopener">Google ADK Docs</a></li>
+                                <li><a href="https://cloud.google.com/vertex-ai/docs/agent-engine" target="_blank" rel="noopener">Agent Engine Docs</a></li>
+                                <li><a href="https://github.com/GoogleCloudPlatform/agent-starter-pack" target="_blank" rel="noopener">Agent Starter Pack</a></li>
                             </ul>
                         </div>
                     </div>
@@ -452,16 +254,11 @@ graph TD
         </div>
     </main>
 
-    <!-- Footer -->
     <footer class="footer">
         <div class="container">
             <p>
-                Built by <a href="https://intentsolutions.io" target="_blank" rel="noopener">Intent Solutions</a>
-                ·
                 <a href="https://github.com/intent-solutions-io/bobs-brain" target="_blank" rel="noopener">intent-solutions-io/bobs-brain</a>
-            </p>
-            <p class="footer-meta">
-                Version 1.1.0 · Last updated December 2025 · Open source under ELv2 License
+                · v1.1.0 · ELv2 License
             </p>
         </div>
     </footer>
