@@ -25,14 +25,21 @@ EXCLUDE_DIRS=".venv|99-Archive|archive|node_modules"
 # R1: Check for alternative agent frameworks
 echo ""
 echo "R1: Checking for alternative agent frameworks..."
+# Exclude:
+# - test files that intentionally contain forbidden imports for detection testing
+# - .nox environments created by nox (contain vertexai which has langchain templates)
+# - documentation and example files
 if grep -rE "from langchain|import langchain|from crewai|import crewai|from autogen|import autogen" \
     --exclude-dir=.venv \
+    --exclude-dir=.nox \
     --exclude-dir=99-Archive \
     --exclude-dir=archive \
     --exclude-dir=node_modules \
     --exclude-dir=000-docs \
     --exclude-dir=claudes-docs \
-    . 2>/dev/null | grep -v "CLAUDE.md" | grep -v "check_nodrift.sh"; then
+    --exclude-dir=mcp/tests \
+    --exclude-dir=tests \
+    . 2>/dev/null | grep -v "CLAUDE.md" | grep -v "check_nodrift.sh" | grep -v "README.md" | grep -v "AGENTCARD_EXAMPLE.md"; then
     echo "❌ VIOLATION R1: Alternative framework imports found"
     echo "   Only google-adk is allowed for agent implementation"
     VIOLATIONS=$((VIOLATIONS + 1))
