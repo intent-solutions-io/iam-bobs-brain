@@ -7,6 +7,96 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.2.0] - 2025-12-20
+
+### 🚀 MCP Server & Enterprise Security Standards
+
+This release introduces Bob's MCP (Model Context Protocol) server and implements enterprise-grade security standards based on an audit of Google's official MCP repository.
+
+### Added - MCP Infrastructure & Cloud API Registry
+
+- **Bob's MCP Server** (`mcp/`)
+  - New FastAPI-based MCP server with 4 repository tools
+  - `search_codebase` - Grep-based code search with ripgrep support
+  - `get_file` - Secure file content retrieval with path validation
+  - `check_patterns` - Hard Mode rule (R1-R8) compliance validation
+  - `analyze_deps` - Python, Node.js, and Terraform dependency analysis
+  - Cloud Run deployment infrastructure (`infra/terraform/cloud_run.tf`)
+  - GitHub Actions workflow (`deploy-mcp.yml`) for CI/CD
+
+- **Cloud API Registry Integration** (`agents/shared_tools/api_registry.py`)
+  - Runtime MCP tool discovery via Google's Cloud API Registry
+  - `get_api_registry()` - Lazy singleton for registry client
+  - `get_tools_for_agent()` - Agent-specific tool loading
+  - Centralized governance for MCP tools across all agents
+  - All 10 agent tool profiles updated to load MCP tools dynamically
+
+### Added - Phase A: Enterprise Security & Testing Standards
+
+Based on CTO audit of Google's MCP repository vs Bob's Brain (9/10 vs 3/10 enterprise readiness):
+
+- **OAuth 2.1 Token Validation** (`mcp/src/auth/oauth_validator.py`)
+  - Full OAuth 2.1 with audience and issuer validation
+  - Thread-safe `TokenCache` with TTL expiration
+  - RFC 9728 protected resource metadata endpoint (`/.well-known/oauth-protected-resource`)
+  - Graceful fallback to header-based auth when disabled
+  - 35+ unit tests for OAuth flows
+
+- **Origin Validation (DNS Rebinding Protection)** (`mcp/src/auth/origin_validator.py`)
+  - `OriginValidatorMiddleware` blocks unauthorized origins
+  - Configurable via `ALLOWED_ORIGINS` environment variable
+  - Default includes `agent.googleapis.com` and localhost for dev
+  - 19 unit tests for validation logic
+
+- **Nox Multi-Version Testing** (`noxfile.py`)
+  - 15+ test sessions (tests, lint, typecheck, format, coverage, etc.)
+  - Python 3.10, 3.11, 3.12, 3.13 support
+  - Integrated pytest configuration (`pytest.ini`, `.coveragerc`)
+  - Guide: `000-docs/241-TQ-GUID-nox-multi-version-testing-guide.md`
+
+- **Pydantic Structured Outputs** (`agents/shared_contracts/tool_outputs.py`)
+  - Pydantic V2 models for all MCP tool responses
+  - `ToolResult`, `ComplianceResult`, `SearchResult`, `FileResult`, `DependencyResult`
+  - JSON Schema generation for AgentCard skills
+  - Backward-compatible package structure (`agents/shared_contracts/`)
+  - 16 unit tests for model validation
+
+### Changed
+
+- **shared_contracts Package Reorganization**
+  - Converted `agents/shared_contracts.py` → `agents/shared_contracts/` package
+  - Moved pipeline contracts to `pipeline_contracts.py`
+  - Added `tool_outputs.py` for MCP Pydantic models
+  - Unified `__init__.py` re-exports all contracts for backward compatibility
+
+- **MCP Server Architecture**
+  - All MCP tools now return Pydantic models (type-safe)
+  - Test suite updated for Pydantic assertions
+  - Server includes OAuth + Origin validation middleware
+
+### Documentation
+
+- `239-AA-PLAN-mcp-enterprise-standards-alignment.md` - CTO implementation plan
+- `240-DR-STND-mcp-security-and-testing-standards-rationale.md` - Standards rationale
+- `241-TQ-GUID-nox-multi-version-testing-guide.md` - Nox usage guide
+- API Registry architecture docs (236, 237)
+
+### Repository Metrics
+
+- **Tests:** 82 MCP tests + 206 total unit tests passing
+- **New Files:** 25 files added/modified
+- **Documentation:** 241 docs in 000-docs/
+- **Security:** OAuth 2.1 + Origin validation = MCP spec compliant
+- **Quality Score:** 95/100 (maintained)
+
+### Impact
+
+- **MCP Ecosystem Ready:** Full Cloud API Registry integration
+- **Enterprise Security:** OAuth 2.1 + DNS rebinding protection
+- **Multi-Version CI:** Nox enables Python 3.10-3.13 testing
+- **Type Safety:** Pydantic models for all MCP tools
+- **Zero Breaking Changes:** All APIs backward compatible
+
 ## [1.0.0] - 2025-12-12
 
 ### 🎉 First Production Release
