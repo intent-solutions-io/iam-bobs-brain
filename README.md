@@ -7,9 +7,9 @@
 [![Agent Engine](https://img.shields.io/badge/Vertex%20AI-Agent%20Engine-4285F4.svg)](https://cloud.google.com/vertex-ai/docs/agent-engine)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-**Specialist AI team for auditing and fixing Google Vertex/ADK design systems.**
+**General-purpose enterprise orchestrator built on Google ADK and Vertex AI Agent Engine.**
 
-Bob's Brain orchestrates expert agents that ensure your codebase follows Google's ADK and Vertex AI patterns. Built with Google ADK, Vertex AI Agent Engine, A2A protocol, Session Cache + Memory Bank. Hard Mode architecture enforces drift-free development.
+Bob's Brain is a production-grade multi-agent system that can accomplish any objective within safety constraints. Built with Google ADK, Vertex AI Agent Engine, A2A protocol, and enterprise controls. Features canonical agent IDs, risk-tier enforcement (R0-R4), evidence bundles, and Mission Spec v1 workflow-as-code.
 
 [Quick Start](#-quick-start) • [What It Does](#-what-bob-does) • [Hard Mode Rules](#%EF%B8%8F-hard-mode-explained) • [Use as Template](#-use-as-template)
 
@@ -19,9 +19,13 @@ Bob's Brain orchestrates expert agents that ensure your codebase follows Google'
 
 ## 👋 What is Bob's Brain?
 
-Bob's Brain is a **Slack AI assistant with a specialist team focused on auditing and constructing fixes for Google Vertex/ADK design systems.** This isn't a general-purpose coding assistant – it's a precision tool that ensures your agents, infrastructure, and architecture align with Google's ADK and Vertex AI recommended patterns.
+Bob's Brain is a **general-purpose enterprise orchestrator** that coordinates specialist AI agents to accomplish any objective within safety constraints. Built on Google's ADK and Vertex AI Agent Engine, it provides enterprise-grade controls including risk tiers, policy gates, evidence bundles, and declarative workflow-as-code.
 
-**Key Focus:** Audit Google Vertex/ADK design compliance → Detect drift → Construct fixes → Maintain alignment
+**Key Capabilities:**
+- **Enterprise Controls**: Risk tiers (R0-R4), policy gates, tool allowlists
+- **Audit Trails**: Evidence bundles with manifest + hashing
+- **Workflow-as-Code**: Mission Spec v1 declarative YAML
+- **Multi-Agent Orchestration**: Foreman → specialist delegation
 
 ### Bob's Multi-Department Architecture
 
@@ -982,39 +986,42 @@ gcloud ai agent-engines list --region=us-central1
 
 ## 📊 Project Status
 
-**Current Version:** v0.10.0 – Agent Engine / A2A Preview (Dev-Ready, Not Deployed)
+**Current Version:** v2.0.0 – Vision Alignment GA (General-Purpose Enterprise Orchestrator)
+
+**What's New in v2.0.0:**
+- ✅ **Canonical Agent IDs**: `bob`, `iam-orchestrator`, `iam-compliance`, etc. with backwards-compatible aliases
+- ✅ **Enterprise Controls**: Risk tiers R0-R4, policy gates, tool allowlists
+- ✅ **Evidence Bundles**: Complete audit trails with manifest + hashing
+- ✅ **Mission Spec v1**: Declarative workflow-as-code in YAML
+- ✅ **103 new tests**: 303 total unit tests
 
 **Deployment Status:**
-- ✅ **Agent Engine**: Wired and documented, dev-ready; prod rollout gated on GCP access and ARV checks
-- ✅ **A2A / AgentCard**: Foreman + workers designed; validation via a2a-inspector planned
-- ✅ **Inline Source Deployment**: Complete with ARV gates, smoke tests, and CI workflows
-- ⏸️ **Production Deployment**: Infrastructure ready, awaiting first dev deployment to Agent Engine
+- ✅ **Agent Engine**: All 10 Hard Mode agents deployed
+- ✅ **A2A Protocol**: Foreman + workers architecture live
+- ✅ **Inline Source Deployment**: Complete with ARV gates and CI workflows
+- ✅ **Slack Integration**: Bob responds via Slack
 
-**Key Features Ready Today:**
-- ✅ IAM specialist agents (iam-senior-adk-devops-lead → iam-adk, iam-issue, iam-fix, iam-qa)
-- ✅ 6767 doc suite (architecture, operations, standards)
-- ✅ Org-level storage + portfolio audit support
-- ✅ Agent Engine + A2A design complete (non-deployed)
+**Key Capabilities:**
+- ✅ Canonical agent identity system with alias support
+- ✅ Enterprise controls (R0-R4 risk tiers, policy gates)
+- ✅ Mission Spec v1 (declarative workflows)
+- ✅ Evidence bundles for audit trails
+- ✅ 8 specialist agents (iam-compliance, iam-triage, iam-planner, etc.)
+- ✅ 6767 doc suite (30+ standards)
 
-**Recent Updates:**
-- ✅ Agent Engine inline source deployment infrastructure (v0.10.0)
-- ✅ AgentCard alignment & contract-first prompt design (v0.10.0)
-- ✅ ARV (Agent Readiness Verification) gates (v0.10.0)
-- ✅ LIVE1-GCS: Org-wide storage with GCS (v0.9.0)
-- ✅ PORT1-3: Multi-repo portfolio orchestration (v0.9.0)
-- ✅ IAM Templates: Reusable multi-agent framework (v0.9.0)
-
-**Roadmap:**
-- 🔄 LIVE-BQ: BigQuery analytics integration
-- 📐 LIVE2: Vertex AI Search RAG + Agent Engine calls (dev-only)
-- 📐 LIVE3: Slack notifications + GitHub issue creation
+**Standards (v2.0.0):**
+- `252-DR-STND-agent-identity-standard.md` - Canonical IDs
+- `253-DR-STND-mandates-budgets-approvals.md` - Enterprise controls
+- `254-DR-STND-policy-gates-risk-tiers.md` - R0-R4 enforcement
+- `255-DR-STND-evidence-bundles-and-audit-export.md` - Audit trails
+- `257-DR-STND-mission-spec-v1.md` - Workflow-as-code
 
 **Metrics:**
-- 226 files
-- 36 tests (100% pass)
-- 20+ comprehensive docs
-- 8 enforced Hard Mode rules
-- 3 deployment environments (dev/staging/prod)
+- 303 unit tests (100% pass)
+- 30+ comprehensive docs
+- 8 enforced Hard Mode rules (R1-R8)
+- 15 CI checks
+- 10 deployed agents
 
 ---
 
