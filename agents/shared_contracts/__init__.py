@@ -3,6 +3,8 @@ Shared contracts package for Bob's Brain agents.
 
 This package contains:
 - agent_identity.py: Canonical agent IDs and alias resolution (252-DR-STND)
+- policy_gates.py: Risk tier enforcement and preflight checks (254-DR-STND)
+- evidence_bundle.py: Audit trail manifests and artifact hashing (255-DR-STND)
 - tool_outputs.py: Pydantic models for MCP tool results
 - pipeline_contracts.py: Dataclasses for SWE pipeline agent communication
 - (future) a2a_envelopes.py: A2A task/result envelope wrappers
@@ -12,6 +14,7 @@ All contracts are designed for:
 - JSON Schema generation for AgentCard skills
 - Validation of inputs/outputs against A2A protocol
 - Canonical agent identity management (Phase D)
+- Enterprise controls with policy gates (Phase E)
 """
 
 # ============================================================================
@@ -98,6 +101,34 @@ from agents.shared_contracts.pipeline_contracts import (
     create_mock_fix_plan,
 )
 
+# ============================================================================
+# POLICY GATES (Risk tiers and preflight checks - 254-DR-STND)
+# ============================================================================
+from agents.shared_contracts.policy_gates import (
+    # Types
+    RiskTier,
+    GateResult,
+    PolicyGate,
+    # Data
+    RISK_TIER_DESCRIPTIONS,
+    # Functions
+    preflight_check,
+)
+
+# ============================================================================
+# EVIDENCE BUNDLES (Audit trails - 255-DR-STND)
+# ============================================================================
+from agents.shared_contracts.evidence_bundle import (
+    # Types
+    ArtifactRecord,
+    ToolCallRecord,
+    UnitTestRecord,
+    EvidenceBundleManifest,
+    EvidenceBundle,
+    # Functions
+    create_evidence_bundle,
+)
+
 __all__ = [
     # Agent identity (252-DR-STND)
     "AgentTier",
@@ -149,4 +180,17 @@ __all__ = [
     "IndexEntry",
     "create_mock_issue",
     "create_mock_fix_plan",
+    # Policy gates (254-DR-STND)
+    "RiskTier",
+    "GateResult",
+    "PolicyGate",
+    "RISK_TIER_DESCRIPTIONS",
+    "preflight_check",
+    # Evidence bundles (255-DR-STND)
+    "ArtifactRecord",
+    "ToolCallRecord",
+    "UnitTestRecord",
+    "EvidenceBundleManifest",
+    "EvidenceBundle",
+    "create_evidence_bundle",
 ]
