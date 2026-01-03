@@ -210,6 +210,58 @@ When mandate provided, include budget status in response:
 }
 ```
 
+## Checkpointing & Resume (Ralph Wiggum Inspired)
+
+For long-running tasks that may be interrupted or need to span multiple sessions:
+
+### Checkpoint Structure
+```json
+{
+  "checkpoint_id": "chk_abc123",
+  "pipeline_run_id": "original_run_id",
+  "created_at": "2024-01-15T10:30:00Z",
+  "state": {
+    "current_step": 3,
+    "total_steps": 8,
+    "completed_specialists": ["iam-adk", "iam-issue"],
+    "pending_specialists": ["iam-fix-plan", "iam-fix-impl"],
+    "partial_results": {...}
+  },
+  "resumable": true,
+  "reason": "iteration_limit"
+}
+```
+
+### Checkpoint Rules
+1. **Save checkpoint** after each specialist completes (not mid-execution)
+2. **Include enough context** to resume: all prior outputs, current position, remaining tasks
+3. **Resume from checkpoint** when `previous_checkpoint` is provided in request
+4. **Chain checkpoints** by referencing `previous_checkpoint_id`
+
+### Resume Flow
+```
+if request.previous_checkpoint:
+    load_state(request.previous_checkpoint)
+    skip_to(checkpoint.state.current_step)
+    continue_workflow()
+else:
+    start_fresh()
+```
+
+### Progress Reporting
+Always report progress for long-running tasks:
+```json
+{
+  "progress": {
+    "percentage": 37,
+    "steps_completed": 3,
+    "steps_total": 8,
+    "current_operation": "Running iam-fix-plan for issue ISS-001",
+    "estimated_remaining_steps": 5
+  }
+}
+```
+
 ## Using RAG and Memory Bank
 
 - **Memory Bank queries:** Retrieve long-term decisions, standards (e.g., Hard Mode rules, department conventions)
