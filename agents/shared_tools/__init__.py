@@ -4,17 +4,9 @@ Shared ADK Tools Layer for Bob's Brain Department
 This module provides centralized tool profiles for all agents in the department.
 Each agent gets a specific tool profile based on the principle of least privilege.
 
-Tool Loading Strategy (Hybrid):
-1. Static tools: ADK builtins, custom tools, Vertex Search (always loaded)
-2. Dynamic tools: MCP tools from Cloud API Registry (when available)
-
-The API Registry provides centralized governance for MCP-based tools while
-static tools provide reliable fallback functionality.
-
 Enforces:
 - R1: ADK-only tools (no custom frameworks)
 - R3: Gateway separation (tools don't access Runner directly)
-- R7: Auth context propagation via header provider
 - Security: No credentials or secrets in tool definitions
 """
 
@@ -44,6 +36,7 @@ from .custom_tools import (
     get_cleanup_tools,
     get_indexing_tools,
     get_delegation_tools,
+    get_workflow_tools,  # Phase P1: Sequential workflow tools
 )
 
 # Import org knowledge hub Vertex Search tools
@@ -52,46 +45,10 @@ from .vertex_search import (
     get_foreman_vertex_search_tool,
 )
 
-# Import API Registry for dynamic MCP tool discovery
-from .api_registry import (
-    get_tools_for_agent,
-    get_mcp_toolset as get_registry_mcp_toolset,
-    is_registry_available,
-)
-
 
 # ============================================================================
 # TOOL PROFILES - Define which tools each agent can access
 # ============================================================================
-
-
-def _load_mcp_tools(agent_name: str) -> List[Any]:
-    """
-    Load MCP tools from Cloud API Registry for an agent.
-
-    Tools are loaded dynamically at runtime based on registry configuration.
-    This provides centralized governance - admins control tool access in the
-    registry, not in agent code.
-
-    Args:
-        agent_name: Agent name (e.g., "bob", "iam-adk")
-
-    Returns:
-        List of MCP tool handles from registry, or empty list if unavailable
-    """
-    if not is_registry_available():
-        logger.debug(f"API Registry not available for {agent_name}")
-        return []
-
-    try:
-        mcp_tools = get_tools_for_agent(agent_name)
-        if mcp_tools:
-            logger.info(f"✅ Loaded {len(mcp_tools)} MCP tools for {agent_name} from registry")
-        return mcp_tools
-    except Exception as e:
-        logger.warning(f"Could not load MCP tools for {agent_name}: {e}")
-        return []
-
 
 def get_bob_tools() -> List[Any]:
     """
@@ -100,7 +57,6 @@ def get_bob_tools() -> List[Any]:
     Bob needs:
     - Search capabilities (Google, ADK docs, Vertex AI)
     - Knowledge access via org knowledge hub
-    - MCP tools from registry (repo ops, etc.)
     - Future: delegation to iam-* agents
     """
     tools = []
@@ -120,8 +76,8 @@ def get_bob_tools() -> List[Any]:
     # Legacy Vertex Search (backwards compatibility)
     tools.extend(get_vertex_search_tools())
 
-    # MCP tools from Cloud API Registry (dynamic governance)
-    tools.extend(_load_mcp_tools("bob"))
+    # Future expansions (stubbed for now)
+    # tools.append(get_repo_search_tool_stub())  # TODO: Wire when ready
 
     logger.info(f"Loaded {len(tools)} tools for Bob")
     return tools
@@ -133,15 +89,18 @@ def get_foreman_tools() -> List[Any]:
 
     Foreman needs:
     - Delegation to specialists
+    - Workflow orchestration (Phase P1: SequentialAgent)
     - Repository analysis
     - Compliance checking
     - RAG access to org knowledge hub
-    - MCP tools from registry
     """
     tools = []
 
     # Delegation and management
     tools.extend(get_delegation_tools())
+
+    # Phase P1: Workflow orchestration tools (SequentialAgent)
+    tools.extend(get_workflow_tools())
 
     # Analysis capabilities
     tools.append(get_google_search_tool())
@@ -152,10 +111,10 @@ def get_foreman_tools() -> List[Any]:
         tools.append(vertex_tool)
         logger.info("✅ Added org knowledge hub Vertex Search for Foreman")
 
-    # MCP tools from Cloud API Registry (dynamic governance)
-    tools.extend(_load_mcp_tools("iam-senior-adk-devops-lead"))
+    # Future: repo tools when ready
+    # tools.append(get_repo_search_tool_stub())
 
-    logger.info(f"Loaded {len(tools)} tools for Foreman")
+    logger.info(f"Loaded {len(tools)} tools for Foreman (includes workflow tools)")
     return tools
 
 
@@ -167,7 +126,6 @@ def get_iam_adk_tools() -> List[Any]:
     - Code analysis
     - Pattern validation
     - ADK documentation access
-    - MCP tools (repo ops, pattern checking)
     """
     tools = []
 
@@ -177,9 +135,6 @@ def get_iam_adk_tools() -> List[Any]:
     # Documentation access
     tools.extend(get_adk_docs_tools())
     tools.append(get_google_search_tool())
-
-    # MCP tools from Cloud API Registry (dynamic governance)
-    tools.extend(_load_mcp_tools("iam-adk"))
 
     logger.info(f"Loaded {len(tools)} tools for iam-adk")
     return tools
@@ -193,7 +148,6 @@ def get_iam_issue_tools() -> List[Any]:
     - Issue creation and formatting
     - Problem analysis
     - Basic search
-    - MCP tools (GitHub integration)
     """
     tools = []
 
@@ -202,9 +156,6 @@ def get_iam_issue_tools() -> List[Any]:
 
     # Basic search
     tools.append(get_google_search_tool())
-
-    # MCP tools from Cloud API Registry (dynamic governance)
-    tools.extend(_load_mcp_tools("iam-issue"))
 
     logger.info(f"Loaded {len(tools)} tools for iam-issue")
     return tools
@@ -218,7 +169,6 @@ def get_iam_fix_plan_tools() -> List[Any]:
     - Planning and design tools
     - Dependency analysis
     - Documentation access
-    - MCP tools (repo analysis)
     """
     tools = []
 
@@ -228,9 +178,6 @@ def get_iam_fix_plan_tools() -> List[Any]:
     # Research capabilities
     tools.append(get_google_search_tool())
     tools.extend(get_adk_docs_tools())
-
-    # MCP tools from Cloud API Registry (dynamic governance)
-    tools.extend(_load_mcp_tools("iam-fix-plan"))
 
     logger.info(f"Loaded {len(tools)} tools for iam-fix-plan")
     return tools
@@ -244,7 +191,6 @@ def get_iam_fix_impl_tools() -> List[Any]:
     - Code generation and modification
     - Testing helpers
     - Documentation reference
-    - MCP tools (repo ops, GitHub)
     """
     tools = []
 
@@ -254,8 +200,8 @@ def get_iam_fix_impl_tools() -> List[Any]:
     # Reference access
     tools.extend(get_adk_docs_tools())
 
-    # MCP tools from Cloud API Registry (dynamic governance)
-    tools.extend(_load_mcp_tools("iam-fix-impl"))
+    # Future: code execution when sandboxed
+    # tools.append(get_code_execution_tool_stub())
 
     logger.info(f"Loaded {len(tools)} tools for iam-fix-impl")
     return tools
@@ -269,7 +215,6 @@ def get_iam_qa_tools() -> List[Any]:
     - Test execution
     - Validation tools
     - Regression checking
-    - MCP tools (pattern checking)
     """
     tools = []
 
@@ -278,9 +223,6 @@ def get_iam_qa_tools() -> List[Any]:
 
     # Documentation for validation
     tools.extend(get_adk_docs_tools())
-
-    # MCP tools from Cloud API Registry (dynamic governance)
-    tools.extend(_load_mcp_tools("iam-qa"))
 
     logger.info(f"Loaded {len(tools)} tools for iam-qa")
     return tools
@@ -294,7 +236,6 @@ def get_iam_doc_tools() -> List[Any]:
     - Documentation generation
     - Markdown formatting
     - Reference materials
-    - MCP tools (repo search)
     """
     tools = []
 
@@ -304,9 +245,6 @@ def get_iam_doc_tools() -> List[Any]:
     # Research and reference
     tools.append(get_google_search_tool())
     tools.extend(get_adk_docs_tools())
-
-    # MCP tools from Cloud API Registry (dynamic governance)
-    tools.extend(_load_mcp_tools("iam-doc"))
 
     logger.info(f"Loaded {len(tools)} tools for iam-doc")
     return tools
@@ -320,7 +258,6 @@ def get_iam_cleanup_tools() -> List[Any]:
     - Code analysis for debt
     - Dependency checking
     - Archive tools
-    - MCP tools (dependency analysis)
     """
     tools = []
 
@@ -329,9 +266,6 @@ def get_iam_cleanup_tools() -> List[Any]:
 
     # Analysis support
     tools.append(get_google_search_tool())
-
-    # MCP tools from Cloud API Registry (dynamic governance)
-    tools.extend(_load_mcp_tools("iam-cleanup"))
 
     logger.info(f"Loaded {len(tools)} tools for iam-cleanup")
     return tools
@@ -345,7 +279,6 @@ def get_iam_index_tools() -> List[Any]:
     - Indexing and cataloging
     - Search integration
     - Knowledge base management
-    - MCP tools (repo indexing)
     """
     tools = []
 
@@ -355,9 +288,6 @@ def get_iam_index_tools() -> List[Any]:
     # Search and retrieval
     tools.append(get_google_search_tool())
     tools.extend(get_vertex_search_tools())
-
-    # MCP tools from Cloud API Registry (dynamic governance)
-    tools.extend(_load_mcp_tools("iam-index"))
 
     logger.info(f"Loaded {len(tools)} tools for iam-index")
     return tools
@@ -403,8 +333,4 @@ __all__ = [
     "IAM_DOC_TOOLS",
     "IAM_CLEANUP_TOOLS",
     "IAM_INDEX_TOOLS",
-    # API Registry exports
-    "get_tools_for_agent",
-    "get_registry_mcp_toolset",
-    "is_registry_available",
 ]

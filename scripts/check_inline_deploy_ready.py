@@ -57,34 +57,6 @@ AGENT_CONFIGS = {
         "entrypoint_module": "agents.iam_adk.agent",
         "entrypoint_object": "app",
     },
-    "iam-issue": {
-        "entrypoint_module": "agents.iam_issue.agent",
-        "entrypoint_object": "app",
-    },
-    "iam-fix-plan": {
-        "entrypoint_module": "agents.iam_fix_plan.agent",
-        "entrypoint_object": "app",
-    },
-    "iam-fix-impl": {
-        "entrypoint_module": "agents.iam_fix_impl.agent",
-        "entrypoint_object": "app",
-    },
-    "iam-qa": {
-        "entrypoint_module": "agents.iam_qa.agent",
-        "entrypoint_object": "app",
-    },
-    "iam-doc": {
-        "entrypoint_module": "agents.iam_doc.agent",
-        "entrypoint_object": "app",
-    },
-    "iam-cleanup": {
-        "entrypoint_module": "agents.iam_cleanup.agent",
-        "entrypoint_object": "app",
-    },
-    "iam-index": {
-        "entrypoint_module": "agents.iam_index.agent",
-        "entrypoint_object": "app",
-    },
 }
 
 SOURCE_PACKAGES = ["agents"]

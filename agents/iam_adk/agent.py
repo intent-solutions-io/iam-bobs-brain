@@ -221,6 +221,7 @@ If the input doesn't match any of your skills:
         name="iam_adk",  # Required: Valid Python identifier (no hyphens)
         tools=IAM_ADK_TOOLS,  # Use shared tools profile
         instruction=instruction,
+        output_key="adk_findings",  # State key for SequentialAgent (Phase P1)
         after_agent_callback=auto_save_session_to_memory,  # R5: Save to Memory Bank
     )
 

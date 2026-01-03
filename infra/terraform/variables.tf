@@ -78,19 +78,6 @@ variable "slack_webhook_image" {
   # Example: gcr.io/bobs-brain/slack-webhook:0.6.0
 }
 
-variable "bobs_mcp_image" {
-  description = "Docker image for Bob's MCP server (GCR path)"
-  type        = string
-  default     = ""
-  # Example: gcr.io/bobs-brain/bobs-mcp:0.1.0
-}
-
-variable "bobs_mcp_enabled" {
-  description = "Enable Bob's MCP server (API Registry tools)"
-  type        = bool
-  default     = false
-}
-
 variable "gateway_max_instances" {
   description = "Maximum instances for Cloud Run gateways"
   type        = number

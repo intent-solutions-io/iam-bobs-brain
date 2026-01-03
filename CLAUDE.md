@@ -1,25 +1,4 @@
-# CLAUDE.md
-
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
-
----
-
-## Task Tracking (Beads / bd)
-
-- Use `bd` for ALL tasks/issues (no markdown TODO lists).
-- Start of session: `bd ready`
-- Create work: `bd create "Title" -p 1 --description "Context + acceptance criteria"`
-- Update status: `bd update <id> --status in_progress`
-- Finish: `bd close <id> --reason "Done"`
-- End of session: `bd sync` (flush/import/export + git sync)
-- Manual testing safety:
-  - Prefer `BEADS_DIR` to isolate a workspace if needed. (`BEADS_DB` exists but is deprecated.)
-
-### Beads Upgrades
-- After upgrading `bd`, run: `bd info --whats-new`
-- If `bd info` warns about hooks, run: `bd hooks install`
-
----
+# CLAUDE.md – How to Work With Claude in bobs-brain
 
 ## 1. Purpose of This File
 
@@ -48,6 +27,12 @@ This is the **live** guide for Claude Code when working in the `bobs-brain` repo
 - ✅ **Production**: Inline source deployment (source code → Agent Engine, no serialization)
 - ⛔ **Legacy**: Serialized/pickle deployment (deprecated, do not use)
 
+**Key Scripts:**
+- `make check-all` - Run all quality checks (drift detection, tests, ARV)
+- `make check-inline-deploy-ready` - ARV checks for Agent Engine deployment
+- `make deploy-inline-dry-run` - Validate deployment config without deploying
+- `make smoke-bob-agent-engine-dev` - Post-deployment health check (requires deployed agent)
+
 **A2A / AgentCard Plan:**
 - Foreman + workers architecture (iam-senior-adk-devops-lead → iam-*)
 - AgentCards in `.well-known/agent-card.json` for all agents
@@ -61,89 +46,6 @@ This is the **live** guide for Claude Code when working in the `bobs-brain` repo
 - ⛔ **NEVER use**: `.github/workflows/deploy-slack-webhook.yml` (deprecated - R4 violation)
 - ⛔ **NEVER run**: `gcloud run services update slack-webhook` (manual deploys violate R4)
 - 📖 **Operator Guide**: `000-docs/164-AA-REPT-phase-24-slack-bob-ci-deploy-and-restore.md`
-
----
-
-## 🚀 Quick Commands (Development Workflow)
-
-### Setup & Testing
-```bash
-# Initial setup
-python3 -m venv .venv
-source .venv/bin/activate
-pip install -r requirements.txt
-
-# Run all quality checks
-make check-all
-
-# Run specific checks
-make check-inline-deploy-ready  # ARV checks for deployment
-bash scripts/ci/check_nodrift.sh  # Drift detection
-pytest  # All tests
-pytest tests/unit/test_agentcard_json.py -v  # AgentCard validation
-
-# Run single test file
-pytest tests/unit/test_<name>.py -v
-
-# Smoke tests
-make smoke-agents  # Test lazy-loading App pattern (6767-LAZY)
-make smoke-bob-agent-engine-dev  # Test deployed agent
-```
-
-### Deployment
-```bash
-# Dry-run validation (safe, no deployment)
-make deploy-inline-dry-run
-
-# ARV checks before deployment
-make check-inline-deploy-ready AGENT_NAME=bob ENV=dev
-
-# CI/CD deployment (recommended)
-git push origin main  # Triggers GitHub Actions
-
-# View deployment status
-gh run list --workflow=agent-engine-inline-deploy.yml
-```
-
-### Task Management (Beads)
-```bash
-bd ready  # Start session
-bd create "Task title" -p 1 --description "Details"
-bd update <id> --status in_progress
-bd close <id> --reason "Done"
-bd sync  # End session (flush + git sync)
-```
-
-### Make Targets Quick Reference
-```bash
-make help  # Show all available targets
-
-# Quality Checks
-make check-all                    # All checks (drift, tests, ARV)
-make check-arv-minimum            # ARV minimum requirements
-make check-a2a-contracts          # Validate AgentCard JSON files
-make smoke-agents                 # Test lazy-loading pattern
-
-# Testing
-make test                         # All tests
-make test-coverage                # Tests with coverage report
-make test-swe-pipeline            # SWE pipeline tests
-
-# ARV Gates
-make check-inline-deploy-ready    # Deployment readiness (ARV)
-make arv-department               # Comprehensive ARV for IAM dept
-make arv-gates                    # All ARV gates
-
-# Deployment
-make deploy-inline-dry-run        # Validate deployment (safe)
-make slack-dev-smoke              # Test Slack webhook
-
-# Development
-make setup                        # Complete dev environment setup
-make lint                         # Run linting checks
-make format                       # Format code with black
-make clean                        # Clean temporary files
-```
 
 ---
 
@@ -202,41 +104,6 @@ make clean                        # Clean temporary files
 │  • Returns structured results matching skill output schema  │
 └─────────────────────────────────────────────────────────────┘
 ```
-
-### Agent Directory Layout
-
-```
-agents/
-├── bob/                          # Tier 1: User-facing conversational agent
-│   ├── agent.py                  # LlmAgent with dual memory (R5)
-│   ├── .well-known/
-│   │   └── agent-card.json       # A2A contract
-│   └── tools/                    # Bob-specific tools (Vertex Search)
-│
-├── iam_senior_adk_devops_lead/   # Tier 2: Foreman/orchestrator
-│   ├── agent.py                  # Workflow coordination
-│   └── orchestrator.py           # SWE pipeline logic
-│
-├── iam_adk/                      # Tier 3: ADK compliance specialist
-├── iam_issue/                    # Tier 3: GitHub issue creator
-├── iam_fix_plan/                 # Tier 3: Fix planner
-├── iam_fix_impl/                 # Tier 3: Fix implementer
-├── iam_qa/                       # Tier 3: QA validator
-├── iam_doc/                      # Tier 3: Documentation writer
-├── iam_cleanup/                  # Tier 3: Repo cleanup
-└── iam_index/                    # Tier 3: Knowledge indexing
-
-shared_tools/                     # Shared tool implementations
-shared_contracts/                 # JSON schemas for agent communication
-```
-
-**Key Pattern (6767-LAZY):**
-- Each agent has `agent.py` with:
-  - `create_agent()` - Lazy agent instantiation
-  - `create_app()` - Wraps in App for Agent Engine
-  - Module-level `app` (NOT `agent`)
-- No import-time validation or heavy work
-- See: `000-docs/6767-LAZY-DR-STND-adk-lazy-loading-app-pattern.md`
 
 ### Key Architectural Rules
 
@@ -340,68 +207,6 @@ When working in this repo, Claude should:
 
 **See:** `000-docs/6767-DR-STND-adk-agent-engine-spec-and-hardmode-rules.md` for complete spec.
 
-### ⛔ Common Anti-Patterns (DO NOT DO)
-
-**R1 Violations (Agent Implementation):**
-```python
-# ❌ WRONG - No LangChain mixing
-from langchain import ...
-
-# ❌ WRONG - No CrewAI mixing
-from crewai import ...
-
-# ✅ CORRECT - ADK only
-from google.adk.agents import LlmAgent
-```
-
-**R3 Violations (Gateway Separation):**
-```python
-# ❌ WRONG - No Runner in service/ gateways
-from google.adk import Runner  # In service/slack_webhook/ or service/a2a_gateway/
-
-# ✅ CORRECT - Use httpx to call Agent Engine REST API
-import httpx
-response = await client.post(f"{AGENT_ENGINE_URL}/query", json=request)
-```
-
-**R4 Violations (CI-Only Deployments):**
-```bash
-# ❌ WRONG - Manual deploys forbidden
-gcloud run services update slack-webhook ...
-terraform apply  # From local machine for prod
-
-# ✅ CORRECT - CI/CD only
-git push origin main  # Triggers GitHub Actions
-```
-
-**R6 Violations (Single Docs Folder):**
-```bash
-# ❌ WRONG - No scattered docs
-mkdir docs/
-touch wiki/architecture.md
-touch agents/bob/README.md
-
-# ✅ CORRECT - All docs in 000-docs/
-touch 000-docs/185-AT-ARCH-bob-architecture.md
-```
-
-**6767-LAZY Violations:**
-```python
-# ❌ WRONG - No eager instantiation at module level
-agent = LlmAgent(...)  # Runs at import time
-
-# ❌ WRONG - Heavy validation at import time
-assert PROJECT_ID, "PROJECT_ID required"  # Blocks imports
-
-# ✅ CORRECT - Lazy-loading pattern
-def create_agent() -> LlmAgent:
-    """Lazy agent creation (called on-demand)"""
-    # Validate here, not at import time
-    return LlmAgent(...)
-
-app = create_app()  # Module-level app, not agent
-```
-
 ### Coding Style
 
 **Python (agents/):**
@@ -476,24 +281,9 @@ Use conventional commits format:
 
 ---
 
-## 5. Documentation Navigation
+## 5. Where to Find the Deep Details
 
-### Start Here (By Role)
-
-**Developers (Building Agents):**
-1. **[Master Index](000-docs/6767-000-DR-INDEX-bobs-brain-standards-catalog.md)** - Complete map of all standards
-2. **[Hard Mode Rules](000-docs/6767-DR-STND-adk-agent-engine-spec-and-hardmode-rules.md)** - R1-R8 architecture rules
-3. **[Lazy-Loading Pattern](000-docs/6767-LAZY-DR-STND-adk-lazy-loading-app-pattern.md)** - Agent implementation pattern
-
-**Operators (Deploying/Running):**
-1. **[DevOps Playbook](000-docs/120-AA-AUDT-appaudit-devops-playbook.md)** - Complete operational guide
-2. **[Inline Deployment](000-docs/6767-INLINE-DR-STND-inline-source-deployment-for-vertex-agent-engine.md)** - Deployment guide
-3. **[Operations Runbook](000-docs/6767-RB-OPS-adk-department-operations-runbook.md)** - Day-to-day operations
-
-**Template Adopters (Porting to New Repos):**
-1. **[Porting Guide](000-docs/6767-DR-GUIDE-porting-iam-department-to-new-repo.md)** - Step-by-step instructions
-2. **[Integration Checklist](000-docs/6767-DR-STND-iam-department-integration-checklist.md)** - Complete checklist
-3. **[Template Standards](000-docs/6767-DR-STND-iam-department-template-scope-and-rules.md)** - Customization rules
+**All detailed documentation lives in `000-docs/`** - DON'T overcrowd this file.
 
 ### Key SOP Documents (6767-series)
 
@@ -507,19 +297,19 @@ All **6767-prefixed docs act as Standard Operating Procedures (SOPs)** - these a
 ### Other Key References
 
 - **127-DR-STND-agent-engine-entrypoints.md** - Canonical entrypoints for inline deployment
-- **120-AA-AUDT-appaudit-devops-playbook.md** - Complete DevOps onboarding (15k words)
+- **126-AA-AUDT-appaudit-devops-playbook.md** - Complete DevOps onboarding (15k words)
 - **claude-working-notes-archive.md** - Historical verbose content
 
-### Quick Lookups
+### How to Find What You Need
 
 ```bash
-# Find all 6767 standards (canonical SOPs)
+# List all SOPs (6767-series)
 ls 000-docs/6767*.md
 
 # List all standards
 ls 000-docs/*-DR-STND-*.md
 
-# Search for topic
+# Search for keyword
 grep -r "inline source" 000-docs/
 
 # Find doc by number
@@ -532,7 +322,7 @@ ls 000-docs/127-*
 
 ## 6. Changelog / Maintenance
 
-**Last Update:** 2025-12-22
+**Last Update:** 2025-12-05
 
 **Recent Changes:**
 - **Phase 26 (v0.14.0)**: Repository cleanup, branch archival tooling, and release
@@ -540,7 +330,6 @@ ls 000-docs/127-*
   - Added `000-docs/ARCHIVED_BRANCHES.md` branch management index
   - Updated version to v0.14.0 with comprehensive CHANGELOG
   - Validated canonical scaffold alignment (single docs root, clear separation)
-- **CLAUDE.md Improvements**: Added Quick Commands, anti-patterns, agent directory structure, Makefile reference
 - **Community Contributions**: Linux Foundation AI Card PR #7, A2A Samples PR #419
 - **Documentation**: Added docs 179-182 (CTO strategy, A2A implementation, Phase 26 planning/AAR)
 - Previous: Phase 25 (Slack Bob Hardening), three-tier architecture documentation
@@ -552,6 +341,32 @@ ls 000-docs/127-*
 - CLAUDE.md should remain concise (target ~15k chars)
   - Exception: Section 2 (Architecture) is worth the space to prevent confusion
 - When adding new standards, update Section 5 with pointer, not full content
+
+---
+
+## Quick Reference Commands
+
+```bash
+# Navigate to repo
+cd /home/jeremy/000-projects/iams/bobs-brain/
+
+# Run tests
+pytest
+pytest tests/unit/test_a2a_card.py -v
+
+# Check compliance
+bash scripts/ci/check_nodrift.sh
+make check-arv-minimum
+
+# Local development
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+
+# View documentation
+ls 000-docs/
+cat 000-docs/6767-DR-STND-adk-agent-engine-spec-and-hardmode-rules.md
+```
 
 ---
 

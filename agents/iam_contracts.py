@@ -275,5 +275,141 @@ class IndexEntry:
         }
 
 
+# ============================================================================
+# Phase P4: Human-in-the-Loop Approval Contracts
+# ============================================================================
+
+
+from enum import Enum
+import uuid
+
+
+class RiskLevel(Enum):
+    """
+    Risk classification for actions requiring approval.
+
+    Used by the Human-in-the-Loop pattern to determine whether
+    an action requires human approval before execution.
+
+    Classification Guidelines:
+    - LOW: Safe, reversible, minimal impact (auto-approve)
+    - MEDIUM: Limited scope, recoverable (auto-approve with logging)
+    - HIGH: Significant scope, requires review (human approval required)
+    - CRITICAL: Production impact, security sensitive (human approval + escalation)
+    """
+
+    LOW = "low"
+    MEDIUM = "medium"
+    HIGH = "high"
+    CRITICAL = "critical"
+
+    @classmethod
+    def requires_approval(cls, level: "RiskLevel") -> bool:
+        """Check if risk level requires human approval."""
+        return level in [cls.HIGH, cls.CRITICAL]
+
+    @classmethod
+    def from_string(cls, value: str) -> "RiskLevel":
+        """Convert string to RiskLevel, defaulting to HIGH if unknown."""
+        try:
+            return cls(value.lower())
+        except ValueError:
+            return cls.HIGH  # Safe default: require approval
+
+
+class ApprovalStatus(Enum):
+    """Status of an approval request."""
+
+    PENDING = "pending"
+    APPROVED = "approved"
+    REJECTED = "rejected"
+    TIMEOUT = "timeout"
+    AUTO_APPROVED = "auto_approved"
+
+
+@dataclass
+class ApprovalRequest:
+    """
+    Request for human approval of a high-risk action.
+
+    This is sent to the approval system (e.g., Slack) when an agent
+    needs permission to execute a potentially dangerous operation.
+    """
+
+    request_id: str = field(default_factory=lambda: str(uuid.uuid4()))
+    action: str = ""
+    description: str = ""
+    risk_level: RiskLevel = RiskLevel.HIGH
+    context: Dict[str, Any] = field(default_factory=dict)
+    requested_by: str = ""  # SPIFFE ID or agent name
+    requested_at: Optional[datetime] = field(default_factory=datetime.utcnow)
+    timeout_seconds: int = 300  # 5 minutes default
+    files_affected: List[str] = field(default_factory=list)
+    estimated_impact: str = ""
+
+    def to_dict(self) -> Dict[str, Any]:
+        """Convert to dictionary for serialization."""
+        return {
+            "request_id": self.request_id,
+            "action": self.action,
+            "description": self.description,
+            "risk_level": self.risk_level.value,
+            "context": self.context,
+            "requested_by": self.requested_by,
+            "requested_at": self.requested_at.isoformat() if self.requested_at else None,
+            "timeout_seconds": self.timeout_seconds,
+            "files_affected": self.files_affected,
+            "estimated_impact": self.estimated_impact,
+        }
+
+
+@dataclass
+class ApprovalResponse:
+    """
+    Response from human approval (or auto-approval).
+
+    Returned after the approval workflow completes, either by
+    human action or automatic decision based on risk level.
+    """
+
+    request_id: str = ""
+    status: ApprovalStatus = ApprovalStatus.PENDING
+    approved: bool = False
+    reason: str = ""
+    approved_by: Optional[str] = None  # Human approver or "system"
+    approved_at: Optional[datetime] = None
+    conditions: List[str] = field(default_factory=list)  # Conditional approval
+
+    def to_dict(self) -> Dict[str, Any]:
+        """Convert to dictionary for serialization."""
+        return {
+            "request_id": self.request_id,
+            "status": self.status.value,
+            "approved": self.approved,
+            "reason": self.reason,
+            "approved_by": self.approved_by,
+            "approved_at": self.approved_at.isoformat() if self.approved_at else None,
+            "conditions": self.conditions,
+        }
+
+
 # Type aliases for clarity
 SpecialistOutput = IssueSpec | FixPlan | QAVerdict | AuditReport | DocumentationUpdate | CleanupTask | IndexEntry
+
+# Export all contracts including Phase P4 additions
+__all__ = [
+    # Existing contracts
+    "IssueSpec",
+    "FixPlan",
+    "QAVerdict",
+    "AuditReport",
+    "DocumentationUpdate",
+    "CleanupTask",
+    "IndexEntry",
+    "SpecialistOutput",
+    # Phase P4: Human-in-the-Loop
+    "RiskLevel",
+    "ApprovalStatus",
+    "ApprovalRequest",
+    "ApprovalResponse",
+]

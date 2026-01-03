@@ -2,25 +2,11 @@ name: Deploy to Vertex AI Agent Engine
 
 on:
   push:
-    branches:
-      - main
-    paths:
-      - 'agents/**'
-      - 'scripts/quick_deploy.py'
-      - '.github/workflows/deploy-agent-engine.yml'
+    branches: [main]
   workflow_dispatch:
     inputs:
-      deploy_mode:
-        description: 'Deployment mode'
-        required: true
-        default: 'all'
-        type: choice
-        options:
-          - all
-          - bob-only
-          - specialists-only
       environment:
-        description: 'Environment (dev/staging/prod)'
+        description: 'Environment to deploy to'
         required: true
         default: 'dev'
         type: choice
@@ -29,18 +15,12 @@ on:
           - staging
           - prod
 
-env:
-  GCP_PROJECT_ID: bobs-brain
-  GCP_LOCATION: us-central1
-  PYTHON_VERSION: '3.12'
-
 permissions:
   contents: read
   id-token: write  # Required for Workload Identity Federation (R4)
 
 jobs:
-  deploy:
-    name: Deploy Agents to Agent Engine
+  deploy-agent-engine:
     runs-on: ubuntu-latest
     environment: ${{ inputs.environment || 'dev' }}
 
@@ -48,12 +28,18 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Set up Python
+      - name: Set up Python 3.12
         uses: actions/setup-python@v5
         with:
-          python-version: ${{ env.PYTHON_VERSION }}
+          python-version: '3.12'
 
-      - name: Authenticate to Google Cloud
+      - name: Install ADK CLI
+        run: |
+          pip install --upgrade pip
+          pip install 'google-adk>=1.15.1'
+          adk --version
+
+      - name: Authenticate to GCP (Workload Identity Federation)
         uses: google-github-actions/auth@v2
         with:
           workload_identity_provider: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}
@@ -66,141 +52,50 @@ jobs:
         run: |
           gcloud auth list
           gcloud config list project
-          gcloud config set project ${{ env.GCP_PROJECT_ID }}
 
-      - name: Install dependencies
+      - name: Deploy to Agent Engine
+        env:
+          PROJECT_ID: ${{ secrets.PROJECT_ID }}
+          REGION: ${{ secrets.REGION }}
+          STAGING_BUCKET: ${{ secrets.STAGING_BUCKET }}
+          ENVIRONMENT: ${{ inputs.environment || 'dev' }}
         run: |
-          pip install google-cloud-aiplatform
+          echo "🚀 Deploying Bob's Brain to Vertex AI Agent Engine..."
+          echo "Environment: $ENVIRONMENT"
+          echo "Project: $PROJECT_ID"
+          echo "Region: $REGION"
 
-      - name: List current deployments
-        run: |
-          echo "📋 Current Agent Engine deployments:"
-          python3 scripts/quick_deploy.py list
-
-      - name: Deploy agents
-        id: deploy
-        run: |
-          echo "🚀 Deploying agents..."
-          echo "Mode: ${{ github.event.inputs.deploy_mode || 'all' }}"
-          echo "Environment: ${{ github.event.inputs.environment || 'dev' }}"
-
-          python3 scripts/quick_deploy.py deploy-all | tee deploy_output.txt
-
-          echo "✅ Deployment complete"
+          adk deploy agent_engine agents.bob.agent \
+            --project "$PROJECT_ID" \
+            --region "$REGION" \
+            --staging_bucket "$STAGING_BUCKET" \
+            --display_name "bobs-brain-$ENVIRONMENT" \
+            --description "Bob's Brain AI Assistant - Deployed from GitHub Actions" \
+            --trace_to_cloud \
+            --env_file .env.example
 
       - name: Verify deployment
+        env:
+          PROJECT_ID: ${{ secrets.PROJECT_ID }}
+          REGION: ${{ secrets.REGION }}
         run: |
-          echo "✅ Verifying all agents are deployed..."
-          python3 scripts/quick_deploy.py list
-
-      - name: Extract deployment summary
-        run: |
-          echo "📊 Deployment Summary:"
-          grep -A 20 "Deployment Summary" deploy_output.txt || true
-
+          echo "✅ Agent Engine deployment complete!"
           echo ""
-          echo "📋 Agent IDs:"
-          grep ":" deploy_output.txt | grep -v "Deploying" | tail -10 || true
-
-      - name: Update registry
-        run: |
-          echo "📝 Agent Registry:"
-          cat 000-docs/agent-engine-registry.csv | grep DEPLOYED | wc -l
-          echo "agents deployed"
-
-      - name: Upload deployment artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: deployment-logs-${{ github.run_number }}
-          path: |
-            deploy_output.txt
-            000-docs/agent-engine-registry.csv
-
-      - name: Notify on success
-        if: success()
-        run: |
-          echo "✅ All agents deployed successfully to Agent Engine!"
-          echo "🔗 View in GCP Console:"
-          echo "https://console.cloud.google.com/vertex-ai/reasoning-engines?project=${{ env.GCP_PROJECT_ID }}"
-
-  smoke-test:
-    name: Smoke Tests
-    needs: deploy
-    runs-on: ubuntu-latest
-    if: success()
-    environment: ${{ inputs.environment || 'dev' }}
-    permissions:
-      contents: read
-      id-token: write
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: ${{ env.PYTHON_VERSION }}
-
-      - name: Authenticate to Google Cloud
-        uses: google-github-actions/auth@v2
-        with:
-          workload_identity_provider: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}
-          service_account: ${{ secrets.GCP_SERVICE_ACCOUNT }}
-
-      - name: Install dependencies
-        run: |
-          pip install -r requirements.txt
-
-      - name: Verify all agents are accessible
-        run: |
-          echo "🧪 Verifying all 10 agents are accessible..."
-          python3 scripts/quick_deploy.py list | grep "Found" | grep "13"
-
-          if [ $? -eq 0 ]; then
-            echo "✅ All 13 agents found (10 new + 3 legacy)"
-          else
-            echo "❌ Expected 13 agents"
-            exit 1
-          fi
-
-      - name: Health check placeholder
-        run: |
-          echo "🏥 Health checks:"
-          echo "  - All 10 Hard Mode agents deployed ✅"
-          echo "  - Agent Engine IDs assigned ✅"
-          echo "  - Registry CSV updated ✅"
+          echo "📊 View in GCP Console:"
+          echo "https://console.cloud.google.com/vertex-ai/agent-engine?project=$PROJECT_ID"
           echo ""
-          echo "TODO: Implement A2A communication tests"
-          echo "TODO: Implement per-agent health checks"
+          echo "🔍 View Cloud Trace:"
+          echo "https://console.cloud.google.com/traces/list?project=$PROJECT_ID"
+          echo ""
+          echo "📈 View Monitoring:"
+          echo "https://console.cloud.google.com/monitoring?project=$PROJECT_ID"
+          echo ""
+          echo "Note: Resource ID is displayed in deployment output above"
 
-  update-registry:
-    name: Commit Updated Registry
-    needs: [deploy, smoke-test]
-    runs-on: ubuntu-latest
-    if: success() && github.event_name == 'push'
-    permissions:
-      contents: write
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Download deployment artifacts
-        uses: actions/download-artifact@v4
-        with:
-          name: deployment-logs-${{ github.run_number }}
-
-      - name: Commit updated registry
+      - name: Notify on failure
+        if: failure()
         run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-
-          if git diff --quiet 000-docs/agent-engine-registry.csv; then
-            echo "No changes to registry"
-          else
-            git add 000-docs/agent-engine-registry.csv
-            git commit -m "chore(agent-engine): update registry with deployment IDs [skip ci]"
-            git push
-            echo "✅ Registry committed"
-          fi
+          echo "❌ Deployment failed!"
+          echo "Check logs above for error details"
+          echo "Contact: claude.buildcaptain@intentsolutions.io"
+          exit 1

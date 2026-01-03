@@ -283,6 +283,7 @@ When implementing fixes, be meticulous and pragmatic. Good implementation:
         name="iam_fix_impl",  # Required: Valid Python identifier (no hyphens)
         tools=IAM_FIX_IMPL_TOOLS,  # Use shared tools profile
         instruction=instruction,
+        output_key="fix_output",  # Phase P3: State key for LoopAgent workflows
         after_agent_callback=auto_save_session_to_memory,  # R5: Save to Memory Bank
     )
 
@@ -356,6 +357,9 @@ def create_runner() -> Runner:
     )
 
     return runner
+
+# Phase P3: Alias for standard pattern
+create_agent = get_agent
 
 # Create the root agent for ADK CLI deployment
 # ADK CLI expects a variable named 'root_agent' at module level

@@ -6,9 +6,6 @@ Tests the lazy-loading App pattern to ensure:
 - Agent created lazily on first use
 - Environment validation happens lazily
 - App can be called multiple times safely
-
-Note: These tests require google-adk package and are skipped in CI
-environments where ADK is not installed.
 """
 
 import pytest
@@ -17,10 +14,7 @@ import sys
 from unittest.mock import patch
 from pathlib import Path
 
-from tests.unit.conftest import requires_adk
 
-
-@requires_adk
 class TestLazyImport:
     """Tests for lazy import behavior."""
 
@@ -60,7 +54,6 @@ class TestLazyImport:
         assert elapsed < 1.0, f"Import took {elapsed:.3f}s (should be < 1s)"
 
 
-@requires_adk
 class TestCreateAgent:
     """Tests for create_agent() function."""
 
@@ -137,7 +130,6 @@ class TestCreateAgent:
             assert hasattr(agent, 'tools')
 
 
-@requires_adk
 class TestCreateApp:
     """Tests for create_app() function."""
 
@@ -194,7 +186,6 @@ class TestCreateApp:
             assert app.name == 'bobs-brain'
 
 
-@requires_adk
 class TestAppEntrypoint:
     """Tests for module-level app entrypoint."""
 
@@ -242,7 +233,6 @@ class TestAppEntrypoint:
             assert not hasattr(agents.iam_adk.agent, 'root_agent')
 
 
-@requires_adk
 class TestBackwardsCompatibility:
     """Tests for backwards compatibility with old pattern."""
 
@@ -287,7 +277,6 @@ class TestBackwardsCompatibility:
                 assert "create_app" in warning_msg
 
 
-@requires_adk
 class TestSmokeTest:
     """Comprehensive smoke test for lazy loading behavior."""
 

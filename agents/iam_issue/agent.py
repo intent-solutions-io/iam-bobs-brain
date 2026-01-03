@@ -205,6 +205,7 @@ When creating issues, be thorough and professional. Each issue should be:
         name="iam_issue",  # Required: Valid Python identifier (no hyphens)
         tools=IAM_ISSUE_TOOLS,  # Use shared tool profile
         instruction=instruction,
+        output_key="issue_specs",  # State key for SequentialAgent (Phase P1)
         after_agent_callback=auto_save_session_to_memory,  # R5: Save to Memory Bank
     )
 

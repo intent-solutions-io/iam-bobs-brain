@@ -3,52 +3,41 @@ Test ADK Imports - Hard Mode (R1)
 
 Ensures all imports work correctly and prevent regression.
 Tests align with Google Cloud user manual patterns.
-
-Note: These tests require google-adk package and are skipped in CI
-environments where ADK is not installed.
 """
 
 import pytest
 
-from tests.unit.conftest import requires_adk
 
-
-@requires_adk
 def test_adk_agent_imports():
     """Test LlmAgent import from google.adk.agents (R1)"""
     from google.adk.agents import LlmAgent
     assert LlmAgent is not None
 
 
-@requires_adk
 def test_adk_runner_import():
     """Test Runner import from google.adk top-level"""
     from google.adk import Runner
     assert Runner is not None
 
 
-@requires_adk
 def test_adk_session_service_import():
     """Test VertexAiSessionService from google.adk.sessions (R5)"""
     from google.adk.sessions import VertexAiSessionService
     assert VertexAiSessionService is not None
 
 
-@requires_adk
 def test_adk_memory_service_import():
     """Test VertexAiMemoryBankService from google.adk.memory (R5)"""
     from google.adk.memory import VertexAiMemoryBankService
     assert VertexAiMemoryBankService is not None
 
 
-@requires_adk
 def test_a2a_agent_card_import():
     """Test AgentCard from a2a.types (R7)"""
     from a2a.types import AgentCard
     assert AgentCard is not None
 
 
-@requires_adk
 def test_all_imports_together():
     """Test all imports can be loaded together"""
     from google.adk.agents import LlmAgent

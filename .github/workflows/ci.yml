@@ -315,11 +315,11 @@ jobs:
             echo "✅ agents/bob/ structure valid"
           fi
 
-          # Verify shared contracts package exists
-          if [ -d "agents/shared_contracts" ] && [ -f "agents/shared_contracts/__init__.py" ]; then
-            echo "✅ agents/shared_contracts/ package present"
+          # Verify shared contracts exist
+          if [ -f "agents/shared_contracts.py" ]; then
+            echo "✅ agents/shared_contracts.py present"
           else
-            echo "❌ agents/shared_contracts/ package missing"
+            echo "❌ agents/shared_contracts.py missing"
             exit 1
           fi
 

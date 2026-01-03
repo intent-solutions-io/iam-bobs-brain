@@ -111,6 +111,13 @@ def get_agent() -> LlmAgent:
 
 **Your Identity:** {AGENT_SPIFFE_ID}
 
+## INPUT (from LoopAgent state)
+
+When running in a fix-review loop, you receive the implementation output:
+- **{{fix_output}}**: The implementation details from iam-fix-impl
+
+Review this output and produce a PASS/FAIL verdict.
+
 **Your Role:**
 
 You are a specialized agent focused on ensuring quality and correctness of implemented fixes.
@@ -283,6 +290,7 @@ When evaluating fixes, be thorough and pragmatic. A good test plan:
         name="iam_qa",  # Required: Valid Python identifier (no hyphens)
         tools=IAM_QA_TOOLS,  # Use shared tools profile
         instruction=instruction,
+        output_key="qa_result",  # Phase P3: State key for LoopAgent workflows
         after_agent_callback=auto_save_session_to_memory,  # R5: Save to Memory Bank
     )
 
@@ -356,6 +364,9 @@ def create_runner() -> Runner:
     )
 
     return runner
+
+# Phase P3: Alias for standard pattern
+create_agent = get_agent
 
 # Create the root agent for ADK CLI deployment
 # ADK CLI expects a variable named 'root_agent' at module level

@@ -25,33 +25,6 @@ resource "google_service_account" "slack_webhook" {
   project      = var.project_id
 }
 
-# Service Account for Bob's MCP Server
-resource "google_service_account" "bobs_mcp" {
-  count        = var.bobs_mcp_enabled ? 1 : 0
-  account_id   = "${var.app_name}-mcp-${var.environment}"
-  display_name = "Bob's MCP Server (${var.environment})"
-  description  = "Service account for Bob's MCP Cloud Run service"
-  project      = var.project_id
-}
-
-# IAM Bindings for Bob's MCP Server
-# Needs logging access for Cloud Run
-
-resource "google_project_iam_member" "bobs_mcp_logging" {
-  count   = var.bobs_mcp_enabled ? 1 : 0
-  project = var.project_id
-  role    = "roles/logging.logWriter"
-  member  = "serviceAccount:${google_service_account.bobs_mcp[0].email}"
-}
-
-# Storage read access for repository analysis
-resource "google_project_iam_member" "bobs_mcp_storage" {
-  count   = var.bobs_mcp_enabled ? 1 : 0
-  project = var.project_id
-  role    = "roles/storage.objectViewer"
-  member  = "serviceAccount:${google_service_account.bobs_mcp[0].email}"
-}
-
 # IAM Bindings for Agent Engine
 # Needs access to Vertex AI services for LLM calls, memory, and tools
 
