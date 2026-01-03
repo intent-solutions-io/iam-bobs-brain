@@ -474,6 +474,38 @@ Use conventional commits format:
 - `docs(000-docs): add plan for iam-adk design phase`
 - `ci(workflows): add ARV checks for agent readiness`
 
+### Git Workflow Protocol
+
+**NEVER commit directly to main.** Always use feature branches:
+
+```bash
+# 1. Start from clean main
+git checkout main && git pull
+
+# 2. Create feature branch FIRST
+git checkout -b feat/my-feature-name
+
+# 3. Make commits on feature branch
+git add . && git commit -m "feat(scope): description"
+
+# 4. Push and create PR
+git push -u origin feat/my-feature-name
+gh pr create --title "feat: description" --body "..."
+
+# 5. After PR merged, clean up
+git checkout main && git pull
+git branch -d feat/my-feature-name
+```
+
+**Branch Naming:**
+- `feat/` - New features
+- `fix/` - Bug fixes
+- `docs/` - Documentation only
+- `refactor/` - Code restructuring
+- `chore/` - Maintenance tasks
+
+**Protected Branch:** `main` is protected - all changes via PR only.
+
 ---
 
 ## 5. Documentation Navigation
