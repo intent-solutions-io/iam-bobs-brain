@@ -1,8 +1,9 @@
 # Bob Orchestrator Implementation Plan
 
 **Document ID:** 251-AA-PLAN-bob-orchestrator-implementation
-**Status:** IN PROGRESS
+**Status:** PHASES A-C COMPLETE
 **Created:** 2026-01-02
+**Updated:** 2026-01-02
 **Author:** Claude Code
 
 ---
@@ -83,7 +84,7 @@ This document outlines the phased implementation plan for enhancing Bob's Brain 
 ---
 
 ### Phase B: Budget & Mandate Patterns
-**Status:** 🔄 IN REVIEW (PR #45)
+**Status:** ✅ COMPLETE (PR #45 merged)
 
 **Objective:** Enable authorized, budget-limited operations.
 
@@ -116,7 +117,7 @@ This document outlines the phased implementation plan for enhancing Bob's Brain 
 ---
 
 ### Phase C: Checkpointing & Resume
-**Status:** 🔄 IN REVIEW (PR #46)
+**Status:** ✅ COMPLETE (PR #46 merged)
 
 **Objective:** Enable long-running tasks to pause and resume.
 
@@ -228,8 +229,9 @@ This document outlines the phased implementation plan for enhancing Bob's Brain 
 | PR | Phase | Title | Status |
 |----|-------|-------|--------|
 | #43 | A | completion_promise and loop pattern | ✅ Merged |
-| #45 | B | Budget & Mandate Patterns | 🔄 Open |
-| #46 | C | Long-Running Task Patterns | 🔄 Open |
+| #44 | - | Git workflow documentation | ✅ Merged |
+| #45 | B | Budget & Mandate Patterns | ✅ Merged |
+| #46 | C | Long-Running Task Patterns | ✅ Merged |
 
 ---
 
@@ -250,12 +252,12 @@ This document outlines the phased implementation plan for enhancing Bob's Brain 
 
 ## Success Criteria
 
-### Phase A-C (Current Focus)
-- [ ] All PRs merged to main
-- [ ] No regressions in existing tests
-- [ ] Foreman can execute loop patterns
-- [ ] Mandates properly validated in dispatcher
-- [ ] Checkpoints serialize/deserialize correctly
+### Phase A-C (COMPLETE)
+- [x] All PRs merged to main
+- [x] No regressions in existing tests
+- [x] Foreman instruction includes loop patterns
+- [x] Mandates properly validated in dispatcher
+- [x] Checkpoint/progress dataclasses defined
 
 ### Phase D-F (Future)
 - [ ] Multi-repo operations work with workspace context
@@ -277,8 +279,8 @@ This document outlines the phased implementation plan for enhancing Bob's Brain 
 
 ## Next Steps
 
-1. **Immediate:** Review and merge PRs #45, #46
-2. **Short-term:** Create Phase D epic for Gastown patterns
+1. **COMPLETE:** PRs #43, #44, #45, #46 all merged to main
+2. **Next:** Create Phase D epic for Gastown Workspace patterns
 3. **Medium-term:** Implement witness monitoring for repos
 4. **Long-term:** Package as reusable skills for other departments
 
