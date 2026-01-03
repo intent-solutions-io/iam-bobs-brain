@@ -182,7 +182,7 @@ For long-running tasks that may be interrupted or need to span multiple sessions
     "partial_results": {...}
   },
   "resumable": true,
-  "reason": "iteration_limit|budget_limit|user_interrupt|error"
+  "reason": "iteration_limit"
 }
 ```
 

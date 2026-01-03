@@ -114,7 +114,9 @@ class TaskCheckpoint:
             "checkpoint_id": self.checkpoint_id,
             "pipeline_run_id": self.pipeline_run_id,
             "current_step": self.current_step,
+            "total_steps": self.total_steps,
             "completed_specialists": self.completed_specialists,
+            "pending_specialists": self.pending_specialists,
             "partial_results": self.partial_results,
         }
 
