@@ -2,6 +2,7 @@
 Shared contracts package for Bob's Brain agents.
 
 This package contains:
+- agent_identity.py: Canonical agent IDs and alias resolution (252-DR-STND)
 - tool_outputs.py: Pydantic models for MCP tool results
 - pipeline_contracts.py: Dataclasses for SWE pipeline agent communication
 - (future) a2a_envelopes.py: A2A task/result envelope wrappers
@@ -10,7 +11,32 @@ All contracts are designed for:
 - Type-safe inter-agent communication
 - JSON Schema generation for AgentCard skills
 - Validation of inputs/outputs against A2A protocol
+- Canonical agent identity management (Phase D)
 """
+
+# ============================================================================
+# AGENT IDENTITY (Canonical IDs and aliases - 252-DR-STND)
+# ============================================================================
+from agents.shared_contracts.agent_identity import (
+    # Types
+    AgentTier,
+    AgentDefinition,
+    # Data
+    CANONICAL_AGENTS,
+    AGENT_ALIASES,
+    CANONICAL_TO_DIRECTORY,
+    DIRECTORY_TO_CANONICAL,
+    # Functions
+    canonicalize,
+    is_canonical,
+    is_valid,
+    get_definition,
+    get_directory,
+    get_spiffe_id,
+    list_canonical_ids,
+    list_by_tier,
+    list_specialists,
+)
 
 # ============================================================================
 # TOOL OUTPUTS (MCP/Pydantic models)
@@ -73,6 +99,22 @@ from agents.shared_contracts.pipeline_contracts import (
 )
 
 __all__ = [
+    # Agent identity (252-DR-STND)
+    "AgentTier",
+    "AgentDefinition",
+    "CANONICAL_AGENTS",
+    "AGENT_ALIASES",
+    "CANONICAL_TO_DIRECTORY",
+    "DIRECTORY_TO_CANONICAL",
+    "canonicalize",
+    "is_canonical",
+    "is_valid",
+    "get_definition",
+    "get_directory",
+    "get_spiffe_id",
+    "list_canonical_ids",
+    "list_by_tier",
+    "list_specialists",
     # Tool outputs (MCP/Pydantic)
     "ToolResult",
     "ComplianceResult",

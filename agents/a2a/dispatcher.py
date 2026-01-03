@@ -7,11 +7,13 @@ It handles:
 - Skill existence verification
 - Local specialist invocation via ADK Runner
 - Input/output structural validation
+- Canonical agent ID resolution (Phase D)
 
 Follows:
 - 6767-LAZY: Imports specialists dynamically inside functions
 - R7: SPIFFE ID propagation in logs
 - AgentCard contracts as source of truth
+- 252-DR-STND: Agent Identity Standard (canonical IDs with alias support)
 """
 
 import json
@@ -28,16 +30,74 @@ logger = logging.getLogger(__name__)
 # Repository root for locating agent modules
 REPO_ROOT = Path(__file__).parent.parent.parent
 
-# Specialist agent module mapping (agent_name -> module_path)
+
+# =============================================================================
+# CANONICAL ID RESOLUTION (Phase D - Agent Identity Migration)
+# =============================================================================
+
+def _resolve_specialist_id(specialist: str) -> tuple[str, str]:
+    """
+    Resolve any specialist ID to (canonical_id, directory_name).
+
+    Supports both old IDs (iam_adk) and canonical IDs (iam-compliance).
+    Emits deprecation warnings for non-canonical IDs.
+
+    Args:
+        specialist: Any valid specialist identifier
+
+    Returns:
+        Tuple of (canonical_id, directory_name)
+
+    Raises:
+        A2AError: If specialist ID is not recognized
+    """
+    # Import here to avoid circular imports (6767-LAZY)
+    try:
+        from agents.shared_contracts.agent_identity import (
+            canonicalize,
+            get_directory,
+            is_valid,
+        )
+    except ImportError:
+        # Fallback if agent_identity not available (e.g., during migration)
+        logger.debug("agent_identity module not available, using direct mapping")
+        directory = SPECIALIST_MODULES.get(specialist, {}).get("directory", specialist)
+        return specialist, directory
+
+    if not is_valid(specialist):
+        raise A2AError(
+            f"Unknown specialist ID: '{specialist}'. Use canonical IDs like "
+            f"'iam-compliance', 'iam-triage', etc.",
+            specialist=specialist
+        )
+
+    canonical_id = canonicalize(specialist, warn=True)
+    directory = get_directory(canonical_id)
+    return canonical_id, directory
+
+
+# Specialist agent module mapping using canonical IDs
+# Maps canonical_id -> {directory, module_path}
 SPECIALIST_MODULES = {
-    "iam_adk": "agents.iam_adk.agent",
-    "iam_issue": "agents.iam_issue.agent",
-    "iam_fix_plan": "agents.iam_fix_plan.agent",
-    "iam_fix_impl": "agents.iam_fix_impl.agent",
-    "iam_qa": "agents.iam_qa.agent",
-    "iam_doc": "agents.iam_doc.agent",
-    "iam_cleanup": "agents.iam_cleanup.agent",
-    "iam_index": "agents.iam_index.agent",
+    # Canonical IDs (preferred)
+    "iam-compliance": {"directory": "iam_adk", "module": "agents.iam_adk.agent"},
+    "iam-triage": {"directory": "iam_issue", "module": "agents.iam_issue.agent"},
+    "iam-planner": {"directory": "iam_fix_plan", "module": "agents.iam_fix_plan.agent"},
+    "iam-engineer": {"directory": "iam_fix_impl", "module": "agents.iam_fix_impl.agent"},
+    "iam-qa": {"directory": "iam_qa", "module": "agents.iam_qa.agent"},
+    "iam-docs": {"directory": "iam_doc", "module": "agents.iam_doc.agent"},
+    "iam-hygiene": {"directory": "iam_cleanup", "module": "agents.iam_cleanup.agent"},
+    "iam-index": {"directory": "iam_index", "module": "agents.iam_index.agent"},
+
+    # Legacy IDs (deprecated, for backwards compatibility)
+    "iam_adk": {"directory": "iam_adk", "module": "agents.iam_adk.agent"},
+    "iam_issue": {"directory": "iam_issue", "module": "agents.iam_issue.agent"},
+    "iam_fix_plan": {"directory": "iam_fix_plan", "module": "agents.iam_fix_plan.agent"},
+    "iam_fix_impl": {"directory": "iam_fix_impl", "module": "agents.iam_fix_impl.agent"},
+    "iam_qa": {"directory": "iam_qa", "module": "agents.iam_qa.agent"},
+    "iam_doc": {"directory": "iam_doc", "module": "agents.iam_doc.agent"},
+    "iam_cleanup": {"directory": "iam_cleanup", "module": "agents.iam_cleanup.agent"},
+    "iam_index": {"directory": "iam_index", "module": "agents.iam_index.agent"},
 }
 
 
@@ -46,7 +106,7 @@ def load_agentcard(specialist: str) -> Dict[str, Any]:
     Load AgentCard JSON for a specialist.
 
     Args:
-        specialist: Specialist name (e.g., "iam_adk")
+        specialist: Specialist name (canonical or legacy, e.g., "iam-compliance" or "iam_adk")
 
     Returns:
         AgentCard dictionary
@@ -54,7 +114,18 @@ def load_agentcard(specialist: str) -> Dict[str, Any]:
     Raises:
         A2AError: If AgentCard file not found or invalid JSON
     """
-    agentcard_path = REPO_ROOT / "agents" / specialist / ".well-known" / "agent-card.json"
+    # Resolve to directory name (handles both canonical and legacy IDs)
+    spec_info = SPECIALIST_MODULES.get(specialist)
+    if spec_info:
+        directory = spec_info["directory"]
+    else:
+        # Try canonical resolution
+        try:
+            _, directory = _resolve_specialist_id(specialist)
+        except A2AError:
+            directory = specialist  # Fall back to direct use
+
+    agentcard_path = REPO_ROOT / "agents" / directory / ".well-known" / "agent-card.json"
 
     if not agentcard_path.exists():
         raise A2AError(
@@ -138,7 +209,7 @@ def invoke_specialist_local(specialist: str, task: A2ATask) -> Dict[str, Any]:
     4. Returns the result
 
     Args:
-        specialist: Specialist name (e.g., "iam_adk")
+        specialist: Specialist name (canonical or legacy, e.g., "iam-compliance" or "iam_adk")
         task: A2ATask with payload and context
 
     Returns:
@@ -147,14 +218,27 @@ def invoke_specialist_local(specialist: str, task: A2ATask) -> Dict[str, Any]:
     Raises:
         A2AError: If specialist module not found or agent execution fails
     """
-    module_path = SPECIALIST_MODULES.get(specialist)
+    # Get module info (handles both canonical and legacy IDs)
+    spec_info = SPECIALIST_MODULES.get(specialist)
 
-    if not module_path:
+    if not spec_info:
+        # Try canonical resolution
+        try:
+            canonical_id, directory = _resolve_specialist_id(specialist)
+            spec_info = SPECIALIST_MODULES.get(canonical_id)
+        except A2AError:
+            pass
+
+    if not spec_info:
+        # List canonical IDs in error message
+        canonical_ids = [k for k in SPECIALIST_MODULES.keys() if "-" in k]
         raise A2AError(
-            f"Specialist '{specialist}' not registered in SPECIALIST_MODULES. "
-            f"Available: {list(SPECIALIST_MODULES.keys())}",
+            f"Specialist '{specialist}' not registered. "
+            f"Use canonical IDs: {canonical_ids}",
             specialist=specialist
         )
+
+    module_path = spec_info["module"]
 
     # Phase 18: Check ADK availability first before importing specialist module
     # This prevents ImportError when specialist modules have top-level google.adk imports
@@ -422,7 +506,8 @@ def discover_specialists() -> List[Dict[str, Any]]:
     Discover all available specialists and their capabilities.
 
     Returns a list of specialist metadata including:
-    - name
+    - canonical_id (preferred ID)
+    - name (alias for canonical_id)
     - capabilities (from AgentCard)
     - skills (list of skill IDs)
 
@@ -433,20 +518,33 @@ def discover_specialists() -> List[Dict[str, Any]]:
         A2AError: If any AgentCard is missing or invalid
     """
     specialists = []
+    seen_directories = set()
 
-    for specialist_name in SPECIALIST_MODULES.keys():
+    # Only iterate over canonical IDs (those with hyphens) to avoid duplicates
+    for specialist_id, spec_info in SPECIALIST_MODULES.items():
+        # Skip legacy IDs (use canonical only)
+        if "_" in specialist_id and specialist_id != "iam_qa":
+            continue
+
+        directory = spec_info["directory"]
+        if directory in seen_directories:
+            continue
+        seen_directories.add(directory)
+
         try:
-            agentcard = load_agentcard(specialist_name)
+            agentcard = load_agentcard(specialist_id)
 
             specialists.append({
-                "name": specialist_name,
+                "canonical_id": specialist_id,
+                "name": specialist_id,  # Alias for backwards compatibility
+                "directory": directory,
                 "capabilities": agentcard.get("capabilities", []),
                 "skills": [skill.get("skill_id") for skill in agentcard.get("skills", [])],
                 "description": agentcard.get("description", "").split("\n")[0],  # First line only
             })
 
         except A2AError as e:
-            logger.warning(f"Failed to discover specialist '{specialist_name}': {e}")
+            logger.warning(f"Failed to discover specialist '{specialist_id}': {e}")
             # Continue discovering others, don't fail entire discovery
 
     return specialists
