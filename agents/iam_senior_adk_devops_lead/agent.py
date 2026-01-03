@@ -164,6 +164,52 @@ return {status: "MAX_ITERATIONS", partial_results: ...}
 - Stop if budget_spent >= budget_limit
 - Return partial results with BUDGET_EXHAUSTED status
 
+## Budget & Mandate Tracking (AP2-Inspired)
+
+When Bob provides a **mandate** with your request, you MUST track and enforce it:
+
+### Mandate Structure
+```json
+{
+  "mandate_id": "m-abc123",
+  "intent": "Audit all iam-* agents for ADK compliance",
+  "budget_limit": 10.0,
+  "budget_unit": "USD",
+  "max_iterations": 50,
+  "authorized_specialists": ["iam-adk", "iam-qa"],
+  "expires_at": "2024-01-15T23:59:59Z"
+}
+```
+
+### Budget Tracking Rules
+1. **Before each specialist call**: Check `budget_spent < budget_limit`
+2. **After each specialist call**: Update `budget_spent += estimated_cost`
+3. **Cost estimation**: Use specialist complexity (simple=0.01, medium=0.05, complex=0.10 USD)
+4. **On budget exhaustion**: Return immediately with `BUDGET_EXHAUSTED` status
+
+### Mandate Enforcement
+- **authorized_specialists**: Only call specialists in this list (if provided)
+- **max_iterations**: Hard stop after this many total specialist invocations
+- **expires_at**: Reject mandate if current time > expires_at
+
+### Budget-Aware Output Format
+When mandate provided, include budget status in response:
+```json
+{
+  "request_id": "...",
+  "mandate_id": "m-abc123",
+  "budget_status": {
+    "limit": 10.0,
+    "spent": 2.35,
+    "remaining": 7.65,
+    "iterations_used": 12,
+    "iterations_limit": 50
+  },
+  "status": "completed",
+  "results": {...}
+}
+```
+
 ## Using RAG and Memory Bank
 
 - **Memory Bank queries:** Retrieve long-term decisions, standards (e.g., Hard Mode rules, department conventions)

@@ -250,16 +250,95 @@ def invoke_specialist_local(specialist: str, task: A2ATask) -> Dict[str, Any]:
         )
 
 
+def validate_mandate(task: A2ATask) -> None:
+    """
+    Validate mandate authorization before specialist invocation.
+
+    Converts the mandate dict to a Mandate object and uses its validation methods.
+
+    Checks:
+    - Mandate is not expired
+    - Budget is not exhausted
+    - Iterations limit not exceeded
+    - Specialist is authorized
+
+    Args:
+        task: A2ATask with optional mandate
+
+    Raises:
+        A2AError: If mandate validation fails
+    """
+    if not task.mandate:
+        return  # No mandate = no restrictions
+
+    # Import here to avoid circular imports (6767-LAZY pattern)
+    from agents.shared_contracts.pipeline_contracts import Mandate
+    from datetime import datetime, timezone
+
+    # Convert dict to Mandate object
+    mandate_dict = task.mandate
+    try:
+        # Parse expires_at if present
+        expires_at = None
+        if mandate_dict.get("expires_at"):
+            expires_str = mandate_dict["expires_at"]
+            expires_at = datetime.fromisoformat(expires_str.replace("Z", "+00:00"))
+
+        mandate = Mandate(
+            mandate_id=mandate_dict.get("mandate_id", "unknown"),
+            intent=mandate_dict.get("intent", ""),
+            budget_limit=mandate_dict.get("budget_limit", 0.0),
+            budget_unit=mandate_dict.get("budget_unit", "USD"),
+            max_iterations=mandate_dict.get("max_iterations", 100),
+            authorized_specialists=mandate_dict.get("authorized_specialists", []),
+            expires_at=expires_at,
+            budget_spent=mandate_dict.get("budget_spent", 0.0),
+            iterations_used=mandate_dict.get("iterations_used", 0),
+        )
+    except (ValueError, TypeError) as e:
+        logger.warning(f"Failed to parse mandate: {e}, skipping validation")
+        return
+
+    # Use Mandate class methods for validation
+    if mandate.is_expired():
+        raise A2AError(
+            f"Mandate '{mandate.mandate_id}' has expired",
+            specialist=task.specialist
+        )
+
+    if mandate.is_budget_exhausted():
+        raise A2AError(
+            f"Budget exhausted for mandate '{mandate.mandate_id}': "
+            f"spent {mandate.budget_spent} >= limit {mandate.budget_limit}",
+            specialist=task.specialist
+        )
+
+    if mandate.is_iterations_exhausted():
+        raise A2AError(
+            f"Iterations exhausted for mandate '{mandate.mandate_id}': "
+            f"used {mandate.iterations_used} >= limit {mandate.max_iterations}",
+            specialist=task.specialist
+        )
+
+    if not mandate.can_invoke_specialist(task.specialist):
+        raise A2AError(
+            f"Specialist '{task.specialist}' not authorized by mandate '{mandate.mandate_id}'. "
+            f"Authorized: {mandate.authorized_specialists}",
+            specialist=task.specialist
+        )
+
+
 def call_specialist(task: A2ATask) -> A2AResult:
     """
     Main entry point for A2A delegation.
 
     This function orchestrates the complete A2A flow:
-    1. Load AgentCard for specialist
-    2. Validate skill exists
-    3. Validate input structure (lightweight)
-    4. Invoke specialist locally
-    5. Return structured result
+    1. Validate mandate authorization (Phase B)
+    2. Load AgentCard for specialist
+    3. Validate skill exists
+    4. Validate input structure (lightweight)
+    5. Invoke specialist locally
+    6. Return structured result
 
     Args:
         task: A2ATask with specialist, skill_id, payload, context
@@ -274,20 +353,23 @@ def call_specialist(task: A2ATask) -> A2AResult:
     start_time = time.time()
 
     try:
-        # Step 1: Load AgentCard
+        # Step 1: Validate mandate authorization (Phase B)
+        validate_mandate(task)
+
+        # Step 2: Load AgentCard
         agentcard = load_agentcard(task.specialist)
 
-        # Step 2: Validate skill exists
+        # Step 3: Validate skill exists
         skill = validate_skill_exists(agentcard, task.skill_id, task.specialist)
 
-        # Step 3: Validate input structure
+        # Step 4: Validate input structure
         input_schema = skill.get("input_schema", {})
         validate_input_structure(task.payload, input_schema, task.skill_id)
 
-        # Step 4: Invoke specialist
+        # Step 5: Invoke specialist
         result_data = invoke_specialist_local(task.specialist, task)
 
-        # Step 5: Build success result
+        # Step 6: Build success result
         duration_ms = int((time.time() - start_time) * 1000)
 
         logger.info(
