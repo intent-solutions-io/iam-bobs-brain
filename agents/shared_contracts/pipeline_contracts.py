@@ -177,6 +177,16 @@ class Mandate:
     # Authorization scope
     authorized_specialists: List[str] = field(default_factory=list)  # Empty = all allowed
 
+    # Enterprise controls (Phase E - Vision Alignment)
+    risk_tier: Literal["R0", "R1", "R2", "R3", "R4"] = "R0"  # R0 = no restrictions (default)
+    tool_allowlist: List[str] = field(default_factory=list)  # Empty = all tools allowed
+    data_classification: Literal["public", "internal", "confidential", "restricted"] = "internal"
+
+    # Approval workflow (for R3/R4 operations)
+    approval_state: Literal["pending", "approved", "denied", "auto"] = "auto"
+    approver_id: Optional[str] = None
+    approval_timestamp: Optional[datetime] = None
+
     # Expiration
     expires_at: Optional[datetime] = None  # None = no expiration
 
@@ -204,8 +214,32 @@ class Mandate:
         """Check if iteration limit reached."""
         return self.iterations_used >= self.max_iterations
 
+    def requires_approval(self) -> bool:
+        """Check if this mandate's risk tier requires human approval."""
+        return self.risk_tier in ("R3", "R4")
+
+    def is_approved(self) -> bool:
+        """Check if mandate is approved (or doesn't require approval)."""
+        if not self.requires_approval():
+            return True  # R0-R2 don't need approval
+        return self.approval_state == "approved"
+
+    def is_pending_approval(self) -> bool:
+        """Check if mandate is awaiting approval."""
+        return self.approval_state == "pending"
+
+    def is_denied(self) -> bool:
+        """Check if mandate was denied."""
+        return self.approval_state == "denied"
+
+    def can_use_tool(self, tool_name: str) -> bool:
+        """Check if a tool is allowed by the mandate."""
+        if not self.tool_allowlist:
+            return True  # Empty = all tools allowed
+        return tool_name in self.tool_allowlist
+
     def can_invoke_specialist(self, specialist_name: str) -> bool:
-        """Check if specialist is authorized and limits not exceeded."""
+        """Check if specialist is authorized and all constraints satisfied."""
         if self.is_expired():
             return False
         if self.is_budget_exhausted():
@@ -214,7 +248,22 @@ class Mandate:
             return False
         if self.authorized_specialists and specialist_name not in self.authorized_specialists:
             return False
+        # Enterprise control: check approval for R3/R4
+        if self.requires_approval() and not self.is_approved():
+            return False
         return True
+
+    def approve(self, approver_id: str) -> None:
+        """Approve the mandate (for R3/R4 operations)."""
+        self.approval_state = "approved"
+        self.approver_id = approver_id
+        self.approval_timestamp = datetime.now(timezone.utc)
+
+    def deny(self, approver_id: str) -> None:
+        """Deny the mandate (for R3/R4 operations)."""
+        self.approval_state = "denied"
+        self.approver_id = approver_id
+        self.approval_timestamp = datetime.now(timezone.utc)
 
     def record_invocation(self, cost: float = 0.01) -> None:
         """Record a specialist invocation and its cost."""
