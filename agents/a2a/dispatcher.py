@@ -8,12 +8,14 @@ It handles:
 - Local specialist invocation via ADK Runner
 - Input/output structural validation
 - Canonical agent ID resolution (Phase D)
+- Policy gate enforcement (Phase E)
 
 Follows:
 - 6767-LAZY: Imports specialists dynamically inside functions
 - R7: SPIFFE ID propagation in logs
 - AgentCard contracts as source of truth
 - 252-DR-STND: Agent Identity Standard (canonical IDs with alias support)
+- 254-DR-STND: Policy Gates and Risk Tiers (enterprise controls)
 """
 
 import json
@@ -339,12 +341,15 @@ def validate_mandate(task: A2ATask) -> None:
     Validate mandate authorization before specialist invocation.
 
     Converts the mandate dict to a Mandate object and uses its validation methods.
+    Also runs policy gate checks for enterprise controls (Phase E).
 
     Checks:
     - Mandate is not expired
     - Budget is not exhausted
     - Iterations limit not exceeded
     - Specialist is authorized
+    - Risk tier requirements met (R0-R4)
+    - Approval state valid for R3/R4 operations
 
     Args:
         task: A2ATask with optional mandate
@@ -352,64 +357,76 @@ def validate_mandate(task: A2ATask) -> None:
     Raises:
         A2AError: If mandate validation fails
     """
-    if not task.mandate:
-        return  # No mandate = no restrictions
-
     # Import here to avoid circular imports (6767-LAZY pattern)
     from agents.shared_contracts.pipeline_contracts import Mandate
+    from agents.shared_contracts.policy_gates import PolicyGate, GateResult
     from datetime import datetime, timezone
 
-    # Convert dict to Mandate object
-    mandate_dict = task.mandate
-    try:
-        # Parse expires_at if present
-        expires_at = None
-        if mandate_dict.get("expires_at"):
-            expires_str = mandate_dict["expires_at"]
-            expires_at = datetime.fromisoformat(expires_str.replace("Z", "+00:00"))
+    # Determine risk tier from task context or mandate
+    risk_tier = "R0"  # Default: no restrictions
+    mandate = None
 
-        mandate = Mandate(
-            mandate_id=mandate_dict.get("mandate_id", "unknown"),
-            intent=mandate_dict.get("intent", ""),
-            budget_limit=mandate_dict.get("budget_limit", 0.0),
-            budget_unit=mandate_dict.get("budget_unit", "USD"),
-            max_iterations=mandate_dict.get("max_iterations", 100),
-            authorized_specialists=mandate_dict.get("authorized_specialists", []),
-            expires_at=expires_at,
-            budget_spent=mandate_dict.get("budget_spent", 0.0),
-            iterations_used=mandate_dict.get("iterations_used", 0),
-        )
-    except (ValueError, TypeError) as e:
-        logger.warning(f"Failed to parse mandate: {e}, skipping validation")
-        return
+    if task.mandate:
+        # Convert dict to Mandate object
+        mandate_dict = task.mandate
+        try:
+            # Parse expires_at if present
+            expires_at = None
+            if mandate_dict.get("expires_at"):
+                expires_str = mandate_dict["expires_at"]
+                expires_at = datetime.fromisoformat(expires_str.replace("Z", "+00:00"))
 
-    # Use Mandate class methods for validation
-    if mandate.is_expired():
+            # Parse approval_timestamp if present
+            approval_timestamp = None
+            if mandate_dict.get("approval_timestamp"):
+                approval_str = mandate_dict["approval_timestamp"]
+                approval_timestamp = datetime.fromisoformat(approval_str.replace("Z", "+00:00"))
+
+            mandate = Mandate(
+                mandate_id=mandate_dict.get("mandate_id", "unknown"),
+                intent=mandate_dict.get("intent", ""),
+                budget_limit=mandate_dict.get("budget_limit", 0.0),
+                budget_unit=mandate_dict.get("budget_unit", "USD"),
+                max_iterations=mandate_dict.get("max_iterations", 100),
+                authorized_specialists=mandate_dict.get("authorized_specialists", []),
+                # Enterprise controls (Phase E)
+                risk_tier=mandate_dict.get("risk_tier", "R0"),
+                tool_allowlist=mandate_dict.get("tool_allowlist", []),
+                data_classification=mandate_dict.get("data_classification", "internal"),
+                approval_state=mandate_dict.get("approval_state", "auto"),
+                approver_id=mandate_dict.get("approver_id"),
+                approval_timestamp=approval_timestamp,
+                expires_at=expires_at,
+                budget_spent=mandate_dict.get("budget_spent", 0.0),
+                iterations_used=mandate_dict.get("iterations_used", 0),
+            )
+            risk_tier = mandate.risk_tier
+        except (ValueError, TypeError) as e:
+            logger.warning(f"Failed to parse mandate: {e}, skipping validation")
+            return
+
+    # Run policy gate preflight checks (Phase E)
+    gate_results = PolicyGate.preflight_check(
+        specialist_name=task.specialist,
+        risk_tier=risk_tier,
+        mandate=mandate
+    )
+
+    # Check for any blocking gates
+    blocking = PolicyGate.get_blocking_gates(gate_results)
+    if blocking:
+        # Build detailed error message from blocking gates
+        blocks = [f"{g.gate_name}: {g.reason}" for g in blocking]
         raise A2AError(
-            f"Mandate '{mandate.mandate_id}' has expired",
+            f"Policy gate check failed for specialist '{task.specialist}': {'; '.join(blocks)}",
             specialist=task.specialist
         )
 
-    if mandate.is_budget_exhausted():
-        raise A2AError(
-            f"Budget exhausted for mandate '{mandate.mandate_id}': "
-            f"spent {mandate.budget_spent} >= limit {mandate.budget_limit}",
-            specialist=task.specialist
-        )
-
-    if mandate.is_iterations_exhausted():
-        raise A2AError(
-            f"Iterations exhausted for mandate '{mandate.mandate_id}': "
-            f"used {mandate.iterations_used} >= limit {mandate.max_iterations}",
-            specialist=task.specialist
-        )
-
-    if not mandate.can_invoke_specialist(task.specialist):
-        raise A2AError(
-            f"Specialist '{task.specialist}' not authorized by mandate '{mandate.mandate_id}'. "
-            f"Authorized: {mandate.authorized_specialists}",
-            specialist=task.specialist
-        )
+    # Log successful gate passage
+    logger.debug(
+        f"Policy gates passed for {task.specialist} (risk_tier={risk_tier})",
+        extra={"specialist": task.specialist, "risk_tier": risk_tier}
+    )
 
 
 def call_specialist(task: A2ATask) -> A2AResult:

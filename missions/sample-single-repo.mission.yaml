@@ -1,0 +1,73 @@
+# Sample Mission: Single Repo ADK Compliance Audit
+#
+# This mission audits the current repository for ADK compliance,
+# creates issues for any violations found, and generates a report.
+#
+# Usage:
+#   python -m agents.mission_spec.runner validate missions/sample-single-repo.mission.yaml
+#   python -m agents.mission_spec.runner dry-run missions/sample-single-repo.mission.yaml
+
+mission_id: "audit-adk-compliance"
+title: "Audit iam-* agents for ADK compliance"
+intent: "Ensure all agents follow Hard Mode rules R1-R8 and ADK best practices"
+version: "1"
+
+scope:
+  repos:
+    - path: "."  # Current repository
+
+workflow:
+  - step: "analyze"
+    agent: "iam-compliance"
+    inputs:
+      targets:
+        - "agents/iam_*/agent.py"
+        - "agents/bob/agent.py"
+      focus_rules:
+        - "R1"  # ADK-Only
+        - "R2"  # Vertex AI Agent Engine
+        - "R5"  # Dual memory wiring
+    outputs:
+      - name: "compliance_report"
+        description: "ADK compliance analysis results"
+
+  - step: "triage"
+    agent: "iam-triage"
+    depends_on:
+      - "analyze"
+    inputs:
+      report: "${analyze.compliance_report}"
+      severity_threshold: "medium"
+    outputs:
+      - name: "issue_specs"
+        description: "List of issues to create"
+
+  - step: "document"
+    agent: "iam-docs"
+    depends_on:
+      - "analyze"
+      - "triage"
+    inputs:
+      compliance_report: "${analyze.compliance_report}"
+      issues: "${triage.issue_specs}"
+    outputs:
+      - name: "audit_summary"
+        description: "Summary document for the audit"
+
+mandate:
+  budget_limit: 2.0
+  budget_unit: "USD"
+  max_iterations: 50
+  authorized_specialists:
+    - "iam-compliance"
+    - "iam-triage"
+    - "iam-docs"
+  risk_tier: "R1"  # Local changes only
+  data_classification: "internal"
+
+evidence:
+  bundle_required: true
+  include:
+    - "compliance_report"
+    - "issue_specs"
+    - "audit_summary"
