@@ -66,6 +66,102 @@ class QAStatus(Enum):
 
 
 # ============================================================================
+# MANDATE & BUDGET TRACKING (AP2-Inspired)
+# ============================================================================
+
+@dataclass
+class Mandate:
+    """
+    Authorization mandate for orchestrated operations.
+
+    Inspired by AP2 (Agent Payments Protocol) patterns for authorized spending.
+    The foreman uses this to track budget and enforce authorization limits.
+    """
+    mandate_id: str  # Unique identifier for this mandate
+    intent: str  # Human-readable description of authorized work
+
+    # Budget limits
+    budget_limit: float = 0.0  # Maximum budget in budget_unit
+    budget_unit: str = "USD"  # Currency or unit (USD, tokens, calls)
+
+    # Iteration limits
+    max_iterations: int = 100  # Maximum total specialist invocations
+
+    # Authorization scope
+    authorized_specialists: List[str] = field(default_factory=list)  # Empty = all allowed
+
+    # Expiration
+    expires_at: Optional[datetime] = None  # None = no expiration
+
+    # Tracking (updated during execution)
+    budget_spent: float = 0.0
+    iterations_used: int = 0
+
+    # Metadata
+    issued_by: str = "bob"  # Who issued the mandate
+    issued_at: datetime = field(default_factory=datetime.now)
+
+    def is_expired(self) -> bool:
+        """Check if mandate has expired."""
+        if self.expires_at is None:
+            return False
+        return datetime.now() > self.expires_at
+
+    def is_budget_exhausted(self) -> bool:
+        """Check if budget limit reached."""
+        if self.budget_limit <= 0:
+            return False  # No limit set
+        return self.budget_spent >= self.budget_limit
+
+    def is_iterations_exhausted(self) -> bool:
+        """Check if iteration limit reached."""
+        return self.iterations_used >= self.max_iterations
+
+    def can_invoke_specialist(self, specialist_name: str) -> bool:
+        """Check if specialist is authorized and limits not exceeded."""
+        if self.is_expired():
+            return False
+        if self.is_budget_exhausted():
+            return False
+        if self.is_iterations_exhausted():
+            return False
+        if self.authorized_specialists and specialist_name not in self.authorized_specialists:
+            return False
+        return True
+
+    def record_invocation(self, cost: float = 0.01) -> None:
+        """Record a specialist invocation and its cost."""
+        self.iterations_used += 1
+        self.budget_spent += cost
+
+    @property
+    def budget_remaining(self) -> float:
+        """Calculate remaining budget."""
+        return max(0.0, self.budget_limit - self.budget_spent)
+
+    @property
+    def iterations_remaining(self) -> int:
+        """Calculate remaining iterations."""
+        return max(0, self.max_iterations - self.iterations_used)
+
+
+@dataclass
+class BudgetStatus:
+    """
+    Current budget/iteration status for mandate tracking.
+
+    Included in foreman responses when mandate is provided.
+    """
+    mandate_id: str
+    limit: float
+    spent: float
+    remaining: float
+    iterations_used: int
+    iterations_limit: int
+    status: Literal["active", "exhausted", "expired"] = "active"
+
+
+# ============================================================================
 # PIPELINE REQUEST AND RESULT
 # ============================================================================
 
@@ -99,6 +195,9 @@ class PipelineRequest:
     # - "dry-run": Log what would be created but don't create
     # - "create": Actually create issues (requires feature flags + allowlist)
 
+    # Budget & Authorization (Phase B - Bob Orchestrator)
+    mandate: Optional["Mandate"] = None  # Authorization mandate with budget limits
+
     metadata: Dict[str, Any] = field(default_factory=dict)
 
 
@@ -125,6 +224,9 @@ class PipelineResult:
     issues_documented: int = 0
     pipeline_duration_seconds: float = 0.0
     timestamp: datetime = field(default_factory=datetime.now)
+
+    # Budget tracking (Phase B - Bob Orchestrator)
+    budget_status: Optional["BudgetStatus"] = None  # Included when mandate provided
 
 
 # ============================================================================
