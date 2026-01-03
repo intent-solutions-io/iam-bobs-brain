@@ -56,12 +56,14 @@ class A2ATask(BaseModel):
         payload: Input data matching the skill's input_schema
         context: Optional metadata (request_id, correlation_id, etc.)
         spiffe_id: Calling agent's SPIFFE ID (R7 propagation)
+        mandate: Optional mandate for budget/authorization tracking (Phase B)
     """
     specialist: str = Field(..., description="Target specialist agent name")
     skill_id: str = Field(..., description="Full skill ID from AgentCard")
     payload: Dict[str, Any] = Field(..., description="Skill input matching input_schema")
     context: Dict[str, Any] = Field(default_factory=dict, description="Request context/metadata")
     spiffe_id: Optional[str] = Field(None, description="Caller's SPIFFE ID (R7)")
+    mandate: Optional[Dict[str, Any]] = Field(None, description="Authorization mandate with budget limits (Phase B)")
 
     class Config:
         json_schema_extra = {

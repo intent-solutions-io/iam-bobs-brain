@@ -250,16 +250,81 @@ def invoke_specialist_local(specialist: str, task: A2ATask) -> Dict[str, Any]:
         )
 
 
+def validate_mandate(task: A2ATask) -> None:
+    """
+    Validate mandate authorization before specialist invocation.
+
+    Checks:
+    - Mandate is not expired
+    - Budget is not exhausted
+    - Iterations limit not exceeded
+    - Specialist is authorized
+
+    Args:
+        task: A2ATask with optional mandate
+
+    Raises:
+        A2AError: If mandate validation fails
+    """
+    if not task.mandate:
+        return  # No mandate = no restrictions
+
+    mandate = task.mandate
+    from datetime import datetime
+
+    # Check expiration
+    if mandate.get("expires_at"):
+        try:
+            expires_at = datetime.fromisoformat(mandate["expires_at"].replace("Z", "+00:00"))
+            if datetime.now(expires_at.tzinfo) > expires_at:
+                raise A2AError(
+                    f"Mandate '{mandate.get('mandate_id')}' has expired",
+                    specialist=task.specialist
+                )
+        except (ValueError, TypeError):
+            pass  # Ignore malformed expiration dates
+
+    # Check budget
+    budget_limit = mandate.get("budget_limit", 0)
+    budget_spent = mandate.get("budget_spent", 0)
+    if budget_limit > 0 and budget_spent >= budget_limit:
+        raise A2AError(
+            f"Budget exhausted for mandate '{mandate.get('mandate_id')}': "
+            f"spent {budget_spent} >= limit {budget_limit}",
+            specialist=task.specialist
+        )
+
+    # Check iterations
+    max_iterations = mandate.get("max_iterations", 100)
+    iterations_used = mandate.get("iterations_used", 0)
+    if iterations_used >= max_iterations:
+        raise A2AError(
+            f"Iterations exhausted for mandate '{mandate.get('mandate_id')}': "
+            f"used {iterations_used} >= limit {max_iterations}",
+            specialist=task.specialist
+        )
+
+    # Check authorized specialists
+    authorized = mandate.get("authorized_specialists", [])
+    if authorized and task.specialist not in authorized:
+        raise A2AError(
+            f"Specialist '{task.specialist}' not authorized by mandate '{mandate.get('mandate_id')}'. "
+            f"Authorized: {authorized}",
+            specialist=task.specialist
+        )
+
+
 def call_specialist(task: A2ATask) -> A2AResult:
     """
     Main entry point for A2A delegation.
 
     This function orchestrates the complete A2A flow:
-    1. Load AgentCard for specialist
-    2. Validate skill exists
-    3. Validate input structure (lightweight)
-    4. Invoke specialist locally
-    5. Return structured result
+    1. Validate mandate authorization (Phase B)
+    2. Load AgentCard for specialist
+    3. Validate skill exists
+    4. Validate input structure (lightweight)
+    5. Invoke specialist locally
+    6. Return structured result
 
     Args:
         task: A2ATask with specialist, skill_id, payload, context
@@ -274,20 +339,23 @@ def call_specialist(task: A2ATask) -> A2AResult:
     start_time = time.time()
 
     try:
-        # Step 1: Load AgentCard
+        # Step 1: Validate mandate authorization (Phase B)
+        validate_mandate(task)
+
+        # Step 2: Load AgentCard
         agentcard = load_agentcard(task.specialist)
 
-        # Step 2: Validate skill exists
+        # Step 3: Validate skill exists
         skill = validate_skill_exists(agentcard, task.skill_id, task.specialist)
 
-        # Step 3: Validate input structure
+        # Step 4: Validate input structure
         input_schema = skill.get("input_schema", {})
         validate_input_structure(task.payload, input_schema, task.skill_id)
 
-        # Step 4: Invoke specialist
+        # Step 5: Invoke specialist
         result_data = invoke_specialist_local(task.specialist, task)
 
-        # Step 5: Build success result
+        # Step 6: Build success result
         duration_ms = int((time.time() - start_time) * 1000)
 
         logger.info(
