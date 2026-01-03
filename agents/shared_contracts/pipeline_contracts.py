@@ -65,6 +65,91 @@ class QAStatus(Enum):
     SKIPPED = "skipped"
 
 
+class CheckpointReason(Enum):
+    """Reasons for creating a checkpoint."""
+    ITERATION_LIMIT = "iteration_limit"
+    BUDGET_LIMIT = "budget_limit"
+    USER_INTERRUPT = "user_interrupt"
+    SPECIALIST_BLOCKED = "specialist_blocked"
+    ERROR = "error"
+    MANUAL = "manual"
+
+
+# ============================================================================
+# CHECKPOINTING & PROGRESS (Phase C - Long-Running Tasks)
+# ============================================================================
+
+@dataclass
+class TaskCheckpoint:
+    """
+    Checkpoint for resumable long-running workflows.
+
+    Inspired by Ralph Wiggum patterns for autonomous task loops.
+    Enables workflows to pause and resume across sessions.
+    """
+    checkpoint_id: str  # Unique identifier for this checkpoint
+    pipeline_run_id: str  # Original pipeline run this belongs to
+    created_at: datetime = field(default_factory=datetime.now)
+
+    # State tracking
+    current_step: int = 0
+    total_steps: int = 0
+    completed_specialists: List[str] = field(default_factory=list)
+    pending_specialists: List[str] = field(default_factory=list)
+
+    # Partial results accumulated so far
+    partial_results: Dict[str, Any] = field(default_factory=dict)
+
+    # Resume information
+    resumable: bool = True
+    reason: CheckpointReason = CheckpointReason.MANUAL
+    previous_checkpoint_id: Optional[str] = None  # Chain of checkpoints
+
+    # Metadata
+    created_by: str = "iam-senior-adk-devops-lead"
+
+    def to_resume_context(self) -> Dict[str, Any]:
+        """Generate context dict for resuming from this checkpoint."""
+        return {
+            "checkpoint_id": self.checkpoint_id,
+            "pipeline_run_id": self.pipeline_run_id,
+            "current_step": self.current_step,
+            "completed_specialists": self.completed_specialists,
+            "partial_results": self.partial_results,
+        }
+
+
+@dataclass
+class ProgressStatus:
+    """
+    Progress tracking for long-running pipelines.
+
+    Included in responses to show workflow progress.
+    """
+    percentage: int  # 0-100
+    steps_completed: int
+    steps_total: int
+    current_operation: str  # Human-readable description
+    estimated_remaining_steps: int = 0
+
+    # Optional timing
+    elapsed_seconds: float = 0.0
+    estimated_remaining_seconds: Optional[float] = None
+
+    @classmethod
+    def from_checkpoint(cls, checkpoint: TaskCheckpoint, current_op: str) -> "ProgressStatus":
+        """Create ProgressStatus from a TaskCheckpoint."""
+        pct = int((checkpoint.current_step / checkpoint.total_steps) * 100) if checkpoint.total_steps > 0 else 0
+        remaining = checkpoint.total_steps - checkpoint.current_step
+        return cls(
+            percentage=pct,
+            steps_completed=checkpoint.current_step,
+            steps_total=checkpoint.total_steps,
+            current_operation=current_op,
+            estimated_remaining_steps=remaining,
+        )
+
+
 # ============================================================================
 # PIPELINE REQUEST AND RESULT
 # ============================================================================
@@ -99,6 +184,9 @@ class PipelineRequest:
     # - "dry-run": Log what would be created but don't create
     # - "create": Actually create issues (requires feature flags + allowlist)
 
+    # Checkpointing (Phase C - Long-Running Tasks)
+    previous_checkpoint: Optional["TaskCheckpoint"] = None  # Resume from checkpoint
+
     metadata: Dict[str, Any] = field(default_factory=dict)
 
 
@@ -125,6 +213,10 @@ class PipelineResult:
     issues_documented: int = 0
     pipeline_duration_seconds: float = 0.0
     timestamp: datetime = field(default_factory=datetime.now)
+
+    # Progress & Checkpointing (Phase C - Long-Running Tasks)
+    progress: Optional["ProgressStatus"] = None  # Current progress for in-flight pipelines
+    checkpoint: Optional["TaskCheckpoint"] = None  # Checkpoint for resumable pipelines
 
 
 # ============================================================================
