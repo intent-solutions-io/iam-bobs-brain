@@ -254,6 +254,8 @@ def validate_mandate(task: A2ATask) -> None:
     """
     Validate mandate authorization before specialist invocation.
 
+    Converts the mandate dict to a Mandate object and uses its validation methods.
+
     Checks:
     - Mandate is not expired
     - Budget is not exhausted
@@ -269,47 +271,59 @@ def validate_mandate(task: A2ATask) -> None:
     if not task.mandate:
         return  # No mandate = no restrictions
 
-    mandate = task.mandate
-    from datetime import datetime
+    # Import here to avoid circular imports (6767-LAZY pattern)
+    from agents.shared_contracts.pipeline_contracts import Mandate
+    from datetime import datetime, timezone
 
-    # Check expiration
-    if mandate.get("expires_at"):
-        try:
-            expires_at = datetime.fromisoformat(mandate["expires_at"].replace("Z", "+00:00"))
-            if datetime.now(expires_at.tzinfo) > expires_at:
-                raise A2AError(
-                    f"Mandate '{mandate.get('mandate_id')}' has expired",
-                    specialist=task.specialist
-                )
-        except (ValueError, TypeError):
-            pass  # Ignore malformed expiration dates
+    # Convert dict to Mandate object
+    mandate_dict = task.mandate
+    try:
+        # Parse expires_at if present
+        expires_at = None
+        if mandate_dict.get("expires_at"):
+            expires_str = mandate_dict["expires_at"]
+            expires_at = datetime.fromisoformat(expires_str.replace("Z", "+00:00"))
 
-    # Check budget
-    budget_limit = mandate.get("budget_limit", 0)
-    budget_spent = mandate.get("budget_spent", 0)
-    if budget_limit > 0 and budget_spent >= budget_limit:
+        mandate = Mandate(
+            mandate_id=mandate_dict.get("mandate_id", "unknown"),
+            intent=mandate_dict.get("intent", ""),
+            budget_limit=mandate_dict.get("budget_limit", 0.0),
+            budget_unit=mandate_dict.get("budget_unit", "USD"),
+            max_iterations=mandate_dict.get("max_iterations", 100),
+            authorized_specialists=mandate_dict.get("authorized_specialists", []),
+            expires_at=expires_at,
+            budget_spent=mandate_dict.get("budget_spent", 0.0),
+            iterations_used=mandate_dict.get("iterations_used", 0),
+        )
+    except (ValueError, TypeError) as e:
+        logger.warning(f"Failed to parse mandate: {e}, skipping validation")
+        return
+
+    # Use Mandate class methods for validation
+    if mandate.is_expired():
         raise A2AError(
-            f"Budget exhausted for mandate '{mandate.get('mandate_id')}': "
-            f"spent {budget_spent} >= limit {budget_limit}",
+            f"Mandate '{mandate.mandate_id}' has expired",
             specialist=task.specialist
         )
 
-    # Check iterations
-    max_iterations = mandate.get("max_iterations", 100)
-    iterations_used = mandate.get("iterations_used", 0)
-    if iterations_used >= max_iterations:
+    if mandate.is_budget_exhausted():
         raise A2AError(
-            f"Iterations exhausted for mandate '{mandate.get('mandate_id')}': "
-            f"used {iterations_used} >= limit {max_iterations}",
+            f"Budget exhausted for mandate '{mandate.mandate_id}': "
+            f"spent {mandate.budget_spent} >= limit {mandate.budget_limit}",
             specialist=task.specialist
         )
 
-    # Check authorized specialists
-    authorized = mandate.get("authorized_specialists", [])
-    if authorized and task.specialist not in authorized:
+    if mandate.is_iterations_exhausted():
         raise A2AError(
-            f"Specialist '{task.specialist}' not authorized by mandate '{mandate.get('mandate_id')}'. "
-            f"Authorized: {authorized}",
+            f"Iterations exhausted for mandate '{mandate.mandate_id}': "
+            f"used {mandate.iterations_used} >= limit {mandate.max_iterations}",
+            specialist=task.specialist
+        )
+
+    if not mandate.can_invoke_specialist(task.specialist):
+        raise A2AError(
+            f"Specialist '{task.specialist}' not authorized by mandate '{mandate.mandate_id}'. "
+            f"Authorized: {mandate.authorized_specialists}",
             specialist=task.specialist
         )
 

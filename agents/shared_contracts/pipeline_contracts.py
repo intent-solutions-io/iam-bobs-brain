@@ -28,7 +28,7 @@ TODO (A2A-1/2/3): Add A2ATaskEnvelope and A2AResultEnvelope wrappers
 
 from dataclasses import dataclass, field
 from typing import List, Optional, Dict, Any, Literal
-from datetime import datetime
+from datetime import datetime, timezone
 from enum import Enum
 import uuid
 
@@ -99,13 +99,13 @@ class Mandate:
 
     # Metadata
     issued_by: str = "bob"  # Who issued the mandate
-    issued_at: datetime = field(default_factory=datetime.now)
+    issued_at: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
 
     def is_expired(self) -> bool:
         """Check if mandate has expired."""
         if self.expires_at is None:
             return False
-        return datetime.now() > self.expires_at
+        return datetime.now(self.expires_at.tzinfo) > self.expires_at
 
     def is_budget_exhausted(self) -> bool:
         """Check if budget limit reached."""
