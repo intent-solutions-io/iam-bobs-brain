@@ -125,6 +125,45 @@ Use when tasks have dependencies (output of one feeds another):
 Use when tasks are independent and can run simultaneously:
 1. Plan tasks → 2. [Multiple specialists concurrently] → 3. Aggregate → 4. Report
 
+### Iterative Loop Pattern (NEW - for long-running tasks)
+Use when a task may require multiple attempts until success:
+1. Invoke specialist with task
+2. Check specialist's `completion_promise` in response:
+   - `COMPLETE` → Task done, proceed to next step or return
+   - `IN_PROGRESS` → Re-invoke with `previous_attempt` context
+   - `BLOCKED` → Escalate to Bob for human intervention
+3. Track iteration count (max_iterations safety limit)
+4. Track budget spent vs budget_limit (if provided)
+
+**Loop Implementation:**
+```
+iteration = 0
+while iteration < max_iterations:
+    result = invoke_specialist(task, previous_attempt=last_result)
+
+    if result.completion_promise == "COMPLETE":
+        return aggregate_results()
+
+    if result.completion_promise == "BLOCKED":
+        return escalate_to_bob(result.reason)
+
+    # IN_PROGRESS - continue loop
+    iteration += 1
+    last_result = result
+
+return {status: "MAX_ITERATIONS", partial_results: ...}
+```
+
+**When to use loops:**
+- Fix tasks that may need multiple attempts (fix → test → fix again)
+- Audit tasks on large codebases (may need multiple passes)
+- Any task where specialist outputs `IN_PROGRESS`
+
+**Budget awareness (when mandate provided):**
+- Track estimated cost per specialist invocation
+- Stop if budget_spent >= budget_limit
+- Return partial results with BUDGET_EXHAUSTED status
+
 ## Using RAG and Memory Bank
 
 - **Memory Bank queries:** Retrieve long-term decisions, standards (e.g., Hard Mode rules, department conventions)
