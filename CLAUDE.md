@@ -483,25 +483,27 @@ Use conventional commits format:
 git checkout main && git pull
 
 # 2. Create feature branch FIRST
-git checkout -b feat/my-feature-name
+git checkout -b feature/my-feature-name
 
 # 3. Make commits on feature branch
-git add . && git commit -m "feat(scope): description"
+git add <files...> && git commit -m "feat(scope): description"
 
 # 4. Push and create PR
-git push -u origin feat/my-feature-name
+git push -u origin feature/my-feature-name
 gh pr create --title "feat: description" --body "..."
 
 # 5. After PR merged, clean up
 git checkout main && git pull
-git branch -d feat/my-feature-name
+git branch -d feature/my-feature-name
 ```
 
 **Branch Naming:**
-- `feat/` - New features
+- `feature/` - New features
 - `fix/` - Bug fixes
 - `docs/` - Documentation only
 - `refactor/` - Code restructuring
+- `test/` - Adding or improving tests
+- `ci/` - CI/CD changes
 - `chore/` - Maintenance tasks
 
 **Protected Branch:** `main` is protected - all changes via PR only.
