@@ -1,0 +1,95 @@
+# Sample Mission: Fix Loop with Gate Checks
+#
+# This mission implements an iterative fix loop that:
+# 1. Analyzes code for issues
+# 2. Plans fixes
+# 3. Implements fixes
+# 4. Runs QA checks
+# 5. Repeats until all tests pass or max iterations reached
+#
+# Usage:
+#   python -m agents.mission_spec.runner validate missions/sample-fix-loop.mission.yaml
+#   python -m agents.mission_spec.runner dry-run missions/sample-fix-loop.mission.yaml
+
+mission_id: "fix-compliance-issues"
+title: "Fix ADK compliance issues iteratively"
+intent: "Automatically fix compliance issues until all tests pass"
+version: "1"
+
+scope:
+  repos:
+    - path: "."
+
+workflow:
+  # Initial analysis
+  - step: "analyze"
+    agent: "iam-compliance"
+    inputs:
+      targets:
+        - "agents/*/agent.py"
+      deep_scan: true
+    outputs:
+      - name: "initial_report"
+
+  - step: "triage"
+    agent: "iam-triage"
+    depends_on:
+      - "analyze"
+    inputs:
+      report: "${analyze.initial_report}"
+    outputs:
+      - name: "issues"
+
+  # Fix loop
+  - loop:
+      name: "fix-loop"
+      until: "all issues resolved"
+      max_iterations: 5
+      gates:
+        - type: "test_pass"
+          command: "pytest tests/unit/ -v"
+      steps:
+        - step: "plan"
+          agent: "iam-planner"
+          inputs:
+            issues: "${triage.issues}"
+        - step: "implement"
+          agent: "iam-engineer"
+          depends_on:
+            - "plan"
+        - step: "verify"
+          agent: "iam-qa"
+          depends_on:
+            - "implement"
+
+  # Final documentation
+  - step: "document"
+    agent: "iam-docs"
+    depends_on:
+      - "triage"
+    inputs:
+      changes_made: "${fix-loop.changes}"
+    outputs:
+      - name: "changelog"
+
+mandate:
+  budget_limit: 10.0
+  budget_unit: "USD"
+  max_iterations: 100
+  authorized_specialists:
+    - "iam-compliance"
+    - "iam-triage"
+    - "iam-planner"
+    - "iam-engineer"
+    - "iam-qa"
+    - "iam-docs"
+  risk_tier: "R2"  # External writes (may create commits)
+  data_classification: "internal"
+
+evidence:
+  bundle_required: true
+  include:
+    - "initial_report"
+    - "issues"
+    - "changelog"
+  export_to_gcs: false
