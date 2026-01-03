@@ -84,13 +84,14 @@ class ARVMinimumChecker:
         """Check that correlation IDs are wired in contracts."""
         print("\n🔍 Checking Correlation ID Wiring...")
 
-        # Check shared contracts
-        contracts_path = Path("agents/shared_contracts.py")
-        if not contracts_path.exists():
-            self.failed.append("agents/shared_contracts.py not found")
+        # Check shared contracts (package with __init__.py)
+        contracts_path = Path("agents/shared_contracts")
+        contracts_init = contracts_path / "__init__.py"
+        if not contracts_path.exists() or not contracts_init.exists():
+            self.failed.append("agents/shared_contracts/ package not found")
             return False
 
-        self.log(f"✓ Found {contracts_path}")
+        self.log(f"✓ Found {contracts_path}/ package")
 
         # Check that PipelineRequest and PipelineResult have pipeline_run_id
         try:

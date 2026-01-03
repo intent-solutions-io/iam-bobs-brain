@@ -1,0 +1,42 @@
+# Coverage.py configuration for Bob's Brain
+# Used by pytest-cov and nox coverage session
+
+[run]
+source = agents,service
+omit =
+    */tests/*
+    */test_*.py
+    */__pycache__/*
+    */venv/*
+    */.venv/*
+    */archive/*
+    */000-docs/.venv/*
+    */versions/*
+    */tools/*
+
+[report]
+exclude_lines =
+    # Default excludes
+    pragma: no cover
+    def __repr__
+    def __str__
+    raise AssertionError
+    raise NotImplementedError
+    if __name__ == .__main__.:
+    if TYPE_CHECKING:
+    @abstractmethod
+    @abc.abstractmethod
+    # Debug code
+    if DEBUG:
+    if debug:
+
+precision = 2
+show_missing = True
+skip_covered = False
+
+[html]
+directory = htmlcov
+title = Bob's Brain Coverage Report
+
+[xml]
+output = coverage.xml

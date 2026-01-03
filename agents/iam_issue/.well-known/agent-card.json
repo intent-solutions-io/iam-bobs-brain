@@ -119,6 +119,11 @@
                 "type": "string"
               }
             }
+          },
+          "completion_promise": {
+            "type": "string",
+            "enum": ["COMPLETE", "IN_PROGRESS", "BLOCKED"],
+            "description": "Task completion status for orchestration loops"
           }
         }
       },
@@ -175,6 +180,11 @@
               "type": "string"
             },
             "description": "List of included sections"
+          },
+          "completion_promise": {
+            "type": "string",
+            "enum": ["COMPLETE", "IN_PROGRESS", "BLOCKED"],
+            "description": "Task completion status for orchestration loops"
           }
         }
       },
@@ -236,6 +246,11 @@
           },
           "type_label": {
             "type": "string"
+          },
+          "completion_promise": {
+            "type": "string",
+            "enum": ["COMPLETE", "IN_PROGRESS", "BLOCKED"],
+            "description": "Task completion status for orchestration loops"
           }
         }
       },
@@ -314,6 +329,11 @@
                 }
               }
             }
+          },
+          "completion_promise": {
+            "type": "string",
+            "enum": ["COMPLETE", "IN_PROGRESS", "BLOCKED"],
+            "description": "Task completion status for orchestration loops"
           }
         }
       },

@@ -2,11 +2,10 @@
 
 <div align="center">
 
-[![Version](https://img.shields.io/badge/version-1.1.0-green.svg)](CHANGELOG.md)
 [![Python 3.12+](https://img.shields.io/badge/python-3.12+-blue.svg)](https://www.python.org/downloads/)
 [![Google ADK](https://img.shields.io/badge/Google-ADK-4285F4.svg)](https://cloud.google.com/vertex-ai/docs/agent-development-kit)
 [![Agent Engine](https://img.shields.io/badge/Vertex%20AI-Agent%20Engine-4285F4.svg)](https://cloud.google.com/vertex-ai/docs/agent-engine)
-[![License: ELv2](https://img.shields.io/badge/License-ELv2-blue.svg)](LICENSE)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
 **Specialist AI team for auditing and fixing Google Vertex/ADK design systems.**
 
@@ -301,7 +300,7 @@ If drift check fails, the entire pipeline stops. No tests run. No deployment hap
 
 ```bash
 # Get the code
-git clone https://github.com/intent-solutions-io/bobs-brain.git
+git clone https://github.com/jeremylongshore/bobs-brain.git
 cd bobs-brain
 
 # Set up Python environment
@@ -983,32 +982,39 @@ gcloud ai agent-engines list --region=us-central1
 
 ## 📊 Project Status
 
-**Current Version:** v1.1.0 – Google Multi-Agent Patterns Rollout
-
-**What's New in v1.1.0:**
-- ✅ **Sequential Pipeline** - SequentialAgent with state passing via `output_key`
-- ✅ **Parallel Fan-Out** - ParallelAgent with unique output_keys per agent
-- ✅ **Quality Gates** - LoopAgent with Generator-Critic iteration
-- ✅ **Human-in-the-Loop** - Callbacks with RiskLevel classification (LOW/MEDIUM/HIGH/CRITICAL)
-- ✅ **Pattern Templates** - 8 reusable templates in `templates/` directory
-
-**Pattern Coverage:** 7 of 8 patterns from [Google's multi-agent patterns guide](https://developers.googleblog.com/en/developers-guide-to-multi-agent-patterns-in-adk/)
-
-**Community:**
-- Featured in [Agent Starter Pack community showcase (PR #580)](https://github.com/GoogleCloudPlatform/agent-starter-pack/pull/580)
+**Current Version:** v0.10.0 – Agent Engine / A2A Preview (Dev-Ready, Not Deployed)
 
 **Deployment Status:**
-- ✅ **Agent Engine**: Inline source deployment with ARV gates
-- ✅ **A2A / AgentCard**: Foreman + workers with validation
-- ✅ **CI/CD**: Drift detection, tests, Terraform-only deploys (R4 compliant)
-- ✅ **Slack Integration**: R3-compliant gateway via Terraform
+- ✅ **Agent Engine**: Wired and documented, dev-ready; prod rollout gated on GCP access and ARV checks
+- ✅ **A2A / AgentCard**: Foreman + workers designed; validation via a2a-inspector planned
+- ✅ **Inline Source Deployment**: Complete with ARV gates, smoke tests, and CI workflows
+- ⏸️ **Production Deployment**: Infrastructure ready, awaiting first dev deployment to Agent Engine
+
+**Key Features Ready Today:**
+- ✅ IAM specialist agents (iam-senior-adk-devops-lead → iam-adk, iam-issue, iam-fix, iam-qa)
+- ✅ 6767 doc suite (architecture, operations, standards)
+- ✅ Org-level storage + portfolio audit support
+- ✅ Agent Engine + A2A design complete (non-deployed)
+
+**Recent Updates:**
+- ✅ Agent Engine inline source deployment infrastructure (v0.10.0)
+- ✅ AgentCard alignment & contract-first prompt design (v0.10.0)
+- ✅ ARV (Agent Readiness Verification) gates (v0.10.0)
+- ✅ LIVE1-GCS: Org-wide storage with GCS (v0.9.0)
+- ✅ PORT1-3: Multi-repo portfolio orchestration (v0.9.0)
+- ✅ IAM Templates: Reusable multi-agent framework (v0.9.0)
+
+**Roadmap:**
+- 🔄 LIVE-BQ: BigQuery analytics integration
+- 📐 LIVE2: Vertex AI Search RAG + Agent Engine calls (dev-only)
+- 📐 LIVE3: Slack notifications + GitHub issue creation
 
 **Metrics:**
-- 9 agent implementations
-- 8 reusable pattern templates
-- 17 test files (unit + integration)
-- CI passes: lint, drift detection, ARV gates
-- 8 enforced Hard Mode rules (R1-R8)
+- 226 files
+- 36 tests (100% pass)
+- 20+ comprehensive docs
+- 8 enforced Hard Mode rules
+- 3 deployment environments (dev/staging/prod)
 
 ---
 
@@ -1076,24 +1082,26 @@ pytest
 
 ## 📄 License
 
-[Elastic License 2.0 (ELv2)](LICENSE) - See LICENSE file for details.
+MIT License - See [LICENSE](LICENSE) file for details.
 
 You're free to:
-- Use this for internal purposes
-- Modify and learn from it
+- Use this in commercial products
+- Modify and distribute
 - Use as a template for your own agents
 
-Restrictions: Cannot provide as a managed service to third parties.
+Just keep the license notice and don't blame us if things break. 😊
 
 ---
 
 ## 🔗 Resources
 
 **This Project:**
-- [GitHub Repository](https://github.com/intent-solutions-io/bobs-brain)
-- [Release Notes](https://github.com/intent-solutions-io/bobs-brain/releases)
+- [GitHub Repository](https://github.com/jeremylongshore/bobs-brain)
+- [Release Notes](https://github.com/jeremylongshore/bobs-brain/releases)
 - [Documentation](000-docs/)
-- [Project Site](https://bobs-brain.web.app)
+
+**Foundation Template:**
+- [iam1-intent-agent-model-vertex-ai](https://github.com/jeremylongshore/iam1-intent-agent-model-vertex-ai)
 
 **Google ADK & Vertex:**
 - [ADK Documentation](https://cloud.google.com/vertex-ai/docs/agent-development-kit)
@@ -1111,6 +1119,6 @@ Restrictions: Cannot provide as a managed service to third parties.
 
 **Built with ❤️ using Google ADK**
 
-[⭐ Star us on GitHub](https://github.com/intent-solutions-io/bobs-brain) • [📖 Read the docs](000-docs/) • [🌐 Project Site](https://bobs-brain.web.app)
+[⭐ Star us on GitHub](https://github.com/jeremylongshore/bobs-brain) • [📖 Read the docs](000-docs/) • [💬 Join the discussion](https://github.com/jeremylongshore/bobs-brain/discussions)
 
 </div>
