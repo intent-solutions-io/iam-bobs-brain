@@ -1,0 +1,21 @@
+# Nox-specific testing dependencies
+# Installed only when running tests via nox
+
+# Testing framework
+pytest>=7.4.0
+pytest-asyncio>=0.21.0
+pytest-cov>=4.1.0
+pytest-xdist>=3.3.0  # Parallel test execution
+pytest-timeout>=2.1.0  # Test timeout handling
+
+# Code quality
+ruff>=0.1.0  # Fast Python linter (replaces flake8, isort)
+black>=23.10.0  # Code formatting
+mypy>=1.6.0  # Type checking
+
+# Security
+bandit>=1.7.5  # Security vulnerability scanner
+safety>=2.3.0  # Dependency vulnerability scanner
+
+# Documentation
+jsonschema>=4.0.0  # JSON schema validation for AgentCards
