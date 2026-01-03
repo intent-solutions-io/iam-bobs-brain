@@ -31,30 +31,39 @@ This is the **live** guide for Claude Code when working in the `bobs-brain` repo
 
 ## 📋 TL;DR for DevOps (Quick Reference)
 
-**Current Status (v0.14.0):**
-- **Version**: v0.14.0 – Documentation Excellence & Community Contributions
-- **Phase**: Phase 26 Complete - Repository Cleanup & Release
+**Current Status (v2.0.0 - Vision Alignment GA):**
+- **Version**: v2.0.0 – General-Purpose Enterprise Orchestrator
+- **Phase**: Vision Alignment Complete (Phases D, E, F, G)
 - **Deployment**: Infrastructure ready, Terraform + GitHub Actions for all deployments (R4 compliance)
-- **Community**: Linux Foundation AI Card PR #7, A2A Samples PR #419 (production patterns shared)
+- **New in v2.0.0**: Canonical agent IDs, enterprise controls, Mission Spec v1
 
 **Key Documents:**
 - **6767 Global Catalog**: `000-docs/6767-000-DR-INDEX-bobs-brain-standards-catalog.md` (START HERE for all 6767 standards)
-- **Agent Engine Sub-Index**: `000-docs/6767-120-DR-STND-agent-engine-a2a-and-inline-deploy-index.md` (for deployment/A2A topics)
 - **Hard Mode Rules**: `000-docs/6767-DR-STND-adk-agent-engine-spec-and-hardmode-rules.md` (R1-R8)
-- **Inline Deployment**: `000-docs/6767-INLINE-DR-STND-inline-source-deployment-for-vertex-agent-engine.md`
+- **Agent Identity**: `000-docs/252-DR-STND-agent-identity-standard.md` (canonical IDs)
+- **Enterprise Controls**: `000-docs/253-DR-STND-mandates-budgets-approvals.md` (mandates, risk tiers)
+- **Policy Gates**: `000-docs/254-DR-STND-policy-gates-risk-tiers.md` (R0-R4 enforcement)
+- **Evidence Bundles**: `000-docs/255-DR-STND-evidence-bundles-and-audit-export.md` (audit trails)
+- **Mission Spec v1**: `000-docs/257-DR-STND-mission-spec-v1.md` (workflow-as-code)
 - **DevOps Playbook**: `000-docs/120-AA-AUDT-appaudit-devops-playbook.md`
 
 **Deployment Pattern:**
 - ✅ **Production**: Inline source deployment (source code → Agent Engine, no serialization)
 - ⛔ **Legacy**: Serialized/pickle deployment (deprecated, do not use)
 
-**A2A / AgentCard Plan:**
-- Foreman + workers architecture (iam-senior-adk-devops-lead → iam-*)
+**Agent Architecture (Canonical IDs):**
+- **bob**: User interface (Slack integration)
+- **iam-orchestrator**: Foreman/scheduler (alias: iam-senior-adk-devops-lead)
+- **iam-compliance**: ADK standards checking (alias: iam-adk)
+- **iam-triage**: Issue decomposition (alias: iam-issue)
+- **iam-planner**: Fix planning (alias: iam-fix-plan)
+- **iam-engineer**: Implementation (alias: iam-fix-impl)
+- **iam-qa**: Testing/verification
+- **iam-docs**: Documentation (alias: iam-doc)
+- **iam-hygiene**: Repo cleanup (alias: iam-cleanup)
+- **iam-index**: Search/catalog
 - AgentCards in `.well-known/agent-card.json` for all agents
-- Validation via `tests/unit/test_agentcard_json.py` and a2a-inspector (planned)
-- **A2A compliance (a2a-inspector + a2a-tck) scaffolded; see 6767-121 for details**
-- See: `000-docs/6767-DR-STND-agentcards-and-a2a-contracts.md`
-- See: `000-docs/6767-121-DR-STND-a2a-compliance-tck-and-inspector.md`
+- See: `000-docs/252-DR-STND-agent-identity-standard.md`
 
 **Slack Bob Deployment (Phase 24 - R4 Compliant):**
 - ✅ **Deploy via Terraform only**: `.github/workflows/terraform-prod.yml`
@@ -566,18 +575,17 @@ ls 000-docs/127-*
 
 ## 6. Changelog / Maintenance
 
-**Last Update:** 2025-12-22
+**Last Update:** 2026-01-03
 
 **Recent Changes:**
-- **Phase 26 (v0.14.0)**: Repository cleanup, branch archival tooling, and release
-  - Created `scripts/maintenance/cleanup_branches.sh` for safe branch archival
-  - Added `000-docs/ARCHIVED_BRANCHES.md` branch management index
-  - Updated version to v0.14.0 with comprehensive CHANGELOG
-  - Validated canonical scaffold alignment (single docs root, clear separation)
-- **CLAUDE.md Improvements**: Added Quick Commands, anti-patterns, agent directory structure, Makefile reference
-- **Community Contributions**: Linux Foundation AI Card PR #7, A2A Samples PR #419
-- **Documentation**: Added docs 179-182 (CTO strategy, A2A implementation, Phase 26 planning/AAR)
-- Previous: Phase 25 (Slack Bob Hardening), three-tier architecture documentation
+- **Vision Alignment GA (v2.0.0)**: General-purpose enterprise orchestrator
+  - **Phase D**: Canonical agent identity system with backwards-compatible aliases
+  - **Phase E**: Enterprise controls (risk tiers R0-R4, policy gates, evidence bundles)
+  - **Phase F**: Mission Spec v1 (declarative workflow-as-code)
+  - **Phase G**: GA finalization, docs 252-257, 260 (AAR)
+  - 103 new unit tests (303 total)
+- **New Standards**: 252 (Agent Identity), 253 (Mandates), 254 (Policy Gates), 255 (Evidence), 257 (Mission Spec)
+- Previous: Phase 26 (v0.14.0) - Repository cleanup, branch archival
 
 **Maintenance Policy:**
 - **DON'T overcrowd CLAUDE.md** - it's a pointer doc, not a knowledge base

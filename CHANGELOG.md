@@ -7,6 +7,57 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.0.0] - 2026-01-03
+
+### Vision Alignment GA - General-Purpose Enterprise Orchestrator
+
+Major release transforming Bob's Brain from ADK-focused devops assistant into a general-purpose enterprise orchestration system.
+
+### Added - Agent Identity System (Phase D)
+
+- **Canonical Agent IDs** with backwards-compatible aliases
+  - New format: `bob`, `iam-orchestrator`, `iam-compliance`, `iam-triage`, etc.
+  - Alias support for legacy underscore IDs (deprecation warnings active)
+- `agents/shared_contracts/agent_identity.py` - Identity resolution and validation
+- `000-docs/252-DR-STND-agent-identity-standard.md` - Agent identity standard
+
+### Added - Enterprise Controls (Phase E)
+
+- **Risk Tier Enforcement (R0-R4)** with policy gates
+  - R0: No restrictions (default)
+  - R1: Local changes only
+  - R2: External writes (requires mandate)
+  - R3: Infrastructure (requires approval)
+  - R4: Financial (requires 2-person approval)
+- **Enhanced Mandate System** with tool allowlists and approval workflow
+- **Evidence Bundles** for complete audit trails
+- `agents/shared_contracts/policy_gates.py` - Policy gate enforcement
+- `agents/shared_contracts/evidence_bundle.py` - Audit trail system
+- `000-docs/253-DR-STND-mandates-budgets-approvals.md`
+- `000-docs/254-DR-STND-policy-gates-risk-tiers.md`
+- `000-docs/255-DR-STND-evidence-bundles-and-audit-export.md`
+
+### Added - Mission Spec v1 (Phase F)
+
+- **Declarative Workflow-as-Code** in YAML format
+- **Deterministic Compilation** (same input → same execution plan)
+- `agents/mission_spec/` package (schema, compiler, runner)
+- CLI commands: `validate`, `compile`, `dry-run`, `run`
+- Sample missions in `missions/` directory
+- `000-docs/257-DR-STND-mission-spec-v1.md` - Mission Spec standard
+
+### Added - Tests
+
+- 103 new unit tests (303 total)
+- Enterprise controls tests (60 tests)
+- Mission Spec tests (28 tests)
+- Agent identity tests (15 tests)
+
+### Documentation
+
+- `000-docs/260-AA-REPT-vision-alignment-ga-aar.md` - GA After Action Report
+- Updated CLAUDE.md with canonical agent IDs and new standards
+
 ## [1.3.0] - 2026-01-02
 
 ### Agent Engine Deployment & CI/CD Automation
