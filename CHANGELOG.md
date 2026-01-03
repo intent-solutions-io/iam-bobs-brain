@@ -7,6 +7,68 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.3.0] - 2026-01-02
+
+### Agent Engine Deployment & CI/CD Automation
+
+This release deploys all 10 Hard Mode agents to Vertex AI Agent Engine with complete CI/CD automation.
+
+### Added - Agent Engine Deployment
+
+- **All 10 Hard Mode Agents Deployed to Agent Engine**
+  - Bob (Global Orchestrator) - ID: `7522671640266670080`
+  - IAM Senior ADK DevOps Lead (Foreman) - ID: `8568632653723467776`
+  - IAM ADK (Compliance Specialist) - ID: `2033909594408878080`
+  - IAM Issue (GitHub Specialist) - ID: `412613728555499520`
+  - IAM Fix Plan (Planning Specialist) - ID: `1604941729901838336`
+  - IAM Fix Implementation (Coding Specialist) - ID: `6216627748329226240`
+  - IAM QA (Testing Specialist) - ID: `6222257247863439360`
+  - IAM Documentation (Docs Specialist) - ID: `3974961033805561856`
+  - IAM Cleanup (Hygiene Specialist) - ID: `6369750135659823104`
+  - IAM Index (Knowledge Specialist) - ID: `2055301692638887936`
+
+- **Deployment Infrastructure** (`scripts/quick_deploy.py`)
+  - Working Python deployment script using ReasoningEngine API directly
+  - Regional endpoint configuration (us-central1-aiplatform.googleapis.com)
+  - Commands: `list`, `deploy-all` for batch deployment
+  - Proper error handling and timeout configuration
+
+- **Agent Registry** (`000-docs/agent-engine-registry.csv`)
+  - CSV registry tracking all deployed agents with IDs
+  - Includes tier, role, entrypoint, deployment status, dates
+  - Tracks 10 Hard Mode agents + 3 legacy agents
+
+- **CI/CD Automation** (`.github/workflows/deploy-agent-engine.yml`)
+  - Automated deployment on push to main (agents/** changes)
+  - Manual workflow_dispatch with deploy mode selection
+  - Workload Identity Federation (R4 compliant)
+  - Smoke tests verify all 13 agents accessible
+  - Automatic registry updates and artifact uploads
+
+### Added - Documentation
+
+- `185-AA-PLAN-deploy-all-hard-mode-agents-to-agent-engine.md` - Deployment plan
+- `186-AA-REPT-agent-engine-deployment-complete.md` - Implementation AAR
+
+### Fixed
+
+- **Tests:** Added 6767-LAZY compliance and skip markers for optional dependencies
+- **CI:** Updated checks for shared_contracts package refactor
+- **CI:** Excluded test dirs and .nox from drift detection
+
+### Technical Notes
+
+- ReasoningEngine API requires regional endpoint in client options
+- Parent path uses actual region (not "global" as some error messages suggest)
+- Minimal ReasoningEngine creation allocates IDs; source code deployment is next phase
+
+### Next Steps (A2A Integration)
+
+- Configure A2A wiring (Bob → Foreman → Specialists)
+- Deploy source code to agents (package to GCS)
+- Implement end-to-end workflow tests
+- Add per-agent health checks
+
 ## [1.2.0] - 2025-12-20
 
 ### 🚀 MCP Server & Enterprise Security Standards
