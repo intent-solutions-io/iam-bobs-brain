@@ -486,8 +486,10 @@ workflow:
             result = runner_main(["dry-run", f.name])
             assert result == 0
 
-    def test_run_command_not_implemented(self):
-        """Run command returns 0 (not implemented message)."""
+    def test_run_command_executes_mission(self):
+        """Run command executes mission with A2A delegation (mocked)."""
+        from unittest.mock import patch
+
         yaml_content = """
 mission_id: test-mission
 title: Test Mission
@@ -496,12 +498,25 @@ workflow:
   - step: analyze
     agent: iam-compliance
 """
+        # Mock the A2A delegation to return success
+        mock_result = {
+            "specialist": "iam-compliance",
+            "status": "success",
+            "result": {"compliance_status": "COMPLIANT"},
+            "error": None,
+            "metadata": {"duration_ms": 100}
+        }
+
         with tempfile.NamedTemporaryFile(mode="w", suffix=".yaml", delete=False) as f:
             f.write(yaml_content)
             f.flush()
 
-            result = runner_main(["run", f.name])
-            assert result == 0
+            with patch(
+                "agents.iam_senior_adk_devops_lead.tools.delegation.delegate_to_specialist",
+                return_value=mock_result
+            ):
+                result = runner_main(["run", f.name])
+                assert result == 0
 
     def test_no_command_shows_help(self):
         """No command returns 1 and shows help."""

@@ -163,10 +163,11 @@ def validate_skill_exists(agentcard: Dict[str, Any], skill_id: str, specialist: 
     skills = agentcard.get("skills", [])
 
     for skill in skills:
-        if skill.get("skill_id") == skill_id:
+        # AgentCard uses "id" field for skill identifier
+        if skill.get("id") == skill_id:
             return skill
 
-    available_skills = [s.get("skill_id") for s in skills]
+    available_skills = [s.get("id") for s in skills]
     raise A2AError(
         f"Skill '{skill_id}' not found in AgentCard for '{specialist}'. Available skills: {available_skills}",
         specialist=specialist,
@@ -245,7 +246,7 @@ def invoke_specialist_local(specialist: str, task: A2ATask) -> Dict[str, Any]:
     # Phase 18: Check ADK availability first before importing specialist module
     # This prevents ImportError when specialist modules have top-level google.adk imports
     try:
-        from google.adk import Runner
+        from google.adk.runners import InMemoryRunner  # noqa: F401
         adk_available = True
     except ImportError:
         adk_available = False
@@ -266,29 +267,28 @@ def invoke_specialist_local(specialist: str, task: A2ATask) -> Dict[str, Any]:
             )
 
         if adk_available:
-            # Real execution path (Phase 18)
+            # Phase H: Real ADK execution requires async run_debug() pattern
+            # For now, fall back to mock execution since async integration is incomplete
+            # TODO: Phase H+ - Implement async A2A dispatch with InMemoryRunner.run_debug()
             logger.info(
-                f"A2A: Invoking {specialist}.{task.skill_id} via ADK Runner",
+                f"A2A: Mock execution of {specialist}.{task.skill_id} (real ADK dispatch pending Phase H+)",
                 extra={"specialist": specialist, "skill_id": task.skill_id}
             )
 
-            # Instantiate agent (lazy loading)
+            # Verify agent can be instantiated (validates module structure)
             agent = module.create_agent()
+            logger.info(
+                f"A2A: Agent '{specialist}' instantiated successfully",
+                extra={"specialist": specialist, "agent_type": type(agent).__name__}
+            )
 
-            # Create Runner for single-turn execution
-            runner = Runner(agent)
-
-            # Execute agent with task payload
-            # The payload is the input to the skill, formatted as a prompt or structured input
-            # depending on the skill's expectations
-            result = runner.run(json.dumps(task.payload))
-
-            # Parse and structure the result
+            # Return mock result with payload echo (simulates successful execution)
             return {
                 "status": "SUCCESS",
-                "message": f"Executed {task.skill_id} via ADK Runner",
-                "result": result,  # Raw result from Runner
-                "payload": task.payload
+                "message": f"Mock execution of {task.skill_id} (ADK async dispatch pending)",
+                "payload_echo": task.payload,
+                "mock": True,
+                "phase": "Phase H - pending async integration"
             }
 
         else:

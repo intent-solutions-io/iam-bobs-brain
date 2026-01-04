@@ -27,6 +27,13 @@ from typing import Any, Dict, List, Optional
 import uuid
 
 
+def _json_serializer(obj: Any) -> Any:
+    """Custom JSON serializer for non-standard types (datetime, etc.)."""
+    if isinstance(obj, datetime):
+        return obj.isoformat()
+    raise TypeError(f"Object of type {type(obj).__name__} is not JSON serializable")
+
+
 @dataclass
 class ArtifactRecord:
     """Record of an artifact in the evidence bundle."""
@@ -120,7 +127,7 @@ class EvidenceBundleManifest:
 
     def to_json(self, indent: int = 2) -> str:
         """Convert to JSON string."""
-        return json.dumps(self.to_dict(), indent=indent)
+        return json.dumps(self.to_dict(), indent=indent, default=_json_serializer)
 
     @classmethod
     def from_dict(cls, data: Dict[str, Any]) -> "EvidenceBundleManifest":

@@ -70,6 +70,38 @@ output "github_actions_service_account" {
   value       = google_service_account.github_actions.email
 }
 
+# Bob's MCP Server Outputs (Phase H - Universal Tool Access)
+output "bobs_mcp_url" {
+  description = "Bob's MCP server URL (set BOBS_MCP_URL env var to this value)"
+  value       = var.bobs_mcp_enabled ? google_cloud_run_service.bobs_mcp[0].status[0].url : null
+}
+
+output "bobs_mcp_enabled" {
+  description = "Whether Bob's MCP server is deployed"
+  value       = var.bobs_mcp_enabled
+}
+
+# Event Trigger Outputs (Phase H)
+output "github_webhook_url" {
+  description = "GitHub Webhook URL (configure in GitHub repo settings)"
+  value       = var.github_webhook_enabled ? google_cloud_run_service.github_webhook[0].status[0].url : null
+}
+
+output "github_webhook_endpoint" {
+  description = "Full GitHub webhook endpoint URL"
+  value       = var.github_webhook_enabled ? "${google_cloud_run_service.github_webhook[0].status[0].url}/github/webhook" : null
+}
+
+output "github_webhook_enabled" {
+  description = "Whether GitHub webhook is deployed"
+  value       = var.github_webhook_enabled
+}
+
+output "scheduler_enabled" {
+  description = "Whether Cloud Scheduler is enabled"
+  value       = var.scheduler_enabled
+}
+
 # Configuration Outputs
 output "environment" {
   description = "Deployment environment"
@@ -106,6 +138,11 @@ output "deployment_summary" {
     slack_webhook_url     = module.slack_bob_gateway.service_url
     slack_events_url      = module.slack_bob_gateway.webhook_url
     slack_bob_enabled     = module.slack_bob_gateway.enabled
+    bobs_mcp_url          = var.bobs_mcp_enabled ? google_cloud_run_service.bobs_mcp[0].status[0].url : null
+    bobs_mcp_enabled      = var.bobs_mcp_enabled
+    github_webhook_url    = var.github_webhook_enabled ? google_cloud_run_service.github_webhook[0].status[0].url : null
+    github_webhook_enabled = var.github_webhook_enabled
+    scheduler_enabled     = var.scheduler_enabled
     spiffe_id             = var.agent_spiffe_id
   }
 }

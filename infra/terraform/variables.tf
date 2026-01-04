@@ -215,3 +215,35 @@ variable "org_storage_writer_service_accounts" {
   type        = list(string)
   default     = []
 }
+
+# ==============================================================================
+# Event Triggers (Phase H)
+# ==============================================================================
+# GitHub webhooks and Cloud Scheduler for autonomous operation
+
+# GitHub Webhook Configuration
+variable "github_webhook_enabled" {
+  description = "Enable GitHub webhook service for event-driven triggers"
+  type        = bool
+  default     = false
+}
+
+variable "github_webhook_image" {
+  description = "Docker image for GitHub webhook (GCR path)"
+  type        = string
+  default     = ""
+  # Example: gcr.io/bobs-brain/github-webhook:0.1.0
+}
+
+variable "github_webhook_secret_id" {
+  description = "Secret Manager secret ID for GitHub webhook secret"
+  type        = string
+  default     = "github-webhook-secret"
+}
+
+# Cloud Scheduler Configuration
+variable "scheduler_enabled" {
+  description = "Enable Cloud Scheduler for cron triggers"
+  type        = bool
+  default     = false
+}
