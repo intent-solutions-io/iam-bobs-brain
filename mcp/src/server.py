@@ -29,7 +29,10 @@ from fastapi.responses import JSONResponse
 from src.auth.validator import validate_request, get_auth_info
 from src.auth.origin_validator import OriginValidatorMiddleware
 from src.auth.oauth_validator import get_oauth_status, is_oauth_enabled
-from src.tools import search_codebase, get_file, analyze_deps, check_patterns
+from src.tools import (
+    search_codebase, get_file, analyze_deps, check_patterns,
+    github_api, web_search, write_file, shell_exec,
+)
 
 logging.basicConfig(
     level=logging.INFO,
@@ -53,8 +56,8 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(
     title="bobs-mcp",
-    description="Bob's MCP server for repository and code operations",
-    version="0.2.0",
+    description="Bob's MCP server for repository and universal operations",
+    version="0.3.0",
     lifespan=lifespan
 )
 
@@ -93,8 +96,15 @@ async def oauth_protected_resource():
         # Tool-specific scopes
         "bobs-mcp:tools:read",
         "bobs-mcp:tools:execute",
+        # Repository tools
         "bobs-mcp:codebase:read",
         "bobs-mcp:codebase:analyze",
+        # Universal tools (Phase H)
+        "bobs-mcp:github:read",
+        "bobs-mcp:github:write",
+        "bobs-mcp:web:search",
+        "bobs-mcp:file:write",
+        "bobs-mcp:shell:execute",
     ]
 
     # Methods required for OAuth 2.1
@@ -182,6 +192,7 @@ async def list_tools(request: Request):
 
     return {
         "tools": [
+            # Core repository tools
             {
                 "name": "search_codebase",
                 "description": "Search repository for code patterns",
@@ -212,6 +223,50 @@ async def list_tools(request: Request):
                     "path": {"type": "string", "default": "."},
                     "rules": {"type": "array", "default": ["R1", "R2", "R3"]}
                 }
+            },
+            # Universal tools (Phase H)
+            {
+                "name": "github_api",
+                "description": "GitHub operations (issues, PRs)",
+                "parameters": {
+                    "operation": {"type": "string", "required": True, "enum": ["list_issues", "create_issue", "list_prs"]},
+                    "owner": {"type": "string", "required": True},
+                    "repo": {"type": "string", "required": True},
+                    "state": {"type": "string", "default": "open"},
+                    "title": {"type": "string"},
+                    "body": {"type": "string"},
+                    "labels": {"type": "array"},
+                    "limit": {"type": "integer", "default": 10}
+                }
+            },
+            {
+                "name": "web_search",
+                "description": "Search the web for information",
+                "parameters": {
+                    "query": {"type": "string", "required": True},
+                    "limit": {"type": "integer", "default": 10},
+                    "backend": {"type": "string", "enum": ["google", "duckduckgo"]}
+                }
+            },
+            {
+                "name": "write_file",
+                "description": "Write content to a file",
+                "parameters": {
+                    "path": {"type": "string", "required": True},
+                    "content": {"type": "string", "required": True},
+                    "mode": {"type": "string", "default": "write", "enum": ["write", "append"]},
+                    "create_dirs": {"type": "boolean", "default": True}
+                }
+            },
+            {
+                "name": "shell_exec",
+                "description": "Execute shell commands (allowlisted)",
+                "parameters": {
+                    "command": {"type": "string", "required": True},
+                    "cwd": {"type": "string"},
+                    "timeout": {"type": "integer", "default": 60},
+                    "env": {"type": "object"}
+                }
             }
         ]
     }
@@ -229,6 +284,7 @@ async def invoke_tool(tool_name: str, request: Request):
 
     logger.info(f"Tool invocation: {tool_name} by {caller}")
 
+    # Core repository tools
     if tool_name == "search_codebase":
         result = await search_codebase.execute(
             query=body.get("query", ""),
@@ -243,6 +299,38 @@ async def invoke_tool(tool_name: str, request: Request):
         result = await check_patterns.execute(
             path=body.get("path", "."),
             rules=body.get("rules", ["R1", "R2", "R3"])
+        )
+    # Universal tools (Phase H)
+    elif tool_name == "github_api":
+        result = await github_api.execute(
+            operation=body.get("operation", ""),
+            owner=body.get("owner", ""),
+            repo=body.get("repo", ""),
+            state=body.get("state", "open"),
+            title=body.get("title"),
+            body=body.get("body"),
+            labels=body.get("labels"),
+            limit=body.get("limit", 10)
+        )
+    elif tool_name == "web_search":
+        result = await web_search.execute(
+            query=body.get("query", ""),
+            limit=body.get("limit", 10),
+            backend=body.get("backend")
+        )
+    elif tool_name == "write_file":
+        result = await write_file.execute(
+            path=body.get("path", ""),
+            content=body.get("content", ""),
+            mode=body.get("mode", "write"),
+            create_dirs=body.get("create_dirs", True)
+        )
+    elif tool_name == "shell_exec":
+        result = await shell_exec.execute(
+            command=body.get("command", ""),
+            cwd=body.get("cwd"),
+            timeout=body.get("timeout", 60),
+            env=body.get("env")
         )
     else:
         raise HTTPException(status_code=404, detail=f"Tool not found: {tool_name}")
