@@ -94,3 +94,6 @@ agents/*/venv/
 agents/*/.venv/
 scripts/*/__pycache__/
 archive/
+
+# Evidence bundles (test artifacts)
+.evidence/
