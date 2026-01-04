@@ -267,34 +267,28 @@ def invoke_specialist_local(specialist: str, task: A2ATask) -> Dict[str, Any]:
             )
 
         if adk_available:
-            # Real execution path (Phase 18)
+            # Phase H: Real ADK execution requires async run_debug() pattern
+            # For now, fall back to mock execution since async integration is incomplete
+            # TODO: Phase H+ - Implement async A2A dispatch with InMemoryRunner.run_debug()
             logger.info(
-                f"A2A: Invoking {specialist}.{task.skill_id} via ADK Runner",
+                f"A2A: Mock execution of {specialist}.{task.skill_id} (real ADK dispatch pending Phase H+)",
                 extra={"specialist": specialist, "skill_id": task.skill_id}
             )
 
-            # Instantiate agent (lazy loading)
+            # Verify agent can be instantiated (validates module structure)
             agent = module.create_agent()
-
-            # Create Runner for single-turn execution
-            # Use InMemoryRunner for A2A dispatch (no persistent memory needed)
-            from google.adk.runners import InMemoryRunner
-            runner = InMemoryRunner(
-                agent=agent,
-                app_name=f"a2a-{specialist}"
+            logger.info(
+                f"A2A: Agent '{specialist}' instantiated successfully",
+                extra={"specialist": specialist, "agent_type": type(agent).__name__}
             )
 
-            # Execute agent with task payload
-            # The payload is the input to the skill, formatted as a prompt or structured input
-            # depending on the skill's expectations
-            result = runner.run(json.dumps(task.payload))
-
-            # Parse and structure the result
+            # Return mock result with payload echo (simulates successful execution)
             return {
                 "status": "SUCCESS",
-                "message": f"Executed {task.skill_id} via ADK Runner",
-                "result": result,  # Raw result from Runner
-                "payload": task.payload
+                "message": f"Mock execution of {task.skill_id} (ADK async dispatch pending)",
+                "payload_echo": task.payload,
+                "mock": True,
+                "phase": "Phase H - pending async integration"
             }
 
         else:
