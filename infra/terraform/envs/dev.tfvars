@@ -26,6 +26,10 @@ a2a_gateway_image     = "gcr.io/bobs-brain-dev/a2a-gateway:0.10.0"
 slack_webhook_image   = "gcr.io/bobs-brain-dev/slack-webhook:0.10.0"
 gateway_max_instances = 5 # Fewer instances for dev
 
+# MCP Server Configuration (Phase H - Universal Tool Access)
+bobs_mcp_enabled = true
+bobs_mcp_image   = "gcr.io/bobs-brain-dev/bobs-mcp:0.2.0"
+
 # Slack Configuration (dev credentials)
 # IMPORTANT: Use Secret Manager or CI/CD secrets in production
 slack_bot_token      = "xoxb-dev-placeholder"
