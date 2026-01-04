@@ -66,7 +66,7 @@ def iam_adk_analyze(repo_hint: str, task: str) -> AnalysisReport:
 
     Phase H: Real A2A call to iam-adk agent using AgentCard contract.
     """
-    logger.info(f"[A2A] Delegating to iam-adk: analyze {repo_hint}")
+    logger.log_info("a2a_delegation", agent="iam-adk", action="analyze", repo=repo_hint)
 
     result = delegate_to_specialist(
         specialist="iam-adk",
@@ -81,7 +81,7 @@ def iam_adk_analyze(repo_hint: str, task: str) -> AnalysisReport:
 
     # Handle delegation result
     if result.get("status") == "failure":
-        logger.warning(f"[A2A] iam-adk delegation failed: {result.get('error')}")
+        logger.log_warning("a2a_failed", agent="iam-adk", error=result.get("error"))
         # Return minimal report on failure
         return AnalysisReport(
             repo_path=repo_hint,
@@ -137,7 +137,7 @@ def iam_issue_create(analysis: AnalysisReport) -> List[IssueSpec]:
 
     Phase H: Real A2A call to iam-issue agent using AgentCard contract.
     """
-    logger.info(f"[A2A] Delegating to iam-issue: create issues from {len(analysis.violations_found)} violations")
+    logger.log_info("a2a_delegation", agent="iam-issue", action="create_issues", violations_count=len(analysis.violations_found))
 
     issues = []
 
@@ -162,7 +162,7 @@ def iam_issue_create(analysis: AnalysisReport) -> List[IssueSpec]:
         )
 
         if result.get("status") == "failure":
-            logger.warning(f"[A2A] iam-issue delegation failed for violation {i}: {result.get('error')}")
+            logger.log_warning("a2a_failed", agent="iam-issue", violation_index=i, error=result.get("error"))
             continue
 
         # Map A2A result to IssueSpec
@@ -182,7 +182,7 @@ def iam_issue_create(analysis: AnalysisReport) -> List[IssueSpec]:
             tags=issue_spec.get("labels", [])
         )
         issues.append(issue)
-        logger.info(f"[A2A] iam-issue created: {issue.id} - {issue.title}")
+        logger.log_info("a2a_result", agent="iam-issue", action="created", issue_id=issue.id, title=issue.title)
 
     return issues
 
@@ -193,7 +193,7 @@ def iam_fix_plan_create(issues: List[IssueSpec], max_fixes: int) -> List[FixPlan
 
     Phase H: Real A2A call to iam-fix-plan agent using AgentCard contract.
     """
-    logger.info(f"[A2A] Delegating to iam-fix-plan: plan fixes for {len(issues)} issues (max: {max_fixes})")
+    logger.log_info("a2a_delegation", agent="iam-fix-plan", action="plan_fixes", issues_count=len(issues), max_fixes=max_fixes)
 
     plans = []
 
@@ -223,7 +223,7 @@ def iam_fix_plan_create(issues: List[IssueSpec], max_fixes: int) -> List[FixPlan
         )
 
         if result.get("status") == "failure":
-            logger.warning(f"[A2A] iam-fix-plan delegation failed for {issue.id}: {result.get('error')}")
+            logger.log_warning("a2a_failed", agent="iam-fix-plan", issue_id=issue.id, error=result.get("error"))
             continue
 
         # Map A2A result to FixPlan
@@ -255,7 +255,7 @@ def iam_fix_plan_create(issues: List[IssueSpec], max_fixes: int) -> List[FixPlan
             estimated_duration_minutes=float(fix_plan.get("estimated_effort", "15").replace("min", "").strip()) if fix_plan.get("estimated_effort") else 15.0
         )
         plans.append(plan)
-        logger.info(f"[A2A] iam-fix-plan created: {plan.plan_id} for {issue.id}")
+        logger.log_info("a2a_result", agent="iam-fix-plan", action="created", plan_id=plan.plan_id, issue_id=issue.id)
 
     return plans
 
@@ -266,7 +266,7 @@ def iam_fix_impl_execute(plans: List[FixPlan]) -> List[CodeChange]:
 
     Phase H: Real A2A call to iam-fix-impl agent using AgentCard contract.
     """
-    logger.info(f"[A2A] Delegating to iam-fix-impl: implement {len(plans)} fix plans")
+    logger.log_info("a2a_delegation", agent="iam-fix-impl", action="implement", plans_count=len(plans))
 
     changes = []
 
@@ -287,7 +287,7 @@ def iam_fix_impl_execute(plans: List[FixPlan]) -> List[CodeChange]:
         )
 
         if result.get("status") == "failure":
-            logger.warning(f"[A2A] iam-fix-impl delegation failed for {plan.plan_id}: {result.get('error')}")
+            logger.log_warning("a2a_delegation_failed", agent="iam-fix-impl", plan_id=plan.plan_id, error=result.get("error"))
             continue
 
         # Map A2A result to CodeChange
@@ -310,7 +310,7 @@ def iam_fix_impl_execute(plans: List[FixPlan]) -> List[CodeChange]:
             confidence=0.9 if impl_result.get("status") == "SUCCESS" else 0.5
         )
         changes.append(change)
-        logger.info(f"[A2A] iam-fix-impl implemented: {change.file_path} for plan {plan.plan_id}")
+        logger.log_info("a2a_result", agent="iam-fix-impl", action="implemented", file_path=change.file_path, plan_id=plan.plan_id)
 
     return changes
 
@@ -321,7 +321,7 @@ def iam_qa_verify(changes: List[CodeChange]) -> List[QAVerdict]:
 
     Phase H: Real A2A call to iam-qa agent using AgentCard contract.
     """
-    logger.info(f"[A2A] Delegating to iam-qa: verify {len(changes)} code changes")
+    logger.log_info("a2a_delegation", agent="iam-qa", action="verify", changes_count=len(changes))
 
     verdicts = []
 
@@ -337,7 +337,7 @@ def iam_qa_verify(changes: List[CodeChange]) -> List[QAVerdict]:
         )
 
         if smoke_result.get("status") == "failure":
-            logger.warning(f"[A2A] iam-qa smoke test failed for {change.plan_id}: {smoke_result.get('error')}")
+            logger.log_warning("a2a_smoke_test_failed", agent="iam-qa", plan_id=change.plan_id, error=smoke_result.get("error"))
             # Create failed verdict
             verdicts.append(QAVerdict(
                 change_id=change.plan_id,
@@ -368,7 +368,7 @@ def iam_qa_verify(changes: List[CodeChange]) -> List[QAVerdict]:
         )
 
         if verdict_result.get("status") == "failure":
-            logger.warning(f"[A2A] iam-qa verdict failed for {change.plan_id}: {verdict_result.get('error')}")
+            logger.log_warning("a2a_verdict_failed", agent="iam-qa", plan_id=change.plan_id, error=verdict_result.get("error"))
 
         # Map A2A results to QAVerdict
         a2a_verdict = verdict_result.get("result", {}).get("verdict", {})
@@ -396,7 +396,7 @@ def iam_qa_verify(changes: List[CodeChange]) -> List[QAVerdict]:
             requires_manual_review=decision != "APPROVE"
         )
         verdicts.append(verdict)
-        logger.info(f"[A2A] iam-qa verdict for {change.plan_id}: {verdict.status.value}")
+        logger.log_info("a2a_result", agent="iam-qa", action="verdict", plan_id=change.plan_id, status=verdict.status.value)
 
     return verdicts
 
@@ -407,7 +407,7 @@ def iam_doc_update(issues: List[IssueSpec], plans: List[FixPlan], verdicts: List
 
     Phase H: Real A2A call to iam-doc agent using AgentCard contract.
     """
-    logger.info(f"[A2A] Delegating to iam-doc: document {len(issues)} issues and {len(plans)} fixes")
+    logger.log_info("a2a_delegation", agent="iam-doc", action="document", issues_count=len(issues), plans_count=len(plans))
 
     docs = []
 
@@ -457,9 +457,9 @@ def iam_doc_update(issues: List[IssueSpec], plans: List[FixPlan], verdicts: List
                 auto_generated=True
             )
             docs.append(doc)
-            logger.info(f"[A2A] iam-doc created AAR: {doc.doc_id}")
+            logger.log_info("a2a_result", agent="iam-doc", action="created_aar", doc_id=doc.doc_id)
         else:
-            logger.warning(f"[A2A] iam-doc AAR generation failed: {result.get('error')}")
+            logger.log_warning("a2a_aar_generation_failed", agent="iam-doc", error=result.get("error"))
 
     return docs
 
@@ -470,7 +470,7 @@ def iam_cleanup_identify(repo_hint: str, issues: List[IssueSpec]) -> List[Cleanu
 
     Phase H: Real A2A call to iam-cleanup agent using AgentCard contract.
     """
-    logger.info(f"[A2A] Delegating to iam-cleanup: identify cleanup in {repo_hint}")
+    logger.log_info("a2a_delegation", agent="iam-cleanup", action="identify", repo=repo_hint)
 
     tasks = []
 
@@ -485,7 +485,7 @@ def iam_cleanup_identify(repo_hint: str, issues: List[IssueSpec]) -> List[Cleanu
     )
 
     if dead_code_result.get("status") == "failure":
-        logger.warning(f"[A2A] iam-cleanup dead code detection failed: {dead_code_result.get('error')}")
+        logger.log_warning("a2a_dead_code_detection_failed", agent="iam-cleanup", error=dead_code_result.get("error"))
     else:
         dead_code = dead_code_result.get("result", {}).get("dead_code_report", {})
 
@@ -517,9 +517,9 @@ def iam_cleanup_identify(repo_hint: str, issues: List[IssueSpec]) -> List[Cleanu
                     safe_to_automate=a2a_task.get("safety_level") == "SAFE"
                 )
                 tasks.append(task)
-                logger.info(f"[A2A] iam-cleanup found: {task.task_id} - {task.title}")
+                logger.log_info("a2a_result", agent="iam-cleanup", action="found", task_id=task.task_id, title=task.title)
         else:
-            logger.warning(f"[A2A] iam-cleanup task generation failed: {cleanup_result.get('error')}")
+            logger.log_warning("a2a_task_generation_failed", agent="iam-cleanup", error=cleanup_result.get("error"))
 
     return tasks
 
@@ -530,7 +530,7 @@ def iam_index_update(result: PipelineResult) -> List[IndexEntry]:
 
     Phase H: Real A2A call to iam-index agent using AgentCard contract.
     """
-    logger.info(f"[A2A] Delegating to iam-index: index {len(result.issues)} issues and {len(result.plans)} fixes")
+    logger.log_info("a2a_delegation", agent="iam-index", action="index", issues_count=len(result.issues), plans_count=len(result.plans))
 
     entries = []
 
@@ -565,7 +565,7 @@ def iam_index_update(result: PipelineResult) -> List[IndexEntry]:
     )
 
     if update_result.get("status") == "failure":
-        logger.warning(f"[A2A] iam-index update failed: {update_result.get('error')}")
+        logger.log_warning("a2a_index_update_failed", agent="iam-index", error=update_result.get("error"))
     else:
         # Create index entry for tracking
         entry = IndexEntry(
@@ -580,7 +580,7 @@ def iam_index_update(result: PipelineResult) -> List[IndexEntry]:
             ttl_days=90
         )
         entries.append(entry)
-        logger.info(f"[A2A] iam-index created: {entry.entry_id}")
+        logger.log_info("a2a_result", agent="iam-index", action="created", entry_id=entry.entry_id)
 
     # Also index patterns learned if we have plans
     if result.plans:
@@ -612,7 +612,7 @@ def iam_index_update(result: PipelineResult) -> List[IndexEntry]:
                 storage_path="knowledge/patterns/"
             )
             entries.append(pattern_entry)
-            logger.info(f"[A2A] iam-index patterns indexed: {pattern_entry.entry_id}")
+            logger.log_info("a2a_result", agent="iam-index", action="patterns_indexed", entry_id=pattern_entry.entry_id)
 
     return entries
 

@@ -163,10 +163,11 @@ def validate_skill_exists(agentcard: Dict[str, Any], skill_id: str, specialist: 
     skills = agentcard.get("skills", [])
 
     for skill in skills:
-        if skill.get("skill_id") == skill_id:
+        # AgentCard uses "id" field for skill identifier
+        if skill.get("id") == skill_id:
             return skill
 
-    available_skills = [s.get("skill_id") for s in skills]
+    available_skills = [s.get("id") for s in skills]
     raise A2AError(
         f"Skill '{skill_id}' not found in AgentCard for '{specialist}'. Available skills: {available_skills}",
         specialist=specialist,
@@ -245,7 +246,7 @@ def invoke_specialist_local(specialist: str, task: A2ATask) -> Dict[str, Any]:
     # Phase 18: Check ADK availability first before importing specialist module
     # This prevents ImportError when specialist modules have top-level google.adk imports
     try:
-        from google.adk import Runner
+        from google.adk.runners import InMemoryRunner  # noqa: F401
         adk_available = True
     except ImportError:
         adk_available = False
@@ -276,7 +277,12 @@ def invoke_specialist_local(specialist: str, task: A2ATask) -> Dict[str, Any]:
             agent = module.create_agent()
 
             # Create Runner for single-turn execution
-            runner = Runner(agent)
+            # Use InMemoryRunner for A2A dispatch (no persistent memory needed)
+            from google.adk.runners import InMemoryRunner
+            runner = InMemoryRunner(
+                agent=agent,
+                app_name=f"a2a-{specialist}"
+            )
 
             # Execute agent with task payload
             # The payload is the input to the skill, formatted as a prompt or structured input
