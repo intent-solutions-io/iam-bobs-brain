@@ -229,7 +229,7 @@ def get_specialist_capabilities(specialist: str) -> Dict[str, Any]:
         return {
             "description": agentcard.get("description", "").split("\n")[0],  # First line only
             "capabilities": agentcard.get("capabilities", []),
-            "skills": [skill.get("skill_id") for skill in agentcard.get("skills", [])],
+            "skills": [skill.get("id") for skill in agentcard.get("skills", [])],
             "agentcard_version": agentcard.get("version", "unknown"),
             "spiffe_id": agentcard.get("spiffe_id", ""),
         }
