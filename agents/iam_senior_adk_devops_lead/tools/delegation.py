@@ -64,7 +64,8 @@ def delegate_to_specialist(
         A2AError: If specialist/skill not found or validation fails
     """
     # 6767-LAZY: Import A2A dispatcher at runtime, not module import time
-    from agents.a2a import A2ATask, call_specialist, A2AError
+    # Phase H+: Use sync wrapper for non-async context
+    from agents.a2a import A2ATask, call_specialist_sync, A2AError
 
     logger.info(
         f"A2A: Delegating to {specialist}.{skill_id}",
@@ -85,8 +86,8 @@ def delegate_to_specialist(
             spiffe_id=FOREMAN_SPIFFE_ID  # R7: Propagate foreman's SPIFFE ID
         )
 
-        # Invoke specialist via A2A dispatcher
-        result = call_specialist(task)
+        # Invoke specialist via A2A dispatcher (sync wrapper for async dispatch)
+        result = call_specialist_sync(task)
 
         # Convert A2AResult to foreman's expected format
         return {
