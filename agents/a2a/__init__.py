@@ -15,12 +15,13 @@ Follows:
 """
 
 from .types import A2ATask, A2AResult, A2AError
-from .dispatcher import call_specialist, discover_specialists
+from .dispatcher import call_specialist, call_specialist_sync, discover_specialists
 
 __all__ = [
     "A2ATask",
     "A2AResult",
     "A2AError",
-    "call_specialist",
+    "call_specialist",  # Async version (use with await)
+    "call_specialist_sync",  # Sync wrapper for non-async contexts
     "discover_specialists",
 ]

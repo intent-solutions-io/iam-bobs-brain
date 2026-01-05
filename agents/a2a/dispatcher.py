@@ -5,7 +5,7 @@ This module provides the core dispatcher logic for agent-to-agent communication.
 It handles:
 - AgentCard discovery and validation
 - Skill existence verification
-- Local specialist invocation via ADK Runner
+- Local specialist invocation via ADK InMemoryRunner
 - Input/output structural validation
 - Canonical agent ID resolution (Phase D)
 - Policy gate enforcement (Phase E)
@@ -16,8 +16,11 @@ Follows:
 - AgentCard contracts as source of truth
 - 252-DR-STND: Agent Identity Standard (canonical IDs with alias support)
 - 254-DR-STND: Policy Gates and Risk Tiers (enterprise controls)
+
+Phase H+: Implements async A2A dispatch using InMemoryRunner.run_debug()
 """
 
+import asyncio
 import json
 import logging
 import os
@@ -201,22 +204,25 @@ def validate_input_structure(payload: Dict[str, Any], input_schema: Dict[str, An
         )
 
 
-def invoke_specialist_local(specialist: str, task: A2ATask) -> Dict[str, Any]:
+async def invoke_specialist_local(specialist: str, task: A2ATask) -> Dict[str, Any]:
     """
-    Invoke specialist agent locally using ADK Runner.
+    Invoke specialist agent locally using ADK InMemoryRunner.
+
+    Phase H+: Implements async A2A dispatch using InMemoryRunner.run_debug().
 
     This function:
     1. Dynamically imports the specialist's agent module
     2. Calls create_agent() to instantiate the agent (lazy loading)
-    3. Runs the agent with the task payload
-    4. Returns the result
+    3. Creates InMemoryRunner and calls run_debug() with task prompt
+    4. Extracts final response from events
+    5. Returns the result
 
     Args:
         specialist: Specialist name (canonical or legacy, e.g., "iam-compliance" or "iam_adk")
         task: A2ATask with payload and context
 
     Returns:
-        Agent output dictionary
+        Agent output dictionary (parsed from agent's JSON response)
 
     Raises:
         A2AError: If specialist module not found or agent execution fails
@@ -243,10 +249,9 @@ def invoke_specialist_local(specialist: str, task: A2ATask) -> Dict[str, Any]:
 
     module_path = spec_info["module"]
 
-    # Phase 18: Check ADK availability first before importing specialist module
-    # This prevents ImportError when specialist modules have top-level google.adk imports
+    # Check ADK availability first before importing specialist module
     try:
-        from google.adk.runners import InMemoryRunner  # noqa: F401
+        from google.adk.runners import InMemoryRunner
         adk_available = True
     except ImportError:
         adk_available = False
@@ -256,8 +261,6 @@ def invoke_specialist_local(specialist: str, task: A2ATask) -> Dict[str, Any]:
 
     try:
         # Dynamic import (6767-LAZY: happens at runtime, not module import)
-        # Note: Specialist modules may have top-level google.adk imports
-        # If ADK is not available, this will fail - handle gracefully
         module = importlib.import_module(module_path)
 
         if not hasattr(module, "create_agent"):
@@ -267,29 +270,60 @@ def invoke_specialist_local(specialist: str, task: A2ATask) -> Dict[str, Any]:
             )
 
         if adk_available:
-            # Phase H: Real ADK execution requires async run_debug() pattern
-            # For now, fall back to mock execution since async integration is incomplete
-            # TODO: Phase H+ - Implement async A2A dispatch with InMemoryRunner.run_debug()
+            # Phase H+: Real async ADK execution using InMemoryRunner.run_debug()
             logger.info(
-                f"A2A: Mock execution of {specialist}.{task.skill_id} (real ADK dispatch pending Phase H+)",
+                f"A2A: Executing {specialist}.{task.skill_id} via InMemoryRunner",
                 extra={"specialist": specialist, "skill_id": task.skill_id}
             )
 
-            # Verify agent can be instantiated (validates module structure)
+            # Create agent instance
             agent = module.create_agent()
             logger.info(
-                f"A2A: Agent '{specialist}' instantiated successfully",
+                f"A2A: Agent '{specialist}' instantiated",
                 extra={"specialist": specialist, "agent_type": type(agent).__name__}
             )
 
-            # Return mock result with payload echo (simulates successful execution)
-            return {
-                "status": "SUCCESS",
-                "message": f"Mock execution of {task.skill_id} (ADK async dispatch pending)",
-                "payload_echo": task.payload,
-                "mock": True,
-                "phase": "Phase H - pending async integration"
-            }
+            # Create InMemoryRunner (no persistent memory - test/local only)
+            runner = InMemoryRunner(agent=agent)
+
+            # Build prompt from task payload
+            # The specialist expects JSON describing the task
+            prompt = _build_specialist_prompt(task)
+
+            try:
+                # Execute via run_debug() - async method
+                events = await runner.run_debug(
+                    user_messages=prompt,
+                    user_id=task.context.get("user_id", "a2a_dispatcher"),
+                    session_id=task.context.get("session_id", f"a2a_{specialist}_{task.skill_id}"),
+                    quiet=True  # Suppress console output
+                )
+
+                # Extract final response from events
+                result = _extract_response_from_events(events, specialist, task.skill_id)
+
+                logger.info(
+                    f"A2A: Successfully executed {specialist}.{task.skill_id}",
+                    extra={
+                        "specialist": specialist,
+                        "skill_id": task.skill_id,
+                        "event_count": len(events)
+                    }
+                )
+
+                return result
+
+            except Exception as run_error:
+                logger.error(
+                    f"A2A: InMemoryRunner.run_debug() failed for {specialist}.{task.skill_id}: {run_error}",
+                    extra={"specialist": specialist, "skill_id": task.skill_id},
+                    exc_info=True
+                )
+                raise A2AError(
+                    f"Agent execution failed for {specialist}.{task.skill_id}: {run_error}",
+                    specialist=specialist,
+                    skill_id=task.skill_id
+                )
 
         else:
             # Mock fallback path (when ADK not installed)
@@ -303,11 +337,11 @@ def invoke_specialist_local(specialist: str, task: A2ATask) -> Dict[str, Any]:
                 "status": "SUCCESS",
                 "message": f"Mock execution of {task.skill_id} (ADK not installed)",
                 "payload_echo": task.payload,
-                "mock": True  # Flag to indicate this is mock data
+                "mock": True
             }
 
     except ImportError as e:
-        # Phase 18: If module import fails due to missing google.adk, fall back to mock
+        # If module import fails due to missing google.adk, fall back to mock
         if "google.adk" in str(e) and not adk_available:
             logger.info(
                 f"A2A: Specialist module '{module_path}' requires google.adk (not available). "
@@ -315,7 +349,6 @@ def invoke_specialist_local(specialist: str, task: A2ATask) -> Dict[str, Any]:
                 extra={"specialist": specialist, "skill_id": task.skill_id}
             )
 
-            # Return mock result
             return {
                 "status": "SUCCESS",
                 "message": f"Mock execution of {task.skill_id} (specialist module requires ADK)",
@@ -323,17 +356,122 @@ def invoke_specialist_local(specialist: str, task: A2ATask) -> Dict[str, Any]:
                 "mock": True
             }
         else:
-            # Other import errors are real problems
             raise A2AError(
                 f"Failed to import specialist module '{module_path}': {e}",
                 specialist=specialist
             )
+    except A2AError:
+        # Re-raise A2A errors as-is
+        raise
     except Exception as e:
         raise A2AError(
             f"Failed to invoke specialist '{specialist}': {e}",
             specialist=specialist,
             skill_id=task.skill_id
         )
+
+
+def _build_specialist_prompt(task: A2ATask) -> str:
+    """
+    Build a prompt string for the specialist from the A2ATask.
+
+    The specialist expects a JSON description of the task matching its skill input schema.
+
+    Args:
+        task: A2ATask with skill_id and payload
+
+    Returns:
+        Prompt string for run_debug()
+    """
+    # Build structured task description
+    task_description = {
+        "task_type": "a2a_invocation",
+        "skill_id": task.skill_id,
+        "payload": task.payload,
+        "context": task.context,
+        "spiffe_id": task.spiffe_id
+    }
+
+    # The specialist is instructed to accept JSON tasks and return JSON responses
+    prompt = f"""Execute the following A2A task:
+
+```json
+{json.dumps(task_description, indent=2)}
+```
+
+Respond with valid JSON matching the skill's output schema."""
+
+    return prompt
+
+
+def _extract_response_from_events(events: list, specialist: str, skill_id: str) -> Dict[str, Any]:
+    """
+    Extract the agent's final response from run_debug() events.
+
+    Args:
+        events: List of Event objects from run_debug()
+        specialist: Specialist name for error messages
+        skill_id: Skill ID for error messages
+
+    Returns:
+        Parsed response dictionary
+
+    Raises:
+        A2AError: If no valid response found
+    """
+    # Find final response event
+    final_content = None
+
+    for event in events:
+        # Check if this is the final response
+        if hasattr(event, 'is_final_response') and event.is_final_response():
+            if hasattr(event, 'content'):
+                final_content = event.content
+                break
+
+    if final_content is None:
+        # Fallback: look for any event with content
+        for event in events:
+            if hasattr(event, 'content') and event.content:
+                final_content = event.content
+
+    if final_content is None:
+        logger.warning(
+            f"A2A: No response content found in events for {specialist}.{skill_id}",
+            extra={"specialist": specialist, "skill_id": skill_id, "event_count": len(events)}
+        )
+        return {
+            "status": "SUCCESS",
+            "message": f"Agent executed but returned no content",
+            "raw_events": len(events)
+        }
+
+    # Try to parse as JSON (specialists return JSON)
+    try:
+        # Handle case where content might be wrapped in markdown code block
+        content_str = str(final_content).strip()
+        if content_str.startswith("```json"):
+            content_str = content_str[7:]
+        if content_str.startswith("```"):
+            content_str = content_str[3:]
+        if content_str.endswith("```"):
+            content_str = content_str[:-3]
+        content_str = content_str.strip()
+
+        result = json.loads(content_str)
+        return result
+
+    except json.JSONDecodeError:
+        # Return raw content if not valid JSON
+        logger.warning(
+            f"A2A: Response from {specialist}.{skill_id} is not valid JSON",
+            extra={"specialist": specialist, "skill_id": skill_id}
+        )
+        return {
+            "status": "SUCCESS",
+            "raw_response": str(final_content),
+            "parse_error": "Response was not valid JSON"
+        }
 
 
 def validate_mandate(task: A2ATask) -> None:
@@ -429,16 +567,18 @@ def validate_mandate(task: A2ATask) -> None:
     )
 
 
-def call_specialist(task: A2ATask) -> A2AResult:
+async def call_specialist(task: A2ATask) -> A2AResult:
     """
     Main entry point for A2A delegation.
+
+    Phase H+: Async implementation using InMemoryRunner.run_debug().
 
     This function orchestrates the complete A2A flow:
     1. Validate mandate authorization (Phase B)
     2. Load AgentCard for specialist
     3. Validate skill exists
     4. Validate input structure (lightweight)
-    5. Invoke specialist locally
+    5. Invoke specialist locally (async)
     6. Return structured result
 
     Args:
@@ -467,8 +607,8 @@ def call_specialist(task: A2ATask) -> A2AResult:
         input_schema = skill.get("input_schema", {})
         validate_input_structure(task.payload, input_schema, task.skill_id)
 
-        # Step 5: Invoke specialist
-        result_data = invoke_specialist_local(task.specialist, task)
+        # Step 5: Invoke specialist (async)
+        result_data = await invoke_specialist_local(task.specialist, task)
 
         # Step 6: Build success result
         duration_ms = int((time.time() - start_time) * 1000)
@@ -516,6 +656,32 @@ def call_specialist(task: A2ATask) -> A2AResult:
             error=str(e),
             duration_ms=duration_ms
         )
+
+
+def call_specialist_sync(task: A2ATask) -> A2AResult:
+    """
+    Synchronous wrapper for call_specialist().
+
+    For use in non-async contexts (e.g., tests, CLI tools).
+    Creates an event loop if needed.
+
+    Args:
+        task: A2ATask with specialist, skill_id, payload, context
+
+    Returns:
+        A2AResult with status, result data, and metadata
+    """
+    try:
+        # Try to get running loop
+        loop = asyncio.get_running_loop()
+        # If we're already in an async context, create a new thread
+        import concurrent.futures
+        with concurrent.futures.ThreadPoolExecutor() as executor:
+            future = executor.submit(asyncio.run, call_specialist(task))
+            return future.result()
+    except RuntimeError:
+        # No running loop - safe to use asyncio.run()
+        return asyncio.run(call_specialist(task))
 
 
 def discover_specialists() -> List[Dict[str, Any]]:
