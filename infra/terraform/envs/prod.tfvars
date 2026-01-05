@@ -20,6 +20,11 @@ a2a_gateway_image     = "gcr.io/bobs-brain/a2a-gateway:0.6.0"
 slack_webhook_image   = "gcr.io/bobs-brain/slack-webhook:0.6.0"
 gateway_max_instances = 20 # More instances for production
 
+# MCP Server Configuration (Phase H - Universal Tool Access)
+# Enable when MCP server is production-tested
+bobs_mcp_enabled = false
+bobs_mcp_image   = "gcr.io/bobs-brain/bobs-mcp:0.2.0"
+
 # Slack Configuration (production)
 # Feature flag to enable Slack Bob gateway (R3 Cloud Run proxy)
 slack_bob_enabled = true

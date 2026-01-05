@@ -20,6 +20,11 @@ a2a_gateway_image     = "gcr.io/bobs-brain-staging/a2a-gateway:0.6.0"
 slack_webhook_image   = "gcr.io/bobs-brain-staging/slack-webhook:0.6.0"
 gateway_max_instances = 10
 
+# MCP Server Configuration (Phase H - Universal Tool Access)
+# Enable when ready to test MCP in staging
+bobs_mcp_enabled = false
+bobs_mcp_image   = "gcr.io/bobs-brain-staging/bobs-mcp:0.2.0"
+
 # Slack Configuration (staging credentials)
 # IMPORTANT: Use Secret Manager or CI/CD secrets in production
 slack_bot_token      = "xoxb-staging-placeholder"

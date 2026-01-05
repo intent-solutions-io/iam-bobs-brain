@@ -40,10 +40,22 @@ try:
 except ImportError:
     ADK_AVAILABLE = False
 
+# Check if Vertex AI environment is configured (for real agent execution)
+VERTEX_AI_CONFIGURED = all([
+    os.getenv("PROJECT_ID") or os.getenv("GOOGLE_CLOUD_PROJECT"),
+    os.getenv("GOOGLE_APPLICATION_CREDENTIALS") or os.getenv("GOOGLE_CLOUD_REGION"),
+])
+
 # Pytest marker for tests requiring ADK
 requires_adk = pytest.mark.skipif(
     not ADK_AVAILABLE,
     reason="google.adk not installed (expected in local environment, runs in Agent Engine)"
+)
+
+# Pytest marker for tests that need Vertex AI credentials to run real agents
+requires_vertex_ai = pytest.mark.skipif(
+    not VERTEX_AI_CONFIGURED,
+    reason="Vertex AI not configured (set PROJECT_ID and credentials for real agent execution)"
 )
 
 
@@ -162,6 +174,7 @@ class TestSkillValidation:
 class TestA2ADelegation:
     """Test end-to-end A2A delegation from foreman to specialists."""
 
+    @requires_vertex_ai
     def test_call_specialist_happy_path(self):
         """Test successful delegation to iam_adk specialist.
 
@@ -284,6 +297,7 @@ class TestForemanDelegationTools:
         assert len(capabilities["skills"]) > 0
         assert any("iam_adk." in skill for skill in capabilities["skills"])
 
+    @requires_vertex_ai
     def test_delegate_to_specialist(self):
         """Test delegate_to_specialist with valid inputs.
 
@@ -319,6 +333,7 @@ class TestForemanDelegationTools:
             # Mock execution - result should have 'mock' flag
             assert result["result"].get("mock") is True
 
+    @requires_vertex_ai
     def test_delegate_to_multiple(self):
         """Test delegate_to_multiple with sequential execution."""
         delegation = self._load_delegation_module()
