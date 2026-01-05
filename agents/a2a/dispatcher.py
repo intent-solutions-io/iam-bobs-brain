@@ -722,7 +722,7 @@ def discover_specialists() -> List[Dict[str, Any]]:
                 "name": specialist_id,  # Alias for backwards compatibility
                 "directory": directory,
                 "capabilities": agentcard.get("capabilities", []),
-                "skills": [skill.get("skill_id") for skill in agentcard.get("skills", [])],
+                "skills": [skill.get("id") for skill in agentcard.get("skills", [])],
                 "description": agentcard.get("description", "").split("\n")[0],  # First line only
             })
 

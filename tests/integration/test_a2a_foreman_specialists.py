@@ -2,6 +2,7 @@
 Integration tests for A2A (Agent-to-Agent) delegation from foreman to specialists.
 
 Phase 17: Tests real A2A wiring using AgentCard contracts and local invocation.
+Phase H+: Updated for async A2A dispatch.
 
 Tests:
 - Happy path delegation to specialists
@@ -13,19 +14,24 @@ Tests:
 
 import pytest
 import json
+import sys
+import os
 from pathlib import Path
 from typing import Dict, Any
 
-# Import A2A components
-from agents.a2a import A2ATask, A2AResult, A2AError, call_specialist, discover_specialists
+# Add repo root to path for imports
+REPO_ROOT = Path(__file__).parent.parent.parent
+sys.path.insert(0, str(REPO_ROOT))
+
+# Import A2A components (using sync wrapper for test compatibility)
+from agents.a2a import A2ATask, A2AResult, A2AError, call_specialist_sync, discover_specialists
 from agents.a2a.dispatcher import (
     load_agentcard,
     validate_skill_exists,
     validate_input_structure,
 )
 
-# Repository root
-REPO_ROOT = Path(__file__).parent.parent.parent
+# Repository root already defined above
 
 # Check if google.adk is available (Phase 18)
 try:
@@ -100,7 +106,8 @@ class TestSkillValidation:
             "iam_adk"
         )
 
-        assert skill["skill_id"] == "iam_adk.check_adk_compliance"
+        # AgentCard uses "id" field, not "skill_id"
+        assert skill["id"] == "iam_adk.check_adk_compliance"
         assert "input_schema" in skill
         assert "output_schema" in skill
 
@@ -173,7 +180,7 @@ class TestA2ADelegation:
             spiffe_id="spiffe://intent.solutions/agent/iam-senior-adk-devops-lead/dev/us-central1/0.10.0"
         )
 
-        result = call_specialist(task)
+        result = call_specialist_sync(task)
 
         # Verify result structure (works in both mock and real mode)
         assert isinstance(result, A2AResult)
@@ -202,7 +209,7 @@ class TestA2ADelegation:
         )
 
         with pytest.raises(A2AError, match="AgentCard not found"):
-            call_specialist(task)
+            call_specialist_sync(task)
 
     def test_call_specialist_with_invalid_skill(self):
         """Test delegation with invalid skill_id raises A2AError."""
@@ -214,7 +221,7 @@ class TestA2ADelegation:
         )
 
         with pytest.raises(A2AError, match="Skill .* not found"):
-            call_specialist(task)
+            call_specialist_sync(task)
 
     def test_call_specialist_with_missing_required_input(self):
         """Test delegation with missing required input raises A2AError."""
@@ -229,7 +236,7 @@ class TestA2ADelegation:
         )
 
         with pytest.raises(A2AError, match="missing required fields"):
-            call_specialist(task)
+            call_specialist_sync(task)
 
 
 class TestForemanDelegationTools:
@@ -237,11 +244,11 @@ class TestForemanDelegationTools:
 
     @staticmethod
     def _load_delegation_module():
-        """Helper to load delegation module using importlib (handles hyphenated name)."""
+        """Helper to load delegation module using importlib."""
         import importlib.util
         spec = importlib.util.spec_from_file_location(
             "delegation",
-            str(REPO_ROOT / "agents" / "iam-senior-adk-devops-lead" / "tools" / "delegation.py")
+            str(REPO_ROOT / "agents" / "iam_senior_adk_devops_lead" / "tools" / "delegation.py")
         )
         if spec and spec.loader:
             delegation = importlib.util.module_from_spec(spec)
@@ -380,17 +387,22 @@ class TestAgentCardSkillsAlignment:
     """Test that all specialists' AgentCards follow skill naming conventions."""
 
     def test_all_skills_follow_naming_convention(self):
-        """Verify all skills follow {agent}.{skill} naming convention."""
+        """Verify all skills follow {directory}.{skill} naming convention.
+
+        Note: Skill IDs use directory names (iam_adk) not canonical IDs (iam-compliance).
+        """
         specialists = discover_specialists()
 
         for spec in specialists:
-            specialist_name = spec["name"]
+            directory = spec["directory"]
             skills = spec["skills"]
 
             for skill_id in skills:
-                # Skill ID should start with specialist name
-                assert skill_id.startswith(f"{specialist_name}."), \
-                    f"Skill '{skill_id}' doesn't follow naming convention for {specialist_name}"
+                # Skill ID should start with directory name (iam_adk, iam_issue, etc.)
+                assert skill_id is not None, \
+                    f"Skill ID is None for {directory}"
+                assert skill_id.startswith(f"{directory}."), \
+                    f"Skill '{skill_id}' doesn't follow naming convention for {directory}"
 
     def test_all_skills_have_schemas(self):
         """Verify all skills have input_schema and output_schema."""
@@ -401,7 +413,7 @@ class TestAgentCardSkillsAlignment:
             agentcard = load_agentcard(specialist_name)
 
             for skill in agentcard.get("skills", []):
-                skill_id = skill.get("skill_id")
+                skill_id = skill.get("id")  # AgentCard uses "id" not "skill_id"
 
                 assert "input_schema" in skill, \
                     f"Skill '{skill_id}' missing input_schema"

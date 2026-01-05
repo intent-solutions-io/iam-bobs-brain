@@ -145,7 +145,7 @@ class TestAgentEngineSmoke:
         assert result.returncode == 0, "Smoke test script --help failed"
         assert "usage:" in result.stdout.lower(), "Help output missing usage info"
         assert "--project" in result.stdout, "Help output missing --project option"
-        assert "--agent" in result.stdout, "Help output missing --agent option"
+        assert "--env" in result.stdout, "Help output missing --env option"
 
 
 class TestSmokeTestConfiguration:
