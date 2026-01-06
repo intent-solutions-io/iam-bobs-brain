@@ -196,10 +196,15 @@ GCS Knowledge Hub (results storage)
 ```
 bobs-brain/
 ├── agents/
-│   └── bob/              # Main agent (LlmAgent + tools)
-│       ├── agent.py      # Core agent logic
-│       ├── a2a_card.py   # Agent-to-Agent protocol
-│       └── tools/        # Custom tools
+│   ├── bob/              # Main agent (LlmAgent + tools)
+│   │   ├── agent.py      # Core agent logic
+│   │   ├── a2a_card.py   # Agent-to-Agent protocol
+│   │   └── tools/        # Custom tools
+│   ├── iam_*/            # 8 specialist agents
+│   └── mission_spec/     # Declarative workflow compiler
+│
+├── mcp/                  # MCP Server (Universal Tool Access)
+│   └── src/              # FastAPI server with 8 tools
 │
 ├── service/              # HTTP gateways (proxies only!)
 │   ├── a2a_gateway/      # A2A protocol endpoint
@@ -304,7 +309,7 @@ If drift check fails, the entire pipeline stops. No tests run. No deployment hap
 
 ```bash
 # Get the code
-git clone https://github.com/jeremylongshore/bobs-brain.git
+git clone https://github.com/intent-solutions-io/bobs-brain.git
 cd bobs-brain
 
 # Set up Python environment
@@ -790,10 +795,12 @@ pytest -v
 ### Test Coverage
 
 - ✅ Agent initialization and tool registration
-- ✅ A2A protocol and AgentCard generation
-- ✅ Portfolio orchestrator (36 tests for org storage)
-- ✅ Storage config and GCS writer
+- ✅ A2A protocol and AgentCard validation
+- ✅ Mission Spec compiler and runner
+- ✅ Portfolio orchestrator and org storage
+- ✅ Enterprise controls (mandates, policy gates)
 - ✅ Memory wiring (Session + Memory Bank)
+- ✅ MCP server tools
 
 ---
 
@@ -836,8 +843,6 @@ git commit -m "feat(scope): description
 Details about the change
 
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
-
-Co-Authored-By: Claude <noreply@anthropic.com>
 "
 git push origin feature/your-feature
 ```
@@ -862,13 +867,13 @@ Required in `.env`:
 PROJECT_ID=your-gcp-project
 LOCATION=us-central1
 AGENT_ENGINE_ID=your-engine-id
-AGENT_SPIFFE_ID=spiffe://intent.solutions/agent/bobs-brain/dev/us-central1/0.10.0
+AGENT_SPIFFE_ID=spiffe://intent.solutions/agent/bobs-brain/dev/us-central1/latest
 
 # Application
 APP_NAME=bobs-brain
-APP_VERSION=0.10.0
+APP_VERSION=2.0.0
 
-# Org Storage (v0.10.0+)
+# Org Storage
 ORG_STORAGE_WRITE_ENABLED=true
 ORG_STORAGE_BUCKET=intent-org-knowledge-hub-dev
 
@@ -993,7 +998,7 @@ gcloud ai agent-engines list --region=us-central1
 - ✅ **Enterprise Controls**: Risk tiers R0-R4, policy gates, tool allowlists
 - ✅ **Evidence Bundles**: Complete audit trails with manifest + hashing
 - ✅ **Mission Spec v1**: Declarative workflow-as-code in YAML
-- ✅ **103 new tests**: 303 total unit tests
+- ✅ **370+ unit tests**: Comprehensive coverage
 
 **Deployment Status:**
 - ✅ **Agent Engine**: All 10 Hard Mode agents deployed
@@ -1006,6 +1011,7 @@ gcloud ai agent-engines list --region=us-central1
 - ✅ Enterprise controls (R0-R4 risk tiers, policy gates)
 - ✅ Mission Spec v1 (declarative workflows)
 - ✅ Evidence bundles for audit trails
+- ✅ MCP Server with 8 tools (code search, file access, pattern checking)
 - ✅ 8 specialist agents (iam-compliance, iam-triage, iam-planner, etc.)
 - ✅ 6767 doc suite (30+ standards)
 
@@ -1017,7 +1023,7 @@ gcloud ai agent-engines list --region=us-central1
 - `257-DR-STND-mission-spec-v1.md` - Workflow-as-code
 
 **Metrics:**
-- 303 unit tests (100% pass)
+- 370+ unit tests (100% pass)
 - 30+ comprehensive docs
 - 8 enforced Hard Mode rules (R1-R8)
 - 15 CI checks
@@ -1071,7 +1077,7 @@ We welcome contributions! Here's how:
 
 ```bash
 # Fork and clone
-git clone https://github.com/YOUR_USERNAME/bobs-brain.git
+git clone https://github.com/YOUR_USERNAME/bobs-brain.git  # Your fork
 cd bobs-brain
 
 # Set up environment
@@ -1103,8 +1109,8 @@ Just keep the license notice and don't blame us if things break. 😊
 ## 🔗 Resources
 
 **This Project:**
-- [GitHub Repository](https://github.com/jeremylongshore/bobs-brain)
-- [Release Notes](https://github.com/jeremylongshore/bobs-brain/releases)
+- [GitHub Repository](https://github.com/intent-solutions-io/bobs-brain)
+- [Release Notes](https://github.com/intent-solutions-io/bobs-brain/releases)
 - [Documentation](000-docs/)
 
 **Foundation Template:**
@@ -1126,6 +1132,6 @@ Just keep the license notice and don't blame us if things break. 😊
 
 **Built with ❤️ using Google ADK**
 
-[⭐ Star us on GitHub](https://github.com/jeremylongshore/bobs-brain) • [📖 Read the docs](000-docs/) • [💬 Join the discussion](https://github.com/jeremylongshore/bobs-brain/discussions)
+[⭐ Star us on GitHub](https://github.com/intent-solutions-io/bobs-brain) • [📖 Read the docs](000-docs/) • [💬 Join the discussion](https://github.com/intent-solutions-io/bobs-brain/discussions)
 
 </div>
