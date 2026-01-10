@@ -46,7 +46,7 @@ APP_NAME = os.getenv("APP_NAME", "bobs-brain")
 AGENT_SPIFFE_ID = os.getenv("AGENT_SPIFFE_ID")
 
 
-def auto_save_session_to_memory(ctx):
+def auto_save_session_to_memory(callback_context=None, **kwargs):
     """
     After-agent callback to persist session to Memory Bank.
 
@@ -63,7 +63,15 @@ def auto_save_session_to_memory(ctx):
         - Includes SPIFFE ID in logs (R7)
     """
     try:
-        if hasattr(ctx, "_invocation_context"):
+        # Handle both old (ctx) and new (callback_context) API
+        ctx = callback_context or kwargs.get('ctx')
+        if ctx is None:
+            logger.debug("No callback context provided, skipping memory save")
+            return
+
+        if hasattr(ctx, "invocation_context"):
+            invocation_ctx = ctx.invocation_context
+        elif hasattr(ctx, "_invocation_context"):
             invocation_ctx = ctx._invocation_context
             memory_svc = invocation_ctx.memory_service
             session = invocation_ctx.session
