@@ -60,7 +60,7 @@ AGENTCARD_PATH = os.path.join(
 # CALLBACKS
 # ============================================================================
 
-def auto_save_session_to_memory(ctx):
+def auto_save_session_to_memory(callback_context=None, **kwargs):
     """
     After-agent callback to persist session to Memory Bank.
 
@@ -70,32 +70,41 @@ def auto_save_session_to_memory(ctx):
     Enforces R5: Dual memory wiring requirement.
 
     Args:
-        ctx: Agent context with invocation_context containing memory_service and session
+        callback_context: ADK CallbackContext with invocation_context
+        **kwargs: Additional arguments for forward compatibility
 
     Note:
         - Never blocks agent execution (errors are logged but not raised)
         - Includes SPIFFE ID in logs (R7)
     """
     try:
-        if hasattr(ctx, "_invocation_context"):
-            invocation_ctx = ctx._invocation_context
-            memory_svc = invocation_ctx.memory_service
-            session = invocation_ctx.session
+        # Handle both old (ctx) and new (callback_context) API
+        ctx = callback_context or kwargs.get('ctx')
+        if ctx is None:
+            logger.debug("No callback context provided, skipping memory save")
+            return
 
-            if memory_svc and session:
-                memory_svc.add_session_to_memory(session)
-                logger.info(
-                    f"✅ Saved session {session.id} to Memory Bank",
-                    extra={"spiffe_id": AGENT_SPIFFE_ID, "session_id": session.id},
-                )
-            else:
-                logger.warning(
-                    "Memory service or session not available in context",
-                    extra={"spiffe_id": AGENT_SPIFFE_ID},
-                )
+        if hasattr(ctx, "invocation_context"):
+            invocation_ctx = ctx.invocation_context
+        elif hasattr(ctx, "_invocation_context"):
+            invocation_ctx = ctx._invocation_context
         else:
-            logger.warning(
-                "Invocation context not available", extra={"spiffe_id": AGENT_SPIFFE_ID}
+            logger.debug("No invocation context in callback")
+            return
+
+        memory_svc = getattr(invocation_ctx, 'memory_service', None)
+        session = getattr(invocation_ctx, 'session', None)
+
+        if memory_svc and session:
+            memory_svc.add_session_to_memory(session)
+            logger.info(
+                f"✅ Saved session {session.id} to Memory Bank",
+                extra={"spiffe_id": AGENT_SPIFFE_ID, "session_id": session.id},
+            )
+        else:
+            logger.debug(
+                "Memory service or session not available in context",
+                extra={"spiffe_id": AGENT_SPIFFE_ID},
             )
     except Exception as e:
         logger.error(

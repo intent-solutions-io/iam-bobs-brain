@@ -45,6 +45,7 @@ class PlannedTask:
     depends_on: List[str] = field(default_factory=list)
     loop_name: Optional[str] = None
     loop_iteration: Optional[int] = None
+    skill_id: Optional[str] = None  # Explicit skill to invoke (from step definition)
 
     def to_dict(self) -> Dict[str, Any]:
         """Convert to dictionary."""
@@ -175,6 +176,7 @@ class MissionCompiler:
                     agent=item.agent,
                     inputs=item.inputs,
                     depends_on=item.depends_on,
+                    skill_id=item.skill_id,  # Preserve explicit skill_id
                 )
                 tasks.append(task)
                 execution_order.append(task_id)

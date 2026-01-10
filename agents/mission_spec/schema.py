@@ -75,6 +75,7 @@ class WorkflowStep(BaseModel):
     """A single step in the workflow."""
     step: str = Field(..., description="Step identifier")
     agent: str = Field(..., description="Agent to invoke (canonical ID)")
+    skill_id: Optional[str] = Field(None, description="Explicit skill ID to invoke (overrides default)")
     inputs: Dict[str, Any] = Field(default_factory=dict, description="Input parameters")
     outputs: List[StepOutput] = Field(default_factory=list, description="Output definitions")
     depends_on: List[str] = Field(default_factory=list, description="Step dependencies")
