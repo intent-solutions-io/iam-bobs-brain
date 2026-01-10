@@ -179,13 +179,27 @@ async def execute_task(
     """
     # Import delegation at runtime (6767-LAZY pattern)
     from agents.iam_senior_adk_devops_lead.tools.delegation import delegate_to_specialist
+    from agents.a2a.dispatcher import load_agentcard
 
     start_time = datetime.now(timezone.utc)
 
     # Map task to specialist skill call
     # Agent name in task is the canonical agent ID (e.g., "iam-compliance")
     agent = task.agent
-    skill_id = f"{agent.replace('-', '_')}.execute"  # Default skill pattern
+
+    # Determine skill_id: explicit in task, or use agent's primary skill
+    skill_id = task.skill_id
+    if not skill_id:
+        # Look up agent's primary skill from AgentCard
+        try:
+            agentcard = load_agentcard(agent)
+            skills = agentcard.get("skills", [])
+            if skills:
+                skill_id = skills[0].get("id")  # Use first skill as primary
+            else:
+                skill_id = f"{agent.replace('-', '_')}.execute"  # Fallback
+        except Exception:
+            skill_id = f"{agent.replace('-', '_')}.execute"  # Fallback on error
 
     logger.info(f"Executing task {task.task_id}: {task.step_name} -> {agent}")
 

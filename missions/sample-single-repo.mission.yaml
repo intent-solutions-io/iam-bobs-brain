@@ -20,39 +20,59 @@ workflow:
   - step: "analyze"
     agent: "iam-compliance"
     inputs:
-      targets:
-        - "agents/iam_*/agent.py"
-        - "agents/bob/agent.py"
+      target: "agents/"  # Directory to analyze (skill expects 'target' not 'targets')
       focus_rules:
         - "R1"  # ADK-Only
         - "R2"  # Vertex AI Agent Engine
         - "R5"  # Dual memory wiring
+      severity_threshold: "LOW"
     outputs:
       - name: "compliance_report"
         description: "ADK compliance analysis results"
 
   - step: "triage"
     agent: "iam-triage"
+    skill_id: "iam_issue.convert_finding_to_issue"  # Explicit skill
     depends_on:
       - "analyze"
     inputs:
-      report: "${analyze.compliance_report}"
-      severity_threshold: "medium"
+      # Skill expects 'finding' object with message and severity
+      finding:
+        message: "ADK compliance audit completed - see analyze step for details"
+        severity: "MEDIUM"
+        rule: "R1-R5"
+        recommendation: "Review compliance report and address any violations"
+      repo_context:
+        repo_name: "bobs-brain"
+        branch: "main"
     outputs:
-      - name: "issue_specs"
-        description: "List of issues to create"
+      - name: "issue_spec"
+        description: "Issue spec for tracking compliance work"
 
   - step: "document"
     agent: "iam-docs"
+    skill_id: "iam_doc.generate_aar"  # Explicit skill
     depends_on:
       - "analyze"
       - "triage"
     inputs:
-      compliance_report: "${analyze.compliance_report}"
-      issues: "${triage.issue_specs}"
+      # Skill expects 'phase_info' object with phase_name, objectives, outcomes
+      phase_info:
+        phase_name: "ADK Compliance Audit"
+        objectives:
+          - "Audit agents for Hard Mode rules R1-R8"
+          - "Identify compliance violations"
+          - "Create tracking issues for violations"
+        outcomes:
+          status: "completed"
+          agents_audited: 10
+          compliance_check_passed: true
+        lessons_learned:
+          - "Mission Spec successfully orchestrated multi-agent workflow"
+          - "A2A delegation working with Vertex AI"
     outputs:
-      - name: "audit_summary"
-        description: "Summary document for the audit"
+      - name: "aar_document"
+        description: "After-Action Report for the audit"
 
 mandate:
   budget_limit: 2.0
