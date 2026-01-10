@@ -186,7 +186,23 @@ class ARVMinimumChecker:
                 self.log(f"  ⚠️  {agent_name} has no documentation")
 
             # Check 4: Has test coverage
-            test_files = list(Path("tests").glob(f"*{agent_name}*.py"))
+            # Look for: 1) files named *{agent_name}*.py, or
+            #           2) files that reference the agent in their content
+            test_files = list(Path("tests").glob(f"**/*{agent_name}*.py"))
+
+            # Also check for comprehensive test files that test multiple agents
+            if not test_files:
+                comprehensive_tests = [
+                    Path("tests/unit/test_iam_specialists_coverage.py"),
+                    Path("tests/unit/test_iam_agents.py"),
+                ]
+                for test_file in comprehensive_tests:
+                    if test_file.exists():
+                        with open(test_file) as f:
+                            if agent_name in f.read():
+                                test_files = [test_file]
+                                break
+
             if test_files:
                 self.log(f"  ✓ {agent_name} has test coverage: {len(test_files)} test file(s)")
             else:
