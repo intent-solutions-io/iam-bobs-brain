@@ -86,17 +86,18 @@ pip install -r requirements.txt
 make check-all
 
 # Run specific checks
-make check-inline-deploy-ready  # ARV checks for deployment
-bash scripts/ci/check_nodrift.sh  # Drift detection
-pytest  # All tests
-pytest tests/unit/test_agentcard_json.py -v  # AgentCard validation
+bash scripts/ci/check_nodrift.sh  # Drift detection (R8)
+pytest tests/unit/ -v             # Unit tests only
+pytest tests/integration/ -v      # Integration tests only
+pytest tests/unit/test_agentcard_json.py -v  # Single test file
+pytest -k "test_agent" -v         # Run tests matching pattern
 
-# Run single test file
-pytest tests/unit/test_<name>.py -v
+# Run single test with verbose output
+pytest tests/unit/test_<name>.py::test_function_name -vvs
 
 # Smoke tests
-make smoke-agents  # Test lazy-loading App pattern (6767-LAZY)
-make smoke-bob-agent-engine-dev  # Test deployed agent
+make smoke-agents                 # Test lazy-loading App pattern (6767-LAZY)
+make smoke-bob-agent-engine-dev   # Test deployed agent
 ```
 
 ### Deployment
@@ -125,33 +126,35 @@ bd sync  # End session (flush + git sync)
 
 ### Make Targets Quick Reference
 ```bash
-make help  # Show all available targets
+make help                         # Show all available targets
 
-# Quality Checks
-make check-all                    # All checks (drift, tests, ARV)
-make check-arv-minimum            # ARV minimum requirements
-make check-a2a-contracts          # Validate AgentCard JSON files
-make smoke-agents                 # Test lazy-loading pattern
+# Quality Checks (run before commits)
+make check-all                    # All checks: drift, tests, ARV
+make lint                         # Flake8 linting
+make format                       # Format with black
+make format-check                 # Check formatting (no changes)
 
 # Testing
-make test                         # All tests
-make test-coverage                # Tests with coverage report
-make test-swe-pipeline            # SWE pipeline tests
+make test                         # All tests (pytest tests/)
+make test-coverage                # Tests with HTML coverage report
+make test-swe-pipeline            # SWE pipeline tests only
+make check-a2a-contracts          # Validate AgentCard JSON files
+make smoke-agents                 # Test lazy-loading pattern (6767-LAZY)
 
-# ARV Gates
-make check-inline-deploy-ready    # Deployment readiness (ARV)
-make arv-department               # Comprehensive ARV for IAM dept
-make arv-gates                    # All ARV gates
+# ARV Gates (Agent Readiness Verification)
+make arv-gates                    # All ARV gates (RAG + minimum + engine + spec)
+make arv-department               # Comprehensive ARV for IAM department
+make check-inline-deploy-ready    # Deployment readiness check
+make check-arv-minimum            # ARV minimum requirements only
 
-# Deployment
-make deploy-inline-dry-run        # Validate deployment (safe)
+# Deployment (CI/CD preferred - R4)
+make deploy-inline-dry-run        # Validate deployment (safe, no changes)
 make slack-dev-smoke              # Test Slack webhook
 
-# Development
+# Development Utilities
 make setup                        # Complete dev environment setup
-make lint                         # Run linting checks
-make format                       # Format code with black
-make clean                        # Clean temporary files
+make clean                        # Clean pycache, coverage, logs
+make safe-commit                  # lint + format-check + test before commit
 ```
 
 ---
@@ -419,6 +422,31 @@ app = create_app()  # Module-level app, not agent
 - Implement `after_agent_callback` for R5 compliance
 - Module-level `app`, not `agent`
 
+**Creating New Agents:**
+```python
+# agents/iam_new/agent.py - REQUIRED STRUCTURE
+from google.adk.agents import LlmAgent
+from google.adk.apps import App
+
+# 1. Config reads (cheap, no validation)
+PROJECT_ID = os.getenv("PROJECT_ID")
+
+# 2. Lazy agent creation
+def create_agent() -> LlmAgent:
+    """Called on-demand, not at import."""
+    return LlmAgent(name="iam-new", model="gemini-2.0-flash", ...)
+
+# 3. Lazy app creation
+def create_app() -> App:
+    return App(agent=create_agent())
+
+# 4. Module-level app (NOT agent)
+app = create_app()
+```
+Each agent also needs:
+- `agents/iam_new/.well-known/agent-card.json` (A2A contract)
+- Entry in `agents/__init__.py` if using shared imports
+
 **Terraform (infra/):**
 - Use modules over copy-pasted resources
 - Keep env configs in `envs/dev`, `envs/prod`
@@ -575,7 +603,7 @@ ls 000-docs/127-*
 
 ## 6. Changelog / Maintenance
 
-**Last Update:** 2026-01-03
+**Last Update:** 2026-02-02
 
 **Recent Changes:**
 - **Vision Alignment GA (v2.0.0)**: General-purpose enterprise orchestrator
