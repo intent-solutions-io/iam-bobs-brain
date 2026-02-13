@@ -55,7 +55,7 @@ This document serves as the **master catalog** for all canonical documentation i
 | 000-DR-STND-adk-lazy-loading-app-pattern.md | DR-STND | adk-lazy-loading-app-pattern.md | Active | Lazy-loading App pattern for all ADK agents (module-level `app` variable) |
 | 000-DR-STND-arv-minimum-gate.md | DR-STND | arv-minimum-gate.md | Active | Agent Readiness Verification (ARV) minimum gate standard for deployment safety |
 | 000-DR-STND-github-issue-creation-guardrails.md | DR-STND | github-issue-creation-guardrails.md | Active | Safety guardrails for GitHub issue creation (write operations disabled by default) |
-| 000-DR-STND-document-filing-system-standard-v4.md | DR-STND | document-filing-system-standard-v3.md | Canonical | Universal standard for organizing project documentation with category-based classification v3.0 |
+| 000-DR-STND-document-filing-system-standard-v4.md | DR-STND | document-filing-system-standard-v4.md | Canonical | Universal standard for organizing project documentation with category-based classification v4.3 |
 | 000-DR-STND-adk-cloud-run-tools-pattern.md | DR-STND | adk-cloud-run-tools-pattern.md | Active | Define how "tools live in Cloud Run" while staying 100% compliant with google-adk 1.18+ |
 | 000-DR-STND-slack-gateway-deploy-pattern.md | DR-STND | slack-gateway-deploy-pattern.md | Active | Deployment pattern for Slack gateway service on Cloud Run |
 
@@ -282,13 +282,13 @@ This document serves as the **master catalog** for all canonical documentation i
 4. Ready for Linux Foundation review
 
 **Next Actions:**
-1. ✅ All 28 6767 files documented in master index
+1. ✅ All 28 canonical files documented in master index
 2. ✅ Ready for Linux Foundation AI Card PR submission
-3. ⏸️ Future: Quarterly review for new 6767-* docs (next: 2026-03-01)
+3. ⏸️ Future: Quarterly review for new canonical docs (next: 2026-06-01)
 4. ⏸️ Future: Consider consolidating overlapping prompt design standards
 
 ---
 
-**Last Updated:** 2025-12-02
-**Status:** Active (complete catalog of all 28 files)
-**Next Review:** 2026-03-01 (quarterly) or when 5+ new 6767-* docs added
+**Last Updated:** 2026-02-13
+**Status:** Active (complete catalog of all 28 canonical files)
+**Next Review:** 2026-06-01 (quarterly) or when 5+ new canonical docs added

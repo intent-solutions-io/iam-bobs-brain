@@ -1,6 +1,6 @@
 # How to Use Bob and the IAM Department for Software Engineering
 
-**Document ID:** 000-DR-GUIDE-iam-department-user-guide-DR-GUIDE
+**Document ID:** 000-DR-GUIDE-iam-department-user-guide
 **Title:** User Guide for Bob and IAM Department Multi-Agent SWE System
 **Phase:** T3 (Operations & Day-to-Day Use)
 **Status:** User Guide

@@ -1,6 +1,6 @@
 # IAM Department Template - Scope and Parameterization Rules
 
-**Document ID:** 000-DR-STND-iam-department-template-scope-and-rules-DR-STND
+**Document ID:** 000-DR-STND-iam-department-template-scope-and-rules
 **Title:** IAM Department Template Scope and Parameterization Rules
 **Phase:** T1 (Template Extraction)
 **Status:** Reference Standard

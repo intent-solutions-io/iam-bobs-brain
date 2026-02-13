@@ -1,6 +1,6 @@
 # IAM Department Integration Checklist
 
-**Document ID:** 000-DR-STND-iam-department-integration-checklist-DR-STND
+**Document ID:** 000-DR-STND-iam-department-integration-checklist
 **Title:** IAM Department Cross-Repo Integration Checklist
 **Phase:** T2 (Porting & Integration)
 **Status:** Standard Checklist

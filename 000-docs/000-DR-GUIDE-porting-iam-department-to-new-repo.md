@@ -1,6 +1,6 @@
 # Porting Guide: IAM Department to New Repository
 
-**Document ID:** 000-DR-GUIDE-porting-iam-department-to-new-repo-DR-GUIDE
+**Document ID:** 000-DR-GUIDE-porting-iam-department-to-new-repo
 **Title:** Porting the IAM Department Template to New Repositories
 **Phase:** T2 (Porting & Integration)
 **Status:** Canonical Guide

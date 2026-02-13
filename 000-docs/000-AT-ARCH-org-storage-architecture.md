@@ -1,6 +1,6 @@
 # Org-Wide Knowledge Hub Storage Architecture (LIVE1-GCS)
 
-**Document Number:** 000-AT-ARCH-org-storage-architecture-AT-ARCH
+**Document Number:** 000-AT-ARCH-org-storage-architecture
 **Status:** Active
 **Phase:** LIVE1-GCS
 **Created:** 2025-11-20

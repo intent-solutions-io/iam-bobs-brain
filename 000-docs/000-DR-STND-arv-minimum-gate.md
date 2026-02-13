@@ -1,6 +1,6 @@
 # ARV Minimum Gate Standard for Bob's Brain
 
-**Document ID:** 000-DR-STND-arv-minimum-gate-DR-STND-arv-minimum-gate-for-bobs-brain
+**Document ID:** 000-DR-STND-arv-minimum-gate
 **Created:** 2025-11-20
 **Phase:** RC2 (Observability)
 **Status:** Active
