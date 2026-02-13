@@ -32,14 +32,14 @@ This is the **live** guide for Claude Code when working in the `bobs-brain` repo
 ## 📋 TL;DR for DevOps (Quick Reference)
 
 **Current Status (v2.0.0 - Vision Alignment GA):**
-- **Version**: v2.0.0 – General-Purpose Enterprise Orchestrator
+- **Version**: v2.0.0 – Enterprise Controls + ADK Compliance Department
 - **Phase**: Vision Alignment Complete (Phases D, E, F, G)
 - **Deployment**: Infrastructure ready, Terraform + GitHub Actions for all deployments (R4 compliance)
 - **New in v2.0.0**: Canonical agent IDs, enterprise controls, Mission Spec v1
 
 **Key Documents:**
-- **6767 Global Catalog**: `000-docs/6767-000-DR-INDEX-bobs-brain-standards-catalog.md` (START HERE for all 6767 standards)
-- **Hard Mode Rules**: `000-docs/6767-DR-STND-adk-agent-engine-spec-and-hardmode-rules.md` (R1-R8)
+- **Standards Catalog**: `000-docs/000-DR-INDEX-bobs-brain-standards-catalog.md` (START HERE for all canonical standards)
+- **Hard Mode Rules**: `000-docs/000-DR-STND-adk-agent-engine-spec-and-hardmode-rules.md` (R1-R8)
 - **Agent Identity**: `000-docs/252-DR-STND-agent-identity-standard.md` (canonical IDs)
 - **Enterprise Controls**: `000-docs/253-DR-STND-mandates-budgets-approvals.md` (mandates, risk tiers)
 - **Policy Gates**: `000-docs/254-DR-STND-policy-gates-risk-tiers.md` (R0-R4 enforcement)
@@ -257,7 +257,7 @@ missions/                         # Mission Spec YAML files (declarative workflo
   - `create_app()` - Wraps in App for Agent Engine
   - Module-level `app` (NOT `agent`)
 - No import-time validation or heavy work
-- See: `000-docs/6767-LAZY-DR-STND-adk-lazy-loading-app-pattern.md`
+- See: `000-docs/000-DR-STND-adk-lazy-loading-app-pattern.md`
 
 ### Key Architectural Rules
 
@@ -335,7 +335,7 @@ User: [Sees friendly response]
 - R7: SPIFFE ID propagation (in AgentCard, logs, headers)
 - R8: Drift detection (runs first in CI, blocks violations)
 
-**See:** `000-docs/6767-DR-STND-adk-agent-engine-spec-and-hardmode-rules.md` for complete spec.
+**See:** `000-docs/000-DR-STND-adk-agent-engine-spec-and-hardmode-rules.md` for complete spec.
 
 ### ⛔ Common Anti-Patterns (DO NOT DO)
 
@@ -465,10 +465,10 @@ Each agent also needs:
 ### Documentation Standards
 
 **Document Filing System v3.0:**
-- Format: `NNN-CC-ABCD-description.md` (project-specific) or `6767-CC-ABCD-description.md` (canonical standards)
+- Format: `NNN-CC-ABCD-description.md` (project-specific) or `000-CC-ABCD-description.md` (canonical standards)
 - Categories: PP (Planning), AT (Architecture), AA (After-Action Reports), DR (Documentation/Reference)
 - All docs in `000-docs/` - NO scattered documentation
-- See: `000-docs/6767-DR-STND-document-filing-system-standard-v3.md` for complete rules
+- See: `000-docs/000-DR-STND-document-filing-system-standard-v4.md` for complete rules
 
 **Key Doc Types:**
 - **PLAN** (`NNN-AA-PLAN-*.md`) - Phase planning before work starts
@@ -557,28 +557,28 @@ git branch -d feature/my-feature-name
 ### Start Here (By Role)
 
 **Developers (Building Agents):**
-1. **[Master Index](000-docs/6767-000-DR-INDEX-bobs-brain-standards-catalog.md)** - Complete map of all standards
-2. **[Hard Mode Rules](000-docs/6767-DR-STND-adk-agent-engine-spec-and-hardmode-rules.md)** - R1-R8 architecture rules
-3. **[Lazy-Loading Pattern](000-docs/6767-LAZY-DR-STND-adk-lazy-loading-app-pattern.md)** - Agent implementation pattern
+1. **[Master Index](000-docs/000-DR-INDEX-bobs-brain-standards-catalog.md)** - Complete map of all standards
+2. **[Hard Mode Rules](000-docs/000-DR-STND-adk-agent-engine-spec-and-hardmode-rules.md)** - R1-R8 architecture rules
+3. **[Lazy-Loading Pattern](000-docs/000-DR-STND-adk-lazy-loading-app-pattern.md)** - Agent implementation pattern
 
 **Operators (Deploying/Running):**
 1. **[DevOps Playbook](000-docs/120-AA-AUDT-appaudit-devops-playbook.md)** - Complete operational guide
-2. **[Inline Deployment](000-docs/6767-INLINE-DR-STND-inline-source-deployment-for-vertex-agent-engine.md)** - Deployment guide
-3. **[Operations Runbook](000-docs/6767-RB-OPS-adk-department-operations-runbook.md)** - Day-to-day operations
+2. **[Inline Deployment](000-docs/000-DR-STND-inline-source-deployment-for-vertex-agent-engine.md)** - Deployment guide
+3. **[Operations Runbook](000-docs/000-RB-OPS-adk-department-operations-runbook.md)** - Day-to-day operations
 
 **Template Adopters (Porting to New Repos):**
-1. **[Porting Guide](000-docs/6767-DR-GUIDE-porting-iam-department-to-new-repo.md)** - Step-by-step instructions
-2. **[Integration Checklist](000-docs/6767-DR-STND-iam-department-integration-checklist.md)** - Complete checklist
-3. **[Template Standards](000-docs/6767-DR-STND-iam-department-template-scope-and-rules.md)** - Customization rules
+1. **[Porting Guide](000-docs/000-DR-GUIDE-porting-iam-department-to-new-repo.md)** - Step-by-step instructions
+2. **[Integration Checklist](000-docs/000-DR-STND-iam-department-integration-checklist.md)** - Complete checklist
+3. **[Template Standards](000-docs/000-DR-STND-iam-department-template-scope-and-rules.md)** - Customization rules
 
-### Key SOP Documents (6767-series)
+### Key SOP Documents (Canonical Standards)
 
-All **6767-prefixed docs act as Standard Operating Procedures (SOPs)** - these are canonical standards:
+All **000-prefixed canonical docs act as Standard Operating Procedures (SOPs)**:
 
-- **6767-DR-STND-adk-agent-engine-spec-and-hardmode-rules.md** - Hard Mode rules (R1-R8)
-- **6767-LAZY-DR-STND-adk-lazy-loading-app-pattern.md** - Lazy-loading App pattern
-- **6767-INLINE-DR-STND-inline-source-deployment-for-vertex-agent-engine.md** - Inline source deployment
-- **6767-115-DR-STND-prompt-design-and-a2a-contracts-for-department-adk-iam.md** - Prompt design contracts
+- **000-DR-STND-adk-agent-engine-spec-and-hardmode-rules.md** - Hard Mode rules (R1-R8)
+- **000-DR-STND-adk-lazy-loading-app-pattern.md** - Lazy-loading App pattern (6767-LAZY)
+- **000-DR-STND-inline-source-deployment-for-vertex-agent-engine.md** - Inline source deployment
+- **000-DR-STND-prompt-design-a2a-contracts-iam-dept.md** - Prompt design contracts
 
 ### Other Key References
 
@@ -589,8 +589,8 @@ All **6767-prefixed docs act as Standard Operating Procedures (SOPs)** - these a
 ### Quick Lookups
 
 ```bash
-# Find all 6767 standards (canonical SOPs)
-ls 000-docs/6767*.md
+# Find all canonical standards
+ls 000-docs/000-*.md
 
 # List all standards
 ls 000-docs/*-DR-STND-*.md
@@ -608,10 +608,12 @@ ls 000-docs/127-*
 
 ## 5. Changelog / Maintenance
 
-**Last Update:** 2026-02-02
+**Last Update:** 2026-02-13
 
 **Recent Changes:**
-- **Vision Alignment GA (v2.0.0)**: General-purpose enterprise orchestrator
+- **Doc-Filing v4.3 Migration**: All 28 `6767-*` canonical docs renamed to `000-*` prefix
+- **Identity Alignment**: README/CLAUDE.md updated to reflect ADK compliance focus (not "general-purpose orchestrator")
+- **Vision Alignment GA (v2.0.0)**: Enterprise controls + ADK compliance department
   - **Phase D**: Canonical agent identity system with backwards-compatible aliases
   - **Phase E**: Enterprise controls (risk tiers R0-R4, policy gates, evidence bundles)
   - **Phase F**: Mission Spec v1 (declarative workflow-as-code)
@@ -622,8 +624,8 @@ ls 000-docs/127-*
 
 **Maintenance Policy:**
 - **DON'T overcrowd CLAUDE.md** - it's a pointer doc, not a knowledge base
-- All detailed docs go in `000-docs/` following NNN-CC-ABCD naming
-- 6767-series docs = SOPs (Standard Operating Procedures)
+- All detailed docs go in `000-docs/` following NNN-CC-ABCD or 000-CC-ABCD naming
+- Canonical docs (000-* prefix) = SOPs (Standard Operating Procedures)
 - CLAUDE.md should remain concise (target ~15k chars)
   - Exception: Section 2 (Architecture) is worth the space to prevent confusion
 - When adding new standards, update Section 5 with pointer, not full content
