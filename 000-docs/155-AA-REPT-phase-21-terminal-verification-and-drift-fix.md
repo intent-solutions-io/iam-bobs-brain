@@ -680,8 +680,8 @@ touch 000-docs/156-AA-REPT-phase-22-foreman-deploy-and-production-monitoring.md
 
 ### Related Standards
 
-- `000-docs/6767-DR-STND-adk-agent-engine-spec-and-hardmode-rules.md` (R1-R8 rules)
-- `000-docs/6767-DR-STND-document-filing-system-standard-v3.md` (Filing standard)
+- `000-docs/000-DR-STND-adk-agent-engine-spec-and-hardmode-rules.md` (R1-R8 rules)
+- `000-docs/000-DR-STND-document-filing-system-standard-v4.md` (Filing standard)
 
 ---
 

@@ -1,4 +1,4 @@
-# 6767-DR-STND-github-issue-creation-guardrails-DR-STND-github-issue-creation-guardrails.md
+# 000-DR-STND-github-issue-creation-guardrails-DR-STND-github-issue-creation-guardrails.md
 
 **Date Created:** 2025-11-20
 **Category:** DR - Documentation & Reference

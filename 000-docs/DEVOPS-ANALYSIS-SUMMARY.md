@@ -424,12 +424,12 @@ gcloud logging read "resource.type=cloud_run_revision" --limit 100
 3. **CHANGELOG.md** (1,000+ lines) - Version history
 
 ### Operational Documents (6767-series = canonical)
-- `6767-DR-STND-adk-agent-engine-spec-and-hardmode-rules.md` - Architecture standard
+- `000-DR-STND-adk-agent-engine-spec-and-hardmode-rules.md` - Architecture standard
 - `6767-OD-RBOK-deployment-runbook.md` - Step-by-step deployment
 - `6767-OD-TELE-observability-telemetry-guide.md` - Monitoring setup
 - `6767-OD-CONF-github-secrets-configuration.md` - CI/CD auth
 - `6767-112-AT-ARCH-org-storage-architecture.md` - GCS design
-- `6767-RB-OPS-adk-department-operations-runbook.md` - Daily ops
+- `000-RB-OPS-adk-department-operations-runbook.md` - Daily ops
 
 ### File Locations
 - Configuration: `/home/jeremy/000-projects/iams/bobs-brain/`

@@ -43,7 +43,7 @@ git status --short
 **Documents Reviewed:**
 - `000-docs/133-PL-PLAN-v0-10-0-preview-merge-and-release.md` - Merge & release plan
 - `000-docs/131-AA-REPT-v0-10-0-preview-release-checklist.md` - Release checklist
-- `000-docs/6767-DR-STND-document-filing-system-standard-v3.md` - Filing standard v3.0
+- `000-docs/000-DR-STND-document-filing-system-standard-v4.md` - Filing standard v3.0
 - `000-docs/134-AA-REPT-phase-10-pr-merge-release-blocked-on-test-env.md` - Previous AAR documenting test failures
 
 **Context Confirmed:**

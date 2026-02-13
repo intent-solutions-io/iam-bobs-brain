@@ -354,7 +354,7 @@ All existing Hard Mode rules remain enforced:
 - 177-AA-REPT-linux-foundation-submission-complete.md
 
 **Hard Mode Rules:**
-- 6767-DR-STND-adk-agent-engine-spec-and-hardmode-rules.md
+- 000-DR-STND-adk-agent-engine-spec-and-hardmode-rules.md
 
 **Previous Releases:**
 - v0.13.0 (2025-12-03) - Linux Foundation PR preparation

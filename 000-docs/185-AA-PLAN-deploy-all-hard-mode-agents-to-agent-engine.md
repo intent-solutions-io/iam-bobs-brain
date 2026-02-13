@@ -257,8 +257,8 @@ gcloud ai reasoning-engines delete AGENT_ENGINE_ID \
 
 ## References
 
-- **ARV Standard:** `000-docs/6767-DR-STND-arv-minimum-gate.md`
-- **Inline Deployment:** `000-docs/6767-INLINE-DR-STND-inline-source-deployment-for-vertex-agent-engine.md`
+- **ARV Standard:** `000-docs/000-DR-STND-arv-minimum-gate.md`
+- **Inline Deployment:** `000-docs/000-DR-STND-inline-source-deployment-for-vertex-agent-engine.md`
 - **Agent Inventory:** `000-docs/085-OD-INVT-vertex-agent-inventory.md`
 - **CSV Registry:** `000-docs/agent-engine-registry.csv`
 

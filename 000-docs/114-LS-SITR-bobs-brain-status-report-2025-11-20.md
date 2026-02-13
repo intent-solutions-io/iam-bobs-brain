@@ -334,18 +334,18 @@ None currently.
    - `CHANGELOG.md` - Version history
 
 2. **Architecture**
-   - `000-docs/6767-DR-STND-iam-department-template-scope-and-rules-DR-STND-iam-department-template-scope-and-rules.md` - Department standards
-   - `000-docs/6767-AT-ARCH-org-storage-architecture-AT-ARCH-org-storage-architecture.md` - GCS storage design
+   - `000-docs/000-DR-STND-iam-department-template-scope-and-rules-DR-STND-iam-department-template-scope-and-rules.md` - Department standards
+   - `000-docs/000-AT-ARCH-org-storage-architecture-AT-ARCH-org-storage-architecture.md` - GCS storage design
    - `000-docs/113-AA-REPT-live1-gcs-implementation.md` - GCS implementation AAR
 
 3. **Operations**
-   - `000-docs/6767-RB-OPS-adk-department-operations-runbook-RB-OPS-adk-department-operations-runbook.md` - Operations guide
+   - `000-docs/000-RB-OPS-adk-department-operations-runbook-RB-OPS-adk-department-operations-runbook.md` - Operations guide
    - `.env.example` - Configuration reference
    - `Makefile` - Common commands
 
 4. **User Guides**
-   - `000-docs/6767-DR-GUIDE-iam-department-user-guide-DR-GUIDE-how-to-use-bob-and-iam-department-for-swe.md` - User guide
-   - `000-docs/6767-DR-GUIDE-porting-iam-department-to-new-repo-DR-GUIDE-porting-iam-department-to-new-repo.md` - Porting guide
+   - `000-docs/000-DR-GUIDE-iam-department-user-guide-DR-GUIDE-how-to-use-bob-and-iam-department-for-swe.md` - User guide
+   - `000-docs/000-DR-GUIDE-porting-iam-department-to-new-repo-DR-GUIDE-porting-iam-department-to-new-repo.md` - Porting guide
 
 **For Understanding LIVE3:**
 
@@ -443,7 +443,7 @@ python3 scripts/run_portfolio_swe.py --repos bobs-brain,diagnosticpro
 - [ ] Read `README.md` and `CLAUDE.md`
 - [ ] Review Hard Mode rules (R1-R8)
 - [ ] Understand multi-department architecture
-- [ ] Read `000-docs/6767-DR-STND-iam-department-template-scope-and-rules-DR-STND-iam-department-template-scope-and-rules.md`
+- [ ] Read `000-docs/000-DR-STND-iam-department-template-scope-and-rules-DR-STND-iam-department-template-scope-and-rules.md`
 
 **Week 2: Hands-On**
 - [ ] Clone repo, set up local environment

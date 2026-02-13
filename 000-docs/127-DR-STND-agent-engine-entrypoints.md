@@ -141,7 +141,7 @@ app = create_app()
 - ✅ Validation happens in `create_agent()`, not at import time
 - ✅ Dual memory wiring in `create_app()`
 
-**See**: `000-docs/6767-LAZY-DR-STND-adk-lazy-loading-app-pattern.md` for complete pattern spec
+**See**: `000-docs/000-DR-STND-adk-lazy-loading-app-pattern.md` for complete pattern spec
 
 ---
 
@@ -250,9 +250,9 @@ Before deploying an agent via inline source:
 
 ## Related Standards
 
-- **6767-LAZY-DR-STND-adk-lazy-loading-app-pattern.md** - Lazy-loading App pattern spec
-- **6767-INLINE-DR-STND-inline-source-deployment-for-vertex-agent-engine.md** - Inline source deployment standard
-- **6767-DR-STND-adk-agent-engine-spec-and-hardmode-rules.md** - Hard Mode rules (R1-R8)
+- **000-DR-STND-adk-lazy-loading-app-pattern.md** - Lazy-loading App pattern spec
+- **000-DR-STND-inline-source-deployment-for-vertex-agent-engine.md** - Inline source deployment standard
+- **000-DR-STND-adk-agent-engine-spec-and-hardmode-rules.md** - Hard Mode rules (R1-R8)
 
 ---
 

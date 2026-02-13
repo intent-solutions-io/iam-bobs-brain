@@ -1,6 +1,6 @@
 # ADK + Agent Engine Specification and Hard Mode Rules
 
-**Document ID:** 6767-DR-STND-adk-agent-engine-spec-and-hardmode-rules
+**Document ID:** 000-DR-STND-adk-agent-engine-spec-and-hardmode-rules
 **Phase:** SPEC-ALIGN-ARV-EXPANSION (S1)
 **Status:** Canonical Standard (Cross-Repo)
 **Created:** 2025-11-20
@@ -496,7 +496,7 @@ bobs-brain/
 - Centralized, not scattered
 
 **Documentation:**
-- Canonical standards: `6767-CC-ABCD-description.md`
+- Canonical standards: `000-CC-ABCD-description.md`
 - Repo-local: `NNN-CC-ABCD-description.md`
 - Where:
   - `NNN` = Sequential number (001-999)
@@ -621,7 +621,7 @@ That mapping document provides:
 - `SLACK_APP_ID`: Slack app identifier (if applicable)
 - `GITHUB_OWNER`: GitHub org/username for issue creation
 
-**See:** `000-docs/6767-DR-STND-iam-department-template-scope-and-rules.md` for full parameterization guide (30+ points).
+**See:** `000-docs/000-DR-STND-iam-department-template-scope-and-rules.md` for full parameterization guide (30+ points).
 
 ---
 
@@ -704,9 +704,9 @@ That mapping document provides:
 ## X. Related Documentation
 
 **6767 Canonical Standards:**
-- `6767-DR-STND-iam-department-template-scope-and-rules.md` - Template scope and parameterization
-- `6767-DR-STND-arv-minimum-gate.md` - ARV baseline requirements
-- `6767-DR-GUIDE-porting-iam-department-to-new-repo.md` - Step-by-step porting guide
+- `000-DR-STND-iam-department-template-scope-and-rules.md` - Template scope and parameterization
+- `000-DR-STND-arv-minimum-gate.md` - ARV baseline requirements
+- `000-DR-GUIDE-porting-iam-department-to-new-repo.md` - Step-by-step porting guide
 
 **Repo-Local Implementation:**
 - `121-DR-MAP-adk-spec-to-implementation-and-arv.md` - (To be created in S2)

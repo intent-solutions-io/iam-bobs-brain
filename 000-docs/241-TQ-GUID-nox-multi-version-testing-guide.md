@@ -733,14 +733,14 @@ This document follows **Document Filing System v3.0**:
 - **Type:** GUID (Guide)
 - **Description:** nox-multi-version-testing-guide
 
-See: `000-docs/6767-DR-STND-document-filing-system-standard-v3.md`
+See: `000-docs/000-DR-STND-document-filing-system-standard-v4.md`
 
 ---
 
 ## Related Documents
 
 - **120-AA-AUDT-appaudit-devops-playbook.md** - Complete DevOps onboarding guide
-- **6767-DR-STND-adk-agent-engine-spec-and-hardmode-rules.md** - Hard Mode rules
+- **000-DR-STND-adk-agent-engine-spec-and-hardmode-rules.md** - Hard Mode rules
 - **240-DR-STND-mcp-security-and-testing-standards-rationale.md** - Security testing standards
 
 ---

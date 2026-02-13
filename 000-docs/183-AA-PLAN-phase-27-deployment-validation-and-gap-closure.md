@@ -161,8 +161,8 @@ git commit -m "docs(phase-27): record deployment validation AAR"
   - `.github/workflows/agent-engine-inline-dev-deploy.yml`
   - `.github/workflows/deploy-slack-gateway-dev.yml`
 - **Standards:**
-  - `000-docs/6767-INLINE-DR-STND-inline-source-deployment-for-vertex-agent-engine.md`
-  - `000-docs/6767-DR-STND-slack-gateway-deploy-pattern.md`
+  - `000-docs/000-DR-STND-inline-source-deployment-for-vertex-agent-engine.md`
+  - `000-docs/000-DR-STND-slack-gateway-deploy-pattern.md`
 - **Previous Phases:**
   - Phase 23: Dev deploy and monitoring plan
   - Phase 24-25: Slack Bob CI deploy and hardening

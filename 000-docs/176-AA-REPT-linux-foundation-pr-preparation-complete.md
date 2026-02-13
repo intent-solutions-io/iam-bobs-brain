@@ -23,7 +23,7 @@ Bob's Brain repository has been comprehensively prepared for submission as a ref
 #### 1.1 6767 Master Index Updated ✅
 - **Before:** 24 files indexed, 4 missing
 - **After:** All 28 canonical standards documented with comprehensive summaries
-- **File:** `000-docs/6767-DR-INDEX-bobs-brain-standards-catalog.md`
+- **File:** `000-docs/000-DR-INDEX-bobs-brain-standards-catalog.md`
 - **Impact:** Complete navigation for all 6767 standards
 
 #### 1.2 Duplicate Document Numbers Fixed ✅
@@ -43,7 +43,7 @@ Bob's Brain repository has been comprehensively prepared for submission as a ref
 
 #### 1.5 README Links Fixed ✅
 - **Before:** Broken master index link
-- **After:** Updated to correct file (`6767-DR-INDEX-bobs-brain-standards-catalog.md`)
+- **After:** Updated to correct file (`000-DR-INDEX-bobs-brain-standards-catalog.md`)
 - **Impact:** All documentation links working
 
 #### 1.6 Marketing Language Removed ✅
@@ -168,7 +168,7 @@ docs/ → github-pages/
 
 **Updated Files:**
 ```
-000-docs/6767-DR-INDEX-bobs-brain-standards-catalog.md (updated: all 28 files indexed)
+000-docs/000-DR-INDEX-bobs-brain-standards-catalog.md (updated: all 28 files indexed)
 README.md (fixed links, removed marketing language)
 .gitignore (added archive/)
 ```
@@ -193,7 +193,7 @@ ai-card-examples/bobs-brain/conversion-guide.md
 ```bash
 git add 000-docs/682-*.md 000-docs/683-*.md 000-docs/684-*.md 000-docs/685-*.md \
         000-docs/686-*.md 000-docs/687-*.md 000-docs/688-*.md 000-docs/689-*.md \
-        000-docs/6767-DR-INDEX-bobs-brain-standards-catalog.md
+        000-docs/000-DR-INDEX-bobs-brain-standards-catalog.md
 
 git commit -m "docs(000-docs): fix duplicate numbers and update 6767 master index
 

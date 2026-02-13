@@ -75,7 +75,7 @@ Used signal detection to classify:
 - Scanned all markdown files for old `6767-NNN` references
 - Updated 51 files with corrected references:
   - Normal docs: `6767-050` → `050`
-  - Canonical docs: `6767-099` → `6767-DR-STND-github-issue-creation-guardrails`
+  - Canonical docs: `6767-099` → `000-DR-STND-github-issue-creation-guardrails`
 
 ---
 
@@ -94,34 +94,34 @@ Used signal detection to classify:
 
 These 10 documents apply to ALL IAM departments across ALL repos:
 
-1. **6767-AT-ARCH-org-storage-architecture.md**
+1. **000-AT-ARCH-org-storage-architecture.md**
    - Org-wide GCS bucket and Vertex Search architecture
 
-2. **6767-DR-GUIDE-iam-department-user-guide.md**
+2. **000-DR-GUIDE-iam-department-user-guide.md**
    - How to use any IAM department (genericized from Bob-specific)
 
-3. **6767-DR-GUIDE-porting-iam-department-to-new-repo.md**
+3. **000-DR-GUIDE-porting-iam-department-to-new-repo.md**
    - Step-by-step guide to port IAM department pattern
 
-4. **6767-DR-STND-arv-minimum-gate.md**
+4. **000-DR-STND-arv-minimum-gate.md**
    - Agent Readiness Verification minimum requirements (genericized)
 
-5. **6767-DR-STND-github-issue-creation-guardrails.md**
+5. **000-DR-STND-github-issue-creation-guardrails.md**
    - GitHub issue creation safety guardrails
 
-6. **6767-DR-STND-iam-department-integration-checklist.md**
+6. **000-DR-STND-iam-department-integration-checklist.md**
    - Integration checklist for IAM departments
 
-7. **6767-DR-STND-iam-department-template-scope-and-rules.md**
+7. **000-DR-STND-iam-department-template-scope-and-rules.md**
    - Scope and rules for IAM department pattern
 
-8. **6767-DR-STND-live-rag-and-agent-engine-rollout-plan.md**
+8. **000-DR-STND-live-rag-and-agent-engine-rollout-plan.md**
    - Live RAG and Agent Engine rollout strategy
 
-9. **6767-OD-ARCH-datahub-storage-consolidation.md**
+9. **000-OD-ARCH-datahub-storage-consolidation.md**
    - Datahub storage consolidation architecture
 
-10. **6767-RB-OPS-adk-department-operations-runbook.md**
+10. **000-RB-OPS-adk-department-operations-runbook.md**
     - Operations runbook for ADK-based departments
 
 ### Normal Docs (Sequential IDs)
@@ -148,7 +148,7 @@ These 10 documents apply to ALL IAM departments across ALL repos:
 ```python
 # Canonical docs: Remove sequential number, keep 6767 prefix
 6767-099-DR-STND-github-issue-creation-guardrails.md
-  → 6767-DR-STND-github-issue-creation-guardrails.md
+  → 000-DR-STND-github-issue-creation-guardrails.md
 
 # Normal docs: Strip 6767 prefix, keep sequential number
 6767-050-AA-REPT-final-cleanup.md
@@ -248,9 +248,9 @@ git status --short | grep "^R" | wc -l
 ## Related Documentation
 
 ### Canonical Standards (Copy these when porting IAM department)
-- `6767-DR-STND-iam-department-template-scope-and-rules.md` - Core rules
-- `6767-DR-GUIDE-porting-iam-department-to-new-repo.md` - Porting guide
-- `6767-RB-OPS-adk-department-operations-runbook.md` - Operations
+- `000-DR-STND-iam-department-template-scope-and-rules.md` - Core rules
+- `000-DR-GUIDE-porting-iam-department-to-new-repo.md` - Porting guide
+- `000-RB-OPS-adk-department-operations-runbook.md` - Operations
 
 ### This Cleanup
 - Phase: Document Organization Cleanup

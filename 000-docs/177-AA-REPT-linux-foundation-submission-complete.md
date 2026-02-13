@@ -234,7 +234,7 @@ VERSION (0.12.0 → 0.13.0)
 CHANGELOG.md (v0.13.0 entry added)
 README.md (links fixed, marketing language removed)
 .gitignore (added github-pages/ and archive/)
-6767-DR-INDEX-bobs-brain-standards-catalog.md (all 28 files indexed)
+000-DR-INDEX-bobs-brain-standards-catalog.md (all 28 files indexed)
 ```
 
 ---

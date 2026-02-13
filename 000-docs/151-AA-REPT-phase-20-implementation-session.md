@@ -1001,10 +1001,10 @@ Phase 20 complete
 - `.github/workflows/deploy-containerized-dev.yml` - Wired deployment script
 
 ### Standards & Patterns Referenced
-- `000-docs/6767-INLINE-DR-STND-inline-source-deployment-for-vertex-agent-engine.md`
+- `000-docs/000-DR-STND-inline-source-deployment-for-vertex-agent-engine.md`
 - `000-docs/127-DR-STND-agent-engine-entrypoints.md`
-- `000-docs/6767-LAZY-DR-STND-adk-lazy-loading-app-pattern.md`
-- `000-docs/6767-DR-STND-adk-agent-engine-spec-and-hardmode-rules.md`
+- `000-docs/000-DR-STND-adk-lazy-loading-app-pattern.md`
+- `000-docs/000-DR-STND-adk-agent-engine-spec-and-hardmode-rules.md`
 
 ### Prior Phases
 - `000-docs/148-AA-REPT-phase-19-agent-engine-dev-deployment.md` - Phase 19 AAR

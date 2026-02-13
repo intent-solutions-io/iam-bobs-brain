@@ -79,12 +79,12 @@ Bob's Brain is a production-grade **ADK (Agent Development Kit) agent department
   - **LS** = Logs & Status
 
 **Key Operational Documents** (6767-series = canonical standards):
-1. `6767-DR-STND-adk-agent-engine-spec-and-hardmode-rules.md` - Architecture standard
+1. `000-DR-STND-adk-agent-engine-spec-and-hardmode-rules.md` - Architecture standard
 2. `6767-OD-RBOK-deployment-runbook.md` - Step-by-step deployment procedures
 3. `6767-OD-TELE-observability-telemetry-guide.md` - Monitoring & logging setup
 4. `6767-OD-CONF-github-secrets-configuration.md` - CI/CD authentication
-5. `6767-RB-OPS-adk-department-operations-runbook.md` - Daily operations
-6. `6767-DR-GUIDE-porting-iam-department-to-new-repo.md` - Template porting
+5. `000-RB-OPS-adk-department-operations-runbook.md` - Daily operations
+6. `000-DR-GUIDE-porting-iam-department-to-new-repo.md` - Template porting
 7. `6767-112-AT-ARCH-org-storage-architecture.md` - GCS knowledge hub design
 8. `6767-113-AA-REPT-live1-gcs-implementation.md` - Storage implementation AAR
 
@@ -1477,7 +1477,7 @@ python3 scripts/run_portfolio_swe.py --dry-run
 **Week 1 - Fundamentals:**
 - [ ] Read README.md (understand what Bob does)
 - [ ] Read CLAUDE.md (understand Hard Mode rules)
-- [ ] Review 000-docs/6767-DR-STND-adk-agent-engine-spec-and-hardmode-rules.md (architecture)
+- [ ] Review 000-docs/000-DR-STND-adk-agent-engine-spec-and-hardmode-rules.md (architecture)
 - [ ] Set up local development environment
 - [ ] Clone repo and install dependencies
 - [ ] Run `bash scripts/ci/check_nodrift.sh` (understand drift detection)
@@ -1589,7 +1589,7 @@ gh run view ${RUN_ID}
 
 1. **Architecture & Standards:**
    - README.md (1,027 lines - everything start)
-   - 000-docs/6767-DR-STND-adk-agent-engine-spec-and-hardmode-rules.md (canonical spec)
+   - 000-docs/000-DR-STND-adk-agent-engine-spec-and-hardmode-rules.md (canonical spec)
    - 000-docs/6767-115-DR-STND-prompt-design-and-a2a-contracts-for-department-adk-iam.md (v0.10.0)
 
 2. **Deployment:**
@@ -1619,7 +1619,7 @@ gh run view ${RUN_ID}
 - **Agent Development:** See agents/bob/README.md or agent.py source
 - **CI/CD Workflows:** Review .github/workflows/ci.yml source
 - **Troubleshooting:** Section 6.2 of this document
-- **Operational Procedures:** 000-docs/6767-RB-OPS-adk-department-operations-runbook.md
+- **Operational Procedures:** 000-docs/000-RB-OPS-adk-department-operations-runbook.md
 
 **GitHub Issues:**
 - File issues at: https://github.com/jeremylongshore/bobs-brain/issues

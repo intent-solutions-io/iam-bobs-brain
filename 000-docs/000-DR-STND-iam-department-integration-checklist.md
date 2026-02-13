@@ -1,6 +1,6 @@
 # IAM Department Integration Checklist
 
-**Document ID:** 6767-DR-STND-iam-department-integration-checklist-DR-STND
+**Document ID:** 000-DR-STND-iam-department-integration-checklist-DR-STND
 **Title:** IAM Department Cross-Repo Integration Checklist
 **Phase:** T2 (Porting & Integration)
 **Status:** Standard Checklist
@@ -11,7 +11,7 @@
 
 ## Quick Reference
 
-Use this checklist alongside the porting guide (`6767-DR-GUIDE-porting-iam-department-to-new-repo-DR-GUIDE-porting-iam-department-to-new-repo.md`) to track your integration progress.
+Use this checklist alongside the porting guide (`000-DR-GUIDE-porting-iam-department-to-new-repo-DR-GUIDE-porting-iam-department-to-new-repo.md`) to track your integration progress.
 
 **Estimated Time:** 1-2 days minimal, 1 week full integration
 
@@ -451,6 +451,6 @@ After completing this checklist:
 **Last Updated:** 2025-11-20
 
 **Related Docs:**
-- 6767-DR-STND-iam-department-template-scope-and-rules-DR-STND-iam-department-template-scope-and-rules.md (scope)
-- 6767-DR-GUIDE-porting-iam-department-to-new-repo-DR-GUIDE-porting-iam-department-to-new-repo.md (detailed guide)
+- 000-DR-STND-iam-department-template-scope-and-rules-DR-STND-iam-department-template-scope-and-rules.md (scope)
+- 000-DR-GUIDE-porting-iam-department-to-new-repo-DR-GUIDE-porting-iam-department-to-new-repo.md (detailed guide)
 - templates/iam-department/README.md (template README)

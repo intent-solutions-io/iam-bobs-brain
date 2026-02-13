@@ -1,6 +1,6 @@
 # ADK Department Operations Runbook
 
-**Document ID:** 6767-RB-OPS-adk-department-operations-runbook-RB-OPS
+**Document ID:** 000-RB-OPS-adk-department-operations-runbook
 **Title:** ADK Department Daily Operations & Troubleshooting Runbook
 **Phase:** T3 (Operations & Day-to-Day Use)
 **Status:** Operational Reference
@@ -14,7 +14,7 @@
 This runbook provides daily operational procedures, monitoring guidance, and troubleshooting workflows for the ADK-based IAM software engineering department.
 
 **Audience:** DevOps teams, SREs, product operators
-**Prerequisites:** IAM department deployed and integrated per 6767-DR-GUIDE-porting-iam-department-to-new-repo porting guide
+**Prerequisites:** IAM department deployed and integrated per 000-DR-GUIDE-porting-iam-department-to-new-repo porting guide
 
 ---
 
@@ -793,9 +793,9 @@ github:
 **Next Review:** 2025-12-20
 
 **Related Docs:**
-- 6767-DR-STND-iam-department-template-scope-and-rules-DR-STND-iam-department-template-scope-and-rules.md (template scope)
-- 6767-DR-GUIDE-porting-iam-department-to-new-repo-DR-GUIDE-porting-iam-department-to-new-repo.md (porting guide)
-- 6767-DR-STND-iam-department-integration-checklist-DR-STND-iam-department-integration-checklist.md (integration checklist)
-- 6767-DR-GUIDE-iam-department-user-guide-DR-GUIDE-how-to-use-bob-and-iam-department-for-swe.md (usage guide)
+- 000-DR-STND-iam-department-template-scope-and-rules-DR-STND-iam-department-template-scope-and-rules.md (template scope)
+- 000-DR-GUIDE-porting-iam-department-to-new-repo-DR-GUIDE-porting-iam-department-to-new-repo.md (porting guide)
+- 000-DR-STND-iam-department-integration-checklist-DR-STND-iam-department-integration-checklist.md (integration checklist)
+- 000-DR-GUIDE-iam-department-user-guide-DR-GUIDE-how-to-use-bob-and-iam-department-for-swe.md (usage guide)
 - **118-DR-STND-cicd-pipeline-for-iam-department.md** (CI/CD pipeline standard - CICD-DEPT)
 - **119-RB-OPS-deployment-operator-runbook.md** (deployment operations runbook - CICD-DEPT)

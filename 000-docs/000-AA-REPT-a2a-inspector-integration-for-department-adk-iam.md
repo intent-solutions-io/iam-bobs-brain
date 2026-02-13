@@ -307,11 +307,11 @@ This discovery led to our **hybrid validation strategy**.
 
 This AAR aligns with and extends the following 6767 standards:
 
-### 6767-DR-STND-agentcards-and-a2a-contracts.md
+### 000-DR-STND-agentcards-and-a2a-contracts.md
 - **Relationship**: Defines what to validate (AgentCard structure, schemas)
 - **This AAR**: Defines how to validate (tools, layers, process)
 
-### 6767-DR-STND-prompt-design-and-agentcard-standard.md
+### 000-DR-STND-prompt-design-and-agentcard-standard.md
 - **Relationship**: Establishes contract-first design philosophy
 - **This AAR**: Implements validation to enforce contract-first approach
 
@@ -390,7 +390,7 @@ python3 scripts/check_a2a_contracts.py agents/iam-adk/.well-known/agent-card.jso
 - **Integration Guide**: `tools/a2a-inspector/README.md`
 - **Validation Strategy**: `agents/shared_contracts.py:9-27` (docstring)
 - **Validator Source**: `scripts/check_a2a_contracts.py`
-- **AgentCard Standard**: `000-docs/6767-DR-STND-agentcards-and-a2a-contracts.md`
+- **AgentCard Standard**: `000-docs/000-DR-STND-agentcards-and-a2a-contracts.md`
 
 ---
 
