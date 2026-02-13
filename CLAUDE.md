@@ -82,8 +82,8 @@ python3 -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
 
-# Run all quality checks
-make check-all
+# Run all quality checks (lint + test)
+make ci
 
 # Run specific checks
 bash scripts/ci/check_nodrift.sh  # Drift detection (R8)
@@ -94,6 +94,17 @@ pytest -k "test_agent" -v         # Run tests matching pattern
 
 # Run single test with verbose output
 pytest tests/unit/test_<name>.py::test_function_name -vvs
+
+# Run tests by marker
+pytest -m unit -v                # Unit tests only (marker-based)
+pytest -m integration -v         # Integration tests (may need GCP)
+pytest -m "not slow" -v          # Skip slow tests
+
+# Multi-version testing with nox
+nox -s tests-3.12                # Test on Python 3.12
+nox -s lint                      # Lint checks via nox
+nox -s coverage                  # Coverage via nox
+nox --list                       # List all nox sessions
 
 # Smoke tests
 make smoke-agents                 # Test lazy-loading App pattern (6767-LAZY)
@@ -115,21 +126,12 @@ git push origin main  # Triggers GitHub Actions
 gh run list --workflow=agent-engine-inline-deploy.yml
 ```
 
-### Task Management (Beads)
-```bash
-bd ready  # Start session
-bd create "Task title" -p 1 --description "Details"
-bd update <id> --status in_progress
-bd close <id> --reason "Done"
-bd sync  # End session (flush + git sync)
-```
-
 ### Make Targets Quick Reference
 ```bash
 make help                         # Show all available targets
 
 # Quality Checks (run before commits)
-make check-all                    # All checks: drift, tests, ARV
+make ci                           # Lint + tests (pre-commit gate)
 make lint                         # Flake8 linting
 make format                       # Format with black
 make format-check                 # Check formatting (no changes)
@@ -240,6 +242,13 @@ agents/
 
 shared_tools/                     # Shared tool implementations
 shared_contracts/                 # JSON schemas for agent communication
+
+service/                          # Cloud Run gateway proxies (R3: no Runner here)
+├── slack_webhook/                # Slack events → Agent Engine REST API
+├── a2a_gateway/                  # A2A protocol HTTP endpoint
+└── github_webhook/               # GitHub events handler
+
+missions/                         # Mission Spec YAML files (declarative workflows)
 ```
 
 **Key Pattern (6767-LAZY):**
@@ -306,37 +315,13 @@ User: [Sees friendly response]
 
 ---
 
-## 3. How to Talk to Claude About This Repo
+## 3. Expectations & House Rules
 
-### Example Prompts
-
-**For agents/department work:**
-- "Design the iam-adk specialist agent following Bob's patterns"
-- "Audit agent.py files for ADK compliance against Hard Mode rules"
-- "Propose A2A wiring between iam-foreman and iam-issue"
-
-**For infrastructure:**
-- "Update Terraform to add Agent Engine configuration for iam-adk"
-- "Design CI workflow for multi-agent ARV (Agent Readiness Verification)"
-
-**For CI/CD:**
-- "Add drift detection checks for new iam-* agents"
-- "Implement ARV gates in GitHub Actions"
-
-### Key Expectations
-
-When working in this repo, Claude should:
-
-1. **Respect repo layout** - Don't invent new folders without permission
-2. **Consult `000-docs/`** - Check existing standards before creating new patterns
-3. **Use plugins/tools first** - Search ADK docs and repo patterns before guessing
-4. **Propose small changes** - Break work into reviewable commits
-5. **Follow phases** - Structure work into phases with PLAN and AAR docs
-6. **Think in agents** - Consider which department agent (bob, foreman, specialist) owns the work
-
----
-
-## 4. Expectations & House Rules
+**Before making changes:**
+1. Consult `000-docs/` for existing standards before creating new patterns
+2. Search ADK docs and repo patterns before guessing
+3. Think in agents - which department agent (bob, foreman, specialist) owns the work?
+4. Don't invent new folders without permission
 
 ### Architecture Standards
 
@@ -457,6 +442,26 @@ Each agent also needs:
 - Group checks logically (lint, test, build, deploy, ARV)
 - Keep workflows focused (avoid mega-workflows)
 
+### Test Infrastructure
+
+**Pytest markers** (use with `-m` flag):
+- `unit` - Fast tests, no external dependencies
+- `integration` - May require GCP/Agent Engine
+- `slack` - Requires Slack webhook
+- `slow` - Tests taking >5 seconds
+- `mcp` - MCP server tests
+- `arv` - Agent Readiness Verification tests
+
+**Conftest skip markers** (auto-applied):
+- `requires_adk` - Skips if `google-adk` not installed
+- `requires_apihub` - Skips if `google-cloud-apihub` not installed
+
+**Drift detection** (`scripts/ci/check_nodrift.sh`):
+- Runs first in CI, blocks on any R1/R3/R4 violations
+- Scans for LangChain/CrewAI/AutoGen imports (R1)
+- Scans for Runner imports in `service/` (R3)
+- Scans for manual deploy commands (R4)
+
 ### Documentation Standards
 
 **Document Filing System v3.0:**
@@ -547,7 +552,7 @@ git branch -d feature/my-feature-name
 
 ---
 
-## 5. Documentation Navigation
+## 4. Documentation Navigation
 
 ### Start Here (By Role)
 
@@ -601,7 +606,7 @@ ls 000-docs/127-*
 
 ---
 
-## 6. Changelog / Maintenance
+## 5. Changelog / Maintenance
 
 **Last Update:** 2026-02-02
 
