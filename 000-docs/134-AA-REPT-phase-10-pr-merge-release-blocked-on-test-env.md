@@ -59,7 +59,7 @@ git status -sb
    - Release title: "v0.10.0-preview – Agent Engine / A2A Preview (Dev-Ready, Not Deployed)"
    - Release notes source: `000-docs/131-AA-REPT-v0-10-0-preview-release-checklist.md`
 
-2. `000-docs/6767-DR-STND-document-filing-system-standard-v3.md` (Filing Standard)
+2. `000-docs/000-DR-STND-document-filing-system-standard-v4.md` (Filing Standard)
    - Correct 6767 pattern: `6767-CC-ABCD-description.ext` (NO numeric IDs in filename)
    - Existing pre-v3.0 files NOT to be renamed in this phase
    - Document IDs can exist in headers but not filenames

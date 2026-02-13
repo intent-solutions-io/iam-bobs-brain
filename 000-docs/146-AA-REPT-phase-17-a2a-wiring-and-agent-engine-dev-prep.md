@@ -892,10 +892,10 @@ print('✓ Delegation tools import successfully')
 ## Appendix D: References
 
 ### ADK/Vertex Standards
-- `000-docs/6767-DR-STND-adk-agent-engine-spec-and-hardmode-rules.md` - Hard Mode R1-R8
-- `000-docs/6767-LAZY-DR-STND-adk-lazy-loading-app-pattern.md` - 6767-LAZY pattern
-- `000-docs/6767-INLINE-DR-STND-inline-source-deployment-for-vertex-agent-engine.md` - Inline deployment
-- `000-docs/6767-DR-STND-agentcards-and-a2a-contracts.md` - AgentCard contracts
+- `000-docs/000-DR-STND-adk-agent-engine-spec-and-hardmode-rules.md` - Hard Mode R1-R8
+- `000-docs/000-DR-STND-adk-lazy-loading-app-pattern.md` - 6767-LAZY pattern
+- `000-docs/000-DR-STND-inline-source-deployment-for-vertex-agent-engine.md` - Inline deployment
+- `000-docs/000-DR-STND-agentcards-and-a2a-contracts.md` - AgentCard contracts
 
 ### Phase Documentation
 - `000-docs/144-AA-REPT-phase-16-agentcards-iam-department.md` - Phase 16 AgentCards AAR

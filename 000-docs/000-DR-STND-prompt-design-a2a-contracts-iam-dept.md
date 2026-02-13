@@ -1,6 +1,6 @@
 # Prompt Design and A2A Contract Standard for Department ADK IAM
 
-**Document ID**: `6767-115-DR-STND-prompt-design-and-a2a-contracts-for-department-adk-iam`
+**Document ID**: `000-DR-STND-prompt-design-a2a-contracts-iam-dept`
 **Date**: 2025-11-21
 **Status**: Standard - Required for all department agents
 **Applies To**: Bob, iam-senior-adk-devops-lead (foreman), and all iam-* specialists
@@ -431,7 +431,7 @@ When reviewing prompt changes:
 
 - **Contract Definitions**: `agents/shared_contracts.py`
 - **A2A Validation**: `tools/a2a-inspector/README.md`
-- **AgentCard Standard**: `000-docs/6767-DR-STND-agentcards-and-a2a-contracts.md` (if exists)
+- **AgentCard Standard**: `000-docs/000-DR-STND-agentcards-and-a2a-contracts.md` (if exists)
 - **ADK Documentation**: `https://google.github.io/adk-docs/`
 - **A2A Protocol Spec**: `https://a2a-protocol.org/`
 

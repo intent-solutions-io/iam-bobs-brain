@@ -5,7 +5,7 @@
 **Phase**: Phase 13 - Tools Validation & Refactor
 **Related Documents**:
 - Prior AAR: `139-AA-REPT-phase-12-adk-1-18-migration-and-app-memory-alignment.md`
-- Hard Mode Spec: `6767-DR-STND-adk-agent-engine-spec-and-hardmode-rules.md`
+- Hard Mode Spec: `000-DR-STND-adk-agent-engine-spec-and-hardmode-rules.md`
 
 ---
 

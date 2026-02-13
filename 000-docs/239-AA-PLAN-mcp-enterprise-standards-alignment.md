@@ -314,7 +314,7 @@ Contents:
 
 #### E.2: Update Hard Mode Rules
 
-**File:** `000-docs/6767-DR-STND-adk-agent-engine-spec-and-hardmode-rules.md`
+**File:** `000-docs/000-DR-STND-adk-agent-engine-spec-and-hardmode-rules.md`
 
 Add:
 - R9: MCP Security - OAuth 2.1 required for external MCP endpoints
@@ -397,7 +397,7 @@ Add:
 
 - Google MCP Repository: https://github.com/google/mcp
 - MCP Specification 2025-06-18: https://modelcontextprotocol.io/specification/2025-06-18/
-- Bob's Brain Hard Mode: `000-docs/6767-DR-STND-adk-agent-engine-spec-and-hardmode-rules.md`
+- Bob's Brain Hard Mode: `000-docs/000-DR-STND-adk-agent-engine-spec-and-hardmode-rules.md`
 - API Registry Architecture: `000-docs/237-AT-ARCH-apiregistry-cloud-tool-governance.md`
 
 ---

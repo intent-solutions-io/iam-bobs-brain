@@ -374,7 +374,7 @@ Mission Spec compiles to Beads-compatible task graphs:
 
 ## 13. Related Documentation
 
-- **6767-DR-STND-adk-agent-engine-spec-and-hardmode-rules.md** - Hard Mode rules
+- **000-DR-STND-adk-agent-engine-spec-and-hardmode-rules.md** - Hard Mode rules
 - **253-DR-STND-mandates-budgets-approvals.md** - Mandate system
 - **254-DR-STND-policy-gates-risk-tiers.md** - Policy gates
 - **255-DR-STND-evidence-bundles-and-audit-export.md** - Evidence bundles

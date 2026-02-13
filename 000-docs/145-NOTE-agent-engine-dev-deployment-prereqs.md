@@ -28,7 +28,7 @@ All agents follow the correct `app` pattern for inline source deployment:
 1. Verify that `agents/iam-senior-adk-devops-lead/agent.py` exports `app = create_app()`
 2. If using legacy `agent_engine_app.py` files, migrate to direct `app` export in agent.py
 
-**Reference:** See `000-docs/6767-INLINE-DR-STND-inline-source-deployment-for-vertex-agent-engine.md`
+**Reference:** See `000-docs/000-DR-STND-inline-source-deployment-for-vertex-agent-engine.md`
 
 ---
 
@@ -315,9 +315,9 @@ gh run watch
 ## 10. References
 
 **ADK/Vertex Standards:**
-- `000-docs/6767-DR-STND-adk-agent-engine-spec-and-hardmode-rules.md` - Hard Mode R1-R8
-- `000-docs/6767-INLINE-DR-STND-inline-source-deployment-for-vertex-agent-engine.md` - Inline deployment
-- `000-docs/6767-DR-STND-agentcards-and-a2a-contracts.md` - AgentCard contracts
+- `000-docs/000-DR-STND-adk-agent-engine-spec-and-hardmode-rules.md` - Hard Mode R1-R8
+- `000-docs/000-DR-STND-inline-source-deployment-for-vertex-agent-engine.md` - Inline deployment
+- `000-docs/000-DR-STND-agentcards-and-a2a-contracts.md` - AgentCard contracts
 
 **A2A Wiring:**
 - `000-docs/144-AA-REPT-phase-16-agentcards-iam-department.md` - Phase 16 AgentCards AAR

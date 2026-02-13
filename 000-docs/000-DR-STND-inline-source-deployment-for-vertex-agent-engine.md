@@ -765,9 +765,9 @@ def get_secret(project_id: str, secret_id: str) -> str:
   https://cloud.google.com/vertex-ai/docs/agent-engine (inline deployment guides)
 
 - **Related bobs-brain standards**:
-  - `6767-LAZY-DR-STND-adk-lazy-loading-app-pattern.md` - Lazy-loading App pattern
-  - `6767-115-DR-STND-prompt-design-and-a2a-contracts-for-department-adk-iam.md` - Prompt design
-  - `6767-DR-STND-adk-agent-engine-spec-and-hardmode-rules.md` - Hard Mode rules (R1-R8)
+  - `000-DR-STND-adk-lazy-loading-app-pattern.md` - Lazy-loading App pattern
+  - `000-DR-STND-prompt-design-a2a-contracts-iam-dept.md` - Prompt design
+  - `000-DR-STND-adk-agent-engine-spec-and-hardmode-rules.md` - Hard Mode rules (R1-R8)
 
 ---
 

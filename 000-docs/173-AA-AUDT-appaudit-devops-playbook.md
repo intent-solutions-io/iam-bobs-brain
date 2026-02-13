@@ -970,11 +970,11 @@ httpx>=0.25.0               # HTTP client
 
 ### Recommended Reading Priority
 
-1. **[6767-DR-STND-adk-agent-engine-spec-and-hardmode-rules.md]** - Understand R1-R8 rules
+1. **[000-DR-STND-adk-agent-engine-spec-and-hardmode-rules.md]** - Understand R1-R8 rules
 2. **[README.md]** - Project overview and quick start
-3. **[6767-DR-INDEX-agent-engine-a2a-inline-deploy.md]** - Master index for deployment
+3. **[000-DR-INDEX-agent-engine-a2a-inline-deploy.md]** - Master index for deployment
 4. **[CLAUDE.md]** - How to work with the codebase
-5. **[6767-RB-OPS-adk-department-operations-runbook.md]** - Daily operations
+5. **[000-RB-OPS-adk-department-operations-runbook.md]** - Daily operations
 
 ---
 
@@ -1077,7 +1077,7 @@ httpx>=0.25.0               # HTTP client
 **Documentation**:
 - Repository: https://github.com/jeremylongshore/bobs-brain
 - Main README: [README.md](README.md)
-- Standards Catalog: [000-docs/6767-DR-INDEX-bobs-brain-standards-catalog.md]
+- Standards Catalog: [000-docs/000-DR-INDEX-bobs-brain-standards-catalog.md]
 - This Playbook: 000-docs/680-AA-AUDT-appaudit-devops-playbook.md
 
 **Communication Channels**:

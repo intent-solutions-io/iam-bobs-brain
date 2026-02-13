@@ -506,9 +506,9 @@ Phase 30+: Continuous Improvement
 - `175-AA-REPT-phase-29-template-canonization.md`
 
 **SOPs (existing + to be created):**
-- `6767-DR-STND-adk-agent-engine-spec-and-hardmode-rules.md` (R1-R8)
-- `6767-LAZY-DR-STND-adk-lazy-loading-app-pattern.md`
-- `6767-INLINE-DR-STND-inline-source-deployment-for-vertex-agent-engine.md`
+- `000-DR-STND-adk-agent-engine-spec-and-hardmode-rules.md` (R1-R8)
+- `000-DR-STND-adk-lazy-loading-app-pattern.md`
+- `000-DR-STND-inline-source-deployment-for-vertex-agent-engine.md`
 - `6767-122-DR-STND-slack-gateway-deploy-pattern.md` (to be created in Phase 25)
 - `6767-123-DR-RUNB-incident-response-playbook.md` (to be created in Phase 27)
 - `6767-200-DR-TMPL-agent-department-quickstart.md` (to be created in Phase 29)

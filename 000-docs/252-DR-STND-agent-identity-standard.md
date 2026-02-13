@@ -245,8 +245,8 @@ pytest tests/unit/test_agent_identity.py -v
 ## 9. Related Documents
 
 - `000-docs/251-AA-PLAN-bob-orchestrator-implementation.md` - Vision Alignment plan
-- `000-docs/6767-DR-STND-agentcards-and-a2a-contracts.md` - AgentCard standard
-- `000-docs/6767-DR-STND-adk-agent-engine-spec-and-hardmode-rules.md` - Hard Mode rules
+- `000-docs/000-DR-STND-agentcards-and-a2a-contracts.md` - AgentCard standard
+- `000-docs/000-DR-STND-adk-agent-engine-spec-and-hardmode-rules.md` - Hard Mode rules
 
 ---
 

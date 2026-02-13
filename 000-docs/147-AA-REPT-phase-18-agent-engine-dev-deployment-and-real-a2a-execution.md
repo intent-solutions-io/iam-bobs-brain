@@ -349,10 +349,10 @@ drift-check → arv-check (includes A2A readiness) → build-and-push → deploy
 - **Deployment Prereqs**: `000-docs/145-NOTE-agent-engine-dev-deployment-prereqs.md` (GCP setup requirements)
 
 ### Standards (6767-series):
-- **6767-DR-STND-adk-agent-engine-spec-and-hardmode-rules.md**: Hard Mode rules (R1-R8)
-- **6767-LAZY-DR-STND-adk-lazy-loading-app-pattern.md**: Lazy-loading App pattern
-- **6767-INLINE-DR-STND-inline-source-deployment-for-vertex-agent-engine.md**: Inline source deployment
-- **6767-DR-STND-agentcards-and-a2a-contracts.md**: AgentCard and A2A protocol spec
+- **000-DR-STND-adk-agent-engine-spec-and-hardmode-rules.md**: Hard Mode rules (R1-R8)
+- **000-DR-STND-adk-lazy-loading-app-pattern.md**: Lazy-loading App pattern
+- **000-DR-STND-inline-source-deployment-for-vertex-agent-engine.md**: Inline source deployment
+- **000-DR-STND-agentcards-and-a2a-contracts.md**: AgentCard and A2A protocol spec
 
 ### Other References:
 - **ARV Script**: `scripts/check_a2a_readiness.py` (Phase 17)

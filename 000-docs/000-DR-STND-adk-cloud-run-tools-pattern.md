@@ -1,4 +1,4 @@
-# 6767-DR-STND – ADK Tools & Cloud Run Integration Pattern
+# 000-DR-STND – ADK Tools & Cloud Run Integration Pattern
 
 **Version:** 0.1 (Draft)
 **Scope:** bobs-brain / department adk iam / future intent-agent-model-* repos
@@ -302,9 +302,9 @@ Short version of what you've already done and what's next:
 ## 9. References
 
 **Related Standards:**
-- `6767-LAZY-DR-STND-adk-lazy-loading-app-pattern.md` - Lazy loading pattern
-- `6767-DR-STND-adk-agent-engine-spec-and-hardmode-rules.md` - Hard Mode rules (R1-R8)
-- `6767-DR-STND-agentcards-and-a2a-contracts.md` - AgentCard and A2A patterns
+- `000-DR-STND-adk-lazy-loading-app-pattern.md` - Lazy loading pattern
+- `000-DR-STND-adk-agent-engine-spec-and-hardmode-rules.md` - Hard Mode rules (R1-R8)
+- `000-DR-STND-agentcards-and-a2a-contracts.md` - AgentCard and A2A patterns
 
 **Phase Documentation:**
 - `141-AA-REPT-phase-13-tools-validation-and-refactor.md` - Tools refactor (dict → VertexAiSearchTool)

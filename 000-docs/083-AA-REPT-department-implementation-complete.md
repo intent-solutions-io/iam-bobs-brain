@@ -324,7 +324,7 @@ Following the successful department implementation, the IAM department pattern w
 **Outcome:** Created `templates/iam-department/` with parameterized agent templates
 
 **Deliverables:**
-- Template scope document (6767-DR-STND-iam-department-template-scope-and-rules)
+- Template scope document (000-DR-STND-iam-department-template-scope-and-rules)
 - 7 template files with {{PARAMETER}} placeholders
 - Template README with quick start guide
 - 30+ identified parameters for customization
@@ -333,8 +333,8 @@ Following the successful department implementation, the IAM department pattern w
 **Outcome:** Comprehensive porting documentation for teams
 
 **Deliverables:**
-- Porting guide (6767-DR-GUIDE-porting-iam-department-to-new-repo) with step-by-step instructions
-- Integration checklist (6767-DR-STND-iam-department-integration-checklist) with 400+ validation items
+- Porting guide (000-DR-GUIDE-porting-iam-department-to-new-repo) with step-by-step instructions
+- Integration checklist (000-DR-STND-iam-department-integration-checklist) with 400+ validation items
 - Updated CLAUDE.md and README.md with template links
 
 **Key Features:**
@@ -347,8 +347,8 @@ Following the successful department implementation, the IAM department pattern w
 **Outcome:** Operational runbook and user guide
 
 **Deliverables:**
-- Operations runbook (6767-RB-OPS-adk-department-operations-runbook) with troubleshooting workflows
-- User guide (6767-DR-GUIDE-iam-department-user-guide) explaining agent roles and usage patterns
+- Operations runbook (000-RB-OPS-adk-department-operations-runbook) with troubleshooting workflows
+- User guide (000-DR-GUIDE-iam-department-user-guide) explaining agent roles and usage patterns
 - Cross-linked ARV/AAR documentation
 
 **Target Audiences:**

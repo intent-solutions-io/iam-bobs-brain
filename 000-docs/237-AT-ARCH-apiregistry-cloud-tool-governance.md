@@ -431,7 +431,7 @@ def test_search_codebase_returns_results():
 - [Cloud API Registry](https://cloud.google.com/vertex-ai/docs/agent-builder/api-registry) (when public)
 - [ADK Tools Documentation](https://google.github.io/adk-docs/tools/)
 - [MCP Protocol Specification](https://spec.modelcontextprotocol.io/)
-- Bob's Brain Hard Mode Rules: `000-docs/6767-DR-STND-adk-agent-engine-spec-and-hardmode-rules.md`
+- Bob's Brain Hard Mode Rules: `000-docs/000-DR-STND-adk-agent-engine-spec-and-hardmode-rules.md`
 
 ---
 

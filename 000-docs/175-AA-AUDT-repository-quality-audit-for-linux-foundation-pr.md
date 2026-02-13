@@ -58,7 +58,7 @@ mv docs/ github-pages/
 # Update references in README.md
 
 # OPTION C: Accept the violation and document it as exception
-# Add to 000-docs/6767-DR-STND-adk-agent-engine-spec-and-hardmode-rules.md:
+# Add to 000-docs/000-DR-STND-adk-agent-engine-spec-and-hardmode-rules.md:
 # "R6 Exception: docs/ contains GitHub Pages only (index.html), not markdown docs"
 ```
 
@@ -350,7 +350,7 @@ This repository follows:
 - CI-only deployments (no manual gcloud)
 - Drift detection (blocks dangerous patterns)
 
-See: 000-docs/6767-DR-STND-adk-agent-engine-spec-and-hardmode-rules.md
+See: 000-docs/000-DR-STND-adk-agent-engine-spec-and-hardmode-rules.md
 EOF
 
 # Add link to README.md
@@ -533,14 +533,14 @@ All contributions must follow R1-R8 rules:
 - R7: SPIFFE identity
 - R8: Drift detection
 
-See: 000-docs/6767-DR-STND-adk-agent-engine-spec-and-hardmode-rules.md
+See: 000-docs/000-DR-STND-adk-agent-engine-spec-and-hardmode-rules.md
 
 ## Documentation Standards
 
 Follow Document Filing System v3.0:
 - Format: `NNN-CC-ABCD-description.md`
 - Location: `000-docs/` only
-- See: 000-docs/6767-DR-STND-document-filing-system-standard-v3.md
+- See: 000-docs/000-DR-STND-document-filing-system-standard-v4.md
 
 ## Commit Message Format
 

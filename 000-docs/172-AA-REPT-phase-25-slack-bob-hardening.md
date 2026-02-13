@@ -139,11 +139,11 @@ Phase 25 successfully:
     - Historical manual deploy commands marked as deprecated
     - Added pointers to current Terraform-based approach
 
-13. **`000-docs/6767-DR-GUIDE-porting-iam-department-to-new-repo.md`** (1 location)
+13. **`000-docs/000-DR-GUIDE-porting-iam-department-to-new-repo.md`** (1 location)
     - Updated porting guide with R4 compliance requirements
     - Deprecated manual deployment examples
 
-14. **`000-docs/6767-SLKDEV-DR-GUIDE-slack-dev-integration-operator-guide.md`** (1 location)
+14. **`000-docs/000-DR-GUIDE-slack-dev-integration-operator-guide.md`** (1 location)
     - Updated Slack dev guide with Terraform deployment pattern
     - Removed manual deployment instructions
 
@@ -621,8 +621,8 @@ All prerequisites for Agent Engine dev deployment are met:
 10. `000-docs/063-DR-IMPL-adk-a2a-agent-patterns-notes.md` (2 deprecation warnings)
 11. `000-docs/DEVOPS-ONBOARDING-ANALYSIS.md` (2 deprecation warnings)
 12. `000-docs/058-LS-COMP-phase-3-complete.md` (2 deprecation warnings)
-13. `000-docs/6767-DR-GUIDE-porting-iam-department-to-new-repo.md` (1 deprecation warning)
-14. `000-docs/6767-SLKDEV-DR-GUIDE-slack-dev-integration-operator-guide.md` (1 deprecation warning)
+13. `000-docs/000-DR-GUIDE-porting-iam-department-to-new-repo.md` (1 deprecation warning)
+14. `000-docs/000-DR-GUIDE-slack-dev-integration-operator-guide.md` (1 deprecation warning)
 15. `000-docs/126-AA-AUDT-appaudit-devops-playbook.md` (150+ lines added, section 3.7)
 
 ### Appendix B: Command Quick Reference
@@ -691,8 +691,8 @@ gh workflow run deploy-slack-gateway-prod.yml --field apply=true
 - **126-AA-AUDT-appaudit-devops-playbook.md** - DevOps playbook (section 3.7)
 
 **Supporting Standards**:
-- **6767-DR-STND-adk-agent-engine-spec-and-hardmode-rules.md** - Hard Mode rules (R1-R8)
-- **6767-INLINE-DR-STND-inline-source-deployment-for-vertex-agent-engine.md** - Inline deployment
+- **000-DR-STND-adk-agent-engine-spec-and-hardmode-rules.md** - Hard Mode rules (R1-R8)
+- **000-DR-STND-inline-source-deployment-for-vertex-agent-engine.md** - Inline deployment
 - **127-DR-STND-agent-engine-entrypoints.md** - Canonical entrypoints
 
 **Next Phase**:

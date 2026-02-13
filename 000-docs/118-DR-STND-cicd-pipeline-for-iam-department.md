@@ -589,8 +589,8 @@ make deploy-status
 - `CI1-WORKFLOW-INVENTORY-FINDINGS.md` - CI1 analysis
 
 **6767 Canonical Standards:**
-- `6767-DR-STND-arv-minimum-gate.md` - ARV minimum requirements
-- `6767-RB-OPS-adk-department-operations-runbook.md` - Operations
+- `000-DR-STND-arv-minimum-gate.md` - ARV minimum requirements
+- `000-RB-OPS-adk-department-operations-runbook.md` - Operations
 
 **External:**
 - [GitHub Actions Documentation](https://docs.github.com/en/actions)

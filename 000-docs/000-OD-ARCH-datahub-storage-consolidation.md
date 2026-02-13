@@ -1,4 +1,4 @@
-# 6767-OD-ARCH-datahub-storage-consolidation-OD-ARCH-datahub-storage-consolidation.md
+# 000-OD-ARCH: DataHub Storage Consolidation
 
 **Date Created:** 2025-11-20
 **Category:** OD - Operations & Deployment

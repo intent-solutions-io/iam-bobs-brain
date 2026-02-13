@@ -123,7 +123,7 @@ If future you is ever lost, read:
 
 1. This roadmap
 2. The top-level `README.md`
-3. `6767-104-DR-STND-iam-department-template-scope-and-rules.md` (or equivalent)
+3. `000-DR-STND-iam-department-template-scope-and-rules.md` (or equivalent)
 4. The latest SITREP doc
 
 ---

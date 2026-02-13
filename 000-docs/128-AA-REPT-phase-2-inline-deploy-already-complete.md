@@ -34,7 +34,7 @@
 - Agent Engine directory: `agents/agent_engine/`
 - Existing deploy script: `agents/agent_engine/deploy_inline_source.py`
 - CI workflow: `.github/workflows/agent-engine-inline-deploy.yml`
-- Standard doc: `000-docs/6767-INLINE-DR-STND-inline-source-deployment-for-vertex-agent-engine.md`
+- Standard doc: `000-docs/000-DR-STND-inline-source-deployment-for-vertex-agent-engine.md`
 
 ---
 
@@ -85,7 +85,7 @@ SOURCE_PACKAGES = [
 
 - Tutorial notebook: 000-docs/001-usermanual/tutorial_get_started_with_agent_engine_terraform_deployment.ipynb
 - Discussion: https://discuss.google.dev/t/deploying-agents-with-inline-source-on-vertex-ai-agent-engine/288935
-- Standard: 000-docs/6767-INLINE-DR-STND-inline-source-deployment-for-vertex-agent-engine.md
+- Standard: 000-docs/000-DR-STND-inline-source-deployment-for-vertex-agent-engine.md
 ```
 
 ---
@@ -108,7 +108,7 @@ SOURCE_PACKAGES = [
 - References section (Google guide + discussion + tutorial)
 - Implementation sketch
 
-**Actual**: ✅ `000-docs/6767-INLINE-DR-STND-inline-source-deployment-for-vertex-agent-engine.md` exists
+**Actual**: ✅ `000-docs/000-DR-STND-inline-source-deployment-for-vertex-agent-engine.md` exists
 - 363 lines, comprehensive standard
 - Complete References/Sources section:
   - Google Discuss thread ✅
@@ -156,7 +156,7 @@ Since all scaffolding was already complete, Phase 2 work consisted of:
 | Deliverable | Location | Status |
 |-------------|----------|--------|
 | Deploy script | `agents/agent_engine/deploy_inline_source.py` | ✅ Complete |
-| 6767 Standard | `000-docs/6767-INLINE-DR-STND-inline-source-deployment-for-vertex-agent-engine.md` | ✅ Complete |
+| 6767 Standard | `000-docs/000-DR-STND-inline-source-deployment-for-vertex-agent-engine.md` | ✅ Complete |
 | Dependencies | `requirements.txt` | ✅ Correct |
 | Tutorial | `000-docs/001-usermanual/tutorial_get_started_with_agent_engine_terraform_deployment.ipynb` | ✅ Exists |
 | CI Workflow | `.github/workflows/agent-engine-inline-deploy.yml` | ✅ Exists (bonus) |
@@ -199,7 +199,7 @@ Phase 2 complete. Ready for Phase 3:
 ## References
 
 - **Deploy script**: `agents/agent_engine/deploy_inline_source.py`
-- **Standard doc**: `000-docs/6767-INLINE-DR-STND-inline-source-deployment-for-vertex-agent-engine.md`
+- **Standard doc**: `000-docs/000-DR-STND-inline-source-deployment-for-vertex-agent-engine.md`
 - **Tutorial**: `000-docs/001-usermanual/tutorial_get_started_with_agent_engine_terraform_deployment.ipynb`
 - **Google Discussion**: https://discuss.google.dev/t/deploying-agents-with-inline-source-on-vertex-ai-agent-engine/288935
 - **CI Workflow**: `.github/workflows/agent-engine-inline-deploy.yml`

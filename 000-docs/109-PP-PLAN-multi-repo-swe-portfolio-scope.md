@@ -21,7 +21,7 @@ This document defines the **Multi-Repo SWE Portfolio** scope for transforming Bo
 
 ### Why Multi-Repo?
 
-The IAM department was designed as a **reusable template** (see 6767-DR-STND-iam-department-template-scope-and-rules, 6767-DR-GUIDE-porting-iam-department-to-new-repo, 6767-DR-STND-iam-department-integration-checklist) for other product repositories. However, the current implementation has limitations:
+The IAM department was designed as a **reusable template** (see 000-DR-STND-iam-department-template-scope-and-rules, 000-DR-GUIDE-porting-iam-department-to-new-repo, 000-DR-STND-iam-department-integration-checklist) for other product repositories. However, the current implementation has limitations:
 
 1. **Single-Repo Focus:** Pipeline only analyzes the current repository
 2. **Manual Switching:** Must run pipeline separately for each repo
@@ -449,7 +449,7 @@ jobs:
 **Locations:**
 - `README.md` - Add portfolio auditor section
 - `CLAUDE.md` - Update with portfolio commands
-- `000-docs/6767-RB-OPS-adk-department-operations-runbook-RB-OPS-adk-department-operations-runbook.md` - Add portfolio operations
+- `000-docs/000-RB-OPS-adk-department-operations-runbook-RB-OPS-adk-department-operations-runbook.md` - Add portfolio operations
 
 ### Deliverables
 
@@ -560,7 +560,7 @@ jobs:
 ### Risk 3: Conflicting ARV Requirements
 **Impact:** Different repos may have incompatible ARV profiles
 **Mitigation:**
-- Document ARV profile standards in 6767-DR-STND-arv-minimum-gate
+- Document ARV profile standards in 000-DR-STND-arv-minimum-gate
 - Validate new repos against standards before adding to registry
 - Allow per-repo ARV overrides in portfolio config
 
@@ -597,9 +597,9 @@ jobs:
 - `093-DR-STND-bob-rag-readiness-standard.md` - RAG readiness (Phase RC1)
 - `094-AT-ARCH-iam-swe-pipeline-orchestration.md` - Pipeline architecture
 - `096-DR-STND-repo-registry-and-target-selection.md` - Registry standard
-- `6767-DR-STND-arv-minimum-gate-DR-STND-arv-minimum-gate-for-bobs-brain.md` - ARV minimum gate
-- `6767-DR-STND-iam-department-template-scope-and-rules-DR-STND-iam-department-template-scope-and-rules.md` - Template scope
-- `6767-RB-OPS-adk-department-operations-runbook-RB-OPS-adk-department-operations-runbook.md` - Operations runbook
+- `000-DR-STND-arv-minimum-gate-DR-STND-arv-minimum-gate-for-bobs-brain.md` - ARV minimum gate
+- `000-DR-STND-iam-department-template-scope-and-rules-DR-STND-iam-department-template-scope-and-rules.md` - Template scope
+- `000-RB-OPS-adk-department-operations-runbook-RB-OPS-adk-department-operations-runbook.md` - Operations runbook
 
 ### PORT Phase Docs (This Series)
 - `109-PP-PLAN-multi-repo-swe-portfolio-scope.md` - This document (PORT1 plan)

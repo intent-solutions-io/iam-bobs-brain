@@ -780,6 +780,6 @@ $ ls infra/terraform/ | grep -i monitor
 **Author:** Claude Code (Phase 22 execution)
 **Related Documents:**
 - 155-AA-REPT-phase-21-terminal-verification-and-drift-fix.md (Phase 21 AAR)
-- 6767-INLINE-DR-STND-inline-source-deployment-for-vertex-agent-engine.md (Deployment standard)
-- 6767-DR-STND-adk-agent-engine-spec-and-hardmode-rules.md (Hard Mode rules)
+- 000-DR-STND-inline-source-deployment-for-vertex-agent-engine.md (Deployment standard)
+- 000-DR-STND-adk-agent-engine-spec-and-hardmode-rules.md (Hard Mode rules)
 - 127-DR-STND-agent-engine-entrypoints.md (Entrypoint specification)

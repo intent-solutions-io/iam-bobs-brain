@@ -1,4 +1,4 @@
-# 6767-122-DR-STND: Slack Gateway Deployment Pattern (Phase 25)
+# 000-DR-STND: Slack Gateway Deployment Pattern (Phase 25)
 
 **Document Type:** DR-STND (Documentation & Reference - Standard Operating Procedure)
 **Created:** 2025-11-30
@@ -999,7 +999,7 @@ bobs-brain/
 │   ├── requirements.txt
 │   └── Dockerfile
 ├── 000-docs/
-│   ├── 6767-122-DR-STND-slack-gateway-deploy-pattern.md  # This SOP
+│   ├── 000-DR-STND-slack-gateway-deploy-pattern.md  # This SOP
 │   ├── 171-AA-PLAN-phase-25-slack-bob-hardening.md       # Phase 25 plan
 │   └── 172-AA-REPT-phase-25-slack-bob-hardening.md       # Phase 25 AAR (TBD)
 └── Makefile                             # make check-slack-gateway-config

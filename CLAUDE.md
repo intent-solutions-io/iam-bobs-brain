@@ -32,14 +32,14 @@ This is the **live** guide for Claude Code when working in the `bobs-brain` repo
 ## 📋 TL;DR for DevOps (Quick Reference)
 
 **Current Status (v2.0.0 - Vision Alignment GA):**
-- **Version**: v2.0.0 – General-Purpose Enterprise Orchestrator
+- **Version**: v2.0.0 – Enterprise Controls + ADK Compliance Department
 - **Phase**: Vision Alignment Complete (Phases D, E, F, G)
 - **Deployment**: Infrastructure ready, Terraform + GitHub Actions for all deployments (R4 compliance)
 - **New in v2.0.0**: Canonical agent IDs, enterprise controls, Mission Spec v1
 
 **Key Documents:**
-- **6767 Global Catalog**: `000-docs/6767-000-DR-INDEX-bobs-brain-standards-catalog.md` (START HERE for all 6767 standards)
-- **Hard Mode Rules**: `000-docs/6767-DR-STND-adk-agent-engine-spec-and-hardmode-rules.md` (R1-R8)
+- **Standards Catalog**: `000-docs/000-DR-INDEX-bobs-brain-standards-catalog.md` (START HERE for all canonical standards)
+- **Hard Mode Rules**: `000-docs/000-DR-STND-adk-agent-engine-spec-and-hardmode-rules.md` (R1-R8)
 - **Agent Identity**: `000-docs/252-DR-STND-agent-identity-standard.md` (canonical IDs)
 - **Enterprise Controls**: `000-docs/253-DR-STND-mandates-budgets-approvals.md` (mandates, risk tiers)
 - **Policy Gates**: `000-docs/254-DR-STND-policy-gates-risk-tiers.md` (R0-R4 enforcement)
@@ -82,21 +82,33 @@ python3 -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
 
-# Run all quality checks
-make check-all
+# Run all quality checks (lint + test)
+make ci
 
 # Run specific checks
-make check-inline-deploy-ready  # ARV checks for deployment
-bash scripts/ci/check_nodrift.sh  # Drift detection
-pytest  # All tests
-pytest tests/unit/test_agentcard_json.py -v  # AgentCard validation
+bash scripts/ci/check_nodrift.sh  # Drift detection (R8)
+pytest tests/unit/ -v             # Unit tests only
+pytest tests/integration/ -v      # Integration tests only
+pytest tests/unit/test_agentcard_json.py -v  # Single test file
+pytest -k "test_agent" -v         # Run tests matching pattern
 
-# Run single test file
-pytest tests/unit/test_<name>.py -v
+# Run single test with verbose output
+pytest tests/unit/test_<name>.py::test_function_name -vvs
+
+# Run tests by marker
+pytest -m unit -v                # Unit tests only (marker-based)
+pytest -m integration -v         # Integration tests (may need GCP)
+pytest -m "not slow" -v          # Skip slow tests
+
+# Multi-version testing with nox
+nox -s tests-3.12                # Test on Python 3.12
+nox -s lint                      # Lint checks via nox
+nox -s coverage                  # Coverage via nox
+nox --list                       # List all nox sessions
 
 # Smoke tests
-make smoke-agents  # Test lazy-loading App pattern (6767-LAZY)
-make smoke-bob-agent-engine-dev  # Test deployed agent
+make smoke-agents                 # Test lazy-loading App pattern (6767-LAZY)
+make smoke-bob-agent-engine-dev   # Test deployed agent
 ```
 
 ### Deployment
@@ -114,44 +126,37 @@ git push origin main  # Triggers GitHub Actions
 gh run list --workflow=agent-engine-inline-deploy.yml
 ```
 
-### Task Management (Beads)
-```bash
-bd ready  # Start session
-bd create "Task title" -p 1 --description "Details"
-bd update <id> --status in_progress
-bd close <id> --reason "Done"
-bd sync  # End session (flush + git sync)
-```
-
 ### Make Targets Quick Reference
 ```bash
-make help  # Show all available targets
+make help                         # Show all available targets
 
-# Quality Checks
-make check-all                    # All checks (drift, tests, ARV)
-make check-arv-minimum            # ARV minimum requirements
-make check-a2a-contracts          # Validate AgentCard JSON files
-make smoke-agents                 # Test lazy-loading pattern
+# Quality Checks (run before commits)
+make ci                           # Lint + tests (pre-commit gate)
+make lint                         # Flake8 linting
+make format                       # Format with black
+make format-check                 # Check formatting (no changes)
 
 # Testing
-make test                         # All tests
-make test-coverage                # Tests with coverage report
-make test-swe-pipeline            # SWE pipeline tests
+make test                         # All tests (pytest tests/)
+make test-coverage                # Tests with HTML coverage report
+make test-swe-pipeline            # SWE pipeline tests only
+make check-a2a-contracts          # Validate AgentCard JSON files
+make smoke-agents                 # Test lazy-loading pattern (6767-LAZY)
 
-# ARV Gates
-make check-inline-deploy-ready    # Deployment readiness (ARV)
-make arv-department               # Comprehensive ARV for IAM dept
-make arv-gates                    # All ARV gates
+# ARV Gates (Agent Readiness Verification)
+make arv-gates                    # All ARV gates (RAG + minimum + engine + spec)
+make arv-department               # Comprehensive ARV for IAM department
+make check-inline-deploy-ready    # Deployment readiness check
+make check-arv-minimum            # ARV minimum requirements only
 
-# Deployment
-make deploy-inline-dry-run        # Validate deployment (safe)
+# Deployment (CI/CD preferred - R4)
+make deploy-inline-dry-run        # Validate deployment (safe, no changes)
 make slack-dev-smoke              # Test Slack webhook
 
-# Development
+# Development Utilities
 make setup                        # Complete dev environment setup
-make lint                         # Run linting checks
-make format                       # Format code with black
-make clean                        # Clean temporary files
+make clean                        # Clean pycache, coverage, logs
+make safe-commit                  # lint + format-check + test before commit
 ```
 
 ---
@@ -237,6 +242,13 @@ agents/
 
 shared_tools/                     # Shared tool implementations
 shared_contracts/                 # JSON schemas for agent communication
+
+service/                          # Cloud Run gateway proxies (R3: no Runner here)
+├── slack_webhook/                # Slack events → Agent Engine REST API
+├── a2a_gateway/                  # A2A protocol HTTP endpoint
+└── github_webhook/               # GitHub events handler
+
+missions/                         # Mission Spec YAML files (declarative workflows)
 ```
 
 **Key Pattern (6767-LAZY):**
@@ -245,7 +257,7 @@ shared_contracts/                 # JSON schemas for agent communication
   - `create_app()` - Wraps in App for Agent Engine
   - Module-level `app` (NOT `agent`)
 - No import-time validation or heavy work
-- See: `000-docs/6767-LAZY-DR-STND-adk-lazy-loading-app-pattern.md`
+- See: `000-docs/000-DR-STND-adk-lazy-loading-app-pattern.md`
 
 ### Key Architectural Rules
 
@@ -303,37 +315,13 @@ User: [Sees friendly response]
 
 ---
 
-## 3. How to Talk to Claude About This Repo
+## 3. Expectations & House Rules
 
-### Example Prompts
-
-**For agents/department work:**
-- "Design the iam-adk specialist agent following Bob's patterns"
-- "Audit agent.py files for ADK compliance against Hard Mode rules"
-- "Propose A2A wiring between iam-foreman and iam-issue"
-
-**For infrastructure:**
-- "Update Terraform to add Agent Engine configuration for iam-adk"
-- "Design CI workflow for multi-agent ARV (Agent Readiness Verification)"
-
-**For CI/CD:**
-- "Add drift detection checks for new iam-* agents"
-- "Implement ARV gates in GitHub Actions"
-
-### Key Expectations
-
-When working in this repo, Claude should:
-
-1. **Respect repo layout** - Don't invent new folders without permission
-2. **Consult `000-docs/`** - Check existing standards before creating new patterns
-3. **Use plugins/tools first** - Search ADK docs and repo patterns before guessing
-4. **Propose small changes** - Break work into reviewable commits
-5. **Follow phases** - Structure work into phases with PLAN and AAR docs
-6. **Think in agents** - Consider which department agent (bob, foreman, specialist) owns the work
-
----
-
-## 4. Expectations & House Rules
+**Before making changes:**
+1. Consult `000-docs/` for existing standards before creating new patterns
+2. Search ADK docs and repo patterns before guessing
+3. Think in agents - which department agent (bob, foreman, specialist) owns the work?
+4. Don't invent new folders without permission
 
 ### Architecture Standards
 
@@ -347,7 +335,7 @@ When working in this repo, Claude should:
 - R7: SPIFFE ID propagation (in AgentCard, logs, headers)
 - R8: Drift detection (runs first in CI, blocks violations)
 
-**See:** `000-docs/6767-DR-STND-adk-agent-engine-spec-and-hardmode-rules.md` for complete spec.
+**See:** `000-docs/000-DR-STND-adk-agent-engine-spec-and-hardmode-rules.md` for complete spec.
 
 ### ⛔ Common Anti-Patterns (DO NOT DO)
 
@@ -419,6 +407,31 @@ app = create_app()  # Module-level app, not agent
 - Implement `after_agent_callback` for R5 compliance
 - Module-level `app`, not `agent`
 
+**Creating New Agents:**
+```python
+# agents/iam_new/agent.py - REQUIRED STRUCTURE
+from google.adk.agents import LlmAgent
+from google.adk.apps import App
+
+# 1. Config reads (cheap, no validation)
+PROJECT_ID = os.getenv("PROJECT_ID")
+
+# 2. Lazy agent creation
+def create_agent() -> LlmAgent:
+    """Called on-demand, not at import."""
+    return LlmAgent(name="iam-new", model="gemini-2.0-flash", ...)
+
+# 3. Lazy app creation
+def create_app() -> App:
+    return App(agent=create_agent())
+
+# 4. Module-level app (NOT agent)
+app = create_app()
+```
+Each agent also needs:
+- `agents/iam_new/.well-known/agent-card.json` (A2A contract)
+- Entry in `agents/__init__.py` if using shared imports
+
 **Terraform (infra/):**
 - Use modules over copy-pasted resources
 - Keep env configs in `envs/dev`, `envs/prod`
@@ -429,13 +442,33 @@ app = create_app()  # Module-level app, not agent
 - Group checks logically (lint, test, build, deploy, ARV)
 - Keep workflows focused (avoid mega-workflows)
 
+### Test Infrastructure
+
+**Pytest markers** (use with `-m` flag):
+- `unit` - Fast tests, no external dependencies
+- `integration` - May require GCP/Agent Engine
+- `slack` - Requires Slack webhook
+- `slow` - Tests taking >5 seconds
+- `mcp` - MCP server tests
+- `arv` - Agent Readiness Verification tests
+
+**Conftest skip markers** (auto-applied):
+- `requires_adk` - Skips if `google-adk` not installed
+- `requires_apihub` - Skips if `google-cloud-apihub` not installed
+
+**Drift detection** (`scripts/ci/check_nodrift.sh`):
+- Runs first in CI, blocks on any R1/R3/R4 violations
+- Scans for LangChain/CrewAI/AutoGen imports (R1)
+- Scans for Runner imports in `service/` (R3)
+- Scans for manual deploy commands (R4)
+
 ### Documentation Standards
 
 **Document Filing System v3.0:**
-- Format: `NNN-CC-ABCD-description.md` (project-specific) or `6767-CC-ABCD-description.md` (canonical standards)
+- Format: `NNN-CC-ABCD-description.md` (project-specific) or `000-CC-ABCD-description.md` (canonical standards)
 - Categories: PP (Planning), AT (Architecture), AA (After-Action Reports), DR (Documentation/Reference)
 - All docs in `000-docs/` - NO scattered documentation
-- See: `000-docs/6767-DR-STND-document-filing-system-standard-v3.md` for complete rules
+- See: `000-docs/000-DR-STND-document-filing-system-standard-v4.md` for complete rules
 
 **Key Doc Types:**
 - **PLAN** (`NNN-AA-PLAN-*.md`) - Phase planning before work starts
@@ -519,33 +552,33 @@ git branch -d feature/my-feature-name
 
 ---
 
-## 5. Documentation Navigation
+## 4. Documentation Navigation
 
 ### Start Here (By Role)
 
 **Developers (Building Agents):**
-1. **[Master Index](000-docs/6767-000-DR-INDEX-bobs-brain-standards-catalog.md)** - Complete map of all standards
-2. **[Hard Mode Rules](000-docs/6767-DR-STND-adk-agent-engine-spec-and-hardmode-rules.md)** - R1-R8 architecture rules
-3. **[Lazy-Loading Pattern](000-docs/6767-LAZY-DR-STND-adk-lazy-loading-app-pattern.md)** - Agent implementation pattern
+1. **[Master Index](000-docs/000-DR-INDEX-bobs-brain-standards-catalog.md)** - Complete map of all standards
+2. **[Hard Mode Rules](000-docs/000-DR-STND-adk-agent-engine-spec-and-hardmode-rules.md)** - R1-R8 architecture rules
+3. **[Lazy-Loading Pattern](000-docs/000-DR-STND-adk-lazy-loading-app-pattern.md)** - Agent implementation pattern
 
 **Operators (Deploying/Running):**
 1. **[DevOps Playbook](000-docs/120-AA-AUDT-appaudit-devops-playbook.md)** - Complete operational guide
-2. **[Inline Deployment](000-docs/6767-INLINE-DR-STND-inline-source-deployment-for-vertex-agent-engine.md)** - Deployment guide
-3. **[Operations Runbook](000-docs/6767-RB-OPS-adk-department-operations-runbook.md)** - Day-to-day operations
+2. **[Inline Deployment](000-docs/000-DR-STND-inline-source-deployment-for-vertex-agent-engine.md)** - Deployment guide
+3. **[Operations Runbook](000-docs/000-RB-OPS-adk-department-operations-runbook.md)** - Day-to-day operations
 
 **Template Adopters (Porting to New Repos):**
-1. **[Porting Guide](000-docs/6767-DR-GUIDE-porting-iam-department-to-new-repo.md)** - Step-by-step instructions
-2. **[Integration Checklist](000-docs/6767-DR-STND-iam-department-integration-checklist.md)** - Complete checklist
-3. **[Template Standards](000-docs/6767-DR-STND-iam-department-template-scope-and-rules.md)** - Customization rules
+1. **[Porting Guide](000-docs/000-DR-GUIDE-porting-iam-department-to-new-repo.md)** - Step-by-step instructions
+2. **[Integration Checklist](000-docs/000-DR-STND-iam-department-integration-checklist.md)** - Complete checklist
+3. **[Template Standards](000-docs/000-DR-STND-iam-department-template-scope-and-rules.md)** - Customization rules
 
-### Key SOP Documents (6767-series)
+### Key SOP Documents (Canonical Standards)
 
-All **6767-prefixed docs act as Standard Operating Procedures (SOPs)** - these are canonical standards:
+All **000-prefixed canonical docs act as Standard Operating Procedures (SOPs)**:
 
-- **6767-DR-STND-adk-agent-engine-spec-and-hardmode-rules.md** - Hard Mode rules (R1-R8)
-- **6767-LAZY-DR-STND-adk-lazy-loading-app-pattern.md** - Lazy-loading App pattern
-- **6767-INLINE-DR-STND-inline-source-deployment-for-vertex-agent-engine.md** - Inline source deployment
-- **6767-115-DR-STND-prompt-design-and-a2a-contracts-for-department-adk-iam.md** - Prompt design contracts
+- **000-DR-STND-adk-agent-engine-spec-and-hardmode-rules.md** - Hard Mode rules (R1-R8)
+- **000-DR-STND-adk-lazy-loading-app-pattern.md** - Lazy-loading App pattern (6767-LAZY)
+- **000-DR-STND-inline-source-deployment-for-vertex-agent-engine.md** - Inline source deployment
+- **000-DR-STND-prompt-design-a2a-contracts-iam-dept.md** - Prompt design contracts
 
 ### Other Key References
 
@@ -556,8 +589,8 @@ All **6767-prefixed docs act as Standard Operating Procedures (SOPs)** - these a
 ### Quick Lookups
 
 ```bash
-# Find all 6767 standards (canonical SOPs)
-ls 000-docs/6767*.md
+# Find all canonical standards
+ls 000-docs/000-*.md
 
 # List all standards
 ls 000-docs/*-DR-STND-*.md
@@ -573,12 +606,14 @@ ls 000-docs/127-*
 
 ---
 
-## 6. Changelog / Maintenance
+## 5. Changelog / Maintenance
 
-**Last Update:** 2026-01-03
+**Last Update:** 2026-02-13
 
 **Recent Changes:**
-- **Vision Alignment GA (v2.0.0)**: General-purpose enterprise orchestrator
+- **Doc-Filing v4.3 Migration**: All 28 `6767-*` canonical docs renamed to `000-*` prefix
+- **Identity Alignment**: README/CLAUDE.md updated to reflect ADK compliance focus (not "general-purpose orchestrator")
+- **Vision Alignment GA (v2.0.0)**: Enterprise controls + ADK compliance department
   - **Phase D**: Canonical agent identity system with backwards-compatible aliases
   - **Phase E**: Enterprise controls (risk tiers R0-R4, policy gates, evidence bundles)
   - **Phase F**: Mission Spec v1 (declarative workflow-as-code)
@@ -589,8 +624,8 @@ ls 000-docs/127-*
 
 **Maintenance Policy:**
 - **DON'T overcrowd CLAUDE.md** - it's a pointer doc, not a knowledge base
-- All detailed docs go in `000-docs/` following NNN-CC-ABCD naming
-- 6767-series docs = SOPs (Standard Operating Procedures)
+- All detailed docs go in `000-docs/` following NNN-CC-ABCD or 000-CC-ABCD naming
+- Canonical docs (000-* prefix) = SOPs (Standard Operating Procedures)
 - CLAUDE.md should remain concise (target ~15k chars)
   - Exception: Section 2 (Architecture) is worth the space to prevent confusion
 - When adding new standards, update Section 5 with pointer, not full content

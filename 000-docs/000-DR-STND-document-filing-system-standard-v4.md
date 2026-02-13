@@ -1,22 +1,22 @@
-# DOCUMENT FILING SYSTEM STANDARD v3.0
+# DOCUMENT FILING SYSTEM STANDARD v4.3
 
 **Purpose:** Universal standard for organizing project documentation with category-based classification
 
-**Last Updated:** 2025-11-21
+**Last Updated:** 2026-02-13
 **Status:** ✅ Production Standard
 **Applies To:** All projects in `/home/jeremy/000-projects/` and cross-repo canonical standards
 
 ---
 
-## WHAT CHANGED IN v3.0
+## WHAT CHANGED IN v4.3
 
 **Key Updates:**
-1. **Clarified 6767 canonical series filing rules** - The 6767 prefix is used ONCE in the filename (no additional numeric IDs like `6767-000-` or `6767-120-`)
-2. **Defined relationship between 6767 canonical docs and NNN project-specific docs** - Clear separation of cross-repo standards vs project-specific documentation
-3. **Added canonical structure guidance for apps and repos** - How to organize documentation across monorepos and multi-project workspaces
-4. **Explicitly banned extra numeric IDs after 6767- in filenames** - Document IDs can exist in headers but NOT in filenames
+1. **Dropped `6767-` prefix from all filenames** - All canonical docs now use `000-` prefix, same as project-specific docs. The `6767-` prefix is retired from filenames entirely.
+2. **Dropped topic prefixes** - Removed INLINE, LAZY, SLKAUD, SLKDEV, AECOMP, AEDEV, A2AINSP, ROADMAP prefixes from filenames. These were v3.0 workarounds that are no longer needed.
+3. **Unified naming** - All docs in `000-docs/` follow exactly `NNN-CC-ABCD-description.ext` with no special-case prefixes.
+4. **Conceptual shorthand preserved** - Pattern names like "6767-LAZY" and "6767 standard" remain as concept labels in code/comments, just not in filenames.
 
-**Migration Impact:** Existing 6767 files with numeric IDs in filenames (like `6767-000-*`, `6767-120-*`) are considered pre-v3.0 and should be renamed in future cleanup phases.
+**Migration Impact:** All 28 `6767-*` files renamed to `000-*` prefix. See version history for v3.0 background.
 
 ---
 
@@ -57,50 +57,45 @@ When a document has multiple related sub-documents:
 
 ### Purpose of 6767 Series
 
-The **6767-series** represents **canonical, cross-repo reusable standards** (Standard Operating Procedures). These are global standards that can be copied and applied across:
+The **canonical standards** (formerly "6767-series") represent **cross-repo reusable standards** (Standard Operating Procedures). These are global standards that can be copied and applied across:
 - bobs-brain
 - DiagnosticPro
 - Hustle
 - BrightStream
 - Other Intent Solutions projects
 
-**Key Distinction:** 6767 docs are NOT tied to a specific sprint, phase, or project implementation. They define universal patterns, architectures, and processes.
+**Key Distinction:** Canonical docs are NOT tied to a specific sprint, phase, or project implementation. They define universal patterns, architectures, and processes.
 
-### 6767 Filename Pattern (v3.0 Rule)
+### Canonical Standards Filename Pattern (v4.3 Rule)
 
-**CORRECT Format:**
+**Format:** Same as project-specific docs, using `000-` prefix:
 ```
-6767-CC-ABCD-short-description.ext
-```
-
-**Components:**
-- **6767** = Fixed canonical series prefix (constant, used ONCE)
-- **CC** = Category code (DR, AT, OD, etc. - same as NNN series)
-- **ABCD** = 4-letter type code (STND, GUID, ARCH, SOPS, etc.)
-- **short-description** = kebab-case, 1-5 words
-
-**IMPORTANT:** No additional numeric ID after `6767-` in the filename.
-
-### Examples (CORRECT v3.0 Format)
-
-```
-✅ 6767-DR-STND-document-filing-system-standard-v3.md
-✅ 6767-DR-STND-adk-agent-engine-spec-and-hardmode-rules.md
-✅ 6767-DR-STND-agentcards-and-a2a-contracts.md
-✅ 6767-DR-INDEX-bobs-brain-standards-catalog.md
-✅ 6767-RB-OPS-adk-department-operations-runbook.md
-✅ 6767-INLINE-DR-STND-inline-source-deployment-for-vertex-agent-engine.md
+000-CC-ABCD-short-description.ext
 ```
 
-### Examples (INCORRECT - Pre-v3.0)
+**Note:** Prior versions used a `6767-` prefix. As of v4.3, all canonical docs use `000-` prefix. The "6767" label survives only as a conceptual shorthand in code comments (e.g., "6767-LAZY pattern").
+
+### Examples (CORRECT v4.3 Format)
 
 ```
-❌ 6767-000-DR-INDEX-bobs-brain-standards-catalog.md
-❌ 6767-120-DR-STND-agent-engine-a2a-and-inline-deploy-index.md
-❌ 6767-121-DR-STND-a2a-compliance-tck-and-inspector.md
+✅ 000-DR-STND-document-filing-system-standard-v4.md
+✅ 000-DR-STND-adk-agent-engine-spec-and-hardmode-rules.md
+✅ 000-DR-STND-agentcards-and-a2a-contracts.md
+✅ 000-DR-INDEX-bobs-brain-standards-catalog.md
+✅ 000-RB-OPS-adk-department-operations-runbook.md
+✅ 000-DR-STND-inline-source-deployment-for-vertex-agent-engine.md
+✅ 000-DR-STND-adk-lazy-loading-app-pattern.md
 ```
 
-**Why Incorrect:** Numeric IDs (`000`, `120`, `121`) should NOT appear in filenames for 6767 series.
+### Examples (INCORRECT - Pre-v4.3)
+
+```
+❌ 6767-DR-INDEX-bobs-brain-standards-catalog.md          (old 6767 prefix)
+❌ 6767-INLINE-DR-STND-inline-source-deployment-...md     (old topic prefix)
+❌ 6767-000-DR-INDEX-bobs-brain-standards-catalog.md      (old numbered prefix)
+```
+
+**Why Incorrect:** The `6767-` prefix and topic prefixes (INLINE, LAZY, etc.) are retired from filenames. All canonical docs use `000-` prefix.
 
 ### Document IDs vs Filenames
 
@@ -120,23 +115,11 @@ The **6767-series** represents **canonical, cross-repo reusable standards** (Sta
 - But the **filename itself** must NOT include these numeric IDs
 - This distinguishes 6767 canonical docs from NNN-series project-specific docs
 
-### Special Topic Prefixes
+### Topic Prefixes (Retired in v4.3)
 
-Some 6767 docs use **topic-specific prefixes** before the category code to group related standards:
+Prior to v4.3, some canonical docs used topic-specific prefixes (INLINE, LAZY, SLKDEV, etc.) between `6767-` and the category code. These have been dropped in v4.3 - the description portion of the filename captures the topic sufficiently.
 
-**Examples:**
-```
-6767-INLINE-DR-STND-inline-source-deployment-for-vertex-agent-engine.md
-     ^^^^^^ Topic prefix for "inline deployment" cluster
-
-6767-LAZY-DR-STND-adk-lazy-loading-app-pattern.md
-     ^^^^^ Topic prefix for "lazy loading" pattern cluster
-
-6767-SLKDEV-DR-GUIDE-slack-dev-integration-operator-guide.md
-     ^^^^^^^ Topic prefix for "Slack dev integration" cluster
-```
-
-**Rule:** Topic prefixes (INLINE, LAZY, SLKDEV, etc.) are optional and used to group thematically related 6767 standards.
+**Conceptual shorthand** like "6767-LAZY pattern" is still used in code comments and docstrings as a pattern label. This is fine - it's the *filename prefix* that changed, not the concept name.
 
 ### Relationship to NNN-Series Docs
 
@@ -179,7 +162,7 @@ repo-root/
 ├── 000-docs/
 │   ├── 001-AA-PLAN-phase-1-skeleton.md          # Project-specific
 │   ├── 002-AA-REPT-phase-1-implementation.md    # Project-specific
-│   ├── 6767-DR-STND-adk-agent-engine-spec.md    # Canonical (if applicable)
+│   ├── 000-DR-STND-adk-agent-engine-spec.md    # Canonical (if applicable)
 │   └── ...
 ```
 
@@ -224,10 +207,10 @@ monorepo-root/
 **Examples:**
 ```
 # Canonical filing standard (this doc):
-6767-DR-STND-document-filing-system-standard-v3.md
+000-DR-STND-document-filing-system-standard-v4.md
 
 # Global Agent Engine standard:
-6767-DR-STND-adk-agent-engine-hardmode-rules.md
+000-DR-STND-adk-agent-engine-spec-and-hardmode-rules.md
 
 # Hustle-specific AAR (in hustle's 01-Docs/):
 027-AA-AACR-hustle-beta-launch-retro.md
@@ -478,9 +461,9 @@ monorepo-root/
 ├── 075-DR-STND-arv-minimum-gate.md
 ├── 100-OD-GUID-deployment-operator-runbook.md
 ├── 128-AA-REPT-phase-4-arv-gate-dev-deploy.md
-├── 6767-DR-STND-adk-agent-engine-spec-and-hardmode-rules.md
-├── 6767-DR-STND-document-filing-system-standard-v3.md
-└── 6767-RB-OPS-adk-department-operations-runbook.md
+├── 000-DR-STND-adk-agent-engine-spec-and-hardmode-rules.md
+├── 000-DR-STND-document-filing-system-standard-v4.md
+└── 000-RB-OPS-adk-department-operations-runbook.md
 ```
 
 ---
@@ -523,23 +506,17 @@ monorepo-root/
 007-AT-ADEC-database-choice.md
 ```
 
-### Migrating Pre-v3.0 6767 Files
+### Migration History
 
-**Old Format (Pre-v3.0):**
-```
-6767-000-DR-INDEX-bobs-brain-standards-catalog.md
-6767-120-DR-STND-agent-engine-a2a-and-inline-deploy-index.md
-6767-121-DR-STND-a2a-compliance-tck-and-inspector.md
-```
+**v3.0 → v4.3 Migration (2026-02-13):**
+All 28 `6767-*` files renamed to `000-*` prefix. Topic prefixes (INLINE, LAZY, etc.) dropped from filenames.
 
-**New Format (v3.0):**
 ```
-6767-DR-INDEX-bobs-brain-standards-catalog.md
-6767-DR-STND-agent-engine-a2a-and-inline-deploy-index.md
-6767-DR-STND-a2a-compliance-tck-and-inspector.md
+# Example renames:
+6767-DR-STND-adk-agent-engine-spec-and-hardmode-rules.md → 000-DR-STND-adk-agent-engine-spec-and-hardmode-rules.md
+6767-INLINE-DR-STND-inline-source-deployment-*.md       → 000-DR-STND-inline-source-deployment-*.md
+6767-LAZY-DR-STND-adk-lazy-loading-app-pattern.md       → 000-DR-STND-adk-lazy-loading-app-pattern.md
 ```
-
-**Important:** Document IDs (like "6767-000", "6767-120") can remain in document headers for cross-referencing, but should NOT appear in filenames.
 
 ### Migration Script Pattern
 ```bash
@@ -576,15 +553,15 @@ monorepo-root/
 | AA-AACR | After-Action Report | 012-AA-AACR-sprint-retro.md |
 | AA-LESN | Lessons Learned | 013-AA-LESN-deployment-lessons.md |
 
-### Common 6767 Combinations
+### Common Canonical Combinations
 
 | Code | Document Type | Example |
 |------|--------------|---------|
-| 6767-DR-STND | Canonical Standard | 6767-DR-STND-filing-system-v3.md |
-| 6767-DR-INDEX | Global Catalog/Index | 6767-DR-INDEX-standards-catalog.md |
-| 6767-RB-OPS | Runbook/Operations | 6767-RB-OPS-deployment-runbook.md |
-| 6767-AT-ARCH | Architecture Standard | 6767-AT-ARCH-microservices-pattern.md |
-| 6767-DR-GUID | Cross-Repo Guide | 6767-DR-GUID-onboarding-guide.md |
+| 000-DR-STND | Canonical Standard | 000-DR-STND-document-filing-system-standard-v4.md |
+| 000-DR-INDEX | Global Catalog/Index | 000-DR-INDEX-bobs-brain-standards-catalog.md |
+| 000-RB-OPS | Runbook/Operations | 000-RB-OPS-adk-department-operations-runbook.md |
+| 000-AT-ARCH | Architecture Standard | 000-AT-ARCH-org-storage-architecture.md |
+| 000-DR-GUIDE | Cross-Repo Guide | 000-DR-GUIDE-porting-iam-department-to-new-repo.md |
 
 ---
 
@@ -637,31 +614,19 @@ monorepo-root/
 
 ## VERSION HISTORY
 
-### v3.0 (2025-11-21)
+### v4.3 (2026-02-13)
 
 **Major Changes:**
-1. **Clarified 6767 canonical series filing rules** (critical update)
-   - Filename pattern: `6767-CC-ABCD-description.ext` (NO numeric ID in filename)
-   - Document IDs (like "6767-120") can exist in headers but NOT filenames
-   - Added comprehensive "Special Case: 6767 Canonical Standards" section
-   - Explicitly banned patterns like `6767-000-*`, `6767-120-*` in filenames
+1. **Dropped `6767-` prefix from all filenames** - All 28 canonical docs renamed from `6767-*` to `000-*`
+2. **Dropped topic prefixes** - INLINE, LAZY, SLKAUD, SLKDEV, AECOMP, AEDEV, A2AINSP, ROADMAP prefixes removed from filenames
+3. **Unified naming** - Canonical docs now use same `000-CC-ABCD-description.ext` format as project-specific docs
+4. **Preserved conceptual shorthand** - "6767-LAZY", "6767 standard" remain valid as concept labels in code
 
-2. **Added canonical structure guidance**
-   - New section: "Canonical Structure for Apps and Repos"
-   - Defined clear relationship between 6767 and NNN series
-   - Provided examples for monorepos and multi-project workspaces
+**Rationale:** Having two different prefix conventions (6767 vs NNN) created confusion. Since all docs live in the same `000-docs/` folder, using a single `000-` prefix is simpler and eliminates the special-case handling.
 
-3. **Enhanced migration guidance**
-   - Added migration examples for pre-v3.0 6767 files
-   - Git best practices for renaming files
-   - Document ID header preservation strategy
+### v3.0 (2025-11-21)
 
-4. **Improved category tables**
-   - Added DR-STND (Standard) and DR-INDEX (Index) to type abbreviations
-   - Added 6767 examples to Quick Reference Card
-   - Clarified cross-repo vs project-specific usage
-
-**Rationale:** v2.0 allowed ambiguity around 6767 naming, leading to files like `6767-000-*` and `6767-120-*` which mixed canonical series prefix with NNN-style numbering. v3.0 explicitly separates these two patterns and establishes 6767 as a pure canonical series with no additional numeric IDs in filenames.
+**Changes:** Introduced `6767-CC-ABCD-description.ext` pattern for canonical docs. Banned numeric IDs in 6767 filenames. Added topic prefixes. (Superseded by v4.3)
 
 ### v2.0 (2025-10-16)
 
@@ -676,7 +641,7 @@ monorepo-root/
 
 ---
 
-**DOCUMENT FILING SYSTEM STANDARD v3.0**
+**DOCUMENT FILING SYSTEM STANDARD v4.3**
 *Category-based organization for professional project documentation with canonical cross-repo standards*
 
 ---

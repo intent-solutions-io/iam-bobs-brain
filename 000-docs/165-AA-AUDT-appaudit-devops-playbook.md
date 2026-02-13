@@ -456,7 +456,7 @@ python-dotenv>=1.0.0
 
 ### Key Documents
 1. `164-AA-REPT-phase-24-slack-bob-ci-deploy-and-restore.md` - Latest deployment process
-2. `6767-DR-STND-adk-agent-engine-spec-and-hardmode-rules.md` - R1-R8 rules
+2. `000-DR-STND-adk-agent-engine-spec-and-hardmode-rules.md` - R1-R8 rules
 3. `120-AA-AUDT-appaudit-devops-playbook.md` - Previous DevOps guide
 
 ### Discrepancies

@@ -1,11 +1,10 @@
 # Agent Engine, A2A, and Inline Deployment - Master Index
 
-**Document Type:** Canonical Standard & Index (6767-DR-STND)
-**Document ID:** 6767-120
+**Document Type:** Canonical Standard & Index (000-DR-INDEX)
 **Status:** Active
 **Applies To:** All ADK agent departments (starting with department adk iam)
 **Purpose:** Master reference linking all Agent Engine, A2A, and inline deployment standards
-**Last Updated:** 2025-11-21
+**Last Updated:** 2026-02-13
 
 ---
 
@@ -28,7 +27,7 @@ This document serves as the **master index** for the Bob's Brain Agent Engine / 
 - A complete specification (see linked 6767 standards for details)
 - Implementation code (see repo code for actual agents)
 
-**Note on 6767 Naming:** This doc uses document ID "6767-120" in its header but follows pre-v3.0 naming conventions in its filename. See `000-docs/6767-DR-STND-document-filing-system-standard-v3.md` for current 6767 naming rules.
+**Note on 6767 Naming:** This doc uses document ID "6767-120" in its header but follows pre-v3.0 naming conventions in its filename. See `000-docs/000-DR-STND-document-filing-system-standard-v4.md` for current 6767 naming rules.
 
 ### Relationship to 6767-000 Global Catalog
 
@@ -40,12 +39,12 @@ This document serves as the **master index** for the Bob's Brain Agent Engine / 
 - **Individual 6767-*** = Specific standards, guides, and implementation docs
 
 **When to Use Each:**
-- **Start with 6767-000** for global orientation across all topics (operations, templates, prompts, etc.)
-- **Drill into 6767-120** when working specifically on Agent Engine deployment or A2A protocol topics
-- **Jump to specific 6767-*** docs when you know exactly what you need
+- **Start with the standards catalog** (`000-DR-INDEX-bobs-brain-standards-catalog.md`) for global orientation across all topics
+- **Drill into this index** when working specifically on Agent Engine deployment or A2A protocol topics
+- **Jump to specific 000-*** docs when you know exactly what you need
 
 **Cross-References:**
-- See `000-docs/6767-000-DR-INDEX-bobs-brain-standards-catalog.md` for complete catalog
+- See `000-docs/000-DR-INDEX-bobs-brain-standards-catalog.md` for complete catalog
 - See Section V below for links to all Agent Engine / A2A / inline deployment standards
 
 ---
@@ -82,7 +81,7 @@ This document serves as the **master index** for the Bob's Brain Agent Engine / 
 - **Vertex AI Agent Engine Docs**: https://cloud.google.com/vertex-ai/docs/agent-engine
 
 **Our Implementation:**
-- See: `6767-INLINE-DR-STND-inline-source-deployment-for-vertex-agent-engine.md`
+- See: `000-DR-STND-inline-source-deployment-for-vertex-agent-engine.md`
 - Scripts: `agents/agent_engine/deploy_inline_source.py`
 - ARV checks: `scripts/check_inline_deploy_ready.py`
 - Workflow: `.github/workflows/agent-engine-inline-dev-deploy.yml`
@@ -120,9 +119,9 @@ This document serves as the **master index** for the Bob's Brain Agent Engine / 
 - A2A gateway for external agent discovery
 
 **Our Implementation:**
-- See: `6767-DR-STND-agentcards-and-a2a-contracts.md`
-- See: `6767-115-DR-STND-prompt-design-and-a2a-contracts-for-department-adk-iam.md`
-- Integration: `6767-A2AINSP-AA-REPT-a2a-inspector-integration-for-department-adk-iam.md`
+- See: `000-DR-STND-agentcards-and-a2a-contracts.md`
+- See: `000-DR-STND-prompt-design-a2a-contracts-iam-dept.md`
+- Integration: `000-AA-REPT-a2a-inspector-integration-for-department-adk-iam.md`
 
 ### A2A Compliance Tooling
 
@@ -143,7 +142,7 @@ This document serves as the **master index** for the Bob's Brain Agent Engine / 
 - CI scaffold: `.github/workflows/a2a-compliance.yml` (workflow_dispatch only)
 
 **Full Standard:**
-- See: `6767-121-DR-STND-a2a-compliance-tck-and-inspector.md`
+- See: `000-DR-STND-a2a-compliance-tck-inspector.md`
 
 ---
 
@@ -188,32 +187,32 @@ spiffe://intent.solutions/agent/bobs-brain/dev/us-central1/0.10.0
 - No long-lived credentials in code or Git
 
 **Our Implementation:**
-- See: `6767-DR-STND-adk-agent-engine-spec-and-hardmode-rules.md` (R7: SPIFFE ID)
+- See: `000-DR-STND-adk-agent-engine-spec-and-hardmode-rules.md` (R7: SPIFFE ID)
 - See: `.env.example` for configuration patterns
 
 ---
 
 ## V. Complete Reference Map
 
-### Core Standards (6767 Canonical Docs)
+### Core Standards (Canonical Docs)
 
 | Document ID | Topic | Description |
 |------------|-------|-------------|
-| `6767-DR-STND-adk-agent-engine-spec-and-hardmode-rules.md` | ADK/Agent Engine spec | Hard Mode rules (R1-R8), compliance requirements |
-| `6767-INLINE-DR-STND-inline-source-deployment-for-vertex-agent-engine.md` | Inline deployment | Source code deployment pattern, ARV gates, CI workflow |
-| `6767-DR-STND-agentcards-and-a2a-contracts.md` | AgentCards & A2A | Contract structure, skill patterns, validation |
-| `6767-121-DR-STND-a2a-compliance-tck-and-inspector.md` | A2A compliance | a2a-inspector (interactive), a2a-tck (automated) validation |
-| `6767-115-DR-STND-prompt-design-and-a2a-contracts-for-department-adk-iam.md` | Prompt design | 5-part system prompt template, contract-first philosophy |
-| `6767-DR-STND-arv-minimum-gate.md` | ARV baseline | Agent Readiness Verification minimum requirements |
-| `6767-LAZY-DR-STND-adk-lazy-loading-app-pattern.md` | Lazy-loading pattern | Module-level `app` variable pattern |
+| `000-DR-STND-adk-agent-engine-spec-and-hardmode-rules.md` | ADK/Agent Engine spec | Hard Mode rules (R1-R8), compliance requirements |
+| `000-DR-STND-inline-source-deployment-for-vertex-agent-engine.md` | Inline deployment | Source code deployment pattern, ARV gates, CI workflow |
+| `000-DR-STND-agentcards-and-a2a-contracts.md` | AgentCards & A2A | Contract structure, skill patterns, validation |
+| `000-DR-STND-a2a-compliance-tck-inspector.md` | A2A compliance | a2a-inspector (interactive), a2a-tck (automated) validation |
+| `000-DR-STND-prompt-design-a2a-contracts-iam-dept.md` | Prompt design | 5-part system prompt template, contract-first philosophy |
+| `000-DR-STND-arv-minimum-gate.md` | ARV baseline | Agent Readiness Verification minimum requirements |
+| `000-DR-STND-adk-lazy-loading-app-pattern.md` | Lazy-loading pattern | Module-level `app` variable pattern |
 
 ### Integration & Operations
 
 | Document ID | Topic | Description |
 |------------|-------|-------------|
-| `6767-A2AINSP-AA-REPT-a2a-inspector-integration-for-department-adk-iam.md` | a2a-inspector | Runtime AgentCard validation |
-| `6767-RB-OPS-adk-department-operations-runbook.md` | Operations | Day-to-day operations guide |
-| `6767-DR-GUIDE-porting-iam-department-to-new-repo.md` | Porting guide | How to copy department to new repo |
+| `000-AA-REPT-a2a-inspector-integration-for-department-adk-iam.md` | a2a-inspector | Runtime AgentCard validation |
+| `000-RB-OPS-adk-department-operations-runbook.md` | Operations | Day-to-day operations guide |
+| `000-DR-GUIDE-porting-iam-department-to-new-repo.md` | Porting guide | How to copy department to new repo |
 
 ### Implementation AARs (Phase Documentation)
 
@@ -256,23 +255,23 @@ spiffe://intent.solutions/agent/bobs-brain/dev/us-central1/0.10.0
 
 ### For New Developers
 
-1. **Read Architecture**: `6767-DR-STND-adk-agent-engine-spec-and-hardmode-rules.md`
-2. **Understand Deployment**: `6767-INLINE-DR-STND-inline-source-deployment-for-vertex-agent-engine.md`
-3. **Learn A2A Contracts**: `6767-DR-STND-agentcards-and-a2a-contracts.md`
-4. **See Operations**: `6767-RB-OPS-adk-department-operations-runbook.md`
+1. **Read Architecture**: `000-DR-STND-adk-agent-engine-spec-and-hardmode-rules.md`
+2. **Understand Deployment**: `000-DR-STND-inline-source-deployment-for-vertex-agent-engine.md`
+3. **Learn A2A Contracts**: `000-DR-STND-agentcards-and-a2a-contracts.md`
+4. **See Operations**: `000-RB-OPS-adk-department-operations-runbook.md`
 
 ### For Operators (Deployment)
 
-1. **ARV Baseline**: `6767-DR-STND-arv-minimum-gate.md`
-2. **Inline Deployment**: `6767-INLINE-DR-STND-inline-source-deployment-for-vertex-agent-engine.md` (Phase 6 runbook)
+1. **ARV Baseline**: `000-DR-STND-arv-minimum-gate.md`
+2. **Inline Deployment**: `000-DR-STND-inline-source-deployment-for-vertex-agent-engine.md` (Phase 6 runbook)
 3. **Smoke Testing**: `000-docs/130-AA-REPT-phase-5-first-dev-deploy-and-smoke-test.md`
-4. **Operations Runbook**: `6767-RB-OPS-adk-department-operations-runbook.md`
+4. **Operations Runbook**: `000-RB-OPS-adk-department-operations-runbook.md`
 
 ### For Template Adopters (Copying to New Repo)
 
-1. **Porting Guide**: `6767-DR-GUIDE-porting-iam-department-to-new-repo.md`
-2. **Template Scope**: `6767-DR-STND-iam-department-template-scope-and-rules.md`
-3. **Integration Checklist**: `6767-DR-STND-iam-department-integration-checklist.md`
+1. **Porting Guide**: `000-DR-GUIDE-porting-iam-department-to-new-repo.md`
+2. **Template Scope**: `000-DR-STND-iam-department-template-scope-and-rules.md`
+3. **Integration Checklist**: `000-DR-STND-iam-department-integration-checklist.md`
 
 ---
 

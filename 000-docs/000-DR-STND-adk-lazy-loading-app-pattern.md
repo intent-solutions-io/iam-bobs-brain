@@ -244,7 +244,7 @@ def create_app() -> App:
 
 Tools and prompts follow existing standards:
 - Tools defined in `agents/shared_tools/`
-- Prompts follow 6767-DR-STND-prompt-design-and-agentcard-standard.md
+- Prompts follow 000-DR-STND-prompt-design-and-agentcard-standard.md
 - No schema duplication in prompts
 
 **No change** - Lazy loading is orthogonal to contract design.
@@ -490,8 +490,8 @@ def create_app():
 - **ADK Documentation**: https://cloud.google.com/vertex-ai/docs/agent-development-kit
 - **Agent Engine Deployment**: https://cloud.google.com/vertex-ai/docs/agent-engine
 - **Gemini Strategic Engineering Guide**: (internal Google reference)
-- **Contract-First Design**: 6767-DR-STND-prompt-design-and-agentcard-standard.md
-- **AgentCards**: 6767-DR-STND-agentcards-and-a2a-contracts.md
+- **Contract-First Design**: 000-DR-STND-prompt-design-and-agentcard-standard.md
+- **AgentCards**: 000-DR-STND-agentcards-and-a2a-contracts.md
 
 ---
 
