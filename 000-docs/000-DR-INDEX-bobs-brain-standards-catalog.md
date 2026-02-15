@@ -247,7 +247,7 @@ This document serves as the **master catalog** for all canonical documentation i
 - **Audience:** Developers tracking phase-specific work and AARs
 
 **Hierarchy:**
-```
+```text
 000-DR-INDEX-bobs-brain-standards-catalog.md (global catalog - this doc)
   └─> 000-DR-INDEX-agent-engine-a2a-inline-deploy.md (sub-index)
       └─> Individual 000-* canonical standards/guides
