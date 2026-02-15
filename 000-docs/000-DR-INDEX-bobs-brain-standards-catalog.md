@@ -116,6 +116,7 @@ This document serves as the **master catalog** for all canonical documentation i
 | ID | Type | Filename | Status | Summary |
 |----|------|----------|--------|---------|
 | 000-DR-INDEX-bobs-brain-standards-catalog.md | DR-INDEX | bobs-brain-standards-catalog.md | Active | **This document** - Global catalog of all canonical standards |
+| 000-AA-AUDT-000-docs-inventory-and-gap-report.md | AA-AUDT | 000-docs-inventory-and-gap-report.md | Active | NNN-series inventory and gap analysis for phase-specific docs |
 
 ### User & Developer Guides
 
@@ -124,7 +125,7 @@ This document serves as the **master catalog** for all canonical documentation i
 | 000-DR-GUIDE-iam-department-user-guide.md | DR-GUIDE | iam-department-user-guide.md | User Guide | How to use Bob and IAM department for software engineering tasks |
 | 000-DR-ROADMAP-bobs-brain-you-are-here.md | DR-ROADMAP | bobs-brain-you-are-here.md | Active | Roadmap and "you are here" orientation for bobs-brain repo |
 
-**Total Canonical Documents:** 28
+**Total Canonical Documents:** 29
 
 ---
 
@@ -260,7 +261,7 @@ This document serves as the **master catalog** for all canonical documentation i
 ## VII. Summary
 
 **Canonical Standards Highlights:**
-- **28 canonical documents** covering standards, guides, runbooks, and architecture
+- **29 canonical documents** covering standards, guides, runbooks, and architecture
 - **2 index documents** for easy navigation (master + sub-index)
 - **Multiple audiences served:** Developers, operators, template adopters, end users
 - **Clear navigation paths** for each audience type
@@ -268,11 +269,11 @@ This document serves as the **master catalog** for all canonical documentation i
 **Key Takeaways:**
 1. Start with this master index for global orientation
 2. Use the Agent Engine sub-index for deployment/A2A work
-3. All 28 files now properly documented with summaries
+3. All 29 files now properly documented with summaries
 4. Ready for Linux Foundation review
 
 **Next Actions:**
-1. ✅ All 28 canonical files documented in master index
+1. ✅ All 29 canonical files documented in master index
 2. ✅ Ready for Linux Foundation AI Card PR submission
 3. ⏸️ Future: Quarterly review for new canonical docs (next: 2026-06-01)
 4. ⏸️ Future: Consider consolidating overlapping prompt design standards
@@ -280,5 +281,5 @@ This document serves as the **master catalog** for all canonical documentation i
 ---
 
 **Last Updated:** 2026-02-13
-**Status:** Active (complete catalog of all 28 canonical files)
+**Status:** Active (complete catalog of all 29 canonical files)
 **Next Review:** 2026-06-01 (quarterly) or when 5+ new canonical docs added
