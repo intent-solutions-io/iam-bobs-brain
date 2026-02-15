@@ -27,24 +27,24 @@ This document serves as the **master catalog** for all canonical documentation i
 ## II. Quick Start
 
 **New to bobs-brain? Start here:**
-1. **6767-000** (this doc) - Global catalog of all 6767 standards
-2. **6767-120** - Agent Engine / A2A / Inline Deployment sub-index (if working on deployment/A2A topics)
+1. **000-DR-INDEX-bobs-brain-standards-catalog.md** (this doc) - Global catalog of all canonical standards
+2. **000-DR-INDEX-agent-engine-a2a-inline-deploy.md** - Agent Engine / A2A / Inline Deployment sub-index (if working on deployment/A2A topics)
 3. **000-DR-STND-adk-agent-engine-spec-and-hardmode-rules.md** - Hard Mode rules (R1-R8)
 4. **000-RB-OPS-adk-department-operations-runbook.md** - Day-to-day operations
 
 **For Operators:**
-- Start with **6767-RB-OPS** (operations runbook)
-- Then review **6767-120** (Agent Engine sub-index)
-- Then drill into specific guides (SLKDEV, AEDEV, etc.)
+- Start with **000-RB-OPS-adk-department-operations-runbook.md** (operations runbook)
+- Then review **000-DR-INDEX-agent-engine-a2a-inline-deploy.md** (Agent Engine sub-index)
+- Then drill into specific guides (Slack dev, Agent Engine dev, etc.)
 
 **For Developers:**
 - Start with **000-DR-STND-adk-agent-engine-spec-and-hardmode-rules.md** (understand Hard Mode)
-- Then review **6767-120** (architecture overview)
-- Then drill into implementation guides (6767-LAZY, 6767-INLINE, etc.)
+- Then review **000-DR-INDEX-agent-engine-a2a-inline-deploy.md** (architecture overview)
+- Then drill into implementation guides (lazy-loading pattern, inline deployment, etc.)
 
 ---
 
-## III. Complete 6767 Standards Catalog
+## III. Complete Canonical Standards Catalog
 
 ### Core Standards (Infrastructure & Compliance)
 
@@ -115,7 +115,7 @@ This document serves as the **master catalog** for all canonical documentation i
 
 | ID | Type | Filename | Status | Summary |
 |----|------|----------|--------|---------|
-| 000-DR-INDEX-bobs-brain-standards-catalog.md | DR-INDEX | bobs-brain-standards-catalog.md | Active | **This document** - Global catalog of all 6767 standards |
+| 000-DR-INDEX-bobs-brain-standards-catalog.md | DR-INDEX | bobs-brain-standards-catalog.md | Active | **This document** - Global catalog of all canonical standards |
 
 ### User & Developer Guides
 
@@ -124,7 +124,7 @@ This document serves as the **master catalog** for all canonical documentation i
 | 000-DR-GUIDE-iam-department-user-guide.md | DR-GUIDE | iam-department-user-guide.md | User Guide | How to use Bob and IAM department for software engineering tasks |
 | 000-DR-ROADMAP-bobs-brain-you-are-here.md | DR-ROADMAP | bobs-brain-you-are-here.md | Active | Roadmap and "you are here" orientation for bobs-brain repo |
 
-**Total 6767 Documents:** 28
+**Total Canonical Documents:** 28
 
 ---
 
@@ -163,7 +163,7 @@ This document serves as the **master catalog** for all canonical documentation i
 
 ---
 
-## V. How to Use the 6767 Series
+## V. How to Use the Canonical Standards
 
 ### Navigation Strategy
 
@@ -198,17 +198,7 @@ This document serves as the **master catalog** for all canonical documentation i
 
 ---
 
-### Document Type Codes (6767-ABCD-*)
-
-**Common Mnemonic Codes:**
-- **INLINE** - Inline source deployment pattern
-- **LAZY** - Lazy-loading app pattern
-- **A2AINSP** - A2A Inspector integration
-- **AEDEV** - Agent Engine dev wiring
-- **AECOMP** - Agent Engine completion status
-- **SLKDEV** - Slack dev integration
-- **SLKAUD** - Slack audit
-- **ROADMAP** - Roadmap / orientation
+### Document Type Codes (000-CC-ABCD-*)
 
 **Standard Type Codes:**
 - **DR-STND** - Documentation/Reference Standard
@@ -225,28 +215,28 @@ This document serves as the **master catalog** for all canonical documentation i
 
 ### Update Policy
 
-**When to Update 6767-000:**
-- ✅ Whenever a new 6767-* document is created
-- ✅ Whenever a 6767-* document status changes (Active → Superseded, Draft → Active)
-- ✅ Quarterly review (next: 2026-02-21)
+**When to Update This Catalog:**
+- ✅ Whenever a new 000-* canonical document is created
+- ✅ Whenever a 000-* document status changes (Active → Superseded, Draft → Active)
+- ✅ Quarterly review (next: 2026-06-01)
 
 **How to Update:**
 - Add new entry to appropriate section (III. Complete Catalog)
 - Update summary/status if changed
 - Update "Last Updated" date in header
-- Commit with message: `docs(6767): update global catalog with <new-doc-name>`
+- Commit with message: `docs(000-docs): update global catalog with <new-doc-name>`
 
 ---
 
 ## VI. Relationship to Other Indexes
 
 **000-DR-INDEX-bobs-brain-standards-catalog.md (this doc):**
-- **Scope:** All 6767-* docs across entire repo
+- **Scope:** All 000-* canonical docs across entire repo
 - **Purpose:** Global catalog and navigation aid
 - **Audience:** Everyone (developers, operators, template adopters, users)
 
 **000-DR-INDEX-agent-engine-a2a-inline-deploy.md (sub-index):**
-- **Scope:** Subset of 6767-* docs related to Agent Engine, A2A, and inline deployment
+- **Scope:** Subset of 000-* docs related to Agent Engine, A2A, and inline deployment
 - **Purpose:** Deep dive into deployment topics
 - **Audience:** Developers and operators working on deployment/A2A features
 
@@ -259,7 +249,7 @@ This document serves as the **master catalog** for all canonical documentation i
 ```
 000-DR-INDEX-bobs-brain-standards-catalog.md (global catalog - this doc)
   └─> 000-DR-INDEX-agent-engine-a2a-inline-deploy.md (sub-index)
-      └─> Individual 6767-* standards/guides
+      └─> Individual 000-* canonical standards/guides
 
 000-AA-AUDT-000-docs-inventory-and-gap-report.md (NNN-series inventory)
   └─> Individual NNN-* phase docs/AARs
@@ -269,7 +259,7 @@ This document serves as the **master catalog** for all canonical documentation i
 
 ## VII. Summary
 
-**6767 Series Highlights:**
+**Canonical Standards Highlights:**
 - **28 canonical documents** covering standards, guides, runbooks, and architecture
 - **2 index documents** for easy navigation (master + sub-index)
 - **Multiple audiences served:** Developers, operators, template adopters, end users

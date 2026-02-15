@@ -1,6 +1,6 @@
 # AgentCards and A2A Contracts Standard
 
-**Document Type:** Canonical Standard (6767-DR-STND)
+**Document Type:** Canonical Standard (DR-STND)
 **Status:** Active
 **Applies To:** All ADK departments, starting with department adk iam
 **Last Updated:** 2025-11-20
@@ -498,7 +498,7 @@ make check-a2a-contracts
 
 ## VIII. Integration with Existing Standards
 
-### Relationship to 6767 Prompt Design Standard
+### Relationship to Prompt Design Standard
 
 **000-DR-STND-prompt-design-and-agentcard-standard.md** defines:
 - How prompts should be structured (role-focused, not schema-focused)
