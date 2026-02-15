@@ -23,10 +23,9 @@ Phase H+: Implements async A2A dispatch using InMemoryRunner.run_debug()
 import asyncio
 import json
 import logging
-import os
 import importlib
 from pathlib import Path
-from typing import Dict, Any, List, Optional
+from typing import Dict, Any, List
 
 from .types import A2ATask, A2AResult, A2AError
 
@@ -442,7 +441,7 @@ def _extract_response_from_events(events: list, specialist: str, skill_id: str) 
         )
         return {
             "status": "SUCCESS",
-            "message": f"Agent executed but returned no content",
+            "message": "Agent executed but returned no content",
             "raw_events": len(events)
         }
 
@@ -497,8 +496,8 @@ def validate_mandate(task: A2ATask) -> None:
     """
     # Import here to avoid circular imports (6767-LAZY pattern)
     from agents.shared_contracts.pipeline_contracts import Mandate
-    from agents.shared_contracts.policy_gates import PolicyGate, GateResult
-    from datetime import datetime, timezone
+    from agents.shared_contracts.policy_gates import PolicyGate
+    from datetime import datetime
 
     # Determine risk tier from task context or mandate
     risk_tier = "R0"  # Default: no restrictions
@@ -539,11 +538,17 @@ def validate_mandate(task: A2ATask) -> None:
                 iterations_used=mandate_dict.get("iterations_used", 0),
             )
             risk_tier = mandate.risk_tier
-        except (ValueError, TypeError) as e:
-            logger.warning(f"Failed to parse mandate: {e}, skipping validation")
-            return
+        except (ValueError, TypeError, AttributeError) as e:
+            raise A2AError(
+                f"Malformed mandate for specialist '{task.specialist}': {e}. "
+                "Mandate validation cannot be skipped (fail-closed policy).",
+                specialist=task.specialist
+            )
 
     # Run policy gate preflight checks (Phase E)
+    # Note: tools_to_use is not passed here because the dispatcher doesn't know
+    # which tools the specialist will use before invocation. Tool allowlist
+    # enforcement is handled as a post-invocation audit log (see call_specialist).
     gate_results = PolicyGate.preflight_check(
         specialist_name=task.specialist,
         risk_tier=risk_tier,
@@ -610,6 +615,51 @@ async def call_specialist(task: A2ATask) -> A2AResult:
         # Step 5: Invoke specialist (async)
         result_data = await invoke_specialist_local(task.specialist, task)
 
+        # Step 5b: Record invocation for budget/iteration tracking (Bug 3 fix)
+        # Note: This only tracks within the current call scope. True cross-call
+        # tracking requires mandate state persistence (future work).
+        if task.mandate:
+            try:
+                from agents.shared_contracts.pipeline_contracts import Mandate as _Mandate
+                from datetime import datetime as _dt
+                _expires_at = None
+                if task.mandate.get("expires_at"):
+                    _expires_at = _dt.fromisoformat(
+                        task.mandate["expires_at"].replace("Z", "+00:00")
+                    )
+                _mandate = _Mandate(
+                    mandate_id=task.mandate.get("mandate_id", "unknown"),
+                    intent=task.mandate.get("intent", ""),
+                    budget_limit=task.mandate.get("budget_limit", 0.0),
+                    max_iterations=task.mandate.get("max_iterations", 100),
+                    budget_spent=task.mandate.get("budget_spent", 0.0),
+                    iterations_used=task.mandate.get("iterations_used", 0),
+                    expires_at=_expires_at,
+                )
+                _mandate.record_invocation()
+                logger.debug(
+                    f"A2A: Recorded invocation for mandate '{_mandate.mandate_id}' "
+                    f"(iterations: {_mandate.iterations_used}/{_mandate.max_iterations}, "
+                    f"budget: {_mandate.budget_spent}/{_mandate.budget_limit})",
+                    extra={"mandate_id": _mandate.mandate_id}
+                )
+            except Exception as e:
+                logger.warning(f"A2A: Failed to record invocation: {e}")
+
+        # Step 5c: Post-invocation tool allowlist audit (Bug 4 fix)
+        # Since we can't know which tools a specialist will use before invocation,
+        # we log a reminder for operators to verify tool usage in evidence bundles.
+        if task.mandate and task.mandate.get("tool_allowlist"):
+            logger.info(
+                f"A2A: Mandate has tool_allowlist set for {task.specialist}. "
+                "Post-invocation audit: tool usage should be verified in "
+                "evidence bundle.",
+                extra={
+                    "specialist": task.specialist,
+                    "tool_allowlist": task.mandate["tool_allowlist"],
+                }
+            )
+
         # Step 6: Build success result
         duration_ms = int((time.time() - start_time) * 1000)
 
@@ -673,7 +723,7 @@ def call_specialist_sync(task: A2ATask) -> A2AResult:
     """
     try:
         # Try to get running loop
-        loop = asyncio.get_running_loop()
+        asyncio.get_running_loop()
         # If we're already in an async context, create a new thread
         import concurrent.futures
         with concurrent.futures.ThreadPoolExecutor() as executor:
