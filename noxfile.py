@@ -85,19 +85,9 @@ def tests_unit(session):
     session.install("-r", "requirements.txt")
     session.install("pytest>=7.4.0", "pytest-asyncio>=0.21.0", "pytest-cov>=4.1.0")
 
-    # Ignore test files with known import issues (stale tests)
-    ignore_patterns = [
-        "--ignore=tests/unit/test_slack_formatter.py",
-        "--ignore=tests/unit/test_slack_sender.py",
-        "--ignore=tests/unit/test_storage_writer.py",
-        "--ignore=tests/unit/test_notifications_config.py",
-        "--ignore=tests/unit/test_storage_config.py",
-    ]
-
     session.run(
         "pytest",
         "tests/unit/",
-        *ignore_patterns,
         "-v",
         "--color=yes",
         "--tb=short",
@@ -452,6 +442,84 @@ def ci(session):
 
 
 @nox.session(python=DEFAULT_PYTHON)
+def tests_e2e(session):
+    """
+    Run end-to-end tests (tests/e2e/).
+
+    Critical user workflow tests that exercise the full pipeline.
+
+    Usage:
+        nox -s tests_e2e
+    """
+    session.log("Running end-to-end tests")
+
+    session.install("-r", "requirements.txt")
+    session.install("pytest>=7.4.0", "pytest-asyncio>=0.21.0", "pytest-timeout>=2.2.0")
+
+    session.run(
+        "pytest",
+        "tests/e2e/",
+        "-v",
+        "--color=yes",
+        "--tb=long",
+        "-m", "e2e",
+        *session.posargs,
+    )
+
+
+@nox.session(python=DEFAULT_PYTHON)
+def tests_smoke(session):
+    """
+    Run smoke tests (tests/smoke/).
+
+    Post-deploy health checks - lightweight, fast, non-destructive.
+
+    Usage:
+        nox -s tests_smoke
+    """
+    session.log("Running smoke tests")
+
+    session.install("-r", "requirements.txt")
+    session.install("pytest>=7.4.0", "pytest-asyncio>=0.21.0", "pytest-timeout>=2.2.0")
+
+    session.run(
+        "pytest",
+        "tests/smoke/",
+        "-v",
+        "--color=yes",
+        "--tb=short",
+        "-m", "smoke",
+        *session.posargs,
+    )
+
+
+@nox.session(python=DEFAULT_PYTHON)
+def tests_contract(session):
+    """
+    Run contract tests (tests/ -m contract).
+
+    Schema validation and A2A protocol compliance tests.
+
+    Usage:
+        nox -s tests_contract
+    """
+    session.log("Running contract tests")
+
+    session.install("-r", "requirements.txt")
+    session.install("pytest>=7.4.0", "pytest-asyncio>=0.21.0")
+
+    session.run(
+        "pytest",
+        "tests/",
+        "-v",
+        "--color=yes",
+        "--tb=short",
+        "-m", "contract",
+        *session.posargs,
+    )
+
+
+@nox.session(python=DEFAULT_PYTHON)
 def clean(session):
     """
     Clean up generated files and caches.
@@ -511,19 +579,9 @@ def quick(session):
     session.install("-r", "requirements.txt")
     session.install("pytest>=7.4.0", "pytest-asyncio>=0.21.0")
 
-    # Ignore test files with known import issues (stale tests)
-    ignore_patterns = [
-        "--ignore=tests/unit/test_slack_formatter.py",
-        "--ignore=tests/unit/test_slack_sender.py",
-        "--ignore=tests/unit/test_storage_writer.py",
-        "--ignore=tests/unit/test_notifications_config.py",
-        "--ignore=tests/unit/test_storage_config.py",
-    ]
-
     session.run(
         "pytest",
         "tests/unit/",
-        *ignore_patterns,
         "-v",
         "--color=yes",
         "-x",  # Stop on first failure
