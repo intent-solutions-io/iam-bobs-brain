@@ -125,7 +125,7 @@ async def test_engine(stub_agent_engine):
 ## CI Pipeline Order
 
 1. Drift detection (`check_nodrift.sh`) - blocks on R1/R3/R4 violations
-2. Lint (flake8/black)
+2. Lint (ruff/black)
 3. Unit tests
 4. Integration tests (if GCP available)
 5. Coverage threshold check (>= 60%)

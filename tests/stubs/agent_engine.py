@@ -18,6 +18,7 @@ Usage:
     })
 """
 
+import copy
 from typing import Any, Dict, List, Optional
 
 
@@ -83,9 +84,9 @@ class StubAgentEngineClient:
         # Match against registered responses
         for key, response in self._responses.items():
             if key in message.lower():
-                return response
+                return copy.deepcopy(response)
 
-        return dict(self._default)
+        return copy.deepcopy(self._default)
 
     async def create_session(self, user_id: str = "test-user") -> str:
         """Simulate session creation."""
