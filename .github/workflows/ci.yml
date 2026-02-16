@@ -159,18 +159,19 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install flake8 black mypy
+          pip install ruff black mypy
 
-      - name: Lint with flake8
+      - name: Lint with ruff
         run: |
-          flake8 agents/ service/ --count --select=E9,F63,F7,F82 --show-source --statistics
-          flake8 agents/ service/ --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
+          ruff check agents/ service/ scripts/ tests/ \
+            --select=E,F,W,C90,I,N,UP,B,A,COM,C4,T10,EM,ISC,PIE,T20,PT,Q,RSE,RET,SIM,TID,ARG,ERA,PGH,PL,RUF \
+            --ignore=E501,S101,S603,S607
 
       - name: Format check with black
-        run: black --check agents/ service/ scripts/ || echo "Format check complete"
+        run: black --check agents/ service/ scripts/ tests/
 
       - name: Type check with mypy
-        run: mypy agents/ --ignore-missing-imports || echo "Type checking complete"
+        run: mypy agents/ --ignore-missing-imports
 
   test:
     runs-on: ubuntu-latest
@@ -191,15 +192,33 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
-          pip install pytest pytest-cov
+          pip install pytest pytest-cov pytest-timeout pytest-asyncio
 
-      - name: Run unit tests
+      - name: Run unit tests with coverage
         run: |
-          pytest tests/unit/ -v --cov=my_agent --cov-report=xml || echo "No unit tests yet"
+          pytest tests/unit/ -v \
+            --cov=agents --cov=service \
+            --cov-report=xml \
+            --cov-report=term-missing \
+            --cov-config=.coveragerc \
+            --timeout=60
+        env:
+          BOB_TEST_MODE: "1"
+          BOB_STUB_EXTERNAL: "1"
+          BOB_LLM_MODE: stub
+          OTEL_TRACES_EXPORTER: none
+
+      - name: Enforce coverage threshold (>= 60%)
+        if: matrix.python-version == '3.11'
+        run: |
+          coverage report --fail-under=60
 
       - name: Run integration tests
         run: |
-          pytest tests/integration/ -v || echo "No integration tests yet"
+          pytest tests/integration/ -v --timeout=120 || echo "No integration tests yet"
+        env:
+          BOB_TEST_MODE: "1"
+          BOB_STUB_EXTERNAL: "1"
 
       - name: Upload coverage
         if: matrix.python-version == '3.11'
@@ -219,16 +238,17 @@ jobs:
         with:
           python-version: '3.11'
 
-      - name: Run Bandit security scan
+      - name: Install security tools
         run: |
-          pip install bandit
-          bandit -r agents/ service/ -ll || echo "Security scan complete"
-
-      - name: Safety check dependencies
-        run: |
-          pip install safety
+          pip install bandit pip-audit
           pip install -r requirements.txt
-          safety check --json || echo "Safety check complete"
+
+      - name: Run Bandit security scan
+        run: bandit -r agents/ service/ -ll -i
+
+      - name: Audit dependencies for vulnerabilities
+        run: pip-audit --strict
+        continue-on-error: true
 
   terraform-validate:
     runs-on: ubuntu-latest
