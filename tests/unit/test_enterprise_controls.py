@@ -662,6 +662,28 @@ class TestBug1MalformedMandateFailsClosed:
         # Should not raise
         validate_mandate(task)
 
+    def test_error_message_omits_internal_details(self):
+        """A2AError for malformed mandate must NOT expose raw parse error."""
+        from agents.a2a.dispatcher import validate_mandate
+        from agents.a2a.types import A2ATask, A2AError
+
+        task = A2ATask(
+            specialist="iam-compliance",
+            skill_id="iam_adk.check_adk_compliance",
+            payload={"target": "agents/bob"},
+            mandate={
+                "mandate_id": "m-bad",
+                "intent": "test",
+                "expires_at": "not-a-date",
+            }
+        )
+        with pytest.raises(A2AError) as exc_info:
+            validate_mandate(task)
+        # Should NOT contain raw exception details like "Invalid isoformat"
+        msg = str(exc_info.value)
+        assert "fromisoformat" not in msg.lower()
+        assert "fail-closed" in msg.lower()
+
 
 class TestBug2MandateExpirationGate:
     """Bug 2: Expired mandate must be caught by preflight_check."""
@@ -785,6 +807,89 @@ class TestBug3RecordInvocation:
         for _ in range(5):
             mandate.record_invocation(cost=0.10)
         assert mandate.is_budget_exhausted() is True
+
+
+class TestValidateMandateReturnValue:
+    """validate_mandate() returns parsed Mandate for reuse (no duplicate parsing)."""
+
+    def test_returns_mandate_when_present(self):
+        """validate_mandate() returns Mandate object when task has mandate."""
+        from agents.a2a.dispatcher import validate_mandate
+        from agents.a2a.types import A2ATask
+
+        task = A2ATask(
+            specialist="iam-compliance",
+            skill_id="iam_adk.check_adk_compliance",
+            payload={"target": "agents/bob"},
+            mandate={
+                "mandate_id": "m-ret",
+                "intent": "return test",
+                "risk_tier": "R1",
+                "budget_limit": 5.0,
+                "iterations_used": 3,
+            }
+        )
+        result = validate_mandate(task)
+        assert result is not None
+        assert result.mandate_id == "m-ret"
+        assert result.risk_tier == "R1"
+        assert result.budget_limit == 5.0
+        assert result.iterations_used == 3
+
+    def test_returns_none_without_mandate(self):
+        """validate_mandate() returns None when task has no mandate."""
+        from agents.a2a.dispatcher import validate_mandate
+        from agents.a2a.types import A2ATask
+
+        task = A2ATask(
+            specialist="iam-compliance",
+            skill_id="iam_adk.check_adk_compliance",
+            payload={"target": "agents/bob"},
+        )
+        result = validate_mandate(task)
+        assert result is None
+
+
+class TestMandateFromDictHelper:
+    """_mandate_from_dict() shared helper parses all fields correctly."""
+
+    def test_parses_all_enterprise_fields(self):
+        """All enterprise control fields are parsed by shared helper."""
+        from agents.a2a.dispatcher import _mandate_from_dict
+
+        mandate = _mandate_from_dict({
+            "mandate_id": "m-full",
+            "intent": "full test",
+            "risk_tier": "R3",
+            "tool_allowlist": ["search_code"],
+            "data_classification": "confidential",
+            "approval_state": "approved",
+            "approver_id": "admin@example.com",
+            "budget_limit": 10.0,
+            "budget_spent": 2.5,
+            "max_iterations": 50,
+            "iterations_used": 7,
+        })
+        assert mandate.mandate_id == "m-full"
+        assert mandate.risk_tier == "R3"
+        assert mandate.tool_allowlist == ["search_code"]
+        assert mandate.data_classification == "confidential"
+        assert mandate.approval_state == "approved"
+        assert mandate.approver_id == "admin@example.com"
+        assert mandate.budget_limit == 10.0
+        assert mandate.budget_spent == 2.5
+        assert mandate.iterations_used == 7
+
+    def test_raises_on_bad_datetime(self):
+        """Malformed datetime fields raise ValueError."""
+        from agents.a2a.dispatcher import _mandate_from_dict
+
+        with pytest.raises((ValueError, TypeError, AttributeError)):
+            _mandate_from_dict({
+                "mandate_id": "m-bad",
+                "intent": "test",
+                "expires_at": "garbage",
+            })
 
 
 class TestBug4ToolAllowlistPreflightCount:
