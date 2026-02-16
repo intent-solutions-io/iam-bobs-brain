@@ -348,7 +348,7 @@ drift-check → arv-check (includes A2A readiness) → build-and-push → deploy
 - **Phase 17**: `000-docs/146-AA-REPT-phase-17-a2a-wiring-and-agent-engine-dev-prep.md` (A2A wiring baseline)
 - **Deployment Prereqs**: `000-docs/145-NOTE-agent-engine-dev-deployment-prereqs.md` (GCP setup requirements)
 
-### Standards (6767-series):
+### Standards (000-series):
 - **000-DR-STND-adk-agent-engine-spec-and-hardmode-rules.md**: Hard Mode rules (R1-R8)
 - **000-DR-STND-adk-lazy-loading-app-pattern.md**: Lazy-loading App pattern
 - **000-DR-STND-inline-source-deployment-for-vertex-agent-engine.md**: Inline source deployment

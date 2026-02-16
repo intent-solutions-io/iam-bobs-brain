@@ -423,7 +423,7 @@ gcloud logging read "resource.type=cloud_run_revision" --limit 100
 2. **CLAUDE.md** (209 lines) - Architecture & rules
 3. **CHANGELOG.md** (1,000+ lines) - Version history
 
-### Operational Documents (6767-series = canonical)
+### Operational Documents (000-series = canonical)
 - `000-DR-STND-adk-agent-engine-spec-and-hardmode-rules.md` - Architecture standard
 - `6767-OD-RBOK-deployment-runbook.md` - Step-by-step deployment
 - `6767-OD-TELE-observability-telemetry-guide.md` - Monitoring setup

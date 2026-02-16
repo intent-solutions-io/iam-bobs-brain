@@ -363,7 +363,7 @@ These rules are **enforced in CI** and violations will fail the build.
 **Required:**
 - ✅ All docs in `000-docs/`
 - ✅ NNN-CC-ABCD naming convention
-- ✅ 6767 prefix for canonical standards
+- ✅ 000 prefix for canonical standards
 
 **Prohibited:**
 - ❌ Multiple doc folders
@@ -534,7 +534,7 @@ ORG_STORAGE_WRITE_ENABLED=false          # Must opt-in
 - Forces conscious decision to enable
 - Makes dev/test environments safe by default
 
-### D. 6767 Canonical Standards
+### D. Canonical Standards (000 prefix)
 
 **What Gets 6767 Prefix:**
 - ✅ Architectural patterns (agent structure, A2A, memory)
@@ -703,7 +703,7 @@ That mapping document provides:
 
 ## X. Related Documentation
 
-**6767 Canonical Standards:**
+**Canonical Standards (000 prefix):**
 - `000-DR-STND-iam-department-template-scope-and-rules.md` - Template scope and parameterization
 - `000-DR-STND-arv-minimum-gate.md` - ARV baseline requirements
 - `000-DR-GUIDE-porting-iam-department-to-new-repo.md` - Step-by-step porting guide

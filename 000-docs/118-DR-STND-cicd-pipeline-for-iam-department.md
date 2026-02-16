@@ -588,7 +588,7 @@ make deploy-status
 - `117-AA-REPT-iam-department-arv-implementation.md` - ARV framework
 - `CI1-WORKFLOW-INVENTORY-FINDINGS.md` - CI1 analysis
 
-**6767 Canonical Standards:**
+**Canonical Standards (000 prefix):**
 - `000-DR-STND-arv-minimum-gate.md` - ARV minimum requirements
 - `000-RB-OPS-adk-department-operations-runbook.md` - Operations
 

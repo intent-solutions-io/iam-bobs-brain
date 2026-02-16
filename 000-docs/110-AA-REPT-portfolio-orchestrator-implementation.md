@@ -368,7 +368,7 @@ make check-arv-portfolio
 ### Operational Standards
 - `094-AT-ARCH-iam-swe-pipeline-orchestration.md` - Single-repo pipeline
 - `096-DR-STND-repo-registry-and-target-selection.md` - Registry standard
-- `000-DR-STND-arv-minimum-gate-DR-STND-arv-minimum-gate-for-bobs-brain.md` - ARV minimum gate
+- `000-DR-STND-arv-minimum-gate.md` - ARV minimum gate
 
 ---
 

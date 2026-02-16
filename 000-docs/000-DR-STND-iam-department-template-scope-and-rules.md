@@ -541,5 +541,5 @@ The IAM department template is successful if:
 **Maintained by:** Build Captain (claude.buildcaptain@intentsolutions.io)
 **Related Docs:**
 - 000-DR-GUIDE-porting-iam-department-to-new-repo-DR-GUIDE-porting-iam-department-to-new-repo.md (next)
-- 000-DR-STND-iam-department-integration-checklist-DR-STND-iam-department-integration-checklist.md
+- 000-DR-STND-iam-department-integration-checklist.md
 - templates/iam-department/README.md

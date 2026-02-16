@@ -449,7 +449,7 @@ jobs:
 **Locations:**
 - `README.md` - Add portfolio auditor section
 - `CLAUDE.md` - Update with portfolio commands
-- `000-docs/000-RB-OPS-adk-department-operations-runbook-RB-OPS-adk-department-operations-runbook.md` - Add portfolio operations
+- `000-docs/000-RB-OPS-adk-department-operations-runbook.md` - Add portfolio operations
 
 ### Deliverables
 
@@ -597,9 +597,9 @@ jobs:
 - `093-DR-STND-bob-rag-readiness-standard.md` - RAG readiness (Phase RC1)
 - `094-AT-ARCH-iam-swe-pipeline-orchestration.md` - Pipeline architecture
 - `096-DR-STND-repo-registry-and-target-selection.md` - Registry standard
-- `000-DR-STND-arv-minimum-gate-DR-STND-arv-minimum-gate-for-bobs-brain.md` - ARV minimum gate
-- `000-DR-STND-iam-department-template-scope-and-rules-DR-STND-iam-department-template-scope-and-rules.md` - Template scope
-- `000-RB-OPS-adk-department-operations-runbook-RB-OPS-adk-department-operations-runbook.md` - Operations runbook
+- `000-DR-STND-arv-minimum-gate.md` - ARV minimum gate
+- `000-DR-STND-iam-department-template-scope-and-rules.md` - Template scope
+- `000-RB-OPS-adk-department-operations-runbook.md` - Operations runbook
 
 ### PORT Phase Docs (This Series)
 - `109-PP-PLAN-multi-repo-swe-portfolio-scope.md` - This document (PORT1 plan)
