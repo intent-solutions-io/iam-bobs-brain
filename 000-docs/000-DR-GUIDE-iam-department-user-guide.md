@@ -968,7 +968,7 @@ python scripts/run_portfolio_swe.py \
 
 ### Documentation
 
-- **Template Guide:** `000-docs/000-DR-GUIDE-porting-iam-department-to-new-repo-DR-GUIDE-porting-iam-department-to-new-repo.md`
+- **Template Guide:** `000-docs/000-DR-GUIDE-porting-iam-department-to-new-repo.md`
 - **Ops Runbook:** `000-docs/000-RB-OPS-adk-department-operations-runbook.md`
 - **Integration Checklist:** `000-docs/000-DR-STND-iam-department-integration-checklist.md`
 
@@ -1093,6 +1093,6 @@ A: PRs welcome! Follow the contribution guide in CLAUDE.md.
 
 **Related Docs:**
 - 000-DR-STND-iam-department-template-scope-and-rules.md (template scope)
-- 000-DR-GUIDE-porting-iam-department-to-new-repo-DR-GUIDE-porting-iam-department-to-new-repo.md (porting guide)
+- 000-DR-GUIDE-porting-iam-department-to-new-repo.md (porting guide)
 - 000-DR-STND-iam-department-integration-checklist.md (integration checklist)
 - 000-RB-OPS-adk-department-operations-runbook.md (operations runbook)

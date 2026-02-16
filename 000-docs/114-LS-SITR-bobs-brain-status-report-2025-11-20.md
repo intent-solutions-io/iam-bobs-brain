@@ -344,8 +344,8 @@ None currently.
    - `Makefile` - Common commands
 
 4. **User Guides**
-   - `000-docs/000-DR-GUIDE-iam-department-user-guide-DR-GUIDE-how-to-use-bob-and-iam-department-for-swe.md` - User guide
-   - `000-docs/000-DR-GUIDE-porting-iam-department-to-new-repo-DR-GUIDE-porting-iam-department-to-new-repo.md` - Porting guide
+   - `000-docs/000-DR-GUIDE-iam-department-user-guide.md` - User guide
+   - `000-docs/000-DR-GUIDE-porting-iam-department-to-new-repo.md` - Porting guide
 
 **For Understanding LIVE3:**
 

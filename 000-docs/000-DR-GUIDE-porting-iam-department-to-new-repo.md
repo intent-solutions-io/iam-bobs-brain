@@ -555,7 +555,7 @@ python scripts/run_swe_pipeline_once.py \
 - **Template Scope:** `000-docs/000-DR-STND-iam-department-template-scope-and-rules.md`
 - **Integration Checklist:** `000-docs/000-DR-STND-iam-department-integration-checklist.md`
 - **Ops Runbook:** `000-docs/000-RB-OPS-adk-department-operations-runbook.md`
-- **Usage Guide:** `000-docs/000-DR-GUIDE-iam-department-user-guide-DR-GUIDE-how-to-use-bob-and-iam-department-for-swe.md`
+- **Usage Guide:** `000-docs/000-DR-GUIDE-iam-department-user-guide.md`
 
 ### Reference Implementation
 - **Source:** bobs-brain repository

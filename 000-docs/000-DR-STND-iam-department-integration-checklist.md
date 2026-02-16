@@ -11,7 +11,7 @@
 
 ## Quick Reference
 
-Use this checklist alongside the porting guide (`000-DR-GUIDE-porting-iam-department-to-new-repo-DR-GUIDE-porting-iam-department-to-new-repo.md`) to track your integration progress.
+Use this checklist alongside the porting guide (`000-DR-GUIDE-porting-iam-department-to-new-repo.md`) to track your integration progress.
 
 **Estimated Time:** 1-2 days minimal, 1 week full integration
 
@@ -452,5 +452,5 @@ After completing this checklist:
 
 **Related Docs:**
 - 000-DR-STND-iam-department-template-scope-and-rules.md (scope)
-- 000-DR-GUIDE-porting-iam-department-to-new-repo-DR-GUIDE-porting-iam-department-to-new-repo.md (detailed guide)
+- 000-DR-GUIDE-porting-iam-department-to-new-repo.md (detailed guide)
 - templates/iam-department/README.md (template README)

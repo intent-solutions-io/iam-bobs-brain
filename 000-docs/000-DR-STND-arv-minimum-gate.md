@@ -261,9 +261,9 @@ Combined ARV gates ensure both RAG foundation and observability are ready.
 
 ### Template & Porting Documentation
 - **000-DR-STND-iam-department-template-scope-and-rules.md** - Template scope and reusability
-- **000-DR-GUIDE-porting-iam-department-to-new-repo-DR-GUIDE-porting-iam-department-to-new-repo.md** - Step-by-step porting guide
+- **000-DR-GUIDE-porting-iam-department-to-new-repo.md** - Step-by-step porting guide
 - **000-DR-STND-iam-department-integration-checklist.md** - Integration checklist
-- **000-DR-GUIDE-iam-department-user-guide-DR-GUIDE-how-to-use-bob-and-iam-department-for-swe.md** - User guide
+- **000-DR-GUIDE-iam-department-user-guide.md** - User guide
 
 ### Repository Guidance
 - **CLAUDE.md** - Repository guidance and ARV gate usage

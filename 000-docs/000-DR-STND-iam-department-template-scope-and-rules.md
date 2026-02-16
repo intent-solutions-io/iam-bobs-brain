@@ -448,7 +448,7 @@ Example: `1.0.0` (initial), `1.1.0` (new agents), `2.0.0` (breaking changes)
 ### C. Documentation Updates
 
 When template changes:
-1. Update `000-DR-GUIDE-porting-iam-department-to-new-repo-DR-GUIDE-porting-iam-department-to-new-repo.md` (porting guide)
+1. Update `000-DR-GUIDE-porting-iam-department-to-new-repo.md` (porting guide)
 2. Update `templates/iam-department/README.md`
 3. Add migration notes for existing ports
 
@@ -540,6 +540,6 @@ The IAM department template is successful if:
 **Template Version:** 1.0.0
 **Maintained by:** Build Captain (claude.buildcaptain@intentsolutions.io)
 **Related Docs:**
-- 000-DR-GUIDE-porting-iam-department-to-new-repo-DR-GUIDE-porting-iam-department-to-new-repo.md (next)
+- 000-DR-GUIDE-porting-iam-department-to-new-repo.md (next)
 - 000-DR-STND-iam-department-integration-checklist.md
 - templates/iam-department/README.md
