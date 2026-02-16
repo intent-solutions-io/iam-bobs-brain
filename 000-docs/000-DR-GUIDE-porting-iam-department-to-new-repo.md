@@ -1,6 +1,6 @@
 # Porting Guide: IAM Department to New Repository
 
-**Document ID:** 6767-DR-GUIDE-porting-iam-department-to-new-repo-DR-GUIDE
+**Document ID:** 000-DR-GUIDE-porting-iam-department-to-new-repo
 **Title:** Porting the IAM Department Template to New Repositories
 **Phase:** T2 (Porting & Integration)
 **Status:** Canonical Guide
@@ -370,7 +370,7 @@ jobs:
 3. **Deploy webhook to Cloud Run:**
 
    > ⚠️ **DEPRECATED (R4 Violation):** Manual `gcloud run deploy` commands are banned in Hard Mode.
-   > ✅ **Use instead:** Terraform + GitHub Actions (see `6767-122-DR-STND-slack-gateway-deploy-pattern.md`)
+   > ✅ **Use instead:** Terraform + GitHub Actions (see `000-DR-STND-slack-gateway-deploy-pattern.md`)
 
    ```bash
    # ❌ DEPRECATED - DO NOT USE (R4 Violation)
@@ -552,10 +552,10 @@ python scripts/run_swe_pipeline_once.py \
 ## X. Support & Resources
 
 ### Documentation
-- **Template Scope:** `000-docs/6767-DR-STND-iam-department-template-scope-and-rules-DR-STND-iam-department-template-scope-and-rules.md`
-- **Integration Checklist:** `000-docs/6767-DR-STND-iam-department-integration-checklist-DR-STND-iam-department-integration-checklist.md`
-- **Ops Runbook:** `000-docs/6767-RB-OPS-adk-department-operations-runbook-RB-OPS-adk-department-operations-runbook.md`
-- **Usage Guide:** `000-docs/6767-DR-GUIDE-iam-department-user-guide-DR-GUIDE-how-to-use-bob-and-iam-department-for-swe.md`
+- **Template Scope:** `000-docs/000-DR-STND-iam-department-template-scope-and-rules.md`
+- **Integration Checklist:** `000-docs/000-DR-STND-iam-department-integration-checklist.md`
+- **Ops Runbook:** `000-docs/000-RB-OPS-adk-department-operations-runbook.md`
+- **Usage Guide:** `000-docs/000-DR-GUIDE-iam-department-user-guide.md`
 
 ### Reference Implementation
 - **Source:** bobs-brain repository
@@ -610,8 +610,8 @@ Your port is successful when:
 **Last Updated:** 2025-11-20
 
 **Related Docs:**
-- 6767-DR-STND-iam-department-template-scope-and-rules-DR-STND-iam-department-template-scope-and-rules.md (scope)
-- 6767-DR-STND-iam-department-integration-checklist-DR-STND-iam-department-integration-checklist.md (checklist)
+- 000-DR-STND-iam-department-template-scope-and-rules.md (scope)
+- 000-DR-STND-iam-department-integration-checklist.md (checklist)
 - templates/iam-department/README.md (template README)
 - **118-DR-STND-cicd-pipeline-for-iam-department.md** (CI/CD pipeline standard - CICD-DEPT)
 - **119-RB-OPS-deployment-operator-runbook.md** (deployment operations - CICD-DEPT)

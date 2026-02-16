@@ -99,7 +99,7 @@
 - Workload Identity Federation: https://cloud.google.com/iam/docs/workload-identity-federation
 
 **Updated Document:**
-- File: 000-docs/6767-DR-STND-agentcards-and-a2a-contracts.md
+- File: 000-docs/000-DR-STND-agentcards-and-a2a-contracts.md
 - Added Section IX: References with external links and related internal standards
 
 **Commit:**
@@ -173,7 +173,7 @@
 - Foreman + workers architecture (iam-senior-adk-devops-lead to iam-*)
 - AgentCards in .well-known/agent-card.json for all agents
 - Validation via tests/unit/test_agentcard_json.py and a2a-inspector (planned)
-- Reference: 6767-DR-STND-agentcards-and-a2a-contracts.md
+- Reference: 000-DR-STND-agentcards-and-a2a-contracts.md
 
 **Commit:**
 - Hash: b4f52165
@@ -229,7 +229,7 @@
 | .env.example | Modified | +9 -9 | Version 0.6.0 to 0.10.0 across all examples |
 | CLAUDE.md | Modified | +32 | TL;DR for DevOps quick reference section |
 | 6767-120-DR-STND-agent-engine-a2a-and-inline-deploy-index.md | Created | +260 | Master index with external citations |
-| 6767-DR-STND-agentcards-and-a2a-contracts.md | Modified | +19 | References section with external links |
+| 000-DR-STND-agentcards-and-a2a-contracts.md | Modified | +19 | References section with external links |
 | 131-AA-REPT-v0-10-0-preview-release-checklist.md | Created | +388 | Complete release checklist and GitHub Release guide |
 
 **Total Impact:**

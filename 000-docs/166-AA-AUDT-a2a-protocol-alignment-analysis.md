@@ -285,7 +285,7 @@ pydantic>=2.0    # For model validation
 
 ### Documentation Updates Needed
 
-1. Update `000-docs/6767-DR-STND-agentcards-and-a2a-contracts.md`
+1. Update `000-docs/000-DR-STND-agentcards-and-a2a-contracts.md`
 2. Create migration guide for existing deployments
 3. Update agent deployment scripts
 4. Add A2A compliance to CI checks

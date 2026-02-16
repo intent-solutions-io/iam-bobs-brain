@@ -151,7 +151,7 @@ We welcome contributions! This project follows Google's ADK patterns and enforce
 ## Development Setup
 1. Fork the repository
 2. Create a feature branch
-3. Follow Hard Mode rules (see 001-docs/6767-DR-STND-adk-agent-engine-spec-and-hardmode-rules.md)
+3. Follow Hard Mode rules (see 001-docs/000-DR-STND-adk-agent-engine-spec-and-hardmode-rules.md)
 4. Submit PR with comprehensive tests
 
 ## Code Standards

@@ -7,11 +7,31 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- **Doc-Filing v4.3 Migration**: Renamed all 28 `6767-*` canonical docs to `000-*` prefix
+- **Identity Alignment**: Updated README and CLAUDE.md to accurately describe ADK/Vertex compliance department (not "general-purpose orchestrator")
+- **Filing System Standard**: Updated from v3.0 to v4.3 in `000-DR-STND-document-filing-system-standard-v4.md`
+
+### Added
+
+- Comprehensive test coverage for all IAM specialists (e192a70d)
+- Agent callback updates and mission spec skill_id support (#57)
+- Phase H async A2A dispatch (#53)
+- MCP server config for staging/prod (#55)
+
+### Fixed
+
+- Broken test warnings and failures (83d6e6b8)
+- Broken skill ID field in tests (#54)
+- Incorrect make targets in CLAUDE.md (f0ab79db)
+- README alignment with v2.0.0 changes (#56)
+
 ## [2.0.0] - 2026-01-03
 
-### Vision Alignment GA - General-Purpose Enterprise Orchestrator
+### Vision Alignment GA - Enterprise Controls + ADK Compliance Department
 
-Major release transforming Bob's Brain from ADK-focused devops assistant into a general-purpose enterprise orchestration system.
+Major release adding enterprise-grade infrastructure (risk tiers, policy gates, evidence bundles, Mission Spec) to the ADK/Vertex compliance department.
 
 ### Added - Agent Identity System (Phase D)
 

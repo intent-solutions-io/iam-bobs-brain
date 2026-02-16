@@ -375,7 +375,7 @@ gh auth login
 - `118-DR-STND-cicd-pipeline-for-iam-department.md` - Full CI/CD standard
 - `117-AA-REPT-iam-department-arv-implementation.md` - ARV framework
 - `116-DR-STND-config-and-feature-flags-standard-v1.md` - Configuration standard
-- `6767-RB-OPS-adk-department-operations-runbook.md` - General operations
+- `000-RB-OPS-adk-department-operations-runbook.md` - General operations
 
 ---
 

@@ -1,6 +1,6 @@
 # Live RAG & Agent Engine Rollout Plan
 
-**Document ID:** 6767-DR-STND-live-rag-and-agent-engine-rollout-plan-DR-STND-live-rag-and-agent-engine-rollout-plan
+**Document ID:** 000-DR-STND-live-rag-and-agent-engine-rollout-plan
 **Created:** 2025-11-20
 **Phase:** AE3 (Live RAG & Engine Rollout + Safety)
 **Status:** Standard (Rollout Plan)

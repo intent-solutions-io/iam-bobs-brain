@@ -1,6 +1,6 @@
 # ARV Minimum Gate Standard for Bob's Brain
 
-**Document ID:** 6767-DR-STND-arv-minimum-gate-DR-STND-arv-minimum-gate-for-bobs-brain
+**Document ID:** 000-DR-STND-arv-minimum-gate
 **Created:** 2025-11-20
 **Phase:** RC2 (Observability)
 **Status:** Active
@@ -121,7 +121,7 @@ Edit `scripts/check_arv_minimum.py` to add/remove checks:
 - Update report generation to include new checks
 
 **2. Update Documentation**
-Update this document (6767-DR-STND-arv-minimum-gate) with:
+Update this document (000-DR-STND-arv-minimum-gate) with:
 - New requirements in "What ARV Minimum Enforces"
 - Rationale for the change
 - Expected impact on existing agents
@@ -256,14 +256,14 @@ Combined ARV gates ensure both RAG foundation and observability are ready.
 ### Operational Standards
 - **093-DR-STND-bob-rag-readiness-standard.md** - RAG readiness standard (Phase RC1)
 - **094-AT-ARCH-iam-swe-pipeline-orchestration.md** - Pipeline architecture
-- **6767-DR-STND-arv-minimum-gate-DR-STND-arv-minimum-gate-for-bobs-brain.md** - This document (ARV minimum gate)
-- **6767-RB-OPS-adk-department-operations-runbook-RB-OPS-adk-department-operations-runbook.md** - Daily operations and troubleshooting
+- **000-DR-STND-arv-minimum-gate.md** - This document (ARV minimum gate)
+- **000-RB-OPS-adk-department-operations-runbook.md** - Daily operations and troubleshooting
 
 ### Template & Porting Documentation
-- **6767-DR-STND-iam-department-template-scope-and-rules-DR-STND-iam-department-template-scope-and-rules.md** - Template scope and reusability
-- **6767-DR-GUIDE-porting-iam-department-to-new-repo-DR-GUIDE-porting-iam-department-to-new-repo.md** - Step-by-step porting guide
-- **6767-DR-STND-iam-department-integration-checklist-DR-STND-iam-department-integration-checklist.md** - Integration checklist
-- **6767-DR-GUIDE-iam-department-user-guide-DR-GUIDE-how-to-use-bob-and-iam-department-for-swe.md** - User guide
+- **000-DR-STND-iam-department-template-scope-and-rules.md** - Template scope and reusability
+- **000-DR-GUIDE-porting-iam-department-to-new-repo.md** - Step-by-step porting guide
+- **000-DR-STND-iam-department-integration-checklist.md** - Integration checklist
+- **000-DR-GUIDE-iam-department-user-guide.md** - User guide
 
 ### Repository Guidance
 - **CLAUDE.md** - Repository guidance and ARV gate usage

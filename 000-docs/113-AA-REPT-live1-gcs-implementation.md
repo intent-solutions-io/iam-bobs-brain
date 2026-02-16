@@ -109,7 +109,7 @@ Successfully implemented org-wide GCS knowledge hub for portfolio/SWE audit data
 - `tests/unit/test_storage_config.py` - 22 passing tests
 - `tests/unit/test_storage_writer.py` - 14 passing tests
 - `scripts/check_org_storage_readiness.py` - Readiness check tool
-- `000-docs/6767-AT-ARCH-org-storage-architecture-AT-ARCH-org-storage-architecture.md` - Architecture doc
+- `000-docs/000-AT-ARCH-org-storage-architecture.md` - Architecture doc
 - `000-docs/113-AA-REPT-live1-gcs-implementation.md` - This AAR
 
 **Test Coverage:**
@@ -409,7 +409,7 @@ When integrating org storage in a new repo:
 - `scripts/check_org_storage_readiness.py` - Readiness script
 
 ### Docs
-- `000-docs/6767-AT-ARCH-org-storage-architecture-AT-ARCH-org-storage-architecture.md` - Architecture
+- `000-docs/000-AT-ARCH-org-storage-architecture.md` - Architecture
 - `000-docs/109-PP-PLAN-multi-repo-swe-portfolio-scope.md` - Portfolio context
 - `000-docs/110-AA-REPT-portfolio-orchestrator-implementation.md` - Orchestrator AAR
 

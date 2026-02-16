@@ -468,10 +468,10 @@ These checks still exist and can be run individually:
 
 ## Related Documentation
 
-**Canonical Standards (6767 prefix):**
-- `6767-DR-STND-arv-minimum-gate.md` - ARV minimum requirements
-- `6767-DR-STND-iam-department-integration-checklist.md` - Department integration
-- `6767-RB-OPS-adk-department-operations-runbook.md` - Operations
+**Canonical Standards (000 prefix):**
+- `000-DR-STND-arv-minimum-gate.md` - ARV minimum requirements
+- `000-DR-STND-iam-department-integration-checklist.md` - Department integration
+- `000-RB-OPS-adk-department-operations-runbook.md` - Operations
 
 **Repo-Local Documentation:**
 - `116-DR-STND-config-and-feature-flags-standard-v1.md` - Config standard

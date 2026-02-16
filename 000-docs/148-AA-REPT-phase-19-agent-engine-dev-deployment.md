@@ -17,7 +17,7 @@ Phase 19 updated Terraform and CI/CD infrastructure to support **inline source d
 - ❌ **NOT**: Docker container deployment (images built but experimental)
 - ✅ **YES**: Inline source deployment via Python script to Agent Engine
 - 📋 **Method**: `scripts/deploy_inline_source.py` (to be created in future phase)
-- 🏛️ **Standard**: 6767-INLINE-DR-STND-inline-source-deployment-for-vertex-agent-engine.md
+- 🏛️ **Standard**: 000-DR-STND-inline-source-deployment-for-vertex-agent-engine.md
 
 ---
 
@@ -463,10 +463,10 @@ SMOKE_TEST_ENABLED=true
 
 ## Cross-References
 
-### Standards (6767-series)
-- **6767-DR-STND-adk-agent-engine-spec-and-hardmode-rules.md**: Hard Mode rules (R1-R8)
-- **6767-LAZY-DR-STND-adk-lazy-loading-app-pattern.md**: Lazy-loading App pattern
-- **6767-INLINE-DR-STND-inline-source-deployment-for-vertex-agent-engine.md**: Inline source deployment
+### Standards (000-series)
+- **000-DR-STND-adk-agent-engine-spec-and-hardmode-rules.md**: Hard Mode rules (R1-R8)
+- **000-DR-STND-adk-lazy-loading-app-pattern.md**: Lazy-loading App pattern
+- **000-DR-STND-inline-source-deployment-for-vertex-agent-engine.md**: Inline source deployment
 - **6767-121-DR-STND-a2a-compliance-tck-and-inspector.md**: A2A compliance and testing
 - **127-DR-STND-agent-engine-entrypoints.md**: Canonical entrypoints reference
 

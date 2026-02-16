@@ -8,7 +8,6 @@ Tests:
 """
 
 import pytest
-import warnings
 from datetime import datetime, timezone, timedelta
 from pathlib import Path
 import tempfile
@@ -24,8 +23,6 @@ from agents.shared_contracts.policy_gates import (
 )
 from agents.shared_contracts.evidence_bundle import (
     ArtifactRecord,
-    ToolCallRecord,
-    UnitTestRecord,
     EvidenceBundleManifest,
     EvidenceBundle,
     create_evidence_bundle,
@@ -602,3 +599,326 @@ class TestCreateEvidenceBundle:
         mandate_dict = {"mandate_id": "m-001"}
         bundle = create_evidence_bundle(mandate_snapshot=mandate_dict)
         assert bundle.manifest.mandate_snapshot == mandate_dict
+
+
+# ============================================================================
+# BUG FIX TESTS - Risk Tier Enforcement Gaps
+# ============================================================================
+
+class TestBug1MalformedMandateFailsClosed:
+    """Bug 1: Malformed mandate must raise A2AError, not silently bypass."""
+
+    def test_malformed_expires_at_raises_error(self):
+        """Bad datetime in expires_at must raise A2AError."""
+        from agents.a2a.dispatcher import validate_mandate
+        from agents.a2a.types import A2ATask, A2AError
+
+        task = A2ATask(
+            specialist="iam-compliance",
+            skill_id="iam_adk.check_adk_compliance",
+            payload={"target": "agents/bob"},
+            mandate={
+                "mandate_id": "m-bad",
+                "intent": "test",
+                "expires_at": "not-a-date",  # Malformed
+            }
+        )
+        with pytest.raises(A2AError, match="Malformed mandate"):
+            validate_mandate(task)
+
+    def test_malformed_approval_timestamp_raises_error(self):
+        """Bad datetime in approval_timestamp must raise A2AError."""
+        from agents.a2a.dispatcher import validate_mandate
+        from agents.a2a.types import A2ATask, A2AError
+
+        task = A2ATask(
+            specialist="iam-compliance",
+            skill_id="iam_adk.check_adk_compliance",
+            payload={"target": "agents/bob"},
+            mandate={
+                "mandate_id": "m-bad",
+                "intent": "test",
+                "approval_timestamp": 12345,  # Wrong type
+            }
+        )
+        with pytest.raises(A2AError, match="Malformed mandate"):
+            validate_mandate(task)
+
+    def test_valid_mandate_does_not_raise(self):
+        """Well-formed mandate should pass validation without error."""
+        from agents.a2a.dispatcher import validate_mandate
+        from agents.a2a.types import A2ATask
+
+        task = A2ATask(
+            specialist="iam-compliance",
+            skill_id="iam_adk.check_adk_compliance",
+            payload={"target": "agents/bob"},
+            mandate={
+                "mandate_id": "m-good",
+                "intent": "test",
+                "risk_tier": "R0",
+            }
+        )
+        # Should not raise
+        validate_mandate(task)
+
+    def test_error_message_omits_internal_details(self):
+        """A2AError for malformed mandate must NOT expose raw parse error."""
+        from agents.a2a.dispatcher import validate_mandate
+        from agents.a2a.types import A2ATask, A2AError
+
+        task = A2ATask(
+            specialist="iam-compliance",
+            skill_id="iam_adk.check_adk_compliance",
+            payload={"target": "agents/bob"},
+            mandate={
+                "mandate_id": "m-bad",
+                "intent": "test",
+                "expires_at": "not-a-date",
+            }
+        )
+        with pytest.raises(A2AError) as exc_info:
+            validate_mandate(task)
+        # Should NOT contain raw exception details like "Invalid isoformat"
+        msg = str(exc_info.value)
+        assert "fromisoformat" not in msg.lower()
+        assert "fail-closed" in msg.lower()
+
+
+class TestBug2MandateExpirationGate:
+    """Bug 2: Expired mandate must be caught by preflight_check."""
+
+    def test_expired_mandate_blocked_by_preflight(self):
+        """Expired mandate should fail preflight with mandate_expired gate."""
+        expired_mandate = Mandate(
+            mandate_id="m-expired",
+            intent="test",
+            risk_tier="R2",
+            expires_at=datetime(2020, 1, 1, tzinfo=timezone.utc),  # In the past
+        )
+        results = preflight_check("iam-compliance", "R2", expired_mandate)
+        blocking = PolicyGate.get_blocking_gates(results)
+        assert len(blocking) > 0
+        gate_names = [g.gate_name for g in blocking]
+        assert "mandate_expired" in gate_names
+
+    def test_valid_mandate_passes_expiration_gate(self):
+        """Non-expired mandate should pass expiration gate."""
+        future = datetime.now(timezone.utc) + timedelta(hours=1)
+        valid_mandate = Mandate(
+            mandate_id="m-valid",
+            intent="test",
+            risk_tier="R1",
+            expires_at=future,
+        )
+        result = PolicyGate.check_mandate_expired(valid_mandate)
+        assert result.allowed is True
+
+    def test_no_mandate_passes_expiration_gate(self):
+        """No mandate at all should pass expiration gate."""
+        result = PolicyGate.check_mandate_expired(None)
+        assert result.allowed is True
+
+    def test_no_expiry_passes_expiration_gate(self):
+        """Mandate with no expires_at should pass expiration gate."""
+        mandate = Mandate(
+            mandate_id="m-noexpiry",
+            intent="test",
+        )
+        result = PolicyGate.check_mandate_expired(mandate)
+        assert result.allowed is True
+
+    def test_expired_mandate_blocks_via_dispatcher(self):
+        """Expired mandate causes A2AError in validate_mandate."""
+        from agents.a2a.dispatcher import validate_mandate
+        from agents.a2a.types import A2ATask, A2AError
+
+        task = A2ATask(
+            specialist="iam-compliance",
+            skill_id="iam_adk.check_adk_compliance",
+            payload={"target": "agents/bob"},
+            mandate={
+                "mandate_id": "m-expired",
+                "intent": "test",
+                "risk_tier": "R2",
+                "expires_at": "2020-01-01T00:00:00+00:00",
+            }
+        )
+        with pytest.raises(A2AError, match="Policy gate check failed"):
+            validate_mandate(task)
+
+
+class TestBug3RecordInvocation:
+    """Bug 3: record_invocation must increment counters."""
+
+    def test_record_invocation_increments_iterations(self):
+        """record_invocation() should increment iterations_used."""
+        mandate = Mandate(
+            mandate_id="m-001",
+            intent="test",
+            max_iterations=10,
+            iterations_used=0,
+        )
+        mandate.record_invocation()
+        assert mandate.iterations_used == 1
+
+    def test_record_invocation_increments_budget(self):
+        """record_invocation() should increment budget_spent."""
+        mandate = Mandate(
+            mandate_id="m-001",
+            intent="test",
+            budget_limit=1.0,
+            budget_spent=0.0,
+        )
+        mandate.record_invocation(cost=0.05)
+        assert mandate.budget_spent == 0.05
+
+    def test_record_invocation_repeated_calls(self):
+        """Multiple record_invocation() calls accumulate correctly."""
+        mandate = Mandate(
+            mandate_id="m-001",
+            intent="test",
+            max_iterations=10,
+            budget_limit=1.0,
+        )
+        for _ in range(5):
+            mandate.record_invocation(cost=0.10)
+        assert mandate.iterations_used == 5
+        assert abs(mandate.budget_spent - 0.50) < 1e-9
+
+    def test_exhausted_after_max_iterations(self):
+        """After max_iterations invocations, is_iterations_exhausted returns True."""
+        mandate = Mandate(
+            mandate_id="m-001",
+            intent="test",
+            max_iterations=3,
+        )
+        for _ in range(3):
+            mandate.record_invocation()
+        assert mandate.is_iterations_exhausted() is True
+
+    def test_budget_exhausted_after_limit(self):
+        """After budget_limit spent, is_budget_exhausted returns True."""
+        mandate = Mandate(
+            mandate_id="m-001",
+            intent="test",
+            budget_limit=0.50,
+        )
+        for _ in range(5):
+            mandate.record_invocation(cost=0.10)
+        assert mandate.is_budget_exhausted() is True
+
+
+class TestValidateMandateReturnValue:
+    """validate_mandate() returns parsed Mandate for reuse (no duplicate parsing)."""
+
+    def test_returns_mandate_when_present(self):
+        """validate_mandate() returns Mandate object when task has mandate."""
+        from agents.a2a.dispatcher import validate_mandate
+        from agents.a2a.types import A2ATask
+
+        task = A2ATask(
+            specialist="iam-compliance",
+            skill_id="iam_adk.check_adk_compliance",
+            payload={"target": "agents/bob"},
+            mandate={
+                "mandate_id": "m-ret",
+                "intent": "return test",
+                "risk_tier": "R1",
+                "budget_limit": 5.0,
+                "iterations_used": 3,
+            }
+        )
+        result = validate_mandate(task)
+        assert result is not None
+        assert result.mandate_id == "m-ret"
+        assert result.risk_tier == "R1"
+        assert result.budget_limit == 5.0
+        assert result.iterations_used == 3
+
+    def test_returns_none_without_mandate(self):
+        """validate_mandate() returns None when task has no mandate."""
+        from agents.a2a.dispatcher import validate_mandate
+        from agents.a2a.types import A2ATask
+
+        task = A2ATask(
+            specialist="iam-compliance",
+            skill_id="iam_adk.check_adk_compliance",
+            payload={"target": "agents/bob"},
+        )
+        result = validate_mandate(task)
+        assert result is None
+
+
+class TestMandateFromDictHelper:
+    """_mandate_from_dict() shared helper parses all fields correctly."""
+
+    def test_parses_all_enterprise_fields(self):
+        """All enterprise control fields are parsed by shared helper."""
+        from agents.a2a.dispatcher import _mandate_from_dict
+
+        mandate = _mandate_from_dict({
+            "mandate_id": "m-full",
+            "intent": "full test",
+            "risk_tier": "R3",
+            "tool_allowlist": ["search_code"],
+            "data_classification": "confidential",
+            "approval_state": "approved",
+            "approver_id": "admin@example.com",
+            "budget_limit": 10.0,
+            "budget_spent": 2.5,
+            "max_iterations": 50,
+            "iterations_used": 7,
+        })
+        assert mandate.mandate_id == "m-full"
+        assert mandate.risk_tier == "R3"
+        assert mandate.tool_allowlist == ["search_code"]
+        assert mandate.data_classification == "confidential"
+        assert mandate.approval_state == "approved"
+        assert mandate.approver_id == "admin@example.com"
+        assert mandate.budget_limit == 10.0
+        assert mandate.budget_spent == 2.5
+        assert mandate.iterations_used == 7
+
+    def test_raises_on_bad_datetime(self):
+        """Malformed datetime fields raise ValueError."""
+        from agents.a2a.dispatcher import _mandate_from_dict
+
+        with pytest.raises((ValueError, TypeError, AttributeError)):
+            _mandate_from_dict({
+                "mandate_id": "m-bad",
+                "intent": "test",
+                "expires_at": "garbage",
+            })
+
+
+class TestBug4ToolAllowlistPreflightCount:
+    """Bug 4: Preflight should include mandate_expired gate in results."""
+
+    def test_preflight_returns_4_gates_without_tools(self):
+        """Preflight without tools_to_use should return 4 gates (including mandate_expired)."""
+        mandate = Mandate(mandate_id="m-001", intent="test", risk_tier="R1")
+        results = preflight_check("iam-compliance", "R1", mandate)
+        gate_names = [r.gate_name for r in results]
+        assert "mandate_required" in gate_names
+        assert "mandate_expired" in gate_names
+        assert "approval_required" in gate_names
+        assert "specialist_authorized" in gate_names
+        assert len(results) == 4
+
+    def test_preflight_returns_extra_gates_with_tools(self):
+        """Preflight with tools_to_use should add tool_allowed gates."""
+        mandate = Mandate(
+            mandate_id="m-001",
+            intent="test",
+            risk_tier="R1",
+            tool_allowlist=["search_code"],
+        )
+        results = preflight_check(
+            "iam-compliance", "R1", mandate,
+            tools_to_use=["search_code", "write_file"]
+        )
+        # 4 base gates + 2 tool gates
+        assert len(results) == 6
+        tool_gates = [r for r in results if r.gate_name == "tool_allowed"]
+        assert len(tool_gates) == 2

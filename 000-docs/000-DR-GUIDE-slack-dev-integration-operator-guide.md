@@ -149,7 +149,7 @@ gh workflow run deploy-slack-gateway-dev.yml
 
 # ❌ DEPRECATED - DO NOT USE (R4 Violation)
 # Manual deployments violate Hard Mode R4 (CI-only deployments)
-# See 6767-122-DR-STND-slack-gateway-deploy-pattern.md for correct approach
+# See 000-DR-STND-slack-gateway-deploy-pattern.md for correct approach
 
 # gcloud run deploy slack-webhook \
 #   --source service/slack_webhook \

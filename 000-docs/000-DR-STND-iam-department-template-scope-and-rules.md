@@ -1,6 +1,6 @@
 # IAM Department Template - Scope and Parameterization Rules
 
-**Document ID:** 6767-DR-STND-iam-department-template-scope-and-rules-DR-STND
+**Document ID:** 000-DR-STND-iam-department-template-scope-and-rules
 **Title:** IAM Department Template Scope and Parameterization Rules
 **Phase:** T1 (Template Extraction)
 **Status:** Reference Standard
@@ -187,13 +187,13 @@ run-swe-pipeline-demo
 #### 10. Documentation Templates
 ```
 000-docs/
-├── 6767-XXX-AT-ARCH-department-architecture.md.template
-├── 6767-XXX-DR-STND-rag-config-pattern.md.template
-├── 6767-XXX-DR-STND-github-integration.md.template
-├── 6767-XXX-DR-STND-a2a-protocol.md.template
-├── 6767-XXX-DR-STND-slack-triggers.md.template
-├── 6767-XXX-DR-STND-arv-minimum.md.template
-└── 6767-XXX-AA-REPT-deployment-aar.md.template
+├── 000-AT-ARCH-department-architecture.md.template
+├── 000-DR-STND-rag-config-pattern.md.template
+├── 000-DR-STND-github-integration.md.template
+├── 000-DR-STND-a2a-protocol.md.template
+├── 000-DR-STND-slack-triggers.md.template
+├── 000-DR-STND-arv-minimum.md.template
+└── 000-AA-REPT-deployment-aar.md.template
 ```
 
 **Template-eligible:** Doc structures, section headings, pattern descriptions
@@ -448,7 +448,7 @@ Example: `1.0.0` (initial), `1.1.0` (new agents), `2.0.0` (breaking changes)
 ### C. Documentation Updates
 
 When template changes:
-1. Update `6767-DR-GUIDE-porting-iam-department-to-new-repo-DR-GUIDE-porting-iam-department-to-new-repo.md` (porting guide)
+1. Update `000-DR-GUIDE-porting-iam-department-to-new-repo.md` (porting guide)
 2. Update `templates/iam-department/README.md`
 3. Add migration notes for existing ports
 
@@ -540,6 +540,6 @@ The IAM department template is successful if:
 **Template Version:** 1.0.0
 **Maintained by:** Build Captain (claude.buildcaptain@intentsolutions.io)
 **Related Docs:**
-- 6767-DR-GUIDE-porting-iam-department-to-new-repo-DR-GUIDE-porting-iam-department-to-new-repo.md (next)
-- 6767-DR-STND-iam-department-integration-checklist-DR-STND-iam-department-integration-checklist.md
+- 000-DR-GUIDE-porting-iam-department-to-new-repo.md (next)
+- 000-DR-STND-iam-department-integration-checklist.md
 - templates/iam-department/README.md

@@ -79,13 +79,13 @@ Bob's Brain is a production-grade **ADK (Agent Development Kit) agent department
   - **LS** = Logs & Status
 
 **Key Operational Documents** (6767-series = canonical standards):
-1. `6767-DR-STND-adk-agent-engine-spec-and-hardmode-rules.md` - Architecture standard
-2. `6767-OD-RBOK-deployment-runbook.md` - Step-by-step deployment procedures
-3. `6767-OD-TELE-observability-telemetry-guide.md` - Monitoring & logging setup
-4. `6767-OD-CONF-github-secrets-configuration.md` - CI/CD authentication
-5. `6767-RB-OPS-adk-department-operations-runbook.md` - Daily operations
-6. `6767-DR-GUIDE-porting-iam-department-to-new-repo.md` - Template porting
-7. `6767-112-AT-ARCH-org-storage-architecture.md` - GCS knowledge hub design
+1. `000-DR-STND-adk-agent-engine-spec-and-hardmode-rules.md` - Architecture standard
+2. `070-OD-RBOK-deployment-runbook.md` - Step-by-step deployment procedures
+3. `069-OD-TELE-observability-telemetry-guide.md` - Monitoring & logging setup
+4. `068-OD-CONF-github-secrets-configuration.md` - CI/CD authentication
+5. `000-RB-OPS-adk-department-operations-runbook.md` - Daily operations
+6. `000-DR-GUIDE-porting-iam-department-to-new-repo.md` - Template porting
+7. `000-AT-ARCH-org-storage-architecture.md` - GCS knowledge hub design
 8. `6767-113-AA-REPT-live1-gcs-implementation.md` - Storage implementation AAR
 
 ---
@@ -1477,7 +1477,7 @@ python3 scripts/run_portfolio_swe.py --dry-run
 **Week 1 - Fundamentals:**
 - [ ] Read README.md (understand what Bob does)
 - [ ] Read CLAUDE.md (understand Hard Mode rules)
-- [ ] Review 000-docs/6767-DR-STND-adk-agent-engine-spec-and-hardmode-rules.md (architecture)
+- [ ] Review 000-docs/000-DR-STND-adk-agent-engine-spec-and-hardmode-rules.md (architecture)
 - [ ] Set up local development environment
 - [ ] Clone repo and install dependencies
 - [ ] Run `bash scripts/ci/check_nodrift.sh` (understand drift detection)
@@ -1486,15 +1486,15 @@ python3 scripts/run_portfolio_swe.py --dry-run
 **Week 2 - Deployment:**
 - [ ] Review .env.example (understand configuration)
 - [ ] Review Terraform configuration (infra/terraform/)
-- [ ] Read 000-docs/6767-OD-CONF-github-secrets-configuration.md (CI/CD auth)
+- [ ] Read 000-docs/068-OD-CONF-github-secrets-configuration.md (CI/CD auth)
 - [ ] Review CI/CD workflows (.github/workflows/)
 - [ ] Set up GCP project with required APIs enabled
 - [ ] Configure GitHub secrets for Workload Identity
 - [ ] Perform test deployment to dev environment
 
 **Week 3 - Operations:**
-- [ ] Read 000-docs/6767-OD-RBOK-deployment-runbook.md (operational procedures)
-- [ ] Read 000-docs/6767-OD-TELE-observability-telemetry-guide.md (monitoring)
+- [ ] Read 000-docs/070-OD-RBOK-deployment-runbook.md (operational procedures)
+- [ ] Read 000-docs/069-OD-TELE-observability-telemetry-guide.md (monitoring)
 - [ ] Set up Cloud Logging dashboards
 - [ ] Test health check procedures (Section 6.1)
 - [ ] Practice troubleshooting scenarios (Section 6.2)
@@ -1502,7 +1502,7 @@ python3 scripts/run_portfolio_swe.py --dry-run
 
 **Week 4 - Advanced:**
 - [ ] Review portfolio orchestration (scripts/run_portfolio_swe.py)
-- [ ] Review org storage architecture (000-docs/6767-112-AT-ARCH-org-storage-architecture.md)
+- [ ] Review org storage architecture (000-docs/000-AT-ARCH-org-storage-architecture.md)
 - [ ] Test portfolio audit runs
 - [ ] Review upgrade path (Section 8.1)
 - [ ] Practice disaster recovery procedures (Section 10.2)
@@ -1589,16 +1589,16 @@ gh run view ${RUN_ID}
 
 1. **Architecture & Standards:**
    - README.md (1,027 lines - everything start)
-   - 000-docs/6767-DR-STND-adk-agent-engine-spec-and-hardmode-rules.md (canonical spec)
+   - 000-docs/000-DR-STND-adk-agent-engine-spec-and-hardmode-rules.md (canonical spec)
    - 000-docs/6767-115-DR-STND-prompt-design-and-a2a-contracts-for-department-adk-iam.md (v0.10.0)
 
 2. **Deployment:**
-   - 000-docs/6767-OD-RBOK-deployment-runbook.md (step-by-step)
-   - 000-docs/6767-OD-CONF-github-secrets-configuration.md (CI/CD auth)
-   - 000-docs/6767-OD-TELE-observability-telemetry-guide.md (monitoring)
+   - 000-docs/070-OD-RBOK-deployment-runbook.md (step-by-step)
+   - 000-docs/068-OD-CONF-github-secrets-configuration.md (CI/CD auth)
+   - 000-docs/069-OD-TELE-observability-telemetry-guide.md (monitoring)
 
 3. **Org Storage & Portfolio:**
-   - 000-docs/6767-112-AT-ARCH-org-storage-architecture.md (GCS hub design)
+   - 000-docs/000-AT-ARCH-org-storage-architecture.md (GCS hub design)
    - 000-docs/6767-113-AA-REPT-live1-gcs-implementation.md (LIVE1 v0.9.0)
    - 000-docs/6767-110-AA-REPT-portfolio-orchestrator-implementation.md (PORT1-3)
 
@@ -1619,7 +1619,7 @@ gh run view ${RUN_ID}
 - **Agent Development:** See agents/bob/README.md or agent.py source
 - **CI/CD Workflows:** Review .github/workflows/ci.yml source
 - **Troubleshooting:** Section 6.2 of this document
-- **Operational Procedures:** 000-docs/6767-RB-OPS-adk-department-operations-runbook.md
+- **Operational Procedures:** 000-docs/000-RB-OPS-adk-department-operations-runbook.md
 
 **GitHub Issues:**
 - File issues at: https://github.com/jeremylongshore/bobs-brain/issues

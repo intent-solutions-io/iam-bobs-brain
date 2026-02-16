@@ -386,7 +386,7 @@ These rules are **enforced in CI** and violations will fail the build:
 
 ## ADK/Agent Engine Specification Compliance
 
-**Canonical Specification:** `000-docs/6767-DR-STND-adk-agent-engine-spec-and-hardmode-rules.md`
+**Canonical Specification:** `000-docs/000-DR-STND-adk-agent-engine-spec-and-hardmode-rules.md`
 
 This repository follows the 6767 ADK/Agent Engine Specification as its guiding architectural standard. All agent development, infrastructure changes, and CI/CD workflows must align with this spec.
 
@@ -395,7 +395,7 @@ This repository follows the 6767 ADK/Agent Engine Specification as its guiding a
 When adding new agents or services to this repository:
 
 1. **Ensure compliance with the spec:**
-   - Read `000-docs/6767-DR-STND-adk-agent-engine-spec-and-hardmode-rules.md` for current rules
+   - Read `000-docs/000-DR-STND-adk-agent-engine-spec-and-hardmode-rules.md` for current rules
    - Follow R1-R8 Hard Mode rules strictly
    - Implement department conventions (feature flags, safety defaults, etc.)
 

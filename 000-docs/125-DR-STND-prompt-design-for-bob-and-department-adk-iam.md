@@ -765,7 +765,7 @@ Before finalizing an agent's system prompt, verify:
 
 - **123-DR-STND-a2a-inspector-usage-and-local-setup.md** - A2A testing tool
 - **124-DR-STND-a2a-quality-gate-for-department-adk-iam.md** - Quality gate standard
-- **6767-DR-STND-adk-agent-engine-spec-and-hardmode-rules.md** - Hard Mode rules (R1-R8)
+- **000-DR-STND-adk-agent-engine-spec-and-hardmode-rules.md** - Hard Mode rules (R1-R8)
 - **121-DR-MAP-adk-spec-to-implementation-and-arv.md** - Implementation mapping
 
 ---

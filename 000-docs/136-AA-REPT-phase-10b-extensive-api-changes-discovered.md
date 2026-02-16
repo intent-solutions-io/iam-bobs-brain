@@ -502,6 +502,6 @@ This goes beyond "minimal import fixes" into architectural changes. I need expli
 **Related Docs:**
 - `000-docs/135-AA-REPT-phase-10-unblocked-new-import-error-discovered.md` (Previous blocker)
 - `000-docs/134-AA-REPT-phase-10-pr-merge-release-blocked-on-test-env.md` (Original blocker)
-- `000-docs/6767-LAZY-DR-STND-adk-lazy-loading-app-pattern.md` (Lazy-loading pattern)
+- `000-docs/000-DR-STND-adk-lazy-loading-app-pattern.md` (Lazy-loading pattern)
 - `000-docs/127-DR-STND-agent-engine-entrypoints.md` (Entrypoint specification)
-- `000-docs/6767-DR-STND-adk-agent-engine-spec-and-hardmode-rules.md` (R5 dual memory rule)
+- `000-docs/000-DR-STND-adk-agent-engine-spec-and-hardmode-rules.md` (R5 dual memory rule)

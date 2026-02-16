@@ -438,7 +438,7 @@ Currently: Star topology (foreman → iam-*)
 ## Related Documents
 
 - **102-AT-ARCH-cloud-run-gateways-and-agent-engine-routing.md** - Gateway design (Phase AE2)
-- **6767-DR-STND-live-rag-and-agent-engine-rollout-plan-DR-STND-live-rag-and-agent-engine-rollout-plan.md** - Rollout plan (Phase AE3)
+- **000-DR-STND-live-rag-and-agent-engine-rollout-plan.md** - Rollout plan (Phase AE3)
 - **config/agent_engine.yaml** - Reasoning engine ID configuration
 - **agents/config/features.py** - Feature flags for gradual rollout
 

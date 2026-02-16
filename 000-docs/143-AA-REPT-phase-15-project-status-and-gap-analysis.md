@@ -118,7 +118,7 @@ You have successfully built a **production-ready ADK agent department** followin
 - ✅ Plain functions work as tools (ADK accepts callables)
 
 **What's Missing:**
-- ⚠️ **No Cloud Run tools implemented** – 6767-DR-STND-adk-cloud-run-tools-pattern.md exists but no implementations
+- ⚠️ **No Cloud Run tools implemented** – 000-DR-STND-adk-cloud-run-tools-pattern.md exists but no implementations
 - ⚠️ **Circular import warnings remain** – Non-blocking but noisy in logs
 - ⚠️ **Tool testing incomplete** – No tests for actual Vertex Search queries
 - ⚠️ **No MCP / A2A toolsets** – Future pattern, not implemented
@@ -181,7 +181,7 @@ You have successfully built a **production-ready ADK agent department** followin
 **Current State:**
 - **Bob**: ✅ Has `agents/bob/a2a_card.py` with Pydantic models, 3 skills, R7 SPIFFE ID
 - **IAM Agents**: ❌ Missing `.well-known/agent-card.json` (all 9 agents)
-- **A2A Protocol**: 📄 Standard defined in `6767-DR-STND-agentcards-and-a2a-contracts.md`
+- **A2A Protocol**: 📄 Standard defined in `000-DR-STND-agentcards-and-a2a-contracts.md`
 - **Foreman/Worker**: 🔧 Architecture designed, not implemented
 
 **What's Working:**
@@ -238,11 +238,11 @@ You have successfully built a **production-ready ADK agent department** followin
 **Current State:**
 - **Document filing**: All docs in `000-docs/` per R6
 - **6767-series standards**: 7+ canonical standards defined
-  - 6767-DR-STND-adk-agent-engine-spec-and-hardmode-rules.md (R1-R8)
-  - 6767-LAZY-DR-STND-adk-lazy-loading-app-pattern.md
-  - 6767-DR-STND-agentcards-and-a2a-contracts.md
-  - 6767-DR-STND-adk-cloud-run-tools-pattern.md
-  - 6767-DR-STND-document-filing-system-standard-v3.md
+  - 000-DR-STND-adk-agent-engine-spec-and-hardmode-rules.md (R1-R8)
+  - 000-DR-STND-adk-lazy-loading-app-pattern.md
+  - 000-DR-STND-agentcards-and-a2a-contracts.md
+  - 000-DR-STND-adk-cloud-run-tools-pattern.md
+  - 000-DR-STND-document-filing-system-standard-v4.md
   - (others)
 - **Phase AARs**: 3 comprehensive AARs (Phase 12, 13, 14)
 - **PLAN docs**: Clear planning docs for each phase
@@ -470,7 +470,7 @@ Use your iam.check_adk_compliance skill (see AgentCard for schema).
 ### Low-Priority Gaps (Future Enhancements)
 
 #### 9. **Cloud Run Tools Standard Unused** 🟢 LOW
-- Good standard doc exists (`6767-DR-STND-adk-cloud-run-tools-pattern.md`)
+- Good standard doc exists (`000-DR-STND-adk-cloud-run-tools-pattern.md`)
 - Zero implementations
 - All tools currently local Python functions
 - Future work when heavy tools needed

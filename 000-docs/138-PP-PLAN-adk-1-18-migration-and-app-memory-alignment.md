@@ -886,10 +886,10 @@ make check-inline-deploy-ready
 - `000-docs/137-AA-REPT-phase-11-pre-upgrade-stabilization-blocked.md` - No compatible version found
 
 **Standards**:
-- `000-docs/6767-DR-STND-adk-agent-engine-spec-and-hardmode-rules.md` - R1-R8 Hard Mode rules
-- `000-docs/6767-LAZY-DR-STND-adk-lazy-loading-app-pattern.md` - Lazy loading pattern
+- `000-docs/000-DR-STND-adk-agent-engine-spec-and-hardmode-rules.md` - R1-R8 Hard Mode rules
+- `000-docs/000-DR-STND-adk-lazy-loading-app-pattern.md` - Lazy loading pattern
 - `000-docs/127-DR-STND-agent-engine-entrypoints.md` - Agent Engine entrypoints
-- `000-docs/6767-DR-STND-document-filing-system-standard-v3.md` - Filing system
+- `000-docs/000-DR-STND-document-filing-system-standard-v4.md` - Filing system
 
 ---
 

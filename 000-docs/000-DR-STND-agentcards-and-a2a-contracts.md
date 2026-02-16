@@ -1,6 +1,6 @@
 # AgentCards and A2A Contracts Standard
 
-**Document Type:** Canonical Standard (6767-DR-STND)
+**Document Type:** Canonical Standard (DR-STND)
 **Status:** Active
 **Applies To:** All ADK departments, starting with department adk iam
 **Last Updated:** 2025-11-20
@@ -498,9 +498,9 @@ make check-a2a-contracts
 
 ## VIII. Integration with Existing Standards
 
-### Relationship to 6767 Prompt Design Standard
+### Relationship to Prompt Design Standard
 
-**6767-DR-STND-prompt-design-and-agentcard-standard.md** defines:
+**000-DR-STND-prompt-design-and-agentcard-standard.md** defines:
 - How prompts should be structured (role-focused, not schema-focused)
 - Where content belongs (system vs Memory Bank vs RAG vs task)
 
@@ -517,7 +517,7 @@ make check-a2a-contracts
 
 ### Relationship to Hard Mode Rules
 
-**6767-DR-STND-adk-agent-engine-spec-and-hardmode-rules.md:**
+**000-DR-STND-adk-agent-engine-spec-and-hardmode-rules.md:**
 - R1: ADK-only implementation
 - R2: Vertex AI Agent Engine runtime
 - R7: SPIFFE ID propagation
@@ -819,11 +819,11 @@ make check-a2a-contracts
 - Vertex AI Agent Engine: https://cloud.google.com/vertex-ai/docs/agent-engine
 - Agent Engine Inline Deployment Discussion: https://discuss.google.dev/t/deploying-agents-with-inline-source-on-vertex-ai-agent-engine/288935
 
-**Related Internal Standards (6767 Canonical Docs):**
-- `6767-DR-STND-adk-agent-engine-spec-and-hardmode-rules.md` - ADK/Agent Engine specification
-- `6767-INLINE-DR-STND-inline-source-deployment-for-vertex-agent-engine.md` - Inline source deployment
-- `6767-115-DR-STND-prompt-design-and-a2a-contracts-for-department-adk-iam.md` - Prompt design with A2A contracts
-- `6767-A2AINSP-AA-REPT-a2a-inspector-integration-for-department-adk-iam.md` - a2a-inspector integration
+**Related Internal Standards (Canonical Docs):**
+- `000-DR-STND-adk-agent-engine-spec-and-hardmode-rules.md` - ADK/Agent Engine specification
+- `000-DR-STND-inline-source-deployment-for-vertex-agent-engine.md` - Inline source deployment
+- `000-DR-STND-prompt-design-a2a-contracts-iam-dept.md` - Prompt design with A2A contracts
+- `000-AA-REPT-a2a-inspector-integration-for-department-adk-iam.md` - a2a-inspector integration
 
 ---
 

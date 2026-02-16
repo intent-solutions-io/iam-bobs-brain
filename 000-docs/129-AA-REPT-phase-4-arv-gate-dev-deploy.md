@@ -205,7 +205,7 @@ $ GCP_PROJECT_ID=test-project-placeholder GCP_LOCATION=us-central1 \
 
 ### ✅ STEP 5: Update 6767-INLINE Standard Doc
 
-**Required**: Add Phase 4 section to `000-docs/6767-INLINE-DR-STND-inline-source-deployment-for-vertex-agent-engine.md`
+**Required**: Add Phase 4 section to `000-docs/000-DR-STND-inline-source-deployment-for-vertex-agent-engine.md`
 
 **Actual**: ✅ **Complete** - Comprehensive Phase 4 section added
 
@@ -485,12 +485,12 @@ Phase 4 establishes the foundation for safe deployment. Future phases will build
 **Updated Files**:
 - `Makefile` - ARV integration
 - `.github/workflows/agent-engine-inline-dryrun.yml` - ARV gate
-- `000-docs/6767-INLINE-DR-STND-inline-source-deployment-for-vertex-agent-engine.md` - Phase 4 section
+- `000-docs/000-DR-STND-inline-source-deployment-for-vertex-agent-engine.md` - Phase 4 section
 
 **External References**:
 - Tutorial: `000-docs/001-usermanual/tutorial_get_started_with_agent_engine_terraform_deployment.ipynb`
 - Discussion: https://discuss.google.dev/t/deploying-agents-with-inline-source-on-vertex-ai-agent-engine/288935
-- Standard: `000-docs/6767-INLINE-DR-STND-inline-source-deployment-for-vertex-agent-engine.md`
+- Standard: `000-docs/000-DR-STND-inline-source-deployment-for-vertex-agent-engine.md`
 
 **Related Commits**:
 - `e4ce5ee7` - ARV check script

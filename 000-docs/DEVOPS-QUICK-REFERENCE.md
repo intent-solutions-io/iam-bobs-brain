@@ -38,7 +38,7 @@ bash scripts/ci/check_nodrift.sh  # MUST PASS
 gsutil mb gs://${PROJECT_ID}-tf-state
 
 # 5. GitHub Secrets (Workload Identity)
-# Instructions: 000-docs/6767-OD-CONF-github-secrets-configuration.md
+# Instructions: 000-docs/068-OD-CONF-github-secrets-configuration.md
 # Need: WIF_PROVIDER, WIF_SERVICE_ACCOUNT
 
 # 6. Deploy Infrastructure
@@ -442,7 +442,7 @@ gh workflow run deploy-dev.yml --ref main
 | Slack integration down | Check secrets, webhook URL, Slack app settings |
 | Performance degradation | Check metrics, check logs, scale if needed |
 | Cost spike | Review Cloud Billing, check for runaway resources |
-| Unsure about anything | Read README.md or 000-docs/6767-* files |
+| Unsure about anything | Read README.md or 000-docs/000-* files |
 
 ---
 
@@ -484,8 +484,8 @@ gh workflow run deploy-dev.yml --ref main
 **Architecture:** CLAUDE.md (209 lines)
 **Full Analysis:** `claudes-docs/DEVOPS-ONBOARDING-ANALYSIS.md`
 **This Card:** `claudes-docs/DEVOPS-QUICK-REFERENCE.md`
-**Standards:** `000-docs/6767-DR-STND-*.md`
-**Runbooks:** `000-docs/6767-OD-RBOK-*.md` & `000-docs/6767-RB-OPS-*.md`
+**Standards:** `000-docs/000-DR-STND-*.md`
+**Runbooks:** `000-docs/*-OD-RBOK-*.md` & `000-docs/*-RB-OPS-*.md`
 **Configuration:** `.env.example` & `infra/terraform/`
 
 ---
@@ -494,8 +494,8 @@ gh workflow run deploy-dev.yml --ref main
 
 **For Questions About:**
 - Architecture & rules → README.md & CLAUDE.md
-- Deployment → 000-docs/6767-OD-RBOK-deployment-runbook.md
-- Monitoring → 000-docs/6767-OD-TELE-observability-telemetry-guide.md
+- Deployment → 000-docs/070-OD-RBOK-deployment-runbook.md
+- Monitoring → 000-docs/069-OD-TELE-observability-telemetry-guide.md
 - Troubleshooting → This card or full analysis document
 - Code issues → GitHub Issues
 - Urgent problems → Review logs first, then escalate

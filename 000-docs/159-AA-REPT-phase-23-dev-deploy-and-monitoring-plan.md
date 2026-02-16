@@ -441,10 +441,10 @@ python scripts/smoke_test_bob_agent_engine_dev.py
 - `000-docs/156-AA-REPT-phase-22-foreman-deploy-and-production-monitoring.md` - Foreman skills
 - `000-docs/157-AA-REPT-phase-22-completion-and-repository-consolidation.md` - v0.11.0 baseline
 
-**6767 Canonical Standards:**
-- `000-docs/6767-INLINE-DR-STND-inline-source-deployment-for-vertex-agent-engine.md` - Deployment pattern
-- `000-docs/6767-LAZY-DR-STND-adk-lazy-loading-app-pattern.md` - Agent initialization
-- `000-docs/6767-DR-STND-adk-agent-engine-spec-and-hardmode-rules.md` - Hard Mode R1-R8
+**Canonical Standards (000 prefix):**
+- `000-docs/000-DR-STND-inline-source-deployment-for-vertex-agent-engine.md` - Deployment pattern
+- `000-docs/000-DR-STND-adk-lazy-loading-app-pattern.md` - Agent initialization
+- `000-docs/000-DR-STND-adk-agent-engine-spec-and-hardmode-rules.md` - Hard Mode R1-R8
 
 **Deployment Scripts:**
 - `scripts/deploy_inline_source.py` - Main deployment script (updated)

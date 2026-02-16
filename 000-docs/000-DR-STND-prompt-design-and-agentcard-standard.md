@@ -543,7 +543,7 @@ When creating a new agent in department adk iam (or any ADK department):
 
 ### Relationship to Other 6767 Docs
 
-- **6767-DR-STND-adk-agent-engine-spec-and-hardmode-rules.md**
+- **000-DR-STND-adk-agent-engine-spec-and-hardmode-rules.md**
   Hard Mode rules (R1-R8) define infrastructure constraints.
   This doc defines how prompts should reference but not duplicate those rules.
 

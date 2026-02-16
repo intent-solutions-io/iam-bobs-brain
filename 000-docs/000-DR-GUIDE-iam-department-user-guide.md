@@ -1,6 +1,6 @@
 # How to Use Bob and the IAM Department for Software Engineering
 
-**Document ID:** 6767-DR-GUIDE-iam-department-user-guide-DR-GUIDE
+**Document ID:** 000-DR-GUIDE-iam-department-user-guide
 **Title:** User Guide for Bob and IAM Department Multi-Agent SWE System
 **Phase:** T3 (Operations & Day-to-Day Use)
 **Status:** User Guide
@@ -968,9 +968,9 @@ python scripts/run_portfolio_swe.py \
 
 ### Documentation
 
-- **Template Guide:** `000-docs/6767-DR-GUIDE-porting-iam-department-to-new-repo-DR-GUIDE-porting-iam-department-to-new-repo.md`
-- **Ops Runbook:** `000-docs/6767-RB-OPS-adk-department-operations-runbook-RB-OPS-adk-department-operations-runbook.md`
-- **Integration Checklist:** `000-docs/6767-DR-STND-iam-department-integration-checklist-DR-STND-iam-department-integration-checklist.md`
+- **Template Guide:** `000-docs/000-DR-GUIDE-porting-iam-department-to-new-repo.md`
+- **Ops Runbook:** `000-docs/000-RB-OPS-adk-department-operations-runbook.md`
+- **Integration Checklist:** `000-docs/000-DR-STND-iam-department-integration-checklist.md`
 
 ### Support Channels
 
@@ -1092,7 +1092,7 @@ A: PRs welcome! Follow the contribution guide in CLAUDE.md.
 **Feedback:** #iam-department Slack channel
 
 **Related Docs:**
-- 6767-DR-STND-iam-department-template-scope-and-rules-DR-STND-iam-department-template-scope-and-rules.md (template scope)
-- 6767-DR-GUIDE-porting-iam-department-to-new-repo-DR-GUIDE-porting-iam-department-to-new-repo.md (porting guide)
-- 6767-DR-STND-iam-department-integration-checklist-DR-STND-iam-department-integration-checklist.md (integration checklist)
-- 6767-RB-OPS-adk-department-operations-runbook-RB-OPS-adk-department-operations-runbook.md (operations runbook)
+- 000-DR-STND-iam-department-template-scope-and-rules.md (template scope)
+- 000-DR-GUIDE-porting-iam-department-to-new-repo.md (porting guide)
+- 000-DR-STND-iam-department-integration-checklist.md (integration checklist)
+- 000-RB-OPS-adk-department-operations-runbook.md (operations runbook)

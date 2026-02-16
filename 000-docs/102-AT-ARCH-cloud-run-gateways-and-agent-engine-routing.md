@@ -510,7 +510,7 @@ Feature flags (from `agents/config/features.py`) control when real Agent Engine 
 - `ENGINE_MODE_FOREMAN_TO_IAM_ISSUE`: Enable foreman → iam-issue via Engine
 - `SLACK_SWE_PIPELINE_MODE_ENABLED`: Enable Option B routing
 
-See Phase AE3 rollout plan (6767-DR-STND-live-rag-and-agent-engine-rollout-plan) for feature flag strategy.
+See Phase AE3 rollout plan (000-DR-STND-live-rag-and-agent-engine-rollout-plan) for feature flag strategy.
 
 ---
 
@@ -540,7 +540,7 @@ See Phase AE3 rollout plan (6767-DR-STND-live-rag-and-agent-engine-rollout-plan)
 - ⏳ Enable Option B routing in slack_webhook behind flag
 - ⏳ Add ARV check for engine flags (`check_arv_engine_flags.py`)
 - ⏳ Gradual rollout per environment (dev → staging → prod)
-- ⏳ Create rollout plan doc (6767-DR-STND-live-rag-and-agent-engine-rollout-plan)
+- ⏳ Create rollout plan doc (000-DR-STND-live-rag-and-agent-engine-rollout-plan)
 
 ---
 
@@ -757,7 +757,7 @@ For production updates:
 ## Related Documents
 
 - **101-AT-ARCH-agent-engine-topology-and-envs.md** - Agent Engine deployment topology (Phase AE1)
-- **6767-DR-STND-live-rag-and-agent-engine-rollout-plan-DR-STND-live-rag-and-agent-engine-rollout-plan.md** - Rollout plan with feature flags (Phase AE3)
+- **000-DR-STND-live-rag-and-agent-engine-rollout-plan.md** - Rollout plan with feature flags (Phase AE3)
 - **agents/config/agent_engine.py** - Agent Engine ID configuration
 - **agents/utils/a2a_adapter.py** - A2A adapter for Agent Engine calls
 - **service/a2a_gateway/main.py** - A2A gateway implementation
@@ -774,4 +774,4 @@ For production updates:
 ---
 
 **Status:** Design (Phase AE2 - Stubbed Implementation)
-**Next Steps:** Create Phase AE3 rollout plan (6767-DR-STND-live-rag-and-agent-engine-rollout-plan) and feature flags module
+**Next Steps:** Create Phase AE3 rollout plan (000-DR-STND-live-rag-and-agent-engine-rollout-plan) and feature flags module

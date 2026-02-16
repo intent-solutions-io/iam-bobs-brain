@@ -8,8 +8,8 @@
 **Related Docs:**
 - Phase 13 AAR: `141-AA-REPT-phase-13-tools-validation-and-refactor.md`
 - Phase 12 AAR: `139-AA-REPT-phase-12-google-adk-1-18-migration-app-pattern.md`
-- 6767-LAZY Standard: `6767-LAZY-DR-STND-adk-lazy-loading-app-pattern.md`
-- AgentCard Standard: `6767-DR-STND-agentcards-and-a2a-contracts.md`
+- 6767-LAZY Standard: `000-DR-STND-adk-lazy-loading-app-pattern.md`
+- AgentCard Standard: `000-DR-STND-agentcards-and-a2a-contracts.md`
 
 ---
 
@@ -56,7 +56,7 @@
 **File Created:** `agents/bob/a2a_card.py`
 
 **What it does:**
-- Provides A2A AgentCard for Bob following 6767-DR-STND-agentcards-and-a2a-contracts.md
+- Provides A2A AgentCard for Bob following 000-DR-STND-agentcards-and-a2a-contracts.md
 - Uses Pydantic BaseModel for type safety
 - Implements two functions:
   - `get_agent_card()` - Returns AgentCard object
@@ -220,7 +220,7 @@ def test_create_agent_without_project_id(self):
 
 **Complexity:** Had to balance:
 - Test requirements (required fields, structure)
-- 6767-DR-STND-agentcards-and-a2a-contracts.md standard
+- 000-DR-STND-agentcards-and-a2a-contracts.md standard
 - Bob's actual current capabilities (no fantasy features)
 - R7 SPIFFE ID requirement
 
@@ -397,7 +397,7 @@ assert app.name == 'bobs-brain'
    - Gained confidence in solution
 
 3. **Documentation Drives Implementation**
-   - 6767-DR-STND-agentcards-and-a2a-contracts.md defined requirements
+   - 000-DR-STND-agentcards-and-a2a-contracts.md defined requirements
    - Tests specified exact structure needed
    - Standards provided patterns to follow
    - No guesswork required
@@ -463,7 +463,7 @@ git commit -m "feat(agents): add minimal AgentCard for bob to satisfy A2A tests
 Fixes 6 test failures in tests/unit/test_a2a_card.py
 
 Phase 14 - Test Maintenance & A2A Card Implementation
-Aligns with: 6767-DR-STND-agentcards-and-a2a-contracts.md
+Aligns with: 000-DR-STND-agentcards-and-a2a-contracts.md
 
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
 
@@ -492,7 +492,7 @@ Tests now verify lazy loading works correctly:
 Fixes 6 test failures in tests/unit/test_iam_adk_lazy_loading.py
 
 Phase 14 - Test Maintenance & A2A Card Implementation
-Completes alignment with: 6767-LAZY-DR-STND-adk-lazy-loading-app-pattern.md
+Completes alignment with: 000-DR-STND-adk-lazy-loading-app-pattern.md
 
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
 
@@ -598,7 +598,7 @@ Co-Authored-By: Claude <noreply@anthropic.com>"
    - Verify SPIFFE ID propagation
 
 3. **Phase 17 (Cloud Run Tools - Optional):**
-   - Implement first Cloud Run-backed tool per 6767-DR-STND-adk-cloud-run-tools-pattern.md
+   - Implement first Cloud Run-backed tool per 000-DR-STND-adk-cloud-run-tools-pattern.md
    - Wire FunctionTool wrappers
    - Add integration tests
 

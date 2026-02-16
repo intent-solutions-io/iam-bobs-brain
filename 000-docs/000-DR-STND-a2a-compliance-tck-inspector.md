@@ -239,10 +239,10 @@ Agents may optionally support:
 ## VII. Integration with Existing Standards
 
 **Related 6767 Standards:**
-- **6767-DR-STND-adk-agent-engine-spec-and-hardmode-rules.md** - ADK/Agent Engine spec (R1-R8 rules)
-- **6767-DR-STND-agentcards-and-a2a-contracts.md** - AgentCard and A2A contracts standard
-- **6767-115-DR-STND-prompt-design-and-a2a-contracts-for-department-adk-iam.md** - Prompt design with A2A
-- **6767-INLINE-DR-STND-inline-source-deployment-for-vertex-agent-engine.md** - Inline deployment (includes A2A endpoints)
+- **000-DR-STND-adk-agent-engine-spec-and-hardmode-rules.md** - ADK/Agent Engine spec (R1-R8 rules)
+- **000-DR-STND-agentcards-and-a2a-contracts.md** - AgentCard and A2A contracts standard
+- **000-DR-STND-prompt-design-a2a-contracts-iam-dept.md** - Prompt design with A2A
+- **000-DR-STND-inline-source-deployment-for-vertex-agent-engine.md** - Inline deployment (includes A2A endpoints)
 
 **Workflow Integration:**
 - AgentCard JSON files validated by unit tests (`tests/unit/test_agentcard_json.py`)
@@ -305,10 +305,10 @@ Agents may optionally support:
 ### Internal bobs-brain Documentation
 
 **Related Standards:**
-- `000-docs/6767-120-DR-STND-agent-engine-a2a-and-inline-deploy-index.md` - Master index
-- `000-docs/6767-DR-STND-adk-agent-engine-spec-and-hardmode-rules.md` - ADK spec (R1-R8)
-- `000-docs/6767-DR-STND-agentcards-and-a2a-contracts.md` - AgentCard contracts
-- `000-docs/6767-INLINE-DR-STND-inline-source-deployment-for-vertex-agent-engine.md` - Inline deployment
+- `000-docs/000-DR-INDEX-agent-engine-a2a-inline-deploy.md` - Master index
+- `000-docs/000-DR-STND-adk-agent-engine-spec-and-hardmode-rules.md` - ADK spec (R1-R8)
+- `000-docs/000-DR-STND-agentcards-and-a2a-contracts.md` - AgentCard contracts
+- `000-docs/000-DR-STND-inline-source-deployment-for-vertex-agent-engine.md` - Inline deployment
 
 **Local Helper Scripts:**
 - `scripts/run_a2a_inspector_local.md` - a2a-inspector usage guide

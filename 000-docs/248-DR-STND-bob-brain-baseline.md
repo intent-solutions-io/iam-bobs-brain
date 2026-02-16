@@ -344,8 +344,8 @@ daemon.pid        # Background sync
 
 ### Architecture
 - `CLAUDE.md` - Working guidance (this repo)
-- `000-docs/6767-DR-STND-adk-agent-engine-spec-and-hardmode-rules.md` - Hard Mode spec
-- `000-docs/6767-LAZY-DR-STND-adk-lazy-loading-app-pattern.md` - Lazy loading pattern
+- `000-docs/000-DR-STND-adk-agent-engine-spec-and-hardmode-rules.md` - Hard Mode spec
+- `000-docs/000-DR-STND-adk-lazy-loading-app-pattern.md` - Lazy loading pattern
 
 ### Agents
 - `agents/bob/agent.py` - Conversational UI agent

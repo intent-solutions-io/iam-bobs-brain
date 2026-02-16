@@ -307,13 +307,13 @@ This is a **preview dev release** showcasing Bob's Brain's Agent Engine deployme
 
 **For Operators:**
 1. Review [DevOps Playbook](000-docs/120-AA-AUDT-appaudit-devops-playbook.md)
-2. Understand [Inline Deployment Standard](000-docs/6767-INLINE-DR-STND-inline-source-deployment-for-vertex-agent-engine.md)
+2. Understand [Inline Deployment Standard](000-docs/000-DR-STND-inline-source-deployment-for-vertex-agent-engine.md)
 3. Prepare for Phase 6 dev deployment when GCP access is available
 
 **For Template Adopters:**
-1. Follow [Porting Guide](000-docs/6767-DR-GUIDE-porting-iam-department-to-new-repo.md)
-2. Use [Integration Checklist](000-docs/6767-DR-STND-iam-department-integration-checklist.md)
-3. Customize per [Template Standards](000-docs/6767-DR-STND-iam-department-template-scope-and-rules.md)
+1. Follow [Porting Guide](000-docs/000-DR-GUIDE-porting-iam-department-to-new-repo.md)
+2. Use [Integration Checklist](000-docs/000-DR-STND-iam-department-integration-checklist.md)
+3. Customize per [Template Standards](000-docs/000-DR-STND-iam-department-template-scope-and-rules.md)
 
 ## 📖 Full Changelog
 

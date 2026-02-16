@@ -6,8 +6,8 @@
 **Related Documents**:
 - PLAN: `138-PP-PLAN-adk-1-18-migration-and-app-memory-alignment.md`
 - Prior AAR: `137-AA-REPT-phase-11-pre-upgrade-stabilization-blocked.md`
-- Hard Mode Spec: `6767-DR-STND-adk-agent-engine-spec-and-hardmode-rules.md`
-- Lazy Loading Standard: `6767-LAZY-DR-STND-adk-lazy-loading-app-pattern.md`
+- Hard Mode Spec: `000-DR-STND-adk-agent-engine-spec-and-hardmode-rules.md`
+- Lazy Loading Standard: `000-DR-STND-adk-lazy-loading-app-pattern.md`
 
 ---
 
