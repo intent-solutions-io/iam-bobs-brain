@@ -229,7 +229,9 @@ def check_agent_entrypoint(agent_name: str) -> Tuple[bool, List[str]]:
     except ImportError as e:
         # This is OK for CI without full dependencies
         print(f"   ⚠️  Import check skipped: {e}")
-        print("   ℹ️  Module file exists, but cannot be imported (missing dependencies)")
+        print(
+            "   ℹ️  Module file exists, but cannot be imported (missing dependencies)"
+        )
         print("   ℹ️  This is OK for ARV validation without full runtime")
 
     return len(errors) == 0, errors

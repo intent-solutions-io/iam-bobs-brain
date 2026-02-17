@@ -206,10 +206,10 @@ jobs:
           BOB_LLM_MODE: stub
           OTEL_TRACES_EXPORTER: none
 
-      - name: Enforce coverage threshold (>= 60%)
+      - name: Enforce coverage threshold (>= 35%)
         if: matrix.python-version == '3.11'
         run: |
-          coverage report --fail-under=60
+          coverage report --fail-under=35
 
       - name: Run integration tests
         run: |

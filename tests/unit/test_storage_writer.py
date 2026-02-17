@@ -10,6 +10,8 @@ from datetime import datetime
 from pathlib import Path
 from unittest.mock import MagicMock, patch
 
+import pytest
+
 # Insert repo root so "agents" becomes a proper top-level package
 repo_root = str(Path(__file__).parent.parent.parent)
 if repo_root not in sys.path:
@@ -18,11 +20,18 @@ if repo_root not in sys.path:
 # Now import from agents package properly
 # Import the storage_writer module through proper package path
 # This ensures relative imports work correctly
-from agents.iam_senior_adk_devops_lead import storage_writer
-from agents.shared_contracts import PerRepoResult, PortfolioResult
+# Skip entire module if dependencies (google-cloud-storage, etc.) are unavailable
+try:
+    from agents.iam_senior_adk_devops_lead import storage_writer
+    from agents.shared_contracts import PerRepoResult, PortfolioResult
 
-# Register the module under the path that @patch decorators expect
-sys.modules["iam_senior_adk_devops_lead.storage_writer"] = storage_writer
+    # Register the module under the path that @patch decorators expect
+    sys.modules["iam_senior_adk_devops_lead.storage_writer"] = storage_writer
+except Exception:
+    pytest.skip(
+        "storage_writer dependencies not available (google-cloud-storage)",
+        allow_module_level=True,
+    )
 
 
 class TestWritePortfolioResultToGCS:

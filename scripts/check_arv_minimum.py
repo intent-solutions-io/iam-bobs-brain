@@ -145,7 +145,9 @@ class ARVMinimumChecker:
             self.warnings.append(
                 "No iam-* agent directories found yet (expected for early phases)"
             )
-            self.log("⚠️  No iam-* agents found (expected if agents not yet scaffolded)")
+            self.log(
+                "⚠️  No iam-* agents found (expected if agents not yet scaffolded)"
+            )
             return True  # Not a failure if we haven't created agents yet
 
         self.log(

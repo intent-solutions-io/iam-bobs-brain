@@ -139,7 +139,9 @@ def get_github_mode(repo_id: Optional[str] = None) -> GitHubMode:
 
         # Prod enabled - check DRY_RUN flag
         if dry_run:
-            logger.warning("⚠️  GitHub mode: DRY_RUN (PRODUCTION enabled, DRY_RUN=true)")
+            logger.warning(
+                "⚠️  GitHub mode: DRY_RUN (PRODUCTION enabled, DRY_RUN=true)"
+            )
             return GitHubMode.DRY_RUN
         else:
             # Check token for real creation

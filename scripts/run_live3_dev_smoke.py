@@ -340,7 +340,9 @@ def create_github_issues(
             result.success = True
             result.details = f"Would create {issue_count} issues (not implemented yet)"
             if verbose:
-                print(f"   ⚠️  Issue creation not implemented yet: {issue_count} issues")
+                print(
+                    f"   ⚠️  Issue creation not implemented yet: {issue_count} issues"
+                )
 
     except Exception as e:
         result.success = False
