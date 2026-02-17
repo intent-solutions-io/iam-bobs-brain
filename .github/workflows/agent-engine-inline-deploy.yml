@@ -5,7 +5,7 @@ name: Agent Engine Inline Source Deployment
 # References:
 # - Discussion: https://discuss.google.dev/t/deploying-agents-with-inline-source-on-vertex-ai-agent-engine/288935
 # - Tutorial: agents/agent_engine/tutorial_deploy_your_first_adk_agent_on_agent_engine.ipynb
-# - Standard: 000-docs/6775-DR-STND-inline-source-deployment-for-vertex-agent-engine.md
+# - Standard: 000-docs/000-DR-STND-inline-source-deployment-for-vertex-agent-engine.md
 
 on:
   workflow_dispatch:
@@ -56,12 +56,30 @@ jobs:
     env:
       AGENT_NAME: ${{ inputs.agent_name || 'bob' }}
       ENV: ${{ inputs.environment || 'dev' }}
-      PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
       LOCATION: us-central1
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+
+      - name: Resolve per-environment PROJECT_ID
+        run: |
+          echo "Resolving PROJECT_ID for environment: $ENV"
+          if [ -z "$PROJECT_ID_VALUE" ]; then
+            echo "::error::PROJECT_ID secret is not set for environment '$ENV'."
+            echo "Configure one of: GCP_PROJECT_ID_DEV, GCP_PROJECT_ID_STAGING, GCP_PROJECT_ID_PROD, or GCP_PROJECT_ID"
+            exit 1
+          fi
+          echo "PROJECT_ID=$PROJECT_ID_VALUE" >> "$GITHUB_ENV"
+        env:
+          PROJECT_ID_VALUE: >-
+            ${{
+              (inputs.environment == 'prod' && secrets.GCP_PROJECT_ID_PROD) ||
+              (inputs.environment == 'staging' && secrets.GCP_PROJECT_ID_STAGING) ||
+              secrets.GCP_PROJECT_ID_DEV ||
+              secrets.GCP_PROJECT_ID ||
+              ''
+            }}
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -77,23 +95,29 @@ jobs:
 
       - name: Run linting checks
         run: |
-          echo "🔍 Running lint checks..."
-          python3 -m flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics || true
+          echo "Running lint checks..."
+          ruff check agents/ service/ scripts/ tests/ \
+            --select=E9,F63,F7,F82
 
       - name: Run tests
         run: |
-          echo "🧪 Running test suite..."
-          python3 -m pytest tests/unit/ -v --tb=short || echo "Tests completed with warnings"
+          echo "Running test suite..."
+          python3 -m pytest tests/unit/ -v --tb=short --timeout=60
+        env:
+          BOB_TEST_MODE: "1"
+          BOB_STUB_EXTERNAL: "1"
+          BOB_LLM_MODE: stub
+          OTEL_TRACES_EXPORTER: none
 
       - name: Run ARV minimum gate
         run: |
-          echo "✅ Running ARV minimum requirements check..."
-          make check-arv-minimum || echo "ARV checks completed"
+          echo "Running ARV minimum requirements check..."
+          make check-arv-minimum
 
       - name: Run drift detection
         run: |
-          echo "🔎 Running drift detection..."
-          bash scripts/ci/check_nodrift.sh || echo "Drift detection completed"
+          echo "Running drift detection..."
+          bash scripts/ci/check_nodrift.sh
 
       - name: Authenticate to Google Cloud (dev)
         if: env.ENV == 'dev'
@@ -101,6 +125,7 @@ jobs:
         with:
           workload_identity_provider: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}
           service_account: ${{ secrets.GCP_SERVICE_ACCOUNT_DEV }}
+          project_id: ${{ env.PROJECT_ID }}
 
       - name: Authenticate to Google Cloud (staging)
         if: env.ENV == 'staging'
@@ -108,6 +133,7 @@ jobs:
         with:
           workload_identity_provider: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}
           service_account: ${{ secrets.GCP_SERVICE_ACCOUNT_STAGING }}
+          project_id: ${{ env.PROJECT_ID }}
 
       - name: Authenticate to Google Cloud (prod)
         if: env.ENV == 'prod'
@@ -115,39 +141,40 @@ jobs:
         with:
           workload_identity_provider: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}
           service_account: ${{ secrets.GCP_SERVICE_ACCOUNT_PROD }}
+          project_id: ${{ env.PROJECT_ID }}
 
       - name: Validate deployment config (dry-run)
         if: inputs.dry_run == true
         run: |
-          echo "🔍 DRY RUN: Validating deployment configuration..."
+          echo "DRY RUN: Validating deployment configuration..."
           python -m agents.agent_engine.deploy_inline_source \
-            --project $PROJECT_ID \
-            --location $LOCATION \
-            --agent-name $AGENT_NAME \
-            --env $ENV \
+            --project "$PROJECT_ID" \
+            --location "$LOCATION" \
+            --agent-name "$AGENT_NAME" \
+            --env "$ENV" \
             --dry-run
 
       - name: Deploy agent via inline source
         if: inputs.dry_run != true
         run: |
-          echo "🚀 Deploying $AGENT_NAME to $ENV via inline source..."
+          echo "Deploying $AGENT_NAME to $ENV via inline source..."
           python -m agents.agent_engine.deploy_inline_source \
-            --project $PROJECT_ID \
-            --location $LOCATION \
-            --agent-name $AGENT_NAME \
-            --env $ENV
+            --project "$PROJECT_ID" \
+            --location "$LOCATION" \
+            --agent-name "$AGENT_NAME" \
+            --env "$ENV"
 
       - name: Smoke test deployed agent
         if: inputs.dry_run != true && env.ENV == 'dev'
         run: |
-          echo "🧪 Running smoke test against deployed agent..."
+          echo "Running smoke test against deployed agent..."
           # TODO: Add actual smoke test command
           echo "Smoke test placeholder - implement agent-specific health check"
 
       - name: Report deployment status
         if: always()
         run: |
-          echo "📊 Deployment Summary:"
+          echo "Deployment Summary:"
           echo "  Agent: $AGENT_NAME"
           echo "  Environment: $ENV"
           echo "  Project: $PROJECT_ID"
@@ -155,5 +182,5 @@ jobs:
           echo "  Dry Run: ${{ inputs.dry_run }}"
           echo ""
           echo "References:"
-          echo "  - Tutorial: agents/agent_engine/tutorial_deploy_your_first_adk_agent_on_agent_engine.ipynb"
+          echo "  - Standard: 000-docs/000-DR-STND-inline-source-deployment-for-vertex-agent-engine.md"
           echo "  - Discussion: https://discuss.google.dev/t/deploying-agents-with-inline-source-on-vertex-ai-agent-engine/288935"
