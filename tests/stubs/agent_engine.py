@@ -42,14 +42,18 @@ class StubAgentEngineClient:
 
     def __init__(self):
         self._responses: Dict[str, Dict[str, Any]] = {}
-        self._default = dict(self.DEFAULT_RESPONSE)
+        self._default = copy.deepcopy(self.DEFAULT_RESPONSE)
         self.call_log: List[Dict[str, Any]] = []
         self.sessions: Dict[str, Dict[str, Any]] = {}
         self._call_count = 0
+        self._session_counter = 0
 
     def register_response(self, query_contains: str, response: Dict[str, Any]):
-        """Register a canned response for queries containing the given string."""
-        self._responses[query_contains] = response
+        """Register a canned response for queries containing the given string.
+
+        Keys are lowercased for case-insensitive matching.
+        """
+        self._responses[query_contains.lower()] = response
 
     async def query(
         self,
@@ -90,7 +94,8 @@ class StubAgentEngineClient:
 
     async def create_session(self, user_id: str = "test-user") -> str:
         """Simulate session creation."""
-        session_id = f"stub-session-{len(self.sessions) + 1}"
+        self._session_counter += 1
+        session_id = f"stub-session-{self._session_counter}"
         self.sessions[session_id] = {"user_id": user_id, "messages": []}
         return session_id
 
@@ -110,4 +115,5 @@ class StubAgentEngineClient:
         self.call_log.clear()
         self.sessions.clear()
         self._call_count = 0
+        self._session_counter = 0
         self._responses.clear()

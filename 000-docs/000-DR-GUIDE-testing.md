@@ -4,7 +4,7 @@ Quick reference for running tests in Bob's Brain.
 
 ## Test Pyramid
 
-```
+```text
            /  E2E  \         tests/e2e/       (critical workflows, slow)
           / Smoke   \        tests/smoke/      (post-deploy health)
          / Contract  \       tests/ -m contract (schema validation)
@@ -67,7 +67,7 @@ nox -s tests_smoke          # Smoke tests
 nox -s tests_contract       # Contract/schema tests
 nox -s coverage             # Coverage with HTML report
 nox -s lint                 # Linting (ruff + black)
-nox -s security             # Security checks (bandit + safety)
+nox -s security             # Security checks (bandit + pip-audit)
 ```
 
 ## Test Fixtures
