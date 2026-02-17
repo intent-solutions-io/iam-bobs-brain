@@ -27,18 +27,15 @@ from collections import defaultdict
 # Add parent directory to path for imports
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
+from agents.arv.check_impl import run_all_checks
 from agents.arv.spec import (
-    ArvCheck,
     ArvResult,
     Environment,
-    Category,
-    ALL_CHECKS,
-    get_checks_for_env,
-    get_checks_by_category,
     get_category_description,
     get_check_summary,
+    get_checks_by_category,
+    get_checks_for_env,
 )
-from agents.arv.check_impl import run_all_checks
 
 
 def print_header(env: Environment):
@@ -233,5 +230,5 @@ if __name__ == "__main__":
         print("\n\nInterrupted by user")
         sys.exit(130)
     except Exception as e:
-        print(f"\n\nERROR: {str(e)}", file=sys.stderr)
+        print(f"\n\nERROR: {e!s}", file=sys.stderr)
         sys.exit(2)

@@ -21,98 +21,24 @@ All contracts are designed for:
 # AGENT IDENTITY (Canonical IDs and aliases - 252-DR-STND)
 # ============================================================================
 from agents.shared_contracts.agent_identity import (
-    # Types
-    AgentTier,
-    AgentDefinition,
+    AGENT_ALIASES,
     # Data
     CANONICAL_AGENTS,
-    AGENT_ALIASES,
     CANONICAL_TO_DIRECTORY,
     DIRECTORY_TO_CANONICAL,
+    AgentDefinition,
+    # Types
+    AgentTier,
     # Functions
     canonicalize,
-    is_canonical,
-    is_valid,
     get_definition,
     get_directory,
     get_spiffe_id,
-    list_canonical_ids,
+    is_canonical,
+    is_valid,
     list_by_tier,
+    list_canonical_ids,
     list_specialists,
-)
-
-# ============================================================================
-# TOOL OUTPUTS (MCP/Pydantic models)
-# ============================================================================
-from agents.shared_contracts.tool_outputs import (
-    # Base models
-    ToolResult,
-    # Specific result types
-    ComplianceResult,
-    SearchResult,
-    FileResult,
-    DependencyResult,
-    # Nested models
-    Violation,
-    SearchMatch,
-    PythonDependencies,
-    NodeDependencies,
-    TerraformDependencies,
-    DependencySummary,
-    # Helper functions
-    create_success_result,
-    create_error_result,
-)
-
-# ============================================================================
-# PIPELINE CONTRACTS (Dataclasses for iam-* agents)
-# ============================================================================
-from agents.shared_contracts.pipeline_contracts import (
-    # Enums
-    Severity,
-    IssueType,
-    QAStatus,
-    # Pipeline request/result
-    PipelineRequest,
-    PipelineResult,
-    # Portfolio contracts
-    PerRepoResult,
-    PortfolioResult,
-    # Analysis contracts
-    AnalysisReport,
-    # Issue contracts
-    IssueSpec,
-    # Fix planning contracts
-    FixPlan,
-    FixStep,
-    # Code change contracts
-    CodeChange,
-    # QA contracts
-    TestResult,
-    QAVerdict,
-    # Documentation contracts
-    DocumentationUpdate,
-    # Cleanup contracts
-    CleanupTask,
-    # Index contracts
-    IndexEntry,
-    # Helper functions
-    create_mock_issue,
-    create_mock_fix_plan,
-)
-
-# ============================================================================
-# POLICY GATES (Risk tiers and preflight checks - 254-DR-STND)
-# ============================================================================
-from agents.shared_contracts.policy_gates import (
-    # Types
-    RiskTier,
-    GateResult,
-    PolicyGate,
-    # Data
-    RISK_TIER_DESCRIPTIONS,
-    # Functions
-    preflight_check,
 )
 
 # ============================================================================
@@ -121,76 +47,145 @@ from agents.shared_contracts.policy_gates import (
 from agents.shared_contracts.evidence_bundle import (
     # Types
     ArtifactRecord,
+    EvidenceBundle,
+    EvidenceBundleManifest,
     ToolCallRecord,
     UnitTestRecord,
-    EvidenceBundleManifest,
-    EvidenceBundle,
     # Functions
     create_evidence_bundle,
 )
 
+# ============================================================================
+# PIPELINE CONTRACTS (Dataclasses for iam-* agents)
+# ============================================================================
+from agents.shared_contracts.pipeline_contracts import (
+    # Analysis contracts
+    AnalysisReport,
+    # Cleanup contracts
+    CleanupTask,
+    # Code change contracts
+    CodeChange,
+    # Documentation contracts
+    DocumentationUpdate,
+    # Fix planning contracts
+    FixPlan,
+    FixStep,
+    # Index contracts
+    IndexEntry,
+    # Issue contracts
+    IssueSpec,
+    IssueType,
+    # Portfolio contracts
+    PerRepoResult,
+    # Pipeline request/result
+    PipelineRequest,
+    PipelineResult,
+    PortfolioResult,
+    QAStatus,
+    QAVerdict,
+    # Enums
+    Severity,
+    # QA contracts
+    TestResult,
+    create_mock_fix_plan,
+    # Helper functions
+    create_mock_issue,
+)
+
+# ============================================================================
+# POLICY GATES (Risk tiers and preflight checks - 254-DR-STND)
+# ============================================================================
+from agents.shared_contracts.policy_gates import (
+    # Data
+    RISK_TIER_DESCRIPTIONS,
+    GateResult,
+    PolicyGate,
+    # Types
+    RiskTier,
+    # Functions
+    preflight_check,
+)
+
+# ============================================================================
+# TOOL OUTPUTS (MCP/Pydantic models)
+# ============================================================================
+from agents.shared_contracts.tool_outputs import (
+    # Specific result types
+    ComplianceResult,
+    DependencyResult,
+    DependencySummary,
+    FileResult,
+    NodeDependencies,
+    PythonDependencies,
+    SearchMatch,
+    SearchResult,
+    TerraformDependencies,
+    # Base models
+    ToolResult,
+    # Nested models
+    Violation,
+    create_error_result,
+    # Helper functions
+    create_success_result,
+)
+
 __all__ = [
-    # Agent identity (252-DR-STND)
-    "AgentTier",
-    "AgentDefinition",
-    "CANONICAL_AGENTS",
     "AGENT_ALIASES",
+    "CANONICAL_AGENTS",
     "CANONICAL_TO_DIRECTORY",
     "DIRECTORY_TO_CANONICAL",
+    "RISK_TIER_DESCRIPTIONS",
+    "AgentDefinition",
+    "AgentTier",
+    "AnalysisReport",
+    "ArtifactRecord",
+    "CleanupTask",
+    "CodeChange",
+    "ComplianceResult",
+    "DependencyResult",
+    "DependencySummary",
+    "DocumentationUpdate",
+    "EvidenceBundle",
+    "EvidenceBundleManifest",
+    "FileResult",
+    "FixPlan",
+    "FixStep",
+    "GateResult",
+    "IndexEntry",
+    "IssueSpec",
+    "IssueType",
+    "NodeDependencies",
+    "PerRepoResult",
+    "PipelineRequest",
+    "PipelineResult",
+    "PolicyGate",
+    "PortfolioResult",
+    "PythonDependencies",
+    "QAStatus",
+    "QAVerdict",
+    "RiskTier",
+    "SearchMatch",
+    "SearchResult",
+    "Severity",
+    "TerraformDependencies",
+    "TestResult",
+    "ToolCallRecord",
+    "ToolResult",
+    "UnitTestRecord",
+    "Violation",
     "canonicalize",
-    "is_canonical",
-    "is_valid",
+    "create_error_result",
+    "create_evidence_bundle",
+    "create_mock_fix_plan",
+    "create_mock_issue",
+    "create_success_result",
     "get_definition",
     "get_directory",
     "get_spiffe_id",
-    "list_canonical_ids",
+    "is_canonical",
+    "is_valid",
     "list_by_tier",
+    "list_canonical_ids",
     "list_specialists",
-    # Tool outputs (MCP/Pydantic)
-    "ToolResult",
-    "ComplianceResult",
-    "SearchResult",
-    "FileResult",
-    "DependencyResult",
-    "Violation",
-    "SearchMatch",
-    "PythonDependencies",
-    "NodeDependencies",
-    "TerraformDependencies",
-    "DependencySummary",
-    "create_success_result",
-    "create_error_result",
-    # Pipeline contracts (dataclasses)
-    "Severity",
-    "IssueType",
-    "QAStatus",
-    "PipelineRequest",
-    "PipelineResult",
-    "PerRepoResult",
-    "PortfolioResult",
-    "AnalysisReport",
-    "IssueSpec",
-    "FixPlan",
-    "FixStep",
-    "CodeChange",
-    "TestResult",
-    "QAVerdict",
-    "DocumentationUpdate",
-    "CleanupTask",
-    "IndexEntry",
-    "create_mock_issue",
-    "create_mock_fix_plan",
-    # Policy gates (254-DR-STND)
-    "RiskTier",
-    "GateResult",
-    "PolicyGate",
-    "RISK_TIER_DESCRIPTIONS",
     "preflight_check",
-    # Evidence bundles (255-DR-STND)
-    "ArtifactRecord",
-    "ToolCallRecord",
-    "UnitTestRecord",
-    "EvidenceBundleManifest",
-    "EvidenceBundle",
-    "create_evidence_bundle",
 ]

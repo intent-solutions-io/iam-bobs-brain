@@ -6,27 +6,18 @@ This script provides a CLI interface to trigger the IAM SWE pipeline
 for testing and demonstration purposes.
 """
 
+import argparse
+import json
+import logging
 import os
 import sys
-import json
-import argparse
-import logging
 from pathlib import Path
-from datetime import datetime
-from typing import Optional
 
 # Add parent directory to path for imports
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 
-from agents.shared_contracts import (
-    PipelineRequest,
-    PipelineResult,
-    Severity,
-    IssueType,
-    QAStatus
-)
-
 from agents.iam_senior_adk_devops_lead.orchestrator import run_swe_pipeline
+from agents.shared_contracts import PipelineRequest, PipelineResult, QAStatus, Severity
 
 # Configure logging
 logging.basicConfig(
@@ -94,9 +85,9 @@ def format_fix_summary(result: PipelineResult) -> str:
             }.get(qa.status, "❓")
             lines.append(f"     QA: {status_icon} {qa.status.value}")
             if qa.safe_to_apply:
-                lines.append(f"     Safe to Apply: ✅")
+                lines.append("     Safe to Apply: ✅")
             else:
-                lines.append(f"     Safe to Apply: ❌")
+                lines.append("     Safe to Apply: ❌")
 
     return "\n".join(lines)
 

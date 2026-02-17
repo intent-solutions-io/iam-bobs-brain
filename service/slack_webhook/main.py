@@ -21,15 +21,15 @@ Environment Variables:
 - A2A_GATEWAY_URL: A2A gateway URL (for engine mode) - Phase AE2
 """
 
-import os
-import logging
 import hashlib
 import hmac
+import logging
+import os
 import time
-from typing import Dict, Any
-from fastapi import FastAPI, HTTPException, Request, Header
-from fastapi.responses import JSONResponse
+from typing import Any, Dict
+
 import httpx
+from fastapi import FastAPI, Header, HTTPException, Request
 
 # Configure logging
 logging.basicConfig(

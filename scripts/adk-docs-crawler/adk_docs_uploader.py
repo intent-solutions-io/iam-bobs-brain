@@ -8,11 +8,10 @@ organization and versioning.
 import json
 import logging
 from datetime import datetime
-from pathlib import Path
 from typing import Dict, List
 
-from google.cloud import storage
 from google.api_core import exceptions as gcp_exceptions
+from google.cloud import storage
 
 from .config import CrawlerConfig
 

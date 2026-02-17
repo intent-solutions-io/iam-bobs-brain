@@ -26,12 +26,11 @@ TODO (A2A-1/2/3): Add A2ATaskEnvelope and A2AResultEnvelope wrappers
 - Validation helpers will check envelopes against AgentCard schemas
 """
 
+import uuid
 from dataclasses import dataclass, field
-from typing import List, Optional, Dict, Any, Literal
 from datetime import datetime, timezone
 from enum import Enum
-import uuid
-
+from typing import Any, Dict, List, Literal, Optional
 
 # ============================================================================
 # ENUMS AND CONSTANTS

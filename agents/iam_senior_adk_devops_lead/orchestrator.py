@@ -7,13 +7,12 @@ coordinates all iam-* specialist agents to analyze, fix, and improve code.
 Currently uses local stub functions. Future: real A2A calls to agents.
 """
 
-import time
-from typing import List, Dict, Any, Optional
-from datetime import datetime
-
 # Import shared contracts
 import sys
+import time
+from datetime import datetime
 from pathlib import Path
+from typing import List, Optional
 
 # Add agents directory to path for consistent imports
 _agents_dir = str(Path(__file__).parent.parent.parent)
@@ -21,33 +20,39 @@ if _agents_dir not in sys.path:
     sys.path.insert(0, _agents_dir)
 
 # Import structured logging (Phase RC2)
-from agents.utils.logging import (
-    get_logger,
-    log_pipeline_start,
-    log_pipeline_complete,
-    log_agent_step,
-    log_github_operation
-)
-
-from agents.shared_contracts import (
-    PipelineRequest, PipelineResult,
-    AnalysisReport, IssueSpec, FixPlan, CodeChange,
-    QAVerdict, DocumentationUpdate, CleanupTask, IndexEntry,
-    Severity, IssueType, QAStatus,
-    create_mock_issue, create_mock_fix_plan
-)
+# Import GitHub feature flags (Phase GHC)
+from agents.config.github_features import can_create_issues_for_repo, get_feature_status_summary
 
 # Import repo registry (Phase GH1)
-from agents.config.repos import get_repo_by_id, RepoConfig, get_registry
-
-# Import GitHub client (Phase GH2)
-from agents.tools.github_client import get_client, GitHubClientError, RepoTree
+from agents.config.repos import get_registry, get_repo_by_id
 
 # Import GitHub issue adapter (Phase GH3)
 from agents.iam_issue.github_issue_adapter import issue_spec_to_github_payload, preview_issue_payload
+from agents.shared_contracts import (
+    AnalysisReport,
+    CleanupTask,
+    CodeChange,
+    DocumentationUpdate,
+    FixPlan,
+    IndexEntry,
+    IssueSpec,
+    IssueType,
+    PipelineRequest,
+    PipelineResult,
+    QAStatus,
+    QAVerdict,
+    Severity,
+)
 
-# Import GitHub feature flags (Phase GHC)
-from agents.config.github_features import can_create_issues_for_repo, get_feature_status_summary
+# Import GitHub client (Phase GH2)
+from agents.tools.github_client import GitHubClientError, RepoTree, get_client
+from agents.utils.logging import (
+    get_logger,
+    log_agent_step,
+    log_github_operation,
+    log_pipeline_complete,
+    log_pipeline_start,
+)
 
 # Import A2A delegation (Phase H - Real A2A Wiring)
 from .tools.delegation import delegate_to_specialist
@@ -420,9 +425,9 @@ def iam_doc_update(issues: List[IssueSpec], plans: List[FixPlan], verdicts: List
                 "phase_info": {
                     "phase_name": f"SWE Pipeline Run - {datetime.now().strftime('%Y-%m-%d')}",
                     "objectives": [
-                        f"Analyze ADK compliance",
+                        "Analyze ADK compliance",
                         f"Fix {len(plans)} pattern violations",
-                        f"Document changes"
+                        "Document changes"
                     ],
                     "outcomes": {
                         "issues_found": len(issues),
@@ -782,8 +787,8 @@ def run_swe_pipeline(request: PipelineRequest) -> PipelineResult:
             if mode == "preview":
                 # Preview mode (default): Just acknowledge issues found
                 print("✓ Preview mode: Issues identified but not created on GitHub")
-                print(f"  Run with --mode=dry-run to see GitHub issue payloads")
-                print(f"  Run with --mode=create to create issues (requires feature flags)")
+                print("  Run with --mode=dry-run to see GitHub issue payloads")
+                print("  Run with --mode=create to create issues (requires feature flags)")
 
             elif mode == "dry-run":
                 # Dry-run mode: Show what would be created
@@ -1042,7 +1047,7 @@ def run_swe_pipeline_for_repo(
 
     if not repo_config:
         print(f"❌ ERROR: Repository '{repo_id}' not found in registry")
-        print(f"   Check config/repos.yaml for available repo IDs")
+        print("   Check config/repos.yaml for available repo IDs")
         print()
 
         # Return empty result indicating error
@@ -1075,9 +1080,9 @@ def run_swe_pipeline_for_repo(
         print(f"⏭️  SKIPPED: Repository '{repo_id}' has no local path")
         print(f"   Local path: {repo_config.local_path}")
         print(f"   GitHub: {repo_config.full_name}")
-        print(f"   To analyze this repo:")
-        print(f"     1. Clone it locally")
-        print(f"     2. Update local_path in config/repos.yaml")
+        print("   To analyze this repo:")
+        print("     1. Clone it locally")
+        print("     2. Update local_path in config/repos.yaml")
         print()
 
         # Return result indicating skipped
@@ -1117,7 +1122,7 @@ def run_swe_pipeline_for_repo(
     print(f"   Local path: {repo_config.local_path}")
     print(f"   GitHub: {repo_config.full_name}")
     if repo_config.arv_profile:
-        print(f"   ARV requirements:")
+        print("   ARV requirements:")
         print(f"     - RAG: {repo_config.arv_profile.requires_rag}")
         print(f"     - IAM Dept: {repo_config.arv_profile.requires_iam_dept}")
         print(f"     - Tests: {repo_config.arv_profile.requires_tests}")

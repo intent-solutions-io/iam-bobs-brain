@@ -5,11 +5,10 @@ These tools help the foreman create execution plans and aggregate
 results from multiple specialist agents.
 """
 
-import json
 import logging
-from typing import Dict, Any, List, Optional
 from datetime import datetime
 from enum import Enum
+from typing import Any, Dict, List, Optional
 
 logger = logging.getLogger(__name__)
 
@@ -378,7 +377,7 @@ def _create_summary(aggregation: Dict[str, Any], plan: Optional[Dict[str, Any]])
     elif status == "partial":
         summary = f"⚠️ Partially completed: {len([d for d in aggregation['details'].values() if d['status'] == 'success'])}/{specialist_count} tasks successful"
     else:
-        summary = f"❌ Failed to complete specialist tasks"
+        summary = "❌ Failed to complete specialist tasks"
 
     if plan:
         summary += f" for {plan.get('request_type', 'general')} request"

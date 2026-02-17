@@ -24,14 +24,14 @@ Environment Variables:
 Phase H: Universal Autonomous AI Crew - Event Triggers
 """
 
-import os
-import logging
 import hashlib
 import hmac
-from typing import Dict, Any, Optional
-from fastapi import FastAPI, HTTPException, Request, Header
-from fastapi.responses import JSONResponse
+import logging
+import os
+from typing import Any, Dict
+
 import httpx
+from fastapi import FastAPI, Header, HTTPException, Request
 
 # Configure logging
 logging.basicConfig(
@@ -139,7 +139,7 @@ def get_target_agent_and_prompt(event_type: str, action: str, payload: Dict[str,
         title = issue.get("title", "")
         body = issue.get("body", "") or ""
         number = issue.get("number", 0)
-        labels = [l.get("name", "") for l in issue.get("labels", [])]
+        labels = [label.get("name", "") for label in issue.get("labels", [])]
 
         if action == "opened":
             return "iam-orchestrator", f"""
@@ -304,7 +304,7 @@ async def github_webhook(
         )
 
         # Query Agent Engine via A2A gateway
-        response = await route_to_agent(
+        _response = await route_to_agent(
             agent_role=agent_role,
             prompt=prompt,
             context={

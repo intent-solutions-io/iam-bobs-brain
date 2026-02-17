@@ -10,8 +10,8 @@ Usage:
     python3 scripts/refactor_to_lazy_app_pattern.py agents/iam_issue/agent.py
 """
 
-import sys
 import re
+import sys
 from pathlib import Path
 
 

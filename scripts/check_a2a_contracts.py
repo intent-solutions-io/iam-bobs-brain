@@ -25,11 +25,10 @@ Exit Codes:
 
 import argparse
 import json
+import re
 import sys
 from pathlib import Path
-from typing import Dict, List, Tuple, Any, Optional
-import re
-
+from typing import Dict, List, Optional, Tuple
 
 # ============================================================================
 # VALIDATION RULES (6767 Standards)
@@ -74,7 +73,7 @@ def validate_json_syntax(file_path: Path) -> Tuple[bool, str, Optional[Dict]]:
     Returns: (valid, message, parsed_json)
     """
     try:
-        with open(file_path, 'r') as f:
+        with open(file_path) as f:
             data = json.load(f)
         return True, "✅ Valid JSON syntax", data
     except json.JSONDecodeError as e:
@@ -282,7 +281,7 @@ def main():
 
     # Validate each AgentCard
     print(f"\n{'='*70}")
-    print(f"A2A Contract Validation")
+    print("A2A Contract Validation")
     print(f"{'='*70}\n")
 
     total_errors = 0
@@ -306,7 +305,7 @@ def main():
 
     # Summary
     print(f"{'='*70}")
-    print(f"Summary")
+    print("Summary")
     print(f"{'='*70}")
 
     passed = sum(1 for _, valid, _ in results if valid)

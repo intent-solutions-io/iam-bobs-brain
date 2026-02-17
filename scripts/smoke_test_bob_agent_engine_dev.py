@@ -50,7 +50,7 @@ from typing import Optional
 # Lazy import to avoid issues in environments without SDK installed
 try:
     from google.cloud import aiplatform
-    from google.cloud.aiplatform import gapic
+    from google.cloud.aiplatform import gapic  # noqa: F401
 except ImportError as e:
     print(f"[SMOKE] ERROR: Missing required Google Cloud SDK dependencies: {e}", file=sys.stderr)
     print("[SMOKE] Install with: pip install google-cloud-aiplatform", file=sys.stderr)
@@ -87,7 +87,7 @@ def smoke_test_bob_agent_engine_dev() -> int:
         print("[SMOKE] RESULT: FAIL (missing configuration)", file=sys.stderr)
         return 1
 
-    print(f"[SMOKE] Configuration:")
+    print("[SMOKE] Configuration:")
     print(f"[SMOKE]   Project: {project_id}")
     print(f"[SMOKE]   Location: {location}")
     print(f"[SMOKE]   Agent: {agent_name}")
@@ -98,7 +98,7 @@ def smoke_test_bob_agent_engine_dev() -> int:
         aiplatform.init(project=project_id, location=location)
 
         # Connect to the agent
-        print(f"[SMOKE] Connecting to Agent Engine instance...")
+        print("[SMOKE] Connecting to Agent Engine instance...")
         print(f"[SMOKE]   Resource name: {agent_name}")
         print()
 
@@ -117,7 +117,7 @@ def smoke_test_bob_agent_engine_dev() -> int:
         # Create a simple health check query
         test_prompt = 'Health check: respond with a short JSON object {"status":"ok","agent":"bob"}.'
 
-        print(f"[SMOKE] Sending test query...")
+        print("[SMOKE] Sending test query...")
         print(f"[SMOKE]   Prompt: {test_prompt}")
         print()
 
@@ -132,7 +132,7 @@ def smoke_test_bob_agent_engine_dev() -> int:
         # Extract response content
         response_text = str(response.output) if hasattr(response, 'output') else str(response)
 
-        print(f"[SMOKE] Response received:")
+        print("[SMOKE] Response received:")
         print(f"[SMOKE]   {response_text[:200]}...")  # Show first 200 chars
         print()
 

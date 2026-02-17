@@ -11,7 +11,7 @@ Design:
 """
 
 from dataclasses import dataclass, field
-from typing import Literal, Optional, List
+from typing import List, Literal, Optional
 
 # Type aliases
 Environment = Literal["dev", "staging", "prod"]

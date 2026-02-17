@@ -8,16 +8,16 @@ Usage:
     make crawl-adk-docs
 """
 
-import sys
-import logging
 import json
+import logging
+import sys
 from pathlib import Path
 
-from .config import load_config, validate_gcp_credentials
-from .adk_docs_crawler import crawl_adk_docs, ADKDocsCrawler
-from .adk_docs_extract import extract_all_documents
 from .adk_docs_chunker import chunk_all_documents
+from .adk_docs_crawler import ADKDocsCrawler
+from .adk_docs_extract import extract_all_documents
 from .adk_docs_uploader import upload_to_gcs
+from .config import load_config, validate_gcp_credentials
 
 
 def setup_logging(verbose: bool = False) -> None:
@@ -113,7 +113,7 @@ def main() -> int:
 
         # 6. Upload to GCS
         logger.info("\n[6/6] Uploading to Google Cloud Storage...")
-        with open(manifest_path, 'r', encoding='utf-8') as f:
+        with open(manifest_path, encoding='utf-8') as f:
             manifest = json.load(f)
 
         gcs_uris = upload_to_gcs(documents, chunks, manifest, config)

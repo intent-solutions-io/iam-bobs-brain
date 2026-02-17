@@ -21,11 +21,10 @@ Checks:
   - Environment labels present
 """
 
-import sys
-import os
 import re
+import sys
 from pathlib import Path
-from typing import Dict, List, Tuple, Optional
+from typing import Dict, List, Optional, Tuple
 
 
 # ANSI color codes for output
@@ -97,7 +96,7 @@ class SlackGatewayConfigValidator:
             return False
 
         try:
-            with open(self.config_file, 'r') as f:
+            with open(self.config_file) as f:
                 content = f.read()
 
             # Simple HCL parsing (not perfect, but sufficient for validation)
@@ -120,7 +119,7 @@ class SlackGatewayConfigValidator:
             return True
 
         except Exception as e:
-            self.add_error('ERROR', f'Failed to parse configuration: {str(e)}')
+            self.add_error('ERROR', f'Failed to parse configuration: {e!s}')
             return False
 
     def check_required_variables(self):
@@ -155,7 +154,7 @@ class SlackGatewayConfigValidator:
         """Check for hardcoded secrets (never acceptable in prod)."""
         # Read raw file content for secret scanning
         try:
-            with open(self.config_file, 'r') as f:
+            with open(self.config_file) as f:
                 content = f.read()
 
             # Check for secret patterns
@@ -191,7 +190,7 @@ class SlackGatewayConfigValidator:
                     )
 
         except Exception as e:
-            self.add_error('WARNING', f'Could not scan for secrets: {str(e)}')
+            self.add_error('WARNING', f'Could not scan for secrets: {e!s}')
 
     def check_secret_manager_refs(self):
         """Verify Secret Manager references for prod."""
@@ -225,7 +224,7 @@ class SlackGatewayConfigValidator:
         """Validate service account naming (if present)."""
         # Service account is created by module, so this is informational
         # Just check if there's a custom SA email that follows conventions
-        pass  # Skipping for now - module handles this
+        # Skipping for now - module handles this
 
     def validate(self) -> Tuple[bool, List[ValidationError]]:
         """Run all validation checks."""
@@ -316,7 +315,7 @@ if __name__ == '__main__':
     try:
         sys.exit(main())
     except Exception as e:
-        print(f'{Colors.RED}Script error: {str(e)}{Colors.END}')
+        print(f'{Colors.RED}Script error: {e!s}{Colors.END}')
         import traceback
         traceback.print_exc()
         sys.exit(2)

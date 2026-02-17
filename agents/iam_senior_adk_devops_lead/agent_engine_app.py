@@ -25,9 +25,10 @@ Enforces:
 - R7: SPIFFE ID propagation
 """
 
-from .agent import create_runner
 import logging
 import os
+
+from .agent import create_runner
 
 # Configure logging
 logging.basicConfig(
@@ -46,7 +47,7 @@ AGENT_SPIFFE_ID = os.getenv(
 # CRITICAL: ADK CLI expects a Runner instance named 'app'
 # This is the entrypoint that gets packaged and deployed to Agent Engine
 logger.info(
-    f"Creating Runner for Foreman Agent Engine deployment via ADK CLI",
+    "Creating Runner for Foreman Agent Engine deployment via ADK CLI",
     extra={
         "app_name": APP_NAME,
         "spiffe_id": AGENT_SPIFFE_ID,

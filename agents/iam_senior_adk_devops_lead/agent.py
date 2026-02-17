@@ -5,15 +5,16 @@ This module defines the foreman LlmAgent that orchestrates iam-* specialists.
 Follows ADK Hard Mode patterns with dual memory and SPIFFE ID propagation.
 """
 
+import logging
+import os
+
+from google.adk import Runner
 from google.adk.agents import LlmAgent
 from google.adk.apps import App
-from google.adk import Runner
-from google.adk.sessions import VertexAiSessionService
 from google.adk.memory import VertexAiMemoryBankService
+from google.adk.sessions import VertexAiSessionService
+
 from agents.shared_tools import FOREMAN_TOOLS  # Use shared tools profile
-import os
-import logging
-from typing import Optional, Dict, Any, List
 
 # Configure logging
 logging.basicConfig(
@@ -305,8 +306,8 @@ Return structured JSON matching your AgentCard output schema:
 - Validate all specialist outputs before aggregating
 - Maintain correlation IDs for tracing (pipeline_run_id, request_id)
 - Follow department standards documented in Memory Bank
-- Query Memory Bank for Hard Mode rules (R1-R8) when validating specialist outputs""".format(
-        spiffe_id=AGENT_SPIFFE_ID
+- Query Memory Bank for Hard Mode rules (R1-R8) when validating specialist outputs""".replace(
+        "{spiffe_id}", AGENT_SPIFFE_ID
     )
 
     return instruction

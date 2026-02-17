@@ -20,11 +20,10 @@ Exit codes:
     2 - Error during checks
 """
 
-import os
-import sys
 import argparse
+import sys
 from pathlib import Path
-from typing import List, Tuple, Dict
+from typing import Tuple
 
 # Add repo root to path
 repo_root = Path(__file__).parent.parent
@@ -33,7 +32,7 @@ sys.path.insert(0, str(repo_root / "agents"))
 
 # Import repo registry (PORT2 - for portfolio mode)
 try:
-    from config.repos import list_repos, RepoConfig
+    from config.repos import RepoConfig, list_repos  # noqa: F401
     REGISTRY_AVAILABLE = True
 except ImportError as e:
     REGISTRY_AVAILABLE = False
@@ -67,11 +66,11 @@ class ARVMinimumChecker:
 
         # Try to import logging helper
         try:
-            from agents.utils.logging import (
+            from agents.utils.logging import (  # noqa: F401
                 get_logger,
-                log_pipeline_start,
+                log_agent_step,
                 log_pipeline_complete,
-                log_agent_step
+                log_pipeline_start,
             )
             self.log("✓ Logging helper imports successfully")
             self.passed.append("Structured logging helper present and importable")
@@ -385,7 +384,7 @@ def run_portfolio_checks(verbose: bool = False) -> int:
     # Run check on current repo
     # (Future: iterate through all local repos if we have multiple)
     print("=" * 70)
-    print(f"CHECKING: bobs-brain (current repository)")
+    print("CHECKING: bobs-brain (current repository)")
     print("=" * 70)
 
     checker = ARVMinimumChecker(verbose=verbose)

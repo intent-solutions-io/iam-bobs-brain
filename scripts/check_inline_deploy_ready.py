@@ -222,8 +222,8 @@ def check_agent_entrypoint(agent_name: str) -> Tuple[bool, List[str]]:
     except ImportError as e:
         # This is OK for CI without full dependencies
         print(f"   ⚠️  Import check skipped: {e}")
-        print(f"   ℹ️  Module file exists, but cannot be imported (missing dependencies)")
-        print(f"   ℹ️  This is OK for ARV validation without full runtime")
+        print("   ℹ️  Module file exists, but cannot be imported (missing dependencies)")
+        print("   ℹ️  This is OK for ARV validation without full runtime")
 
     return len(errors) == 0, errors
 
@@ -250,7 +250,7 @@ def check_environment_safety(env: str) -> Tuple[bool, List[str]]:
         # In CI, this is enforced by workflow trigger rules
         # Locally, we just warn
         print(f"   ⚠️  {env.upper()} deployment requires manual approval")
-        print(f"   ℹ️  Use GitHub Actions workflow_dispatch for production deploys")
+        print("   ℹ️  Use GitHub Actions workflow_dispatch for production deploys")
 
     return len(errors) == 0, errors
 

@@ -7,7 +7,8 @@ Enforces R7: SPIFFE ID must be included in card metadata.
 """
 
 import os
-from typing import List, Dict, Any
+from typing import Any, Dict, List
+
 from pydantic import BaseModel, Field
 
 

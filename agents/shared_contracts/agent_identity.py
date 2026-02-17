@@ -27,8 +27,8 @@ Usage:
 import logging
 import warnings
 from dataclasses import dataclass
-from typing import Dict, List, Optional, Literal
 from enum import Enum
+from typing import Dict, List
 
 logger = logging.getLogger(__name__)
 
@@ -344,22 +344,19 @@ def list_specialists() -> List[str]:
 # =============================================================================
 
 __all__ = [
-    # Types
-    "AgentTier",
-    "AgentDefinition",
-    # Data
-    "CANONICAL_AGENTS",
     "AGENT_ALIASES",
+    "CANONICAL_AGENTS",
     "CANONICAL_TO_DIRECTORY",
     "DIRECTORY_TO_CANONICAL",
-    # Functions
+    "AgentDefinition",
+    "AgentTier",
     "canonicalize",
-    "is_canonical",
-    "is_valid",
     "get_definition",
     "get_directory",
     "get_spiffe_id",
-    "list_canonical_ids",
+    "is_canonical",
+    "is_valid",
     "list_by_tier",
+    "list_canonical_ids",
     "list_specialists",
 ]

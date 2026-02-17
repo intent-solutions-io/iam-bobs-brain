@@ -3,19 +3,19 @@ Agent tools for GitHub integration and other utilities.
 """
 
 from .github_client import (
+    GitHubAuthError,
     GitHubClient,
     GitHubClientError,
-    GitHubAuthError,
     GitHubRateLimitError,
     RepoFile,
     RepoTree,
-    get_client
+    get_client,
 )
 
 __all__ = [
+    'GitHubAuthError',
     'GitHubClient',
     'GitHubClientError',
-    'GitHubAuthError',
     'GitHubRateLimitError',
     'RepoFile',
     'RepoTree',

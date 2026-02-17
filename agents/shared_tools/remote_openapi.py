@@ -10,9 +10,8 @@ They do NOT directly call external APIs.
 Status: STUB ONLY - No OpenAPI gateways deployed yet
 """
 
-from typing import Any, Optional, List
 import logging
-import os
+from typing import Any, List, Optional
 
 logger = logging.getLogger(__name__)
 

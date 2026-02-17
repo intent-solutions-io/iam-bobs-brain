@@ -9,8 +9,8 @@ These tools enable iam-qa to evaluate implemented fixes and ensure quality stand
 
 import json
 import logging
-from typing import Dict, List, Any, Optional
 from datetime import datetime
+from typing import Any, Dict, List
 
 logger = logging.getLogger(__name__)
 

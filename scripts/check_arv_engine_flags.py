@@ -36,18 +36,18 @@ repo_root = Path(__file__).parent.parent
 sys.path.insert(0, str(repo_root))
 
 from agents.config.features import (
-    get_current_environment,
-    get_all_flags,
-    get_enabled_flags,
-    LIVE_RAG_BOB_ENABLED,
-    LIVE_RAG_FOREMAN_ENABLED,
-    ENGINE_MODE_FOREMAN_TO_IAM_ADK,
-    ENGINE_MODE_FOREMAN_TO_IAM_ISSUE,
-    ENGINE_MODE_FOREMAN_TO_IAM_FIX,
-    SLACK_SWE_PIPELINE_MODE_ENABLED,
     AGENT_ENGINE_BOB_NEXT_GEN_ENABLED,
     AGENT_ENGINE_BOB_NEXT_GEN_PERCENT,
     BLUE_GREEN_SHADOW_TRAFFIC_ENABLED,
+    ENGINE_MODE_FOREMAN_TO_IAM_ADK,
+    ENGINE_MODE_FOREMAN_TO_IAM_FIX,
+    ENGINE_MODE_FOREMAN_TO_IAM_ISSUE,
+    LIVE_RAG_BOB_ENABLED,
+    LIVE_RAG_FOREMAN_ENABLED,
+    SLACK_SWE_PIPELINE_MODE_ENABLED,
+    get_all_flags,
+    get_current_environment,
+    get_enabled_flags,
 )
 
 
@@ -233,7 +233,7 @@ class ARVEngineFlagsChecker:
         # (Would need to query other environments to validate full progression)
         if env == "prod" and enabled:
             self.log_info(
-                f"Production has flags enabled - ensure they were validated in staging first"
+                "Production has flags enabled - ensure they were validated in staging first"
             )
 
         # Check canary progression

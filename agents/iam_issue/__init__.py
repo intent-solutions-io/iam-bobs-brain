@@ -12,9 +12,9 @@ Phase 12 Update: Migrated to google-adk 1.18+ API (App pattern)
 """
 
 __all__ = [
-    "get_agent",  # Creates the LlmAgent instance
-    "create_runner",
     "auto_save_session_to_memory",
+    "create_runner",
+    "get_agent",  # Creates the LlmAgent instance
     "root_agent",  # Module-level agent for ADK deployment
 ]
 

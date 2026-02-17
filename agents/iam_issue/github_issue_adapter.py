@@ -10,24 +10,19 @@ via GitHub REST API with safety gates:
 Phase: LIVE3B/LIVE3C-GITHUB-ISSUES (G2)
 """
 
-import sys
-import os
 import logging
-from pathlib import Path
-from typing import Dict, List, Optional, Any, Tuple
-from datetime import datetime
+import os
+import sys
 from dataclasses import dataclass
+from pathlib import Path
+from typing import Any, Dict, List, Optional
 
 # Add parent directory for imports
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from shared_contracts import IssueSpec, Severity, IssueType
-from config.github_features import (
-    get_github_mode,
-    GitHubMode,
-    load_github_feature_config,
-    can_create_issues_for_repo
-)
+from config.github_features import GitHubMode, get_github_mode
+
+from shared_contracts import IssueSpec, IssueType, Severity
 
 logger = logging.getLogger(__name__)
 
@@ -167,7 +162,7 @@ def issue_spec_to_github_payload(
         labels.extend(issue.tags)
 
     # Remove duplicates and empty labels
-    labels = list(set(l for l in labels if l))
+    labels = list(set(label for label in labels if label))
 
     # Build payload
     payload = {
@@ -277,7 +272,7 @@ def create_github_issue(
     mode = get_github_mode(repo_id)
 
     logger.info(
-        f"GitHub issue creation attempt",
+        "GitHub issue creation attempt",
         extra={
             "repo_id": repo_id,
             "github_repo": f"{github_owner}/{github_repo}",
@@ -292,7 +287,7 @@ def create_github_issue(
     # MODE: DISABLED
     if mode == GitHubMode.DISABLED:
         logger.info(
-            f"GitHub issue creation DISABLED",
+            "GitHub issue creation DISABLED",
             extra={
                 "repo_id": repo_id,
                 "reason": "Feature flag off or repo not in allowlist"
@@ -307,7 +302,7 @@ def create_github_issue(
     # MODE: DRY_RUN
     if mode == GitHubMode.DRY_RUN:
         logger.info(
-            f"📝 DRY-RUN: Would create GitHub issue",
+            "📝 DRY-RUN: Would create GitHub issue",
             extra={
                 "repo": f"{github_owner}/{github_repo}",
                 "title": issue.title,
@@ -353,7 +348,7 @@ def create_github_issue(
         }
 
         logger.warning(
-            f"🚨 Creating REAL GitHub issue",
+            "🚨 Creating REAL GitHub issue",
             extra={
                 "repo": f"{github_owner}/{github_repo}",
                 "title": issue.title,
@@ -395,7 +390,7 @@ def create_github_issue(
             # API error
             error_msg = f"GitHub API returned {response.status_code}: {response.text}"
             logger.error(
-                f"Failed to create GitHub issue",
+                "Failed to create GitHub issue",
                 extra={
                     "repo": f"{github_owner}/{github_repo}",
                     "status_code": response.status_code,

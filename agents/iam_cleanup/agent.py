@@ -15,13 +15,13 @@ Enforces:
 - R7: SPIFFE ID propagation in logs
 """
 
-from google.adk.agents import LlmAgent
-from google.adk import Runner
-from google.adk.sessions import VertexAiSessionService
-from google.adk.memory import VertexAiMemoryBankService
-import os
 import logging
-from typing import Optional
+import os
+
+from google.adk import Runner
+from google.adk.agents import LlmAgent
+from google.adk.memory import VertexAiMemoryBankService
+from google.adk.sessions import VertexAiSessionService
 
 # Configure logging
 logging.basicConfig(
@@ -326,7 +326,7 @@ def create_runner() -> Runner:
         Gateway code in service/ MUST NOT import or call this (R3).
     """
     logger.info(
-        f"Creating Runner with dual memory for iam-cleanup",
+        "Creating Runner with dual memory for iam-cleanup",
         extra={
             "spiffe_id": AGENT_SPIFFE_ID,
             "project_id": PROJECT_ID,

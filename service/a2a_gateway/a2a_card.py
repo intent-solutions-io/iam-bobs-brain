@@ -7,9 +7,10 @@ Enforces:
 - R7: SPIFFE ID included in description
 """
 
-from a2a.types import AgentCard, AgentCapabilities
-import os
 import logging
+import os
+
+from a2a.types import AgentCapabilities, AgentCard
 
 logger = logging.getLogger(__name__)
 

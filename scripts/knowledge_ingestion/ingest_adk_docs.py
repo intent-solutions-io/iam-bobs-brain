@@ -8,12 +8,11 @@ to be used as grounding knowledge for Bob's Brain agents.
 Target Bucket: bob-vertex-agent-datastore or appropriate Vertex AI storage
 """
 
-import os
 import json
-import hashlib
-from datetime import datetime
-from typing import Dict, List, Optional
 import logging
+import os
+from datetime import datetime
+from typing import Dict
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)

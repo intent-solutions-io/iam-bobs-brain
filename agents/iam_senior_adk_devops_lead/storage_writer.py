@@ -20,7 +20,6 @@ BigQuery:
 
 import json
 import logging
-from typing import Optional
 from datetime import datetime
 
 # Import GCS client
@@ -31,16 +30,15 @@ except ImportError:
     GCS_AVAILABLE = False
 
 # Import config helpers
-from ..config.storage import (
-    get_org_storage_bucket,
-    is_org_storage_write_enabled,
-    make_portfolio_run_summary_path,
-    make_portfolio_run_repo_path,
-)
-
 # Import contracts
 from agents.shared_contracts import PortfolioResult
 
+from ..config.storage import (
+    get_org_storage_bucket,
+    is_org_storage_write_enabled,
+    make_portfolio_run_repo_path,
+    make_portfolio_run_summary_path,
+)
 
 logger = logging.getLogger(__name__)
 

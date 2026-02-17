@@ -29,9 +29,10 @@ Hard Mode Compliance:
 - R7: Passes SPIFFE ID in X-Agent-SPIFFE-ID header
 """
 
-from typing import Any, Optional, List, Dict
 import logging
 import os
+from typing import Any, Dict, List, Optional
+
 import httpx
 
 logger = logging.getLogger(__name__)

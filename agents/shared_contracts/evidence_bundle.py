@@ -19,12 +19,11 @@ See: 000-docs/255-DR-STND-evidence-bundles-and-audit-export.md
 
 import hashlib
 import json
-import os
-from dataclasses import dataclass, field, asdict
+import uuid
+from dataclasses import asdict, dataclass, field
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Dict, List, Optional
-import uuid
 
 
 def _json_serializer(obj: Any) -> Any:
@@ -315,7 +314,7 @@ class EvidenceBundle:
         if not manifest_path.exists():
             raise FileNotFoundError(f"Manifest not found: {manifest_path}")
 
-        with open(manifest_path, "r") as f:
+        with open(manifest_path) as f:
             manifest = EvidenceBundleManifest.from_json(f.read())
 
         bundle = cls(manifest=manifest, base_path=bundle_path.parent.parent)

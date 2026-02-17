@@ -9,21 +9,15 @@ Usage:
     success = send_portfolio_notification(portfolio_result, env="dev")
 """
 
-import os
 import logging
-import requests
-from typing import Dict, Any, Optional, List
+import os
+from typing import Any, Dict, List, Optional
 
+import requests
+
+from agents.config.notifications import SlackDestination, get_swe_slack_destination, should_send_slack_notifications
+from agents.notifications.slack_formatter import format_portfolio_completion
 from agents.shared_contracts import PortfolioResult
-from agents.config.notifications import (
-    should_send_slack_notifications,
-    get_swe_slack_destination,
-    SlackDestination
-)
-from agents.notifications.slack_formatter import (
-    format_portfolio_completion,
-    format_portfolio_completion_simple
-)
 
 logger = logging.getLogger(__name__)
 
@@ -273,7 +267,6 @@ def test_slack_connection(
 if __name__ == "__main__":
     # Quick test/demo
     import sys
-    from datetime import datetime
     logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
 
     print("Slack Sender Test")

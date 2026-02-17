@@ -7,12 +7,11 @@ and structured fields for observability.
 Part of Phase RC2 observability improvements.
 """
 
-import logging
 import json
+import logging
 import sys
 from datetime import datetime
-from typing import Optional, Dict, Any
-from pathlib import Path
+from typing import Dict
 
 
 class StructuredLogger:

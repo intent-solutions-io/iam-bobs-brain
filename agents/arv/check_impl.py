@@ -7,7 +7,6 @@ Each function executes a check and returns an ArvResult.
 
 import os
 import subprocess
-from typing import Optional
 
 from agents.arv.spec import ArvCheck, ArvResult, Environment
 
@@ -96,7 +95,7 @@ def run_check(check: ArvCheck, env: Environment, verbose: bool = False) -> ArvRe
         # Run the command
         result = subprocess.run(
             check.command,
-            shell=True,
+            check=False, shell=True,
             capture_output=True,
             text=True,
             timeout=300,  # 5 minute timeout
@@ -141,7 +140,7 @@ def run_check(check: ArvCheck, env: Environment, verbose: bool = False) -> ArvRe
             check=check,
             passed=False,
             skipped=False,
-            details=f"Error executing check: {str(e)}",
+            details=f"Error executing check: {e!s}",
             exit_code=1,
         )
 

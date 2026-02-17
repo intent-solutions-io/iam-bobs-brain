@@ -25,12 +25,12 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
-from agents.mission_spec.schema import load_mission, validate_mission, MissionSpec
-from agents.mission_spec.compiler import compile_mission, CompilerResult, ExecutionPlan, PlannedTask
+from agents.mission_spec.compiler import ExecutionPlan, PlannedTask, compile_mission
+from agents.mission_spec.schema import load_mission, validate_mission
 from agents.shared_contracts.evidence_bundle import (
-    create_evidence_bundle,
     EvidenceBundle,
     ToolCallRecord,
+    create_evidence_bundle,
 )
 
 logger = logging.getLogger(__name__)
@@ -178,8 +178,8 @@ async def execute_task(
         Task result dict
     """
     # Import delegation at runtime (6767-LAZY pattern)
-    from agents.iam_senior_adk_devops_lead.tools.delegation import delegate_to_specialist
     from agents.a2a.dispatcher import load_agentcard
+    from agents.iam_senior_adk_devops_lead.tools.delegation import delegate_to_specialist
 
     start_time = datetime.now(timezone.utc)
 

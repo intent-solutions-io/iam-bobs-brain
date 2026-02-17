@@ -10,8 +10,6 @@ into well-formatted GitHub issues.
 
 import json
 import logging
-from typing import Dict, List, Any, Optional
-from datetime import datetime
 
 logger = logging.getLogger(__name__)
 
@@ -143,7 +141,7 @@ def validate_issue_spec(issue_data: str) -> str:
         return json.dumps(
             {
                 "is_valid": False,
-                "errors": [{"field": "root", "message": f"Invalid JSON: {str(e)}"}],
+                "errors": [{"field": "root", "message": f"Invalid JSON: {e!s}"}],
                 "warnings": [],
                 "score": 0.0,
             }
@@ -153,7 +151,7 @@ def validate_issue_spec(issue_data: str) -> str:
         return json.dumps(
             {
                 "is_valid": False,
-                "errors": [{"field": "root", "message": f"Validation error: {str(e)}"}],
+                "errors": [{"field": "root", "message": f"Validation error: {e!s}"}],
                 "warnings": [],
                 "score": 0.0,
             }
@@ -215,7 +213,7 @@ def format_issue_markdown(issue_data: str) -> str:
 
     except Exception as e:
         logger.error(f"Error formatting issue markdown: {e}")
-        return f"Error formatting issue: {str(e)}"
+        return f"Error formatting issue: {e!s}"
 
 
 def generate_issue_labels(issue_data: str) -> str:
@@ -304,7 +302,7 @@ def create_github_issue_body(issue_data: str, include_metadata: bool = True) -> 
 
         # Add metadata comments for automation
         if include_metadata:
-            metadata = f"\n\n<!-- Issue Metadata -->\n"
+            metadata = "\n\n<!-- Issue Metadata -->\n"
             metadata += f"<!-- ID: {issue.get('id', 'unassigned')} -->\n"
             metadata += f"<!-- Component: {issue.get('component', 'general')} -->\n"
             metadata += f"<!-- Type: {issue.get('type', 'task')} -->\n"
@@ -319,4 +317,4 @@ def create_github_issue_body(issue_data: str, include_metadata: bool = True) -> 
 
     except Exception as e:
         logger.error(f"Error creating GitHub issue body: {e}")
-        return f"Error creating issue body: {str(e)}"
+        return f"Error creating issue body: {e!s}"

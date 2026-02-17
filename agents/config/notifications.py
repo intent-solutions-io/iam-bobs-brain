@@ -30,11 +30,11 @@ Usage:
         # Send notification with prefix to dest
 """
 
-import os
 import logging
-from typing import Optional, Literal
+import os
 from dataclasses import dataclass
 from enum import Enum
+from typing import Literal, Optional
 
 logger = logging.getLogger(__name__)
 

@@ -24,20 +24,19 @@ Design Philosophy:
 - Respects all LIVE3 feature flags
 """
 
-import sys
-import os
-import json
 import argparse
-from pathlib import Path
+import json
+import os
+import sys
 from datetime import datetime
-from typing import Dict, Any, List, Optional
+from pathlib import Path
+from typing import Any, Dict, List, Optional
 
 # Add agents to path
 sys.path.insert(0, str(Path(__file__).parent.parent / "agents"))
 
 from iam_senior_adk_devops_lead.portfolio_orchestrator import (
     run_portfolio_swe,
-    get_portfolio_local_repos,
 )
 
 
@@ -169,11 +168,11 @@ def run_portfolio_audit(target_repo: str, env: str, verbose: bool) -> SubsystemR
             result.success = False
             result.details = "Audit returned no results"
             if verbose:
-                print(f"   ❌ Portfolio audit failed: no results")
+                print("   ❌ Portfolio audit failed: no results")
 
     except Exception as e:
         result.success = False
-        result.details = f"Exception: {str(e)}"
+        result.details = f"Exception: {e!s}"
         if verbose:
             print(f"   ❌ Portfolio audit exception: {e}")
 
@@ -228,7 +227,7 @@ def write_to_gcs(swe_result: Dict[str, Any], config: Dict[str, str], verbose: bo
 
     except Exception as e:
         result.success = False
-        result.details = f"Exception: {str(e)}"
+        result.details = f"Exception: {e!s}"
         if verbose:
             print(f"   ❌ GCS write failed: {e}")
 
@@ -258,7 +257,7 @@ def send_slack_notification(swe_result: Dict[str, Any], config: Dict[str, str], 
             return result
 
         if verbose:
-            print(f"\n💬 Sending Slack notification")
+            print("\n💬 Sending Slack notification")
 
         # Import requests (only if enabled)
         import requests
@@ -266,7 +265,7 @@ def send_slack_notification(swe_result: Dict[str, Any], config: Dict[str, str], 
         # Build message
         repo_count = len(swe_result.get("results", []))
         message = {
-            "text": f"🧪 LIVE3 Dev Smoke Test Completed",
+            "text": "🧪 LIVE3 Dev Smoke Test Completed",
             "blocks": [
                 {
                     "type": "section",
@@ -289,7 +288,7 @@ def send_slack_notification(swe_result: Dict[str, Any], config: Dict[str, str], 
 
     except Exception as e:
         result.success = False
-        result.details = f"Exception: {str(e)}"
+        result.details = f"Exception: {e!s}"
         if verbose:
             print(f"   ❌ Slack notification failed: {e}")
 
@@ -338,7 +337,7 @@ def create_github_issues(swe_result: Dict[str, Any], config: Dict[str, str], ver
 
     except Exception as e:
         result.success = False
-        result.details = f"Exception: {str(e)}"
+        result.details = f"Exception: {e!s}"
         if verbose:
             print(f"   ❌ GitHub issue creation failed: {e}")
 

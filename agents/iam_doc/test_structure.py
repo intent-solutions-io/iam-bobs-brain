@@ -17,10 +17,8 @@ sys.modules['google.adk.memory'] = MagicMock()
 
 # Now we can import our agent
 from agents.iam_doc.tools.documentation_tools import (
-    generate_aar,
-    update_readme,
     create_design_doc,
-    list_documentation,
+    generate_aar,
 )
 
 # Test tool imports

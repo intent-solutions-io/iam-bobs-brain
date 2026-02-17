@@ -10,14 +10,15 @@ feature flags for safety.
 """
 
 import os
-import json
-import requests
-from dataclasses import dataclass, field
-from typing import List, Optional, Dict, Any
-from pathlib import Path
 
 # Import structured logging (Phase RC2)
 import sys
+from dataclasses import dataclass, field
+from pathlib import Path
+from typing import Any, Dict, List, Optional
+
+import requests
+
 sys.path.insert(0, str(Path(__file__).parent.parent))
 from utils.logging import get_logger
 
@@ -63,17 +64,14 @@ class CreatedIssue:
 
 class GitHubClientError(Exception):
     """Base exception for GitHub client errors."""
-    pass
 
 
 class GitHubAuthError(GitHubClientError):
     """Authentication/authorization error."""
-    pass
 
 
 class GitHubRateLimitError(GitHubClientError):
     """API rate limit exceeded."""
-    pass
 
 
 class GitHubClient:

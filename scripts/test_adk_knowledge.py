@@ -20,10 +20,11 @@ sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from google.adk.agents import LlmAgent
 from google.adk.runners import InMemoryRunner
+
 from agents.bob.tools.adk_tools import (
-    search_adk_docs,
     get_adk_api_reference,
     list_adk_documentation,
+    search_adk_docs,
 )
 
 
@@ -193,15 +194,15 @@ Be concise and helpful.""",
     print(f"❌ Failed: {failed}/{len(results)}")
 
     if passed >= len(results) * 0.75:  # At least 75% pass rate
-        print(f"\n🎉 **Overall: SUCCESS** - Bob demonstrates strong ADK knowledge!")
+        print("\n🎉 **Overall: SUCCESS** - Bob demonstrates strong ADK knowledge!")
         return 0
     elif passed + partial >= len(results) * 0.75:
         print(
-            f"\n⚠️  **Overall: PARTIAL** - Bob has ADK knowledge but could be more accurate"
+            "\n⚠️  **Overall: PARTIAL** - Bob has ADK knowledge but could be more accurate"
         )
         return 0
     else:
-        print(f"\n❌ **Overall: NEEDS IMPROVEMENT** - Bob needs better ADK grounding")
+        print("\n❌ **Overall: NEEDS IMPROVEMENT** - Bob needs better ADK grounding")
         return 1
 
 

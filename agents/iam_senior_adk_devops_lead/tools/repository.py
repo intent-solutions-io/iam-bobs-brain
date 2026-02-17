@@ -5,11 +5,8 @@ This tool helps the foreman analyze the repository structure,
 find relevant files, and understand the current state of the codebase.
 """
 
-import os
-import json
 import logging
-from typing import Dict, Any, List, Optional
-from pathlib import Path
+from typing import Any, Dict, List, Optional
 
 logger = logging.getLogger(__name__)
 

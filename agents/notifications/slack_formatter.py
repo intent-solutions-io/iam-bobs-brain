@@ -9,8 +9,9 @@ Usage:
     message_blocks = format_portfolio_completion(portfolio_result, env="dev")
 """
 
-from typing import List, Dict, Any
-from agents.shared_contracts import PortfolioResult, PerRepoResult
+from typing import Any, Dict, List
+
+from agents.shared_contracts import PortfolioResult
 
 
 def format_portfolio_completion(
@@ -302,8 +303,8 @@ def format_portfolio_completion_simple(
 
 if __name__ == "__main__":
     # Quick test/demo
-    from datetime import datetime
     import json
+    from datetime import datetime
 
     # Create a sample PortfolioResult for testing
     sample_result = PortfolioResult(

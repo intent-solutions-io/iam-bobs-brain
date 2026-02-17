@@ -11,11 +11,11 @@ Usage:
     python3 scripts/check_org_storage_readiness.py --write-test  # Attempt test write
 """
 
-import sys
-import os
 import argparse
-from pathlib import Path
+import os
+import sys
 from datetime import datetime
+from pathlib import Path
 
 # Add agents to path
 sys.path.insert(0, str(Path(__file__).parent.parent / "agents"))
@@ -23,7 +23,6 @@ sys.path.insert(0, str(Path(__file__).parent.parent / "agents"))
 from config.storage import (
     get_org_storage_bucket,
     is_org_storage_write_enabled,
-    make_portfolio_run_summary_path,
 )
 
 
@@ -60,7 +59,7 @@ def check_gcs_library():
     print("=" * 70)
 
     try:
-        from google.cloud import storage
+        from google.cloud import storage  # noqa: F401
         print("✅ google-cloud-storage is installed")
         return True
     except ImportError:
@@ -123,7 +122,7 @@ def check_bucket_access():
             return True
         else:
             print(f"❌ Bucket does NOT exist: gs://{bucket_name}/")
-            print(f"   Create bucket with Terraform or gcloud:")
+            print("   Create bucket with Terraform or gcloud:")
             print(f"   gcloud storage buckets create gs://{bucket_name}/ --location=US")
             return False
 
@@ -145,8 +144,9 @@ def test_write_permissions():
         return False
 
     try:
-        from google.cloud import storage
         import json
+
+        from google.cloud import storage
 
         client = storage.Client()
         bucket = client.bucket(bucket_name)
@@ -166,13 +166,13 @@ def test_write_permissions():
             content_type="application/json"
         )
 
-        print(f"✅ Write access confirmed")
+        print("✅ Write access confirmed")
         print(f"   Test file created: gs://{bucket_name}/{test_path}")
 
         # Clean up test file
         try:
             blob.delete()
-            print(f"✅ Test file deleted successfully")
+            print("✅ Test file deleted successfully")
         except Exception as e:
             print(f"⚠️  Failed to delete test file: {e}")
 

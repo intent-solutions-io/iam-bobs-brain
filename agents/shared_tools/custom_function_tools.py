@@ -27,9 +27,8 @@ Example:
             return f"Result: {param}"
 """
 
-from dataclasses import dataclass
-from typing import Dict, List, Optional, Any
 import logging
+from typing import Any, Dict, List, Optional
 
 logger = logging.getLogger(__name__)
 
@@ -91,7 +90,7 @@ def create_custom_file_tool(base_path: str = "/workspace") -> Any:
 
         if operation == "read":
             try:
-                with open(full_path, 'r') as f:
+                with open(full_path) as f:
                     return f.read()
             except Exception as e:
                 return f"Error reading file: {e}"
@@ -202,7 +201,7 @@ def wrap_legacy_function(func: Any, description: str) -> Any:
             return func(**filtered_kwargs)
         except Exception as e:
             logger.error(f"Error in wrapped tool: {e}")
-            return f"Error: {str(e)}"
+            return f"Error: {e!s}"
 
     # Update docstring
     wrapped_tool.__doc__ = f"""{description}
@@ -236,8 +235,9 @@ async def example_async_tool(url: str, timeout: int = 30) -> Dict[str, Any]:
     Returns:
         Response data dictionary
     """
-    import aiohttp
     import asyncio
+
+    import aiohttp
 
     async with aiohttp.ClientSession() as session:
         try:

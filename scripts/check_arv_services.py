@@ -17,11 +17,10 @@ Exit codes:
   1: Violations found
 """
 
-import sys
-import os
-from pathlib import Path
-from typing import List, Dict
 import ast
+import sys
+from pathlib import Path
+from typing import Dict, List
 
 # ANSI colors for output
 RED = "\033[91m"
@@ -222,7 +221,7 @@ def main():
 
     if not service_files:
         print(f"{GREEN}✓{RESET} No service files found (or service/ directory doesn't exist)")
-        print(f"  This is okay if all services use Agent Engine directly")
+        print("  This is okay if all services use Agent Engine directly")
         return 0
 
     print(f"Found {len(service_files)} service files to check:\n")
@@ -295,9 +294,9 @@ def main():
 
         print(f"{GREEN}✓ All service files passed gateway compliance checks{RESET}")
         print(f"  - {len(service_files)} files checked")
-        print(f"  - No Runner imports detected")
-        print(f"  - No direct model API calls detected")
-        print(f"  - Gateway separation maintained")
+        print("  - No Runner imports detected")
+        print("  - No direct model API calls detected")
+        print("  - Gateway separation maintained")
         print()
         print(f"{BLUE}{'=' * 70}{RESET}")
         print(f"{GREEN}✅ ARV Check PASSED{RESET}")

@@ -22,15 +22,14 @@ Exit Codes:
 """
 
 import sys
-import json
 from pathlib import Path
-from typing import Dict, Any, List, Tuple
+from typing import Any, Dict, List, Tuple
 
 # Add repo root to path for imports
 REPO_ROOT = Path(__file__).parent.parent
 sys.path.insert(0, str(REPO_ROOT))
 
-from agents.a2a import discover_specialists, A2AError
+from agents.a2a import A2AError, discover_specialists
 from agents.a2a.dispatcher import load_agentcard
 
 
@@ -113,7 +112,7 @@ def check_skill_naming(specialist: str, skills: List[Dict[str, Any]]) -> Tuple[b
         skill_name = skill.get("name", skill.get("skill_id", ""))
 
         if not skill_name:
-            warnings.append(f"Skill missing 'name' field (required by A2A spec)")
+            warnings.append("Skill missing 'name' field (required by A2A spec)")
             continue
 
         # {agent}.{skill} naming is recommended but not required per A2A spec
@@ -281,7 +280,7 @@ def run_all_checks() -> bool:
     print_header("CHECK 2: Foreman Discovery")
     success, issues = check_foreman_discovery()
     if success:
-        print_success(f"Foreman can discover all specialists")
+        print_success("Foreman can discover all specialists")
     else:
         print_failure("Foreman discovery issues:")
         for issue in issues:
@@ -302,7 +301,7 @@ def run_all_checks() -> bool:
             if success:
                 print_success(f"  Skill naming: {len(skills)} skills follow convention")
             else:
-                print_failure(f"  Skill naming violations:")
+                print_failure("  Skill naming violations:")
                 for violation in violations:
                     print_failure(f"    - {violation}")
                 all_passed = False
@@ -312,7 +311,7 @@ def run_all_checks() -> bool:
             if success:
                 print_success(f"  Skill schemas: All {len(skills)} skills have valid schemas")
             else:
-                print_failure(f"  Skill schema violations:")
+                print_failure("  Skill schema violations:")
                 for violation in violations:
                     print_failure(f"    - {violation}")
                 all_passed = False
@@ -322,7 +321,7 @@ def run_all_checks() -> bool:
             if success:
                 print_success(f"  R7 SPIFFE ID: Compliant ({agentcard.get('spiffe_id')})")
             else:
-                print_failure(f"  R7 SPIFFE ID violations:")
+                print_failure("  R7 SPIFFE ID violations:")
                 for violation in violations:
                     print_failure(f"    - {violation}")
                 all_passed = False

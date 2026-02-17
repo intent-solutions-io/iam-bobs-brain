@@ -4,11 +4,11 @@ Import all data to Vertex AI Search Datastore
 Consolidates everything into bob-vertex-agent-datastore
 """
 
-import os
+import logging
 from typing import List
+
 from google.cloud import discoveryengine_v1 as discoveryengine
 from google.cloud import storage
-import logging
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)

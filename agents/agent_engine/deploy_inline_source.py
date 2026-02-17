@@ -43,12 +43,12 @@ import argparse
 import os
 import sys
 from pathlib import Path
-from typing import List, Optional
+from typing import Optional
 
 # GCP imports (lazy-loaded to avoid import errors in environments without SDK)
 try:
     from google.cloud import aiplatform
-    from google.cloud.aiplatform import gapic
+    from google.cloud.aiplatform import gapic  # noqa: F401
 except ImportError as e:
     print(f"ERROR: Missing required Google Cloud SDK dependencies: {e}", file=sys.stderr)
     print("Install with: pip install google-cloud-aiplatform", file=sys.stderr)
@@ -196,8 +196,8 @@ def validate_agent_config(agent_name: str, check_imports: bool = False) -> dict:
             print(f"   ✅ Entrypoint object '{config['entrypoint_object']}' found")
         except ImportError as e:
             print(f"   ⚠️  Import check skipped: {e}")
-            print(f"   ℹ️  This is OK for CI without full dependencies installed")
-            print(f"   ℹ️  Install dependencies with: pip install -r requirements.txt")
+            print("   ℹ️  This is OK for CI without full dependencies installed")
+            print("   ℹ️  Install dependencies with: pip install -r requirements.txt")
 
     return config
 
@@ -239,8 +239,6 @@ def deploy_agent_inline_source(
     aiplatform.init(project=project_id, location=location)
 
     # Prepare inline source configuration
-    repo_root = get_repo_root()
-
     inline_source_config = {
         "source_packages": SOURCE_PACKAGES,
         "entrypoint": {
@@ -250,7 +248,7 @@ def deploy_agent_inline_source(
         "class_methods": agent_config["class_methods"],
     }
 
-    print(f"\n📦 Inline Source Config:")
+    print("\n📦 Inline Source Config:")
     print(f"   Source Packages: {inline_source_config['source_packages']}")
     print(f"   Entrypoint Module: {inline_source_config['entrypoint']['module']}")
     print(f"   Entrypoint Object: {inline_source_config['entrypoint']['object']}")
@@ -260,7 +258,7 @@ def deploy_agent_inline_source(
     display_name = f"{agent_config['display_name']} ({env})"
 
     try:
-        print(f"\n⏳ Deploying to Vertex AI Agent Engine...")
+        print("\n⏳ Deploying to Vertex AI Agent Engine...")
 
         # Use ReasoningEngine API for deployment
         from google.cloud.aiplatform_v1 import ReasoningEngineServiceClient
@@ -278,8 +276,8 @@ def deploy_agent_inline_source(
         # For inline source deployment, we need to package and upload the source first
         # For now, create a minimal reasoning engine
 
-        print(f"   Note: Full inline source deployment requires packaging agents/ directory")
-        print(f"   This is a minimal deployment to get Agent Engine IDs")
+        print("   Note: Full inline source deployment requires packaging agents/ directory")
+        print("   This is a minimal deployment to get Agent Engine IDs")
 
         reasoning_engine = ReasoningEngine(
             display_name=display_name,
@@ -287,7 +285,6 @@ def deploy_agent_inline_source(
 
         if agent_id:
             print(f"   Updating existing agent: {agent_id}")
-            name = f"{parent}/reasoningEngines/{agent_id}"
             operation = client.update_reasoning_engine(
                 reasoning_engine=reasoning_engine,
                 update_mask={"paths": ["display_name", "spec"]}
@@ -295,7 +292,7 @@ def deploy_agent_inline_source(
             result = operation.result()
             agent_resource_name = result.name
         else:
-            print(f"   Creating new reasoning engine...")
+            print("   Creating new reasoning engine...")
             operation = client.create_reasoning_engine(
                 parent=parent,
                 reasoning_engine=reasoning_engine,
@@ -307,7 +304,7 @@ def deploy_agent_inline_source(
             engine_id = agent_resource_name.split('/')[-1]
             print(f"   Engine ID: {engine_id}")
 
-        print(f"\n✅ Deployment successful!")
+        print("\n✅ Deployment successful!")
         print(f"   Agent Resource: {agent_resource_name}")
 
         return agent_resource_name

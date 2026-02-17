@@ -17,18 +17,12 @@ Usage:
 
 import os
 import sys
-import json
-import yaml
 from pathlib import Path
 
 # Add parent directory to path so we can import agents modules
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from agents.shared_tools.vertex_search import (
-    get_current_environment,
-    get_datastore_info,
-    load_vertex_search_config
-)
+from agents.shared_tools.vertex_search import get_current_environment, get_datastore_info, load_vertex_search_config
 
 
 def print_header(title: str):
@@ -104,10 +98,10 @@ def main():
             print(f"    gcloud ai search datastores create {ds_id} \\")
             print(f"      --location={location} \\")
             print(f"      --project={project} \\")
-            print(f"      --type=unstructured")
+            print("      --type=unstructured")
 
             print("\n  Import knowledge:")
-            print(f"    gcloud ai search documents import \\")
+            print("    gcloud ai search documents import \\")
             print(f"      --datastore={ds_id} \\")
             print(f"      --location={location} \\")
             print(f"      --project={project} \\")

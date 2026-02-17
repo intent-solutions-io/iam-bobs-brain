@@ -14,15 +14,14 @@ See: 000-docs/257-DR-STND-mission-spec-v1.md
 
 import hashlib
 import json
-from dataclasses import dataclass, field, asdict
+from dataclasses import asdict, dataclass, field
 from datetime import datetime, timezone
 from typing import Any, Dict, List, Optional
-import uuid
 
 from agents.mission_spec.schema import (
+    LoopStep,
     MissionSpec,
     WorkflowStep,
-    LoopStep,
     validate_mission,
 )
 from agents.shared_contracts.pipeline_contracts import Mandate, PipelineRequest

@@ -8,11 +8,12 @@ Phase 13 Update: Replaced dict-based tools with proper VertexAiSearchTool instan
 to comply with google-adk 1.18+ Pydantic validation.
 """
 
-import os
 import logging
-import yaml
-from typing import Any, Dict, Optional
+import os
 from pathlib import Path
+from typing import Any, Dict, Optional
+
+import yaml
 
 # ADK 1.18+ proper tool import
 from google.adk.tools import VertexAiSearchTool
@@ -33,7 +34,7 @@ def load_vertex_search_config() -> Dict[str, Any]:
         logger.warning(f"Vertex Search config not found at {config_path}")
         return {}
 
-    with open(config_path, 'r') as f:
+    with open(config_path) as f:
         return yaml.safe_load(f)
 
 
@@ -192,7 +193,7 @@ def get_datastore_info(env: Optional[str] = None) -> Dict[str, str]:
 # Export the main factory functions
 __all__ = [
     "get_bob_vertex_search_tool",
-    "get_foreman_vertex_search_tool",
     "get_current_environment",
-    "get_datastore_info"
+    "get_datastore_info",
+    "get_foreman_vertex_search_tool"
 ]

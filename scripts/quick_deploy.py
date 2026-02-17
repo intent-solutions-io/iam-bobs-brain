@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
 """Quick deploy script using Vertex AI SDK"""
 
+import sys
+
 from google.cloud.aiplatform_v1 import ReasoningEngineServiceClient
 from google.cloud.aiplatform_v1.types import ReasoningEngine
-import sys
 
 PROJECT = "bobs-brain"
 LOCATION = "us-central1"
@@ -65,7 +66,7 @@ def deploy_agent(agent_name, display_name):
             reasoning_engine=engine,
         )
 
-        print(f"   Creating... (this may take a minute)")
+        print("   Creating... (this may take a minute)")
         result = operation.result(timeout=180)
 
         engine_id = result.name.split('/')[-1]

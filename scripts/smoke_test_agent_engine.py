@@ -30,7 +30,7 @@ import argparse
 import os
 import sys
 from pathlib import Path
-from typing import Dict, List, Optional
+from typing import Dict
 
 # Add repo root to path
 sys.path.insert(0, str(Path(__file__).parent.parent))
@@ -112,7 +112,7 @@ def run_config_only_tests(config: Dict) -> bool:
     try:
         import sys
         sys.path.insert(0, str(Path(__file__).parent.parent))
-        from agents.config.agent_engine import get_agent_engine_config
+        from agents.config.agent_engine import get_agent_engine_config  # noqa: F401
         print("   agents.config.agent_engine: OK")
     except ImportError as e:
         print(f"   ❌ Import error: {e}")
@@ -191,14 +191,14 @@ def run_live_smoke_tests(config: Dict) -> bool:
             # Get the remote app
             try:
                 remote_app = agent_engines.get(resource_name)
-                print(f"   ✅ Agent Engine connection established")
+                print("   ✅ Agent Engine connection established")
             except Exception as e:
                 print(f"   ❌ Failed to connect: {e}")
                 test_results.append(False)
                 continue
 
             # Send a lightweight smoke test query
-            test_prompt = f"[SMOKE TEST] What is your name? (Reply briefly)"
+            test_prompt = "[SMOKE TEST] What is your name? (Reply briefly)"
             print(f"   📤 Sending: '{test_prompt[:50]}...'")
 
             try:

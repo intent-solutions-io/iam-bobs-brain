@@ -9,16 +9,16 @@ Uses centralized RAG configuration from agents.config.rag.
 
 import sys
 from pathlib import Path
-from typing import Literal, Optional, Any
+from typing import Literal, Optional
 
 # Add parent directory for imports
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from config.rag import (
-    get_current_env,
+    VertexSearchConfig,
     get_bob_vertex_search_config,
+    get_current_env,
     get_foreman_vertex_search_config,
-    VertexSearchConfig
 )
 
 

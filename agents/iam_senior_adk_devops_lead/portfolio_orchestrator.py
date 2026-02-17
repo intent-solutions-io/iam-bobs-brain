@@ -7,47 +7,37 @@ an entire portfolio of repositories, producing aggregated quality reports.
 Future: Can be parallelized for faster execution across many repos.
 """
 
-import time
-import uuid
-from typing import List, Optional, Dict, Tuple
-from datetime import datetime
-from collections import Counter
-
 # Import shared contracts
 import sys
+import time
+import uuid
+from collections import Counter
+from datetime import datetime
 from pathlib import Path
+from typing import Dict, List, Optional, Tuple
+
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from shared_contracts import (
-    PortfolioResult, PerRepoResult, PipelineResult,
-    Severity, IssueType, IssueSpec
-)
+from config.github_features import can_create_issues_for_repo, get_github_mode
+from config.notifications import should_send_slack_notifications
 
 # Import repo registry
-from config.repos import list_repos, get_repo_by_id, RepoConfig
+from config.repos import get_repo_by_id, list_repos
+from config.storage import get_org_storage_bucket, is_org_storage_write_enabled
+
+# Import GitHub issue creation (LIVE3B/LIVE3C-GITHUB-ISSUES)
+from iam_issue.github_issue_adapter import batch_create_github_issues
+
+# Import notifications (LIVE3A)
+from notifications import send_portfolio_notification
+
+from shared_contracts import IssueSpec, PerRepoResult, PortfolioResult
 
 # Import single-repo orchestrator (relative import to avoid module path issues)
 from .orchestrator import run_swe_pipeline_for_repo
 
 # Import org storage writer (LIVE1-GCS)
 from .storage_writer import write_portfolio_result_to_gcs
-from config.storage import is_org_storage_write_enabled, get_org_storage_bucket
-
-# Import notifications (LIVE3A)
-from notifications import send_portfolio_notification
-from config.notifications import should_send_slack_notifications
-
-# Import GitHub issue creation (LIVE3B/LIVE3C-GITHUB-ISSUES)
-from iam_issue.github_issue_adapter import (
-    create_github_issue,
-    batch_create_github_issues,
-    IssueCreationResult
-)
-from config.github_features import (
-    can_create_issues_for_repo,
-    get_github_mode,
-    GitHubMode
-)
 
 
 def run_portfolio_swe(
@@ -225,9 +215,9 @@ def run_portfolio_swe(
                     portfolio_result.issues_created += 1
                     print(f"    ✅ Created issue #{result.issue_number}: {result.issue_url}")
                 elif result.success and result.mode == "dry_run":
-                    print(f"    📝 DRY-RUN: Would create issue")
+                    print("    📝 DRY-RUN: Would create issue")
                 elif result.mode == "disabled":
-                    print(f"    ⏭️  DISABLED: Skipped issue creation")
+                    print("    ⏭️  DISABLED: Skipped issue creation")
                 else:
                     print(f"    ❌ FAILED: {result.error}")
 

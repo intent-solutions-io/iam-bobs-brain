@@ -9,9 +9,9 @@ Usage:
     python3 scripts/export_agentcards.py
 """
 
+import importlib.util
 import json
 import sys
-import importlib.util
 from pathlib import Path
 
 # Add agents directory to Python path

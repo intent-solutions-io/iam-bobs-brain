@@ -27,17 +27,16 @@ project_root = Path(__file__).parent.parent
 sys.path.insert(0, str(project_root))
 
 from agents.config.features import get_current_environment
+from agents.config.github_features import (
+    GitHubMode,
+    get_github_mode,
+    load_github_feature_config,
+)
 from agents.config.notifications import (
+    SlackMode,
     are_slack_notifications_enabled,
     get_slack_mode,
     get_swe_slack_destination,
-    get_slack_env_prefix,
-    SlackMode,
-)
-from agents.config.github_features import (
-    load_github_feature_config,
-    get_github_mode,
-    GitHubMode,
 )
 
 
@@ -57,7 +56,6 @@ def check_slack_readiness() -> Tuple[str, str, List[str]]:
     enabled = are_slack_notifications_enabled()
     mode = get_slack_mode()
     dest = get_swe_slack_destination()
-    prefix = get_slack_env_prefix()
 
     if not enabled:
         return "DISABLED", "Feature flag off", []
@@ -68,12 +66,12 @@ def check_slack_readiness() -> Tuple[str, str, List[str]]:
             warnings.append(
                 "⚠️  Slack enabled but SLACK_ENABLE_STAGING=false - no messages will be sent"
             )
-            return "DISABLED", f"Staging gate active (override not set)", warnings
+            return "DISABLED", "Staging gate active (override not set)", warnings
         elif env == "prod":
             warnings.append(
                 "⚠️  Slack enabled but SLACK_ENABLE_PROD=false - no messages will be sent"
             )
-            return "DISABLED", f"Production gate active (override not set)", warnings
+            return "DISABLED", "Production gate active (override not set)", warnings
         else:
             warnings.append("⚠️  Slack enabled but no valid destination configured")
             return "MISCONFIGURED", "No valid webhook/channel", warnings
@@ -270,7 +268,7 @@ def main():
         1 for status, _, _ in results.values() if status == "MISCONFIGURED"
     )
 
-    print(f"Summary:")
+    print("Summary:")
     print(f"  Enabled/Active: {enabled_count}/3")
     print(f"  Disabled: {disabled_count}/3")
     print(f"  Misconfigured: {misconfigured_count}/3")
@@ -307,7 +305,7 @@ if __name__ == "__main__":
     try:
         sys.exit(main())
     except Exception as e:
-        print(f"\n❌ ERROR: LIVE3 readiness check failed with exception:", file=sys.stderr)
+        print("\n❌ ERROR: LIVE3 readiness check failed with exception:", file=sys.stderr)
         print(f"   {type(e).__name__}: {e}", file=sys.stderr)
         print("\nThis indicates an infrastructure or import issue, not a config problem.")
         print("Check that all dependencies are installed and imports are correct.\n")

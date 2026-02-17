@@ -10,8 +10,7 @@ actionable FixPlan implementations.
 
 import json
 import logging
-from typing import Dict, List, Any, Optional
-from datetime import datetime
+from typing import Any, Dict, List
 
 logger = logging.getLogger(__name__)
 
@@ -83,7 +82,7 @@ def create_fix_plan(issue_data: str) -> str:
     except json.JSONDecodeError as e:
         logger.error(f"Invalid JSON in issue_data: {e}")
         return json.dumps({
-            "error": f"Invalid JSON: {str(e)}",
+            "error": f"Invalid JSON: {e!s}",
             "received": issue_data[:100]
         })
     except Exception as e:
@@ -409,7 +408,7 @@ def validate_fix_plan(plan_data: str) -> str:
         logger.error(f"Invalid JSON in plan_data: {e}")
         return json.dumps({
             "is_valid": False,
-            "error": f"Invalid JSON: {str(e)}"
+            "error": f"Invalid JSON: {e!s}"
         })
     except Exception as e:
         logger.error(f"Error validating fix plan: {e}")
@@ -528,7 +527,7 @@ def _generate_risk_recommendation(risk_level: str, component: str, severity: str
     elif risk_level == "medium":
         return f"Medium-risk fix for {severity} severity issue. Recommend: single deployment to prod with monitoring, manual rollback plan available."
     else:
-        return f"Low-risk fix. Can proceed with standard merge and deployment via CI/CD."
+        return "Low-risk fix. Can proceed with standard merge and deployment via CI/CD."
 
 
 def define_testing_strategy(component: str, issue_type: str, impacted_areas: str) -> str:
@@ -734,7 +733,7 @@ def estimate_effort(plan_data: str, team_expertise: str = "medium") -> str:
             try:
                 hours_str = estimated_effort.split()[0]
                 impl_hours = float(hours_str) * base_mult
-            except:
+            except Exception:
                 impl_hours = len(steps) * 0.5
 
         # Testing hours

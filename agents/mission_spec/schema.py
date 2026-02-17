@@ -36,8 +36,9 @@ See: 000-docs/257-DR-STND-mission-spec-v1.md
 from enum import Enum
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Union
-from pydantic import BaseModel, Field, field_validator
+
 import yaml
+from pydantic import BaseModel, Field, field_validator
 
 
 class StepType(str, Enum):
@@ -319,7 +320,7 @@ def load_mission(path: Union[str, Path]) -> MissionSpec:
     if not path.exists():
         raise FileNotFoundError(f"Mission file not found: {path}")
 
-    with open(path, "r") as f:
+    with open(path) as f:
         data = yaml.safe_load(f)
 
     if not data:

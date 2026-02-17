@@ -18,11 +18,11 @@ Environment Variables:
 - GITHUB_TOKEN: GitHub Personal Access Token (required for real creation)
 """
 
-import os
 import logging
-from typing import Set, Optional, Literal
+import os
 from dataclasses import dataclass
 from enum import Enum
+from typing import Literal, Optional, Set
 
 logger = logging.getLogger(__name__)
 

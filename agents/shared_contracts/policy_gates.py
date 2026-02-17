@@ -17,7 +17,7 @@ See: 000-docs/254-DR-STND-policy-gates-risk-tiers.md
 
 from dataclasses import dataclass
 from enum import Enum
-from typing import Optional, List
+from typing import List, Optional
 
 from agents.shared_contracts.pipeline_contracts import Mandate
 

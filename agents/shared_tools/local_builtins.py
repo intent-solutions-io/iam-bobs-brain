@@ -7,9 +7,9 @@ These tools are executed in-process by the Runner/Agent Engine.
 No external services or Cloud Run deployments required.
 """
 
-from typing import Any, Optional
 import logging
 import os
+from typing import Any
 
 logger = logging.getLogger(__name__)
 

@@ -7,11 +7,9 @@ These tools enable Bob to access comprehensive Google ADK documentation
 without requiring external API calls or internet connectivity.
 """
 
-import os
+import logging
 import re
 from pathlib import Path
-from typing import List, Dict, Any
-import logging
 
 logger = logging.getLogger(__name__)
 
@@ -63,7 +61,7 @@ def search_adk_docs(query: str, max_results: int = 5, context_lines: int = 3) ->
         # Search each file
         for doc_file in doc_files:
             try:
-                with open(doc_file, "r", encoding="utf-8") as f:
+                with open(doc_file, encoding="utf-8") as f:
                     lines = f.readlines()
 
                 # Search for matches
@@ -128,7 +126,7 @@ def search_adk_docs(query: str, max_results: int = 5, context_lines: int = 3) ->
 
     except Exception as e:
         logger.error(f"Error in search_adk_docs: {e}", exc_info=True)
-        return f"❌ Error searching documentation: {str(e)}"
+        return f"❌ Error searching documentation: {e!s}"
 
 
 def get_adk_api_reference(topic: str) -> str:
@@ -161,7 +159,7 @@ def get_adk_api_reference(topic: str) -> str:
         if not api_ref_path.exists():
             return f"❌ API reference not found: {api_ref_path}"
 
-        with open(api_ref_path, "r", encoding="utf-8") as f:
+        with open(api_ref_path, encoding="utf-8") as f:
             content = f.read()
 
         # Search for topic (case-insensitive heading search)
@@ -218,7 +216,7 @@ def get_adk_api_reference(topic: str) -> str:
 
     except Exception as e:
         logger.error(f"Error in get_adk_api_reference: {e}", exc_info=True)
-        return f"❌ Error retrieving API reference: {str(e)}"
+        return f"❌ Error retrieving API reference: {e!s}"
 
 
 def list_adk_documentation() -> str:
@@ -254,7 +252,7 @@ def list_adk_documentation() -> str:
 
             # Try to extract first heading as description
             try:
-                with open(doc_file, "r", encoding="utf-8") as f:
+                with open(doc_file, encoding="utf-8") as f:
                     first_lines = [next(f) for _ in range(5)]
                     description = None
                     for line in first_lines:
@@ -263,7 +261,7 @@ def list_adk_documentation() -> str:
                             break
                     if not description:
                         description = "ADK Documentation"
-            except:
+            except Exception:
                 description = "ADK Documentation"
 
             result.append(
@@ -271,17 +269,17 @@ def list_adk_documentation() -> str:
             )
 
         result.append(
-            f"\n💡 **Usage:**\n"
-            f"- Search: `search_adk_docs('your query')`\n"
-            f"- API Reference: `get_adk_api_reference('ClassName')`\n"
+            "\n💡 **Usage:**\n"
+            "- Search: `search_adk_docs('your query')`\n"
+            "- API Reference: `get_adk_api_reference('ClassName')`\n"
         )
 
         return "".join(result)
 
     except Exception as e:
         logger.error(f"Error in list_adk_documentation: {e}", exc_info=True)
-        return f"❌ Error listing documentation: {str(e)}"
+        return f"❌ Error listing documentation: {e!s}"
 
 
 # Tool metadata for ADK agent integration
-__all__ = ["search_adk_docs", "get_adk_api_reference", "list_adk_documentation"]
+__all__ = ["get_adk_api_reference", "list_adk_documentation", "search_adk_docs"]

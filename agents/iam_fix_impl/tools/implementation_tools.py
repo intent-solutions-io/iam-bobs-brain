@@ -6,7 +6,6 @@ These tools help convert FixPlan specifications into working code with tests.
 
 import json
 import logging
-from typing import Dict, Any
 
 logger = logging.getLogger(__name__)
 
@@ -75,7 +74,7 @@ Remember:
         logger.error(f"Error in implement_fix_step: {e}", exc_info=True)
         return json.dumps({
             "status": "error",
-            "message": f"Failed to process step: {str(e)}"
+            "message": f"Failed to process step: {e!s}"
         })
 
 
@@ -137,7 +136,7 @@ def validate_implementation(validation_data: str) -> str:
         logger.error(f"Error in validate_implementation: {e}", exc_info=True)
         return json.dumps({
             "status": "error",
-            "message": f"Validation failed: {str(e)}"
+            "message": f"Validation failed: {e!s}"
         })
 
 
@@ -162,7 +161,6 @@ def generate_unit_tests(code_data: str) -> str:
         file_path = data.get("file_path", "")
         functions = data.get("functions", [])
         classes = data.get("classes", [])
-        scenarios = data.get("test_scenarios", [])
 
         # Generate test file path
         if "agents/" in file_path:
@@ -258,7 +256,7 @@ class Test{cls}:
         logger.error(f"Error in generate_unit_tests: {e}", exc_info=True)
         return json.dumps({
             "status": "error",
-            "message": f"Test generation failed: {str(e)}"
+            "message": f"Test generation failed: {e!s}"
         })
 
 
@@ -279,7 +277,6 @@ def check_compliance(compliance_data: str) -> str:
         data = json.loads(compliance_data)
         file_path = data.get("file_path", "")
         contents = data.get("file_contents", "")
-        component = data.get("component", "")
 
         violations = []
 
@@ -349,7 +346,7 @@ def check_compliance(compliance_data: str) -> str:
         logger.error(f"Error in check_compliance: {e}", exc_info=True)
         return json.dumps({
             "status": "error",
-            "message": f"Compliance check failed: {str(e)}"
+            "message": f"Compliance check failed: {e!s}"
         })
 
 
@@ -391,7 +388,7 @@ def document_implementation(doc_data: str) -> str:
 {chr(10).join(f"{i+1}. {d}" for i, d in enumerate(decisions)) if decisions else "None"}
 
 ## Known Limitations
-{chr(10).join(f"- {l}" for l in limitations) if limitations else "None"}
+{chr(10).join(f"- {item}" for item in limitations) if limitations else "None"}
 
 ## QA Testing Recommendations
 {chr(10).join(f"{i+1}. {r}" for i, r in enumerate(qa_recs)) if qa_recs else "Run standard test suite"}
@@ -422,5 +419,5 @@ def document_implementation(doc_data: str) -> str:
         logger.error(f"Error in document_implementation: {e}", exc_info=True)
         return json.dumps({
             "status": "error",
-            "message": f"Documentation failed: {str(e)}"
+            "message": f"Documentation failed: {e!s}"
         })

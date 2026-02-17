@@ -18,16 +18,14 @@ Related Docs:
 
 import os
 import uuid
-from typing import Dict, Any, Optional, Literal
 from dataclasses import dataclass
+from typing import Any, Dict, Optional
 
 # Import Agent Engine configuration
 from agents.config.agent_engine import (
+    Environment,
     get_agent_engine_config,
-    get_reasoning_engine_id,
     get_spiffe_id,
-    AgentEngineConfig,
-    Environment
 )
 
 
@@ -375,22 +373,22 @@ def print_agent_engine_info(
 
     if config is None:
         print(f"❌ Agent {agent_role} NOT deployed to Agent Engine in {env}")
-        print(f"   Uses local stub implementation")
+        print("   Uses local stub implementation")
         return
 
     print(f"✅ Agent {agent_role} deployed to Agent Engine")
-    print(f"\nReasoning Engine ID:")
+    print("\nReasoning Engine ID:")
     print(f"  {config.reasoning_engine_id}")
-    print(f"\nRegion:")
+    print("\nRegion:")
     print(f"  {config.region}")
-    print(f"\nSPIFFE ID:")
+    print("\nSPIFFE ID:")
     print(f"  {config.spiffe_id}")
-    print(f"\nREST Endpoint:")
+    print("\nREST Endpoint:")
     endpoint = resolve_agent_engine_endpoint(agent_role, env)
     print(f"  {endpoint}")
 
     if config.notes:
-        print(f"\nNotes:")
+        print("\nNotes:")
         print(f"  {config.notes}")
 
     print(f"{'=' * 60}\n")
@@ -414,7 +412,7 @@ if __name__ == "__main__":
             caller_agent_role="foreman",
             env="staging"
         )
-        print(f"\nResponse preview:")
+        print("\nResponse preview:")
         print(response.response[:200] + "...")
     else:
         print("iam-adk not available in staging")

@@ -16,9 +16,10 @@ import sys
 from pathlib import Path
 from typing import Any, Dict
 
+
 def load_agentcard(path: Path) -> Dict[str, Any]:
     """Load an AgentCard JSON file."""
-    with open(path, 'r') as f:
+    with open(path) as f:
         return json.load(f)
 
 def save_agentcard(path: Path, data: Dict[str, Any], dry_run: bool = False) -> None:
@@ -176,7 +177,7 @@ def main():
 
             # Check if already migrated
             if card.get('protocol_version') == '0.3.0':
-                print(f"  ✓ Already at v0.3.0")
+                print("  ✓ Already at v0.3.0")
                 success_count += 1
                 continue
 

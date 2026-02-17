@@ -5,12 +5,13 @@ These tools handle documentation indexing, knowledge base queries,
 and Vertex AI Search integration.
 """
 
+import hashlib
 import json
 import os
-from typing import Dict, List, Any, Optional
 from datetime import datetime
 from pathlib import Path
-import hashlib
+from typing import List, Optional
+
 from agents.iam_contracts import IndexEntry
 
 

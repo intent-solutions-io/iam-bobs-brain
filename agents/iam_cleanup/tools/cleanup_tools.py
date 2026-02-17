@@ -9,11 +9,8 @@ This module provides tools for:
 - Proposing cleanup tasks with safety assessments
 """
 
-import os
 import logging
-from typing import List, Dict, Any, Optional
-from pathlib import Path
-import re
+from typing import Any, Dict, List, Optional
 
 logger = logging.getLogger(__name__)
 

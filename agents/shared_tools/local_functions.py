@@ -8,8 +8,8 @@ that do not require any external services.
 All tools here run in-process within the Runner/Agent Engine.
 """
 
-from typing import Dict, List, Any, Optional
 import logging
+from typing import Any, Dict, List
 
 logger = logging.getLogger(__name__)
 

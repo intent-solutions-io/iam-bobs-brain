@@ -5,13 +5,13 @@ Crawls the ADK documentation site, follows internal links, and extracts raw HTML
 Respects robots.txt and implements rate limiting.
 """
 
-import time
-import logging
 import hashlib
 import json
-from typing import List, Dict, Set, Optional
-from urllib.parse import urljoin, urlparse, urlunparse
+import logging
+import time
 from datetime import datetime
+from typing import Dict, List, Optional, Set
+from urllib.parse import urljoin, urlparse, urlunparse
 
 import requests
 from bs4 import BeautifulSoup

@@ -190,8 +190,6 @@ def is_feature_enabled(flag_name: str, env: Optional[str] = None) -> bool:
         - Missing environment defaults to "dev"
         - All flags default to False unless explicitly set
     """
-    current_env = env or get_current_environment()
-
     # Get flag value from globals
     flag_value = globals().get(flag_name, False)
 

@@ -4,8 +4,8 @@ Configuration management for ADK docs crawler.
 Loads and validates configuration from environment variables with sensible defaults.
 """
 
-import os
 import logging
+import os
 from dataclasses import dataclass
 from typing import Optional
 
@@ -35,7 +35,7 @@ class CrawlerConfig:
         if self.max_chunk_tokens <= 0:
             raise ValueError("MAX_CHUNK_TOKENS must be positive")
 
-        logger.info(f"Crawler configuration loaded:")
+        logger.info("Crawler configuration loaded:")
         logger.info(f"  Project ID: {self.project_id}")
         logger.info(f"  Docs Bucket: {self.docs_bucket}")
         logger.info(f"  Crawl Delay: {self.crawl_delay_seconds}s")

@@ -5,11 +5,11 @@ Provides centralized configuration for target repositories that
 the SWE pipeline and agents can operate on.
 """
 
-import os
-import yaml
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import List, Optional, Dict, Any
+from typing import Dict, List, Optional
+
+import yaml
 
 
 @dataclass
@@ -107,7 +107,7 @@ class RepoRegistry:
 
     def _load(self):
         """Load registry from YAML file."""
-        with open(self.config_path, 'r') as f:
+        with open(self.config_path) as f:
             data = yaml.safe_load(f)
 
         # Load repos

@@ -17,9 +17,9 @@ Exit codes:
     2 - Error during checks
 """
 
+import argparse
 import os
 import sys
-import argparse
 from pathlib import Path
 from typing import Tuple
 
@@ -55,12 +55,12 @@ class RAGReadinessChecker:
         # Try to import config module
         try:
             from agents.config.rag import (
+                VertexSearchConfig,  # noqa: F401
+                get_bob_vertex_search_config,  # noqa: F401
                 get_current_env,
-                get_vertex_search_config,
-                get_bob_vertex_search_config,
-                get_foreman_vertex_search_config,
+                get_foreman_vertex_search_config,  # noqa: F401
+                get_vertex_search_config,  # noqa: F401
                 validate_rag_config,
-                VertexSearchConfig
             )
             self.log("✓ Imported RAG config functions")
         except ImportError as e:
@@ -128,10 +128,10 @@ class RAGReadinessChecker:
         # Try to import tool factory
         try:
             from agents.tools.vertex_search import (
+                VertexSearchToolStub,  # noqa: F401
                 get_bob_vertex_search_tool,
                 get_foreman_vertex_search_tool,
-                get_vertex_search_tool_for_env,
-                VertexSearchToolStub
+                get_vertex_search_tool_for_env,  # noqa: F401
             )
             self.log("✓ Imported tool factory functions")
         except ImportError as e:

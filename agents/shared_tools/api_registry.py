@@ -15,9 +15,9 @@ Hard Mode Compliance:
 - R7: Header provider propagates auth context
 """
 
-from typing import Optional, Any, List, Callable
 import logging
 import os
+from typing import Any, Callable, List, Optional
 
 logger = logging.getLogger(__name__)
 
@@ -115,7 +115,7 @@ def get_tools_for_agent(agent_name: str) -> List[Any]:
         return tools
     except AttributeError:
         # API might be different - try alternative method
-        logger.info(f"get_agent_tools not available, trying get_toolset")
+        logger.info("get_agent_tools not available, trying get_toolset")
         return _get_tools_via_toolset(registry, agent_name)
     except Exception as e:
         logger.error(f"Failed to get tools for {agent_name}: {e}")

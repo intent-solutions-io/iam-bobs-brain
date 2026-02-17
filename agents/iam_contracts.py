@@ -6,8 +6,8 @@ to communicate with each other and with the foreman.
 """
 
 from dataclasses import dataclass, field
-from typing import List, Optional, Literal, Dict, Any
 from datetime import datetime
+from typing import Any, Dict, List, Literal, Optional
 
 
 @dataclass

@@ -21,13 +21,13 @@ Phase H+: Implements async A2A dispatch using InMemoryRunner.run_debug()
 """
 
 import asyncio
+import importlib
 import json
 import logging
-import importlib
 from pathlib import Path
-from typing import Dict, Any, List
+from typing import Any, Dict, List
 
-from .types import A2ATask, A2AResult, A2AError
+from .types import A2AError, A2AResult, A2ATask
 
 logger = logging.getLogger(__name__)
 
@@ -138,7 +138,7 @@ def load_agentcard(specialist: str) -> Dict[str, Any]:
         )
 
     try:
-        with open(agentcard_path, "r") as f:
+        with open(agentcard_path) as f:
             return json.load(f)
     except json.JSONDecodeError as e:
         raise A2AError(
@@ -489,8 +489,9 @@ def _mandate_from_dict(mandate_dict: Dict[str, Any]):
     Raises:
         ValueError, TypeError, AttributeError: On malformed fields
     """
-    from agents.shared_contracts.pipeline_contracts import Mandate
     from datetime import datetime
+
+    from agents.shared_contracts.pipeline_contracts import Mandate
 
     # Parse expires_at if present
     expires_at = None

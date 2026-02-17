@@ -10,9 +10,10 @@ Classes:
 - A2AError: Exception raised for A2A protocol violations
 """
 
-from pydantic import BaseModel, Field
-from typing import Dict, Any, Optional, Literal, List
 from datetime import datetime
+from typing import Any, Dict, List, Literal, Optional
+
+from pydantic import BaseModel, Field
 
 
 class AgentCard(BaseModel):

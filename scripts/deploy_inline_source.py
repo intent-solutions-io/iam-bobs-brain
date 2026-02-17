@@ -29,7 +29,7 @@ import argparse
 import os
 import sys
 from pathlib import Path
-from typing import Dict, Optional
+from typing import Dict
 
 # Add repo root to path
 sys.path.insert(0, str(Path(__file__).parent.parent))
@@ -188,11 +188,11 @@ def deploy_with_inline_source(config: Dict) -> str:
         if capture_message_content:
             os.environ["OTEL_INSTRUMENTATION_GENAI_CAPTURE_MESSAGE_CONTENT"] = "true"
 
-        print(f"✅ Agent loaded successfully")
+        print("✅ Agent loaded successfully")
 
         # Deploy to Agent Engine
-        print(f"\n🔄 Creating reasoning engine on Vertex AI...")
-        print(f"   This may take 2-3 minutes...")
+        print("\n🔄 Creating reasoning engine on Vertex AI...")
+        print("   This may take 2-3 minutes...")
 
         remote_app = agent_engines.create(
             agent_engine=agent_app,
@@ -205,13 +205,13 @@ def deploy_with_inline_source(config: Dict) -> str:
         )
 
         resource_name = remote_app.resource_name
-        print(f"\n✅ Deployment successful!")
+        print("\n✅ Deployment successful!")
         print(f"   Resource Name: {resource_name}")
 
         # Extract reasoning engine ID
         engine_id = resource_name.split('/')[-1]
         print(f"   Engine ID: {engine_id}")
-        print(f"\n🔍 View in Console:")
+        print("\n🔍 View in Console:")
         print(f"   https://console.cloud.google.com/vertex-ai/agent-engine?project={config['project']}")
 
         return resource_name

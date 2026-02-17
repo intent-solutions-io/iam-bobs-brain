@@ -5,8 +5,8 @@ Splits documents into semantic chunks suitable for embedding and retrieval.
 Preserves heading context and code blocks.
 """
 
-import logging
 import hashlib
+import logging
 from typing import Dict, List
 
 from .config import CrawlerConfig

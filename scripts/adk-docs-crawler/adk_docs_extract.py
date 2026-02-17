@@ -6,8 +6,9 @@ and code blocks in canonical JSON format for RAG ingestion.
 """
 
 import logging
-from typing import Dict, List, Optional
-from bs4 import BeautifulSoup, Tag
+from typing import Dict, List
+
+from bs4 import BeautifulSoup
 
 logger = logging.getLogger(__name__)
 

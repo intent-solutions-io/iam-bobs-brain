@@ -5,8 +5,8 @@ This module aggregates custom tools from various agent implementations.
 It provides a central import point while maintaining backward compatibility.
 """
 
-from typing import List, Any
 import logging
+from typing import Any, List
 
 logger = logging.getLogger(__name__)
 
@@ -20,9 +20,9 @@ def get_adk_docs_tools() -> List[Any]:
     """
     try:
         from agents.bob.tools.adk_tools import (
-            search_adk_docs,
             get_adk_api_reference,
             list_adk_documentation,
+            search_adk_docs,
         )
         return [search_adk_docs, get_adk_api_reference, list_adk_documentation]
     except ImportError as e:
@@ -39,8 +39,8 @@ def get_vertex_search_tools() -> List[Any]:
     """
     try:
         from agents.bob.tools.vertex_search_tool import (
-            search_vertex_ai,
             get_vertex_search_status,
+            search_vertex_ai,
         )
         return [search_vertex_ai, get_vertex_search_status]
     except ImportError as e:
@@ -58,8 +58,8 @@ def get_analysis_tools() -> List[Any]:
     try:
         from agents.iam_adk.tools.analysis_tools import (
             analyze_agent_code,
-            validate_adk_pattern,
             check_a2a_compliance,
+            validate_adk_pattern,
         )
         return [analyze_agent_code, validate_adk_pattern, check_a2a_compliance]
     except ImportError as e:
@@ -76,12 +76,12 @@ def get_issue_management_tools() -> List[Any]:
     """
     try:
         from agents.iam_issue.tools.formatting_tools import (
-            create_issue_spec,
             analyze_problem,
             categorize_issue,
+            create_issue_spec,
             estimate_severity,
-            suggest_labels,
             format_github_issue,
+            suggest_labels,
         )
         return [
             create_issue_spec,
@@ -105,8 +105,8 @@ def get_planning_tools() -> List[Any]:
     """
     try:
         from agents.iam_fix_plan.tools.planning_tools import (
-            create_fix_plan,
             analyze_dependencies,
+            create_fix_plan,
             estimate_effort,
             identify_risks,
             suggest_alternatives,
@@ -134,11 +134,11 @@ def get_implementation_tools() -> List[Any]:
     """
     try:
         from agents.iam_fix_impl.tools.implementation_tools import (
-            implement_fix,
-            generate_code,
-            apply_patch,
-            refactor_code,
             add_tests,
+            apply_patch,
+            generate_code,
+            implement_fix,
+            refactor_code,
             update_documentation,
         )
         return [
@@ -163,12 +163,12 @@ def get_qa_tools() -> List[Any]:
     """
     try:
         from agents.iam_qa.tools.qa_tools import (
-            run_tests,
-            validate_fix,
             check_regression,
-            verify_requirements,
             generate_test_report,
+            run_tests,
             suggest_test_cases,
+            validate_fix,
+            verify_requirements,
         )
         return [
             run_tests,
@@ -193,11 +193,11 @@ def get_documentation_tools() -> List[Any]:
     try:
         from agents.iam_doc.tools.documentation_tools import (
             create_documentation,
-            update_readme,
-            generate_api_docs,
             create_runbook,
-            update_changelog,
             format_markdown,
+            generate_api_docs,
+            update_changelog,
+            update_readme,
         )
         return [
             create_documentation,
@@ -221,12 +221,12 @@ def get_cleanup_tools() -> List[Any]:
     """
     try:
         from agents.iam_cleanup.tools.cleanup_tools import (
+            archive_old_files,
             identify_tech_debt,
-            remove_dead_code,
             optimize_imports,
+            remove_dead_code,
             standardize_formatting,
             update_dependencies,
-            archive_old_files,
         )
         return [
             identify_tech_debt,
@@ -250,12 +250,12 @@ def get_indexing_tools() -> List[Any]:
     """
     try:
         from agents.iam_index.tools.indexing_tools import (
+            analyze_knowledge_gaps,
+            generate_index_entry,
             index_adk_docs,
             index_project_docs,
             query_knowledge_base,
             sync_vertex_search,
-            generate_index_entry,
-            analyze_knowledge_gaps,
         )
         return [
             index_adk_docs,
@@ -281,9 +281,9 @@ def get_delegation_tools() -> List[Any]:
     """
     try:
         from agents.iam_senior_adk_devops_lead.tools.delegation import (
-            delegate_to_specialist,
-            delegate_to_multiple,
             check_specialist_availability,
+            delegate_to_multiple,
+            delegate_to_specialist,
             get_specialist_capabilities,
         )
         return [
@@ -295,7 +295,6 @@ def get_delegation_tools() -> List[Any]:
     except ImportError:
         # Try with hyphenated directory name
         try:
-            import sys
             import importlib.util
 
             # Manually load from hyphenated directory

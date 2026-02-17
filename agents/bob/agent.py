@@ -18,14 +18,14 @@ LAZY-LOADING PATTERN (6767-LAZY):
 - No import-time validation or heavy work
 """
 
+import logging
+import os
+
+from google.adk import Runner
 from google.adk.agents import LlmAgent
 from google.adk.apps import App
-from google.adk import Runner
-from google.adk.sessions import VertexAiSessionService
 from google.adk.memory import VertexAiMemoryBankService
-import os
-import logging
-from typing import Optional
+from google.adk.sessions import VertexAiSessionService
 
 # Configure logging
 logging.basicConfig(

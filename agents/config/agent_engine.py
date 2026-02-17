@@ -25,7 +25,7 @@ Related Docs:
 
 import os
 from dataclasses import dataclass
-from typing import Dict, Optional, Literal
+from typing import Dict, Literal, Optional
 
 # Import environment detection from features module
 from agents.config.features import get_current_environment
@@ -435,7 +435,7 @@ if __name__ == "__main__":
     if not agents:
         print(f"  No agents configured for {env} environment")
         print()
-        print(f"  Set environment variables like:")
+        print("  Set environment variables like:")
         print(f"    export AGENT_ENGINE_BOB_{env.upper()}=your-engine-id")
     else:
         for role, config in agents.items():

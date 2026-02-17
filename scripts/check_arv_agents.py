@@ -16,11 +16,10 @@ Exit codes:
   1: Violations found
 """
 
-import sys
-import os
-from pathlib import Path
-from typing import List, Tuple, Dict
 import ast
+import sys
+from pathlib import Path
+from typing import Dict, List
 
 # ANSI colors for output
 RED = "\033[91m"
@@ -304,9 +303,9 @@ def main():
     else:
         print(f"{GREEN}✓ All agent files passed ADK compliance checks{RESET}")
         print(f"  - {len(agent_files)} agents checked")
-        print(f"  - No prohibited frameworks detected")
-        print(f"  - ADK imports verified")
-        print(f"  - Factory patterns present")
+        print("  - No prohibited frameworks detected")
+        print("  - ADK imports verified")
+        print("  - Factory patterns present")
         print()
         print(f"{BLUE}{'=' * 70}{RESET}")
         print(f"{GREEN}✅ ARV Check PASSED{RESET}")

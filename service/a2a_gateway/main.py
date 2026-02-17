@@ -17,14 +17,14 @@ Environment Variables:
 - PORT: Service port (default 8080)
 """
 
-import os
 import logging
+import os
 import uuid
-from typing import Dict, Any, Optional
-from pydantic import BaseModel
-from fastapi import FastAPI, HTTPException, Request
-from fastapi.responses import JSONResponse
+from typing import Any, Dict, Optional
+
 import httpx
+from fastapi import FastAPI, HTTPException, Request
+from pydantic import BaseModel
 
 # Configure logging
 logging.basicConfig(
@@ -367,7 +367,7 @@ async def a2a_run(call: A2AAgentCall) -> A2AAgentResult:
         )
         return A2AAgentResult(
             response="",
-            error=f"A2A call failed: {str(e)}",
+            error=f"A2A call failed: {e!s}",
             correlation_id=call.correlation_id or str(uuid.uuid4()),
             metadata={
                 "phase": "AE2",

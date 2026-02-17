@@ -5,13 +5,13 @@ This module defines the knowledge indexing and retrieval specialist agent
 that manages Vertex AI Search integration and maintains the knowledge base.
 """
 
-from google.adk.agents import LlmAgent
-from google.adk import Runner
-from google.adk.sessions import VertexAiSessionService
-from google.adk.memory import VertexAiMemoryBankService
-import os
 import logging
-from typing import Optional
+import os
+
+from google.adk import Runner
+from google.adk.agents import LlmAgent
+from google.adk.memory import VertexAiMemoryBankService
+from google.adk.sessions import VertexAiSessionService
 
 # Configure logging
 logging.basicConfig(

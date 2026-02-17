@@ -10,8 +10,8 @@ Usage:
     make smoke-agents
 """
 
-import sys
 import os
+import sys
 from pathlib import Path
 
 # Add project root to path

@@ -12,10 +12,9 @@ Follows:
 Phase 17: Real A2A wiring with local specialist invocation.
 """
 
-import json
 import logging
 import os
-from typing import Dict, Any, Optional, List
+from typing import Any, Dict, List, Optional
 
 logger = logging.getLogger(__name__)
 
@@ -65,7 +64,7 @@ def delegate_to_specialist(
     """
     # 6767-LAZY: Import A2A dispatcher at runtime, not module import time
     # Phase H+: Use sync wrapper for non-async context
-    from agents.a2a import A2ATask, call_specialist_sync, A2AError
+    from agents.a2a import A2AError, A2ATask, call_specialist_sync
 
     logger.info(
         f"A2A: Delegating to {specialist}.{skill_id}",

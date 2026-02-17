@@ -16,11 +16,10 @@ Exit codes:
   1: Violations found
 """
 
-import sys
-import os
-from pathlib import Path
-from typing import List, Dict, Set
 import ast
+import sys
+from pathlib import Path
+from typing import Dict, List
 
 # ANSI colors for output
 RED = "\033[91m"
@@ -303,9 +302,9 @@ def main():
     else:
         print(f"{GREEN}✓ All config files passed safety checks{RESET}")
         print(f"  - {len(config_files)} files checked")
-        print(f"  - Feature flags default to safe values")
-        print(f"  - Dry-run modes default enabled")
-        print(f"  - No hard-coded secrets detected")
+        print("  - Feature flags default to safe values")
+        print("  - Dry-run modes default enabled")
+        print("  - No hard-coded secrets detected")
         print()
         print(f"{BLUE}{'=' * 70}{RESET}")
         print(f"{GREEN}✅ ARV Check PASSED{RESET}")

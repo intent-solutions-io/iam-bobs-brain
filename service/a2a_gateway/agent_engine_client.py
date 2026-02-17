@@ -23,12 +23,13 @@ Usage:
     )
 """
 
+import logging
 import os
 import sys
-import logging
-import httpx
-from typing import Optional, Dict, Any
 from dataclasses import dataclass
+from typing import Any, Dict, Optional
+
+import httpx
 
 # Add project root to path for imports
 project_root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -36,8 +37,8 @@ sys.path.insert(0, project_root)
 
 from agents.config.agent_engine import (
     build_agent_config,
-    get_reasoning_engine_url,
     get_current_environment,
+    get_reasoning_engine_url,
 )
 
 logger = logging.getLogger(__name__)
@@ -270,7 +271,7 @@ async def call_agent_engine(
         )
 
     except Exception as e:
-        error_msg = f"Agent Engine call failed: {str(e)}"
+        error_msg = f"Agent Engine call failed: {e!s}"
         logger.error(
             error_msg,
             extra={

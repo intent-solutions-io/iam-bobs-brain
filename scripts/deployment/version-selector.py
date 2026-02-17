@@ -5,8 +5,8 @@ Interactive tool to explore and run different Bob versions
 """
 
 import os
-import sys
 import subprocess
+import sys
 from pathlib import Path
 from typing import Dict, List
 
@@ -72,7 +72,7 @@ class BobVersionSelector:
         for key, version in self.versions.items():
             print(f"\n[{key}] {version['title']}")
             print(f"    {version['description']}")
-            print(f"    Features:")
+            print("    Features:")
             for feature in version["features"]:
                 print(f"      • {feature}")
 
@@ -104,7 +104,7 @@ class BobVersionSelector:
         """Install missing packages"""
         print("\nInstalling requirements...")
         for package in packages:
-            subprocess.run([sys.executable, "-m", "pip", "install", package])
+            subprocess.run([sys.executable, "-m", "pip", "install", package], check=False)
         print("✅ Installation complete!")
 
     def setup_version(self, version: Dict):
@@ -124,19 +124,19 @@ class BobVersionSelector:
             template = self.root_dir / ".env.template"
             if template.exists():
                 print("\n⚠️  No .env file found. Creating from template...")
-                subprocess.run(["cp", str(template), str(env_file)])
+                subprocess.run(["cp", str(template), str(env_file)], check=False)
                 print(f"   Please edit: {env_file}")
                 edit = input("Would you like to edit it now? (y/n): ").lower()
                 if edit == "y":
                     editor = os.environ.get("EDITOR", "nano")
-                    subprocess.run([editor, str(env_file)])
+                    subprocess.run([editor, str(env_file)], check=False)
 
         # Run the version
         print(f"\n▶️  Running: {version['run_command']}")
         print("-" * 40)
 
         os.chdir(version_path)
-        subprocess.run(version["run_command"].split())
+        subprocess.run(version["run_command"].split(), check=False)
 
     def run_interactive(self):
         """Run interactive version selector"""
@@ -194,9 +194,9 @@ class BobVersionSelector:
             if doc_path.exists():
                 print(f"\n✅ {doc}")
                 print(f"   {description}")
-                view = input(f"   View this file? (y/n): ").lower()
+                view = input("   View this file? (y/n): ").lower()
                 if view == "y":
-                    with open(doc_path, "r") as f:
+                    with open(doc_path) as f:
                         content = f.read()
                     print("\n" + content[:1000] + "...\n")
                     input("Press Enter to continue...")
@@ -217,12 +217,12 @@ class BobVersionSelector:
                     "-t",
                     f"bobs-brain:{version_name}",
                     ".",
-                ]
+                ], check=False
             )
 
             # Run container
             subprocess.run(
-                ["docker", "run", "-it", "--rm", f"bobs-brain:{version_name}"]
+                ["docker", "run", "-it", "--rm", f"bobs-brain:{version_name}"], check=False
             )
         else:
             print(f"❌ Docker file not found: {docker_file}")

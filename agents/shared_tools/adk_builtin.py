@@ -12,8 +12,8 @@ ADK provides two ways to access tools:
 2. Custom tools via @dataclass and FunctionTool
 """
 
-from typing import Any, Optional, List
 import logging
+from typing import Any
 
 logger = logging.getLogger(__name__)
 
@@ -113,8 +113,9 @@ def get_bigquery_toolset() -> Any:
         BigQuery toolset or stub
     """
     try:
-        from google.adk.toolsets import BigQueryToolset
         import os
+
+        from google.adk.toolsets import BigQueryToolset
 
         project_id = os.getenv("PROJECT_ID")
         if project_id:
@@ -159,8 +160,9 @@ def get_mcp_toolset() -> Any:
         MCP toolset or stub
     """
     try:
-        from google.adk.toolsets import MCPToolset
         import os
+
+        from google.adk.toolsets import MCPToolset
 
         mcp_server_url = os.getenv("MCP_SERVER_URL")
         if mcp_server_url:
