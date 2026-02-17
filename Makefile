@@ -11,7 +11,7 @@ PYTHON := python3
 PIP := $(PYTHON) -m pip
 PYTEST := $(PYTHON) -m pytest
 BLACK := $(PYTHON) -m black
-FLAKE8 := $(PYTHON) -m flake8
+RUFF := $(PYTHON) -m ruff
 DOCKER := docker
 DOCKER_COMPOSE := docker-compose
 
@@ -74,10 +74,12 @@ deps: ## Install all dependencies
 # Code Quality
 #################################
 
-lint: ## Run linting checks
+lint: ## Run linting checks (ruff + black)
 	@echo "$(BLUE)🔍 Running lint checks...$(NC)"
-	$(FLAKE8) . --count --select=E9,F63,F7,F82 --show-source --statistics
-	$(FLAKE8) . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
+	$(PYTHON) -m ruff check agents/ service/ scripts/ tests/ \
+		--select=E,F,W,C90,I,N,UP,B,A,COM,C4,T10,EM,ISC,PIE,T20,PT,Q,RSE,RET,SIM,TID,ARG,ERA,PGH,PL,RUF \
+		--ignore=E501,S101,S603,S607
+	$(BLACK) --check agents/ service/ scripts/ tests/
 	@echo "$(GREEN)✅ Lint checks passed!$(NC)"
 
 format: ## Format code with black

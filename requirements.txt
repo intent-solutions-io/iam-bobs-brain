@@ -34,13 +34,19 @@ opentelemetry-exporter-gcp-trace>=1.5.0  # Google Cloud Trace
 pytest>=7.4.0  # Testing framework
 pytest-asyncio>=0.21.0  # Async test support
 pytest-cov>=4.1.0  # Coverage reporting
+pytest-timeout>=2.2.0  # Test timeout enforcement
 
 # Code Quality
+ruff>=0.1.0  # Fast Python linter (replaces flake8, isort)
 black>=23.10.0  # Code formatting
-flake8>=6.1.0  # Linting
 mypy>=1.6.0  # Type checking
 bandit>=1.7.5  # Security scanning
-safety>=2.3.0  # Dependency vulnerability scanning
+pip-audit>=2.6.0  # Dependency vulnerability scanning
+
+# Testing - Extended
+pytest-xdist>=3.5.0  # Parallel test execution
+pytest-rerunfailures>=13.0  # Flaky test detection and rerun
+respx>=0.21.0  # HTTP record/replay for httpx
 
 # Crawler dependencies (tools/)
 requests>=2.31.0  # HTTP client for web crawling
