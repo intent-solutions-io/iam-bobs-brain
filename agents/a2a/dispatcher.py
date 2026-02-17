@@ -23,10 +23,9 @@ Phase H+: Implements async A2A dispatch using InMemoryRunner.run_debug()
 import asyncio
 import json
 import logging
-import os
 import importlib
 from pathlib import Path
-from typing import Dict, Any, List, Optional
+from typing import Dict, Any, List
 
 from .types import A2ATask, A2AResult, A2AError
 
@@ -442,7 +441,7 @@ def _extract_response_from_events(events: list, specialist: str, skill_id: str) 
         )
         return {
             "status": "SUCCESS",
-            "message": f"Agent executed but returned no content",
+            "message": "Agent executed but returned no content",
             "raw_events": len(events)
         }
 
@@ -474,7 +473,58 @@ def _extract_response_from_events(events: list, specialist: str, skill_id: str) 
         }
 
 
-def validate_mandate(task: A2ATask) -> None:
+def _mandate_from_dict(mandate_dict: Dict[str, Any]):
+    """
+    Parse a mandate dict into a Mandate object.
+
+    Shared helper used by both validate_mandate() and call_specialist()
+    to avoid duplicate parsing with divergent field sets.
+
+    Args:
+        mandate_dict: Raw mandate dictionary from A2ATask.mandate
+
+    Returns:
+        Parsed Mandate object
+
+    Raises:
+        ValueError, TypeError, AttributeError: On malformed fields
+    """
+    from agents.shared_contracts.pipeline_contracts import Mandate
+    from datetime import datetime
+
+    # Parse expires_at if present
+    expires_at = None
+    if mandate_dict.get("expires_at"):
+        expires_str = mandate_dict["expires_at"]
+        expires_at = datetime.fromisoformat(expires_str.replace("Z", "+00:00"))
+
+    # Parse approval_timestamp if present
+    approval_timestamp = None
+    if mandate_dict.get("approval_timestamp"):
+        approval_str = mandate_dict["approval_timestamp"]
+        approval_timestamp = datetime.fromisoformat(approval_str.replace("Z", "+00:00"))
+
+    return Mandate(
+        mandate_id=mandate_dict.get("mandate_id", "unknown"),
+        intent=mandate_dict.get("intent", ""),
+        budget_limit=mandate_dict.get("budget_limit", 0.0),
+        budget_unit=mandate_dict.get("budget_unit", "USD"),
+        max_iterations=mandate_dict.get("max_iterations", 100),
+        authorized_specialists=mandate_dict.get("authorized_specialists", []),
+        # Enterprise controls (Phase E)
+        risk_tier=mandate_dict.get("risk_tier", "R0"),
+        tool_allowlist=mandate_dict.get("tool_allowlist", []),
+        data_classification=mandate_dict.get("data_classification", "internal"),
+        approval_state=mandate_dict.get("approval_state", "auto"),
+        approver_id=mandate_dict.get("approver_id"),
+        approval_timestamp=approval_timestamp,
+        expires_at=expires_at,
+        budget_spent=mandate_dict.get("budget_spent", 0.0),
+        iterations_used=mandate_dict.get("iterations_used", 0),
+    )
+
+
+def validate_mandate(task: A2ATask):
     """
     Validate mandate authorization before specialist invocation.
 
@@ -492,58 +542,41 @@ def validate_mandate(task: A2ATask) -> None:
     Args:
         task: A2ATask with optional mandate
 
+    Returns:
+        Parsed Mandate object if task has a mandate, None otherwise.
+        Returned so call_specialist() can reuse it without re-parsing.
+
     Raises:
         A2AError: If mandate validation fails
     """
-    # Import here to avoid circular imports (6767-LAZY pattern)
-    from agents.shared_contracts.pipeline_contracts import Mandate
-    from agents.shared_contracts.policy_gates import PolicyGate, GateResult
-    from datetime import datetime, timezone
+    from agents.shared_contracts.policy_gates import PolicyGate
 
     # Determine risk tier from task context or mandate
     risk_tier = "R0"  # Default: no restrictions
     mandate = None
 
     if task.mandate:
-        # Convert dict to Mandate object
-        mandate_dict = task.mandate
         try:
-            # Parse expires_at if present
-            expires_at = None
-            if mandate_dict.get("expires_at"):
-                expires_str = mandate_dict["expires_at"]
-                expires_at = datetime.fromisoformat(expires_str.replace("Z", "+00:00"))
-
-            # Parse approval_timestamp if present
-            approval_timestamp = None
-            if mandate_dict.get("approval_timestamp"):
-                approval_str = mandate_dict["approval_timestamp"]
-                approval_timestamp = datetime.fromisoformat(approval_str.replace("Z", "+00:00"))
-
-            mandate = Mandate(
-                mandate_id=mandate_dict.get("mandate_id", "unknown"),
-                intent=mandate_dict.get("intent", ""),
-                budget_limit=mandate_dict.get("budget_limit", 0.0),
-                budget_unit=mandate_dict.get("budget_unit", "USD"),
-                max_iterations=mandate_dict.get("max_iterations", 100),
-                authorized_specialists=mandate_dict.get("authorized_specialists", []),
-                # Enterprise controls (Phase E)
-                risk_tier=mandate_dict.get("risk_tier", "R0"),
-                tool_allowlist=mandate_dict.get("tool_allowlist", []),
-                data_classification=mandate_dict.get("data_classification", "internal"),
-                approval_state=mandate_dict.get("approval_state", "auto"),
-                approver_id=mandate_dict.get("approver_id"),
-                approval_timestamp=approval_timestamp,
-                expires_at=expires_at,
-                budget_spent=mandate_dict.get("budget_spent", 0.0),
-                iterations_used=mandate_dict.get("iterations_used", 0),
-            )
+            mandate = _mandate_from_dict(task.mandate)
             risk_tier = mandate.risk_tier
-        except (ValueError, TypeError) as e:
-            logger.warning(f"Failed to parse mandate: {e}, skipping validation")
-            return
+        except (ValueError, TypeError, AttributeError) as e:
+            # Log full details internally for debugging
+            logger.warning(
+                "Malformed mandate rejected (fail-closed): %s", e,
+                extra={"specialist": task.specialist},
+                exc_info=True,
+            )
+            # User-facing error omits internal parse details
+            raise A2AError(
+                f"Malformed mandate for specialist '{task.specialist}'. "
+                "Mandate validation cannot be skipped (fail-closed policy).",
+                specialist=task.specialist
+            )
 
     # Run policy gate preflight checks (Phase E)
+    # Note: tools_to_use is not passed here because the dispatcher doesn't know
+    # which tools the specialist will use before invocation. Tool allowlist
+    # enforcement is handled as a post-invocation audit log (see call_specialist).
     gate_results = PolicyGate.preflight_check(
         specialist_name=task.specialist,
         risk_tier=risk_tier,
@@ -565,6 +598,8 @@ def validate_mandate(task: A2ATask) -> None:
         f"Policy gates passed for {task.specialist} (risk_tier={risk_tier})",
         extra={"specialist": task.specialist, "risk_tier": risk_tier}
     )
+
+    return mandate
 
 
 async def call_specialist(task: A2ATask) -> A2AResult:
@@ -595,7 +630,8 @@ async def call_specialist(task: A2ATask) -> A2AResult:
 
     try:
         # Step 1: Validate mandate authorization (Phase B)
-        validate_mandate(task)
+        # Returns the parsed Mandate so we can reuse it (no duplicate parsing).
+        mandate = validate_mandate(task)
 
         # Step 2: Load AgentCard
         agentcard = load_agentcard(task.specialist)
@@ -609,6 +645,48 @@ async def call_specialist(task: A2ATask) -> A2AResult:
 
         # Step 5: Invoke specialist (async)
         result_data = await invoke_specialist_local(task.specialist, task)
+
+        # Step 5b: Record invocation for budget/iteration tracking
+        # Uses the Mandate object returned by validate_mandate() (shared
+        # parsing via _mandate_from_dict - no duplicate construction).
+        # Updated counters are written back to task.mandate so callers
+        # holding a reference to the dict see the new values.
+        if mandate is not None:
+            mandate.record_invocation()
+            # Persist updated counters back to the source dict
+            task.mandate["iterations_used"] = mandate.iterations_used
+            task.mandate["budget_spent"] = mandate.budget_spent
+            logger.debug(
+                "A2A: Recorded invocation for mandate '%s' "
+                "(iterations: %d/%d, budget: %.4f/%.4f)",
+                mandate.mandate_id,
+                mandate.iterations_used,
+                mandate.max_iterations,
+                mandate.budget_spent,
+                mandate.budget_limit,
+                extra={"mandate_id": mandate.mandate_id},
+            )
+
+        # Step 5c: Post-invocation tool allowlist audit
+        # Since we can't know which tools a specialist will use before
+        # invocation, we log a reminder to verify in the evidence bundle.
+        if mandate is not None and mandate.tool_allowlist:
+            # Sanitize: only log list-of-strings, cap length
+            safe_allowlist = [
+                str(t)[:64] for t in mandate.tool_allowlist[:20]
+                if isinstance(t, str)
+            ]
+            logger.info(
+                "A2A: Mandate has tool_allowlist for %s. "
+                "Post-invocation audit: verify tool usage in evidence bundle.",
+                task.specialist,
+                extra={
+                    "specialist": task.specialist,
+                    "tool_allowlist": safe_allowlist,
+                    "caller_spiffe": task.spiffe_id,
+                    "mandate_id": mandate.mandate_id,
+                },
+            )
 
         # Step 6: Build success result
         duration_ms = int((time.time() - start_time) * 1000)
@@ -673,7 +751,7 @@ def call_specialist_sync(task: A2ATask) -> A2AResult:
     """
     try:
         # Try to get running loop
-        loop = asyncio.get_running_loop()
+        asyncio.get_running_loop()
         # If we're already in an async context, create a new thread
         import concurrent.futures
         with concurrent.futures.ThreadPoolExecutor() as executor:

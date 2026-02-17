@@ -101,6 +101,41 @@ class PolicyGate:
         )
 
     @staticmethod
+    def check_mandate_expired(
+        mandate: Optional[Mandate] = None
+    ) -> GateResult:
+        """
+        Check if mandate has expired.
+
+        This is a standalone gate that runs before specialist_authorized
+        to provide a clear error message when the mandate itself is expired.
+        """
+        if mandate is None:
+            return GateResult(
+                allowed=True,
+                reason="No mandate to check for expiration",
+                risk_tier="R0",
+                gate_name="mandate_expired"
+            )
+        if mandate.is_expired():
+            return GateResult(
+                allowed=False,
+                reason=(
+                    f"Mandate '{mandate.mandate_id}' has expired "
+                    f"(expires_at: {mandate.expires_at})"
+                ),
+                risk_tier=mandate.risk_tier,
+                gate_name="mandate_expired",
+                blocking_requirement="mandate_expired"
+            )
+        return GateResult(
+            allowed=True,
+            reason="Mandate has not expired",
+            risk_tier=mandate.risk_tier,
+            gate_name="mandate_expired"
+        )
+
+    @staticmethod
     def check_approval_required(
         risk_tier: str,
         mandate: Optional[Mandate] = None
@@ -125,7 +160,7 @@ class PolicyGate:
         if mandate is None:
             return GateResult(
                 allowed=False,
-                reason=f"R3/R4 operations require a mandate with approval",
+                reason="R3/R4 operations require a mandate with approval",
                 risk_tier=risk_tier,
                 gate_name="approval_required",
                 blocking_requirement="mandate"
@@ -278,6 +313,9 @@ class PolicyGate:
 
         # Check mandate requirement
         results.append(cls.check_mandate_required(risk_tier, mandate))
+
+        # Check mandate expiration (before approval, for clearer error messages)
+        results.append(cls.check_mandate_expired(mandate))
 
         # Check approval requirement
         results.append(cls.check_approval_required(risk_tier, mandate))

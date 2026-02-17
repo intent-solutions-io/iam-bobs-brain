@@ -463,7 +463,7 @@ SMOKE_TEST_ENABLED=true
 
 ## Cross-References
 
-### Standards (6767-series)
+### Standards (000-series)
 - **000-DR-STND-adk-agent-engine-spec-and-hardmode-rules.md**: Hard Mode rules (R1-R8)
 - **000-DR-STND-adk-lazy-loading-app-pattern.md**: Lazy-loading App pattern
 - **000-DR-STND-inline-source-deployment-for-vertex-agent-engine.md**: Inline source deployment

@@ -352,7 +352,7 @@ No point checking agent readiness if basic configuration is invalid.
 
 ## Related Documentation
 
-**Canonical Standards (6767 prefix):**
+**Canonical Standards (000 prefix):**
 - `000-DR-STND-arv-minimum-gate.md` - ARV minimum requirements
 - `000-DR-STND-live-rag-and-agent-engine-rollout-plan.md` - LIVE1-3 phases
 - `000-RB-OPS-adk-department-operations-runbook.md` - Operations

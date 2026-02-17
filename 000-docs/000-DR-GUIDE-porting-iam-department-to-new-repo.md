@@ -552,10 +552,10 @@ python scripts/run_swe_pipeline_once.py \
 ## X. Support & Resources
 
 ### Documentation
-- **Template Scope:** `000-docs/000-DR-STND-iam-department-template-scope-and-rules-DR-STND-iam-department-template-scope-and-rules.md`
-- **Integration Checklist:** `000-docs/000-DR-STND-iam-department-integration-checklist-DR-STND-iam-department-integration-checklist.md`
-- **Ops Runbook:** `000-docs/000-RB-OPS-adk-department-operations-runbook-RB-OPS-adk-department-operations-runbook.md`
-- **Usage Guide:** `000-docs/000-DR-GUIDE-iam-department-user-guide-DR-GUIDE-how-to-use-bob-and-iam-department-for-swe.md`
+- **Template Scope:** `000-docs/000-DR-STND-iam-department-template-scope-and-rules.md`
+- **Integration Checklist:** `000-docs/000-DR-STND-iam-department-integration-checklist.md`
+- **Ops Runbook:** `000-docs/000-RB-OPS-adk-department-operations-runbook.md`
+- **Usage Guide:** `000-docs/000-DR-GUIDE-iam-department-user-guide.md`
 
 ### Reference Implementation
 - **Source:** bobs-brain repository
@@ -610,8 +610,8 @@ Your port is successful when:
 **Last Updated:** 2025-11-20
 
 **Related Docs:**
-- 000-DR-STND-iam-department-template-scope-and-rules-DR-STND-iam-department-template-scope-and-rules.md (scope)
-- 000-DR-STND-iam-department-integration-checklist-DR-STND-iam-department-integration-checklist.md (checklist)
+- 000-DR-STND-iam-department-template-scope-and-rules.md (scope)
+- 000-DR-STND-iam-department-integration-checklist.md (checklist)
 - templates/iam-department/README.md (template README)
 - **118-DR-STND-cicd-pipeline-for-iam-department.md** (CI/CD pipeline standard - CICD-DEPT)
 - **119-RB-OPS-deployment-operator-runbook.md** (deployment operations - CICD-DEPT)

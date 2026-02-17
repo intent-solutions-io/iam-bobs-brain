@@ -96,11 +96,11 @@ bobs-brain/
 │   └── integration/                 # Integration tests
 │
 ├── 000-docs/                        # All documentation (1,684 files)
-│   ├── 6767-DR-STND-*.md            # Canonical standards
-│   ├── 6767-OD-RBOK-*.md            # Operational runbooks
-│   ├── 6767-AT-ARCH-*.md            # Architecture guides
-│   ├── 6767-AA-REPT-*.md            # After-Action Reports
-│   ├── 6767-AA-PLAN-*.md            # Phase plans
+│   ├── 000-DR-STND-*.md             # Canonical standards
+│   ├── NNN-OD-RBOK-*.md             # Operational runbooks
+│   ├── NNN-AT-ARCH-*.md             # Architecture guides
+│   ├── NNN-AA-REPT-*.md             # After-Action Reports
+│   ├── NNN-AA-PLAN-*.md             # Phase plans
 │   └── ...                          # 100+ docs
 │
 ├── requirements.txt                 # Python dependencies
@@ -177,7 +177,7 @@ cd infra/terraform
 terraform apply -var-file=envs/dev.tfvars
 
 # 5. Configure GitHub secrets (WIF)
-# See: 000-docs/6767-OD-CONF-github-secrets-configuration.md
+# See: 000-docs/068-OD-CONF-github-secrets-configuration.md
 ```
 
 ### Daily Operations
@@ -423,12 +423,12 @@ gcloud logging read "resource.type=cloud_run_revision" --limit 100
 2. **CLAUDE.md** (209 lines) - Architecture & rules
 3. **CHANGELOG.md** (1,000+ lines) - Version history
 
-### Operational Documents (6767-series = canonical)
+### Operational Documents (000-series = canonical)
 - `000-DR-STND-adk-agent-engine-spec-and-hardmode-rules.md` - Architecture standard
-- `6767-OD-RBOK-deployment-runbook.md` - Step-by-step deployment
-- `6767-OD-TELE-observability-telemetry-guide.md` - Monitoring setup
-- `6767-OD-CONF-github-secrets-configuration.md` - CI/CD auth
-- `6767-112-AT-ARCH-org-storage-architecture.md` - GCS design
+- `070-OD-RBOK-deployment-runbook.md` - Step-by-step deployment
+- `069-OD-TELE-observability-telemetry-guide.md` - Monitoring setup
+- `068-OD-CONF-github-secrets-configuration.md` - CI/CD auth
+- `000-AT-ARCH-org-storage-architecture.md` - GCS design
 - `000-RB-OPS-adk-department-operations-runbook.md` - Daily ops
 
 ### File Locations

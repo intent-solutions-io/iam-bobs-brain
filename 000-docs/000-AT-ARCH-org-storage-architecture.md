@@ -284,7 +284,7 @@ gcloud storage buckets get-iam-policy gs://intent-org-knowledge-hub-dev
 5. Add tests (see `tests/unit/test_storage_*.py`)
 6. Update repo SA in `org_storage_writer_service_accounts` list
 
-**See:** `000-docs/000-DR-STND-iam-department-integration-checklist-DR-STND-iam-department-integration-checklist.md` for full checklist
+**See:** `000-docs/000-DR-STND-iam-department-integration-checklist.md` for full checklist
 
 ---
 

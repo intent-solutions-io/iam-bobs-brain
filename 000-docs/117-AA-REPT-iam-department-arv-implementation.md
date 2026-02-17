@@ -468,7 +468,7 @@ These checks still exist and can be run individually:
 
 ## Related Documentation
 
-**Canonical Standards (6767 prefix):**
+**Canonical Standards (000 prefix):**
 - `000-DR-STND-arv-minimum-gate.md` - ARV minimum requirements
 - `000-DR-STND-iam-department-integration-checklist.md` - Department integration
 - `000-RB-OPS-adk-department-operations-runbook.md` - Operations
