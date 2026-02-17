@@ -3,9 +3,6 @@ Example agent with ADK violations for testing.
 This file deliberately contains anti-patterns for the pipeline to detect.
 """
 
-import os
-import json
-from typing import List, Dict, Any
 
 # VIOLATION: Not using ADK LlmAgent pattern
 class ExampleAgent:

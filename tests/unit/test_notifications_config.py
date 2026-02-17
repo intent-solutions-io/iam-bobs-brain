@@ -4,16 +4,15 @@ Unit tests for notifications configuration module.
 Tests the notification config helpers and feature flag behavior.
 """
 
-import pytest
 import os
 from unittest.mock import patch
 
 from agents.config.notifications import (
+    SlackDestination,
     are_slack_notifications_enabled,
+    get_notification_summary,
     get_swe_slack_destination,
     should_send_slack_notifications,
-    get_notification_summary,
-    SlackDestination
 )
 
 

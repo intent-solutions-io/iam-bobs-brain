@@ -4,8 +4,8 @@ Test suite for Bob v1 Basic
 """
 
 import sys
-import os
 from pathlib import Path
+
 import pytest
 
 # Add version directory to path
@@ -35,16 +35,16 @@ def test_bob_commands():
     try:
         from bob_clean import BobBrain
         bob = BobBrain()
-        
+
         # Test status command
         response = bob.chat("status")
         assert response is not None
         assert len(response) > 0
-        
+
         # Test memory command
         response = bob.chat("memory")
         assert response is not None
-        
+
     except ImportError:
         pytest.skip("Bob v1 not available")
 
@@ -53,12 +53,12 @@ def test_bob_conversation():
     try:
         from bob_clean import BobBrain
         bob = BobBrain()
-        
+
         response = bob.chat("Hello Bob!")
         assert response is not None
         assert len(response) > 0
         assert not response.startswith("Error")
-        
+
     except ImportError:
         pytest.skip("Bob v1 not available")
 

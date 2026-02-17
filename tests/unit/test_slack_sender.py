@@ -4,19 +4,22 @@ Unit tests for Slack sender module.
 Tests the actual sending logic with mocked HTTP requests.
 """
 
-import pytest
 import os
-from unittest.mock import patch, MagicMock, Mock
 from datetime import datetime
+from unittest.mock import Mock, patch
 
-from agents.shared_contracts import PortfolioResult
+import pytest
+
 from agents.config.notifications import SlackDestination
 from agents.notifications.slack_sender import (
-    send_portfolio_notification,
-    _send_via_webhook,
     _send_via_api,
+    _send_via_webhook,
+    send_portfolio_notification,
+)
+from agents.notifications.slack_sender import (
     test_slack_connection as check_slack_connection,  # Renamed to avoid pytest collection
 )
+from agents.shared_contracts import PortfolioResult
 
 
 @pytest.fixture

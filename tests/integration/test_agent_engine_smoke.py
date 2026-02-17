@@ -24,20 +24,21 @@ Skip if not deployed:
 """
 
 import os
-import pytest
 import subprocess
 import sys
 from pathlib import Path
 from typing import Optional
+
+import pytest
 
 # Repository root
 REPO_ROOT = Path(__file__).parent.parent.parent
 
 # Check if GCP libraries available
 try:
-    import google.cloud.aiplatform
+    import google.cloud.aiplatform  # noqa: F401
     GCP_AVAILABLE = True
-except ImportError:
+except Exception:
     GCP_AVAILABLE = False
 
 # Check if deployed (has required env vars)
@@ -87,7 +88,7 @@ class TestAgentEngineSmoke:
 
         result = subprocess.run(
             cmd,
-            env=env,
+            check=False, env=env,
             capture_output=True,
             text=True
         )
@@ -138,7 +139,7 @@ class TestAgentEngineSmoke:
         """Verify smoke test script shows help without errors."""
         result = subprocess.run(
             [sys.executable, str(REPO_ROOT / "scripts" / "smoke_test_agent_engine.py"), "--help"],
-            capture_output=True,
+            check=False, capture_output=True,
             text=True
         )
 
@@ -163,7 +164,7 @@ class TestSmokeTestConfiguration:
         # Run with --help to avoid actual invocation
         result = subprocess.run(
             [sys.executable, str(REPO_ROOT / "scripts" / "smoke_test_agent_engine.py"), "--help"],
-            env=env,
+            check=False, env=env,
             capture_output=True,
             text=True
         )
@@ -178,7 +179,7 @@ class TestSmokeTestConfiguration:
 
         result = subprocess.run(
             [sys.executable, str(REPO_ROOT / "scripts" / "smoke_test_agent_engine.py"), "--agent", "bob"],
-            env=env,
+            check=False, env=env,
             capture_output=True,
             text=True
         )

@@ -4,6 +4,7 @@ Legacy tool with outdated patterns.
 
 import requests
 
+
 # VIOLATION: Not using ADK Tool class
 def search_database(query: str) -> str:
     """Search the database."""

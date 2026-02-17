@@ -51,11 +51,11 @@ def test_a2a_agent_card_import():
 @requires_adk
 def test_all_imports_together():
     """Test all imports can be loaded together"""
-    from google.adk.agents import LlmAgent
-    from google.adk import Runner
-    from google.adk.sessions import VertexAiSessionService
-    from google.adk.memory import VertexAiMemoryBankService
     from a2a.types import AgentCard
+    from google.adk import Runner
+    from google.adk.agents import LlmAgent
+    from google.adk.memory import VertexAiMemoryBankService
+    from google.adk.sessions import VertexAiSessionService
 
     assert all([
         LlmAgent is not None,

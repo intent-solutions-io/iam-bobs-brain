@@ -7,27 +7,27 @@ Tests:
 - Evidence bundle creation and validation
 """
 
-import pytest
-from datetime import datetime, timezone, timedelta
-from pathlib import Path
-import tempfile
 import json
+import tempfile
+from datetime import datetime, timedelta, timezone
+from pathlib import Path
 
-from agents.shared_contracts.pipeline_contracts import Mandate
-from agents.shared_contracts.policy_gates import (
-    RiskTier,
-    GateResult,
-    PolicyGate,
-    RISK_TIER_DESCRIPTIONS,
-    preflight_check,
-)
+import pytest
+
 from agents.shared_contracts.evidence_bundle import (
     ArtifactRecord,
-    EvidenceBundleManifest,
     EvidenceBundle,
+    EvidenceBundleManifest,
     create_evidence_bundle,
 )
-
+from agents.shared_contracts.pipeline_contracts import Mandate
+from agents.shared_contracts.policy_gates import (
+    RISK_TIER_DESCRIPTIONS,
+    GateResult,
+    PolicyGate,
+    RiskTier,
+    preflight_check,
+)
 
 # ============================================================================
 # MANDATE ENTERPRISE CONTROLS TESTS
@@ -611,7 +611,7 @@ class TestBug1MalformedMandateFailsClosed:
     def test_malformed_expires_at_raises_error(self):
         """Bad datetime in expires_at must raise A2AError."""
         from agents.a2a.dispatcher import validate_mandate
-        from agents.a2a.types import A2ATask, A2AError
+        from agents.a2a.types import A2AError, A2ATask
 
         task = A2ATask(
             specialist="iam-compliance",
@@ -629,7 +629,7 @@ class TestBug1MalformedMandateFailsClosed:
     def test_malformed_approval_timestamp_raises_error(self):
         """Bad datetime in approval_timestamp must raise A2AError."""
         from agents.a2a.dispatcher import validate_mandate
-        from agents.a2a.types import A2ATask, A2AError
+        from agents.a2a.types import A2AError, A2ATask
 
         task = A2ATask(
             specialist="iam-compliance",
@@ -665,7 +665,7 @@ class TestBug1MalformedMandateFailsClosed:
     def test_error_message_omits_internal_details(self):
         """A2AError for malformed mandate must NOT expose raw parse error."""
         from agents.a2a.dispatcher import validate_mandate
-        from agents.a2a.types import A2ATask, A2AError
+        from agents.a2a.types import A2AError, A2ATask
 
         task = A2ATask(
             specialist="iam-compliance",
@@ -731,7 +731,7 @@ class TestBug2MandateExpirationGate:
     def test_expired_mandate_blocks_via_dispatcher(self):
         """Expired mandate causes A2AError in validate_mandate."""
         from agents.a2a.dispatcher import validate_mandate
-        from agents.a2a.types import A2ATask, A2AError
+        from agents.a2a.types import A2AError, A2ATask
 
         task = A2ATask(
             specialist="iam-compliance",

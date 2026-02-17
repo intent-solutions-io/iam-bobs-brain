@@ -4,26 +4,28 @@ Unit tests for agent identity module (252-DR-STND).
 Tests canonical ID resolution, alias mapping, and backwards compatibility.
 """
 
-import pytest
 import warnings
+
+import pytest
+
 from agents.shared_contracts.agent_identity import (
-    # Types
-    AgentTier,
-    AgentDefinition,
+    AGENT_ALIASES,
     # Data
     CANONICAL_AGENTS,
-    AGENT_ALIASES,
     CANONICAL_TO_DIRECTORY,
     DIRECTORY_TO_CANONICAL,
+    AgentDefinition,
+    # Types
+    AgentTier,
     # Functions
     canonicalize,
-    is_canonical,
-    is_valid,
     get_definition,
     get_directory,
     get_spiffe_id,
-    list_canonical_ids,
+    is_canonical,
+    is_valid,
     list_by_tier,
+    list_canonical_ids,
     list_specialists,
 )
 

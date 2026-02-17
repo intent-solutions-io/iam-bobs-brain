@@ -22,7 +22,6 @@ Usage:
 import os
 from typing import Any, Dict, List, Optional
 
-
 BOB_LLM_MODE = os.getenv("BOB_LLM_MODE", "stub")
 
 

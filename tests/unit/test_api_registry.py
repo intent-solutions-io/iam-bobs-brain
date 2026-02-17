@@ -4,9 +4,8 @@ Note: These tests require google-cloud-apihub package and are skipped
 in CI environments where the package is not installed.
 """
 
-import pytest
-from unittest.mock import patch, MagicMock
 import os
+from unittest.mock import MagicMock, patch
 
 from tests.unit.conftest import requires_apihub
 
@@ -17,10 +16,9 @@ class TestGetApiRegistry:
 
     def test_returns_none_without_project_id(self):
         """Should return None when PROJECT_ID not set."""
-        from agents.shared_tools.api_registry import get_api_registry
-
         # Clear singleton
         import agents.shared_tools.api_registry as module
+        from agents.shared_tools.api_registry import get_api_registry
         module._registry_instance = None
 
         with patch.dict(os.environ, {}, clear=True):
@@ -29,9 +27,8 @@ class TestGetApiRegistry:
 
     def test_returns_none_when_import_fails(self):
         """Should return None when ApiRegistry import fails."""
-        from agents.shared_tools.api_registry import get_api_registry
-
         import agents.shared_tools.api_registry as module
+        from agents.shared_tools.api_registry import get_api_registry
         module._registry_instance = None
 
         with patch.dict(os.environ, {"PROJECT_ID": "test-project"}):
@@ -60,9 +57,8 @@ class TestGetToolsForAgent:
 
     def test_returns_empty_when_registry_unavailable(self):
         """Should return empty list when registry unavailable."""
-        from agents.shared_tools.api_registry import get_tools_for_agent
-
         import agents.shared_tools.api_registry as module
+        from agents.shared_tools.api_registry import get_tools_for_agent
         module._registry_instance = None
 
         with patch.dict(os.environ, {}, clear=True):
@@ -71,9 +67,8 @@ class TestGetToolsForAgent:
 
     def test_returns_empty_on_exception(self):
         """Should return empty list on registry exception."""
-        from agents.shared_tools.api_registry import get_tools_for_agent
-
         import agents.shared_tools.api_registry as module
+        from agents.shared_tools.api_registry import get_tools_for_agent
 
         mock_registry = MagicMock()
         mock_registry.get_agent_tools.side_effect = Exception("Network error")
@@ -95,9 +90,8 @@ class TestGetMcpToolset:
 
     def test_returns_none_when_registry_unavailable(self):
         """Should return None when registry unavailable."""
-        from agents.shared_tools.api_registry import get_mcp_toolset
-
         import agents.shared_tools.api_registry as module
+        from agents.shared_tools.api_registry import get_mcp_toolset
         module._registry_instance = None
 
         with patch.dict(os.environ, {}, clear=True):
@@ -106,9 +100,8 @@ class TestGetMcpToolset:
 
     def test_builds_full_resource_name(self):
         """Should build full resource name from short name."""
-        from agents.shared_tools.api_registry import get_mcp_toolset
-
         import agents.shared_tools.api_registry as module
+        from agents.shared_tools.api_registry import get_mcp_toolset
 
         mock_registry = MagicMock()
         mock_toolset = MagicMock()
@@ -117,7 +110,7 @@ class TestGetMcpToolset:
         module._registry_instance = mock_registry
 
         with patch.dict(os.environ, {"PROJECT_ID": "my-project"}):
-            result = get_mcp_toolset("mcp-repo-ops")
+            _result = get_mcp_toolset("mcp-repo-ops")
 
             # Verify it built the full resource name
             mock_registry.get_toolset.assert_called_once()
@@ -128,9 +121,8 @@ class TestGetMcpToolset:
 
     def test_passes_tool_filter(self):
         """Should pass tool filter to registry."""
-        from agents.shared_tools.api_registry import get_mcp_toolset
-
         import agents.shared_tools.api_registry as module
+        from agents.shared_tools.api_registry import get_mcp_toolset
 
         mock_registry = MagicMock()
         module._registry_instance = mock_registry
@@ -150,9 +142,8 @@ class TestIsRegistryAvailable:
 
     def test_returns_false_when_unavailable(self):
         """Should return False when registry not configured."""
-        from agents.shared_tools.api_registry import is_registry_available
-
         import agents.shared_tools.api_registry as module
+        from agents.shared_tools.api_registry import is_registry_available
         module._registry_instance = None
 
         with patch.dict(os.environ, {}, clear=True):
@@ -161,9 +152,8 @@ class TestIsRegistryAvailable:
 
     def test_returns_true_when_available(self):
         """Should return True when registry is available."""
-        from agents.shared_tools.api_registry import is_registry_available
-
         import agents.shared_tools.api_registry as module
+        from agents.shared_tools.api_registry import is_registry_available
         module._registry_instance = MagicMock()
 
         result = is_registry_available()

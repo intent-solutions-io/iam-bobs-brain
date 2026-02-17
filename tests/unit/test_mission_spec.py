@@ -8,35 +8,27 @@ Tests:
 - Runner CLI commands
 """
 
-import pytest
-import tempfile
 import json
+import tempfile
 from pathlib import Path
 
+import pytest
+
+from agents.mission_spec.compiler import (
+    ExecutionPlan,
+    PlannedTask,
+    compile_mission,
+)
+from agents.mission_spec.runner import main as runner_main
 from agents.mission_spec.schema import (
-    MissionSpec,
+    MissionMandate,
     MissionScope,
+    MissionSpec,
     RepoScope,
     WorkflowStep,
-    LoopStep,
-    MissionMandate,
-    EvidenceConfig,
-    StepOutput,
-    GateConfig,
-    StepType,
-    GateType,
     load_mission,
     validate_mission,
 )
-from agents.mission_spec.compiler import (
-    MissionCompiler,
-    compile_mission,
-    PlannedTask,
-    ExecutionPlan,
-    CompilerResult,
-)
-from agents.mission_spec.runner import main as runner_main
-
 
 # ============================================================================
 # SCHEMA TESTS

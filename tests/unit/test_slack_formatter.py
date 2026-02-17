@@ -4,17 +4,19 @@ Unit tests for Slack formatter module.
 Tests the conversion of PortfolioResult to Slack Block Kit format.
 """
 
-import pytest
 from datetime import datetime
-from agents.shared_contracts import PortfolioResult, PerRepoResult
+
+import pytest
+
 from agents.notifications.slack_formatter import (
-    format_portfolio_completion,
-    format_portfolio_completion_simple,
+    _format_duration,
     _get_env_badge,
     _severity_emoji,
     _severity_order,
-    _format_duration
+    format_portfolio_completion,
+    format_portfolio_completion_simple,
 )
+from agents.shared_contracts import PortfolioResult
 
 
 @pytest.fixture

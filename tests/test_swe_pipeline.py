@@ -7,44 +7,37 @@ Tests the complete end-to-end pipeline flow with synthetic data.
 
 import os
 import sys
-import json
 import unittest
 from pathlib import Path
-from datetime import datetime
-from unittest.mock import patch, MagicMock
+from unittest.mock import MagicMock, patch
 
 # Add parent directory to path for imports
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 
 # Import pipeline components
-from agents.shared_contracts import (
-    PipelineRequest,
-    PipelineResult,
-    IssueSpec,
-    FixPlan,
-    CodeChange,
-    QAVerdict,
-    DocumentationUpdate,
-    CleanupTask,
-    IndexEntry,
-    Severity,
-    IssueType,
-    QAStatus,
-    create_mock_issue,
-    create_mock_fix_plan
-)
-
 # Import orchestrator
 from agents.iam_senior_adk_devops_lead.orchestrator import (
-    run_swe_pipeline,
     iam_adk_analyze,
-    iam_issue_create,
-    iam_fix_plan_create,
-    iam_fix_impl_execute,
-    iam_qa_verify,
     iam_doc_update,
-    iam_cleanup_identify,
-    iam_index_update
+    iam_fix_impl_execute,
+    iam_fix_plan_create,
+    iam_issue_create,
+    iam_qa_verify,
+    run_swe_pipeline,
+)
+from agents.shared_contracts import (
+    CleanupTask,
+    CodeChange,
+    DocumentationUpdate,
+    FixPlan,
+    IndexEntry,
+    IssueSpec,
+    IssueType,
+    PipelineRequest,
+    PipelineResult,
+    QAVerdict,
+    create_mock_fix_plan,
+    create_mock_issue,
 )
 
 
@@ -299,13 +292,11 @@ class TestPipelineIntegration(unittest.TestCase):
     def test_vertex_search_integration(self):
         """Test integration with Vertex AI Search."""
         # Would test actual Vertex AI Search calls
-        pass
 
     @unittest.skip("Requires actual A2A setup")
     def test_a2a_protocol(self):
         """Test A2A protocol with Agent Engine."""
         # Would test actual A2A communication
-        pass
 
 
 class TestPipelinePerformance(unittest.TestCase):

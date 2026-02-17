@@ -9,16 +9,15 @@ import os
 import sys
 import unittest
 from unittest.mock import patch
-from pathlib import Path
 
 # Add parent directory to path for imports
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 
 from agents.config.github_features import (
     GitHubFeatureConfig,
-    load_github_feature_config,
     can_create_issues_for_repo,
-    get_feature_status_summary
+    get_feature_status_summary,
+    load_github_feature_config,
 )
 
 

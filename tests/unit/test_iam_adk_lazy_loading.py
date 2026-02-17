@@ -11,11 +11,11 @@ Note: These tests require google-adk package and are skipped in CI
 environments where ADK is not installed.
 """
 
-import pytest
 import os
 import sys
 from unittest.mock import patch
-from pathlib import Path
+
+import pytest
 
 from tests.unit.conftest import requires_adk
 
@@ -53,7 +53,6 @@ class TestLazyImport:
 
         # Measure import time
         start = time.time()
-        import agents.iam_adk.agent
         elapsed = time.time() - start
 
         # Import should be under 1 second (target: 50-200ms, allowing buffer)
@@ -273,12 +272,12 @@ class TestBackwardsCompatibility:
         }
 
         with patch.dict(os.environ, env, clear=True):
+
             from agents.iam_adk.agent import create_runner
-            import logging
 
             # Capture logs
             with patch('agents.iam_adk.agent.logger') as mock_logger:
-                runner = create_runner()
+                _runner = create_runner()
 
                 # Should log deprecation warning
                 assert mock_logger.warning.called

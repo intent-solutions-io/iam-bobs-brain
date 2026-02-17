@@ -4,14 +4,11 @@ Test Org Storage Writer Module (LIVE1-GCS)
 Tests GCS writer for portfolio results with mocking.
 """
 
-import pytest
-import json
-from unittest.mock import patch, MagicMock, call
-from datetime import datetime
-
 # Add agents to path (as a proper package)
 import sys
+from datetime import datetime
 from pathlib import Path
+from unittest.mock import MagicMock, patch
 
 # Insert repo root so "agents" becomes a proper top-level package
 repo_root = str(Path(__file__).parent.parent.parent)
@@ -19,11 +16,10 @@ if repo_root not in sys.path:
     sys.path.insert(0, repo_root)
 
 # Now import from agents package properly
-from agents.shared_contracts import PortfolioResult, PerRepoResult, PipelineResult, Severity, IssueType
-
 # Import the storage_writer module through proper package path
 # This ensures relative imports work correctly
 from agents.iam_senior_adk_devops_lead import storage_writer
+from agents.shared_contracts import PerRepoResult, PortfolioResult
 
 # Register the module under the path that @patch decorators expect
 sys.modules["iam_senior_adk_devops_lead.storage_writer"] = storage_writer
@@ -48,6 +44,7 @@ class TestWritePortfolioResultToGCS:
     def test_skips_when_writes_disabled(self, mock_enabled, caplog):
         """Test skips write when ORG_STORAGE_WRITE_ENABLED is false"""
         import logging
+
         from iam_senior_adk_devops_lead.storage_writer import write_portfolio_result_to_gcs
 
         caplog.set_level(logging.INFO, logger="agents.iam_senior_adk_devops_lead.storage_writer")
@@ -127,6 +124,7 @@ class TestWritePortfolioResultToGCS:
     ):
         """Test successful write to GCS"""
         import logging
+
         from iam_senior_adk_devops_lead.storage_writer import write_portfolio_result_to_gcs
 
         caplog.set_level(logging.INFO, logger="agents.iam_senior_adk_devops_lead.storage_writer")

@@ -11,8 +11,9 @@ Tests foreman (iam-senior-adk-devops-lead) and specialist (iam-adk) AgentCards.
 """
 
 import json
-import pytest
 from pathlib import Path
+
+import pytest
 
 
 def load_agentcard(agent_name: str) -> dict:
@@ -22,7 +23,7 @@ def load_agentcard(agent_name: str) -> dict:
     if not agentcard_path.exists():
         pytest.skip(f"AgentCard not found for {agent_name}: {agentcard_path}")
 
-    with open(agentcard_path, "r") as f:
+    with open(agentcard_path) as f:
         return json.load(f)
 
 

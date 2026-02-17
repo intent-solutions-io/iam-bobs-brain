@@ -12,10 +12,11 @@ Test Coverage:
 - Response parsing and metadata
 """
 
-import pytest
-from unittest.mock import Mock, patch, AsyncMock
 import os
 import sys
+from unittest.mock import AsyncMock, Mock, patch
+
+import pytest
 
 # Add project root to path
 project_root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -193,8 +194,9 @@ async def test_call_agent_engine_auth_failure(mock_get_token, mock_build_config,
 @patch("service.a2a_gateway.agent_engine_client.httpx.AsyncClient")
 async def test_call_agent_engine_http_error(mock_client_class, mock_get_token, mock_build_config, mock_agent_config, mock_env_vars):
     """Test HTTP error from Agent Engine."""
-    from service.a2a_gateway.agent_engine_client import call_agent_engine
     import httpx
+
+    from service.a2a_gateway.agent_engine_client import call_agent_engine
 
     mock_build_config.return_value = mock_agent_config
     mock_get_token.return_value = "test-token"
@@ -227,8 +229,9 @@ async def test_call_agent_engine_http_error(mock_client_class, mock_get_token, m
 @patch("service.a2a_gateway.agent_engine_client.httpx.AsyncClient")
 async def test_call_agent_engine_timeout(mock_client_class, mock_get_token, mock_build_config, mock_agent_config, mock_env_vars):
     """Test timeout error."""
-    from service.a2a_gateway.agent_engine_client import call_agent_engine
     import httpx
+
+    from service.a2a_gateway.agent_engine_client import call_agent_engine
 
     mock_build_config.return_value = mock_agent_config
     mock_get_token.return_value = "test-token"

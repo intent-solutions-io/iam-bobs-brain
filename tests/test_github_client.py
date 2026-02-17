@@ -10,20 +10,18 @@ Tests work with and without GITHUB_TOKEN:
 import os
 import sys
 import unittest
-from unittest.mock import Mock, patch, MagicMock
-from pathlib import Path
+from unittest.mock import Mock, patch
 
 # Add parent directory to path for imports
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 
 from agents.tools.github_client import (
-    GitHubClient,
-    GitHubClientError,
     GitHubAuthError,
+    GitHubClient,
     GitHubRateLimitError,
     RepoFile,
     RepoTree,
-    get_client
+    get_client,
 )
 
 

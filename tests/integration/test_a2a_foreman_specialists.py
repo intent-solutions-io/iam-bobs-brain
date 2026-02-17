@@ -12,32 +12,31 @@ Tests:
 - Error handling
 """
 
-import pytest
-import json
-import sys
 import os
+import sys
 from pathlib import Path
-from typing import Dict, Any
+
+import pytest
 
 # Add repo root to path for imports
 REPO_ROOT = Path(__file__).parent.parent.parent
 sys.path.insert(0, str(REPO_ROOT))
 
 # Import A2A components (using sync wrapper for test compatibility)
-from agents.a2a import A2ATask, A2AResult, A2AError, call_specialist_sync, discover_specialists
+from agents.a2a import A2AError, A2AResult, A2ATask, call_specialist_sync, discover_specialists
 from agents.a2a.dispatcher import (
     load_agentcard,
-    validate_skill_exists,
     validate_input_structure,
+    validate_skill_exists,
 )
 
 # Repository root already defined above
 
 # Check if google.adk is available (Phase 18)
 try:
-    import google.adk
+    import google.adk  # noqa: F401
     ADK_AVAILABLE = True
-except ImportError:
+except Exception:
     ADK_AVAILABLE = False
 
 # Check if Vertex AI environment is configured (for real agent execution)

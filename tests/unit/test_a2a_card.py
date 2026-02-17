@@ -4,11 +4,12 @@ Test A2A AgentCard - Hard Mode (R7)
 Tests AgentCard creation and SPIFFE ID inclusion for all agents.
 """
 
-import os
-import pytest
-from unittest.mock import patch
 import importlib.util
+import os
 from pathlib import Path
+from unittest.mock import patch
+
+import pytest
 
 
 @pytest.fixture
