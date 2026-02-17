@@ -104,7 +104,9 @@ class BobVersionSelector:
         """Install missing packages"""
         print("\nInstalling requirements...")
         for package in packages:
-            subprocess.run([sys.executable, "-m", "pip", "install", package], check=False)
+            subprocess.run(
+                [sys.executable, "-m", "pip", "install", package], check=False
+            )
         print("✅ Installation complete!")
 
     def setup_version(self, version: Dict):
@@ -217,12 +219,14 @@ class BobVersionSelector:
                     "-t",
                     f"bobs-brain:{version_name}",
                     ".",
-                ], check=False
+                ],
+                check=False,
             )
 
             # Run container
             subprocess.run(
-                ["docker", "run", "-it", "--rm", f"bobs-brain:{version_name}"], check=False
+                ["docker", "run", "-it", "--rm", f"bobs-brain:{version_name}"],
+                check=False,
             )
         else:
             print(f"❌ Docker file not found: {docker_file}")

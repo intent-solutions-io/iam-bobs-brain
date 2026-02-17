@@ -24,6 +24,7 @@ def get_adk_docs_tools() -> List[Any]:
             list_adk_documentation,
             search_adk_docs,
         )
+
         return [search_adk_docs, get_adk_api_reference, list_adk_documentation]
     except ImportError as e:
         logger.warning(f"Could not import ADK docs tools: {e}")
@@ -42,6 +43,7 @@ def get_vertex_search_tools() -> List[Any]:
             get_vertex_search_status,
             search_vertex_ai,
         )
+
         return [search_vertex_ai, get_vertex_search_status]
     except ImportError as e:
         logger.warning(f"Could not import Vertex Search tools: {e}")
@@ -61,6 +63,7 @@ def get_analysis_tools() -> List[Any]:
             check_a2a_compliance,
             validate_adk_pattern,
         )
+
         return [analyze_agent_code, validate_adk_pattern, check_a2a_compliance]
     except ImportError as e:
         logger.warning(f"Could not import analysis tools: {e}")
@@ -83,6 +86,7 @@ def get_issue_management_tools() -> List[Any]:
             format_github_issue,
             suggest_labels,
         )
+
         return [
             create_issue_spec,
             analyze_problem,
@@ -112,6 +116,7 @@ def get_planning_tools() -> List[Any]:
             suggest_alternatives,
             validate_approach,
         )
+
         return [
             create_fix_plan,
             analyze_dependencies,
@@ -141,6 +146,7 @@ def get_implementation_tools() -> List[Any]:
             refactor_code,
             update_documentation,
         )
+
         return [
             implement_fix,
             generate_code,
@@ -170,6 +176,7 @@ def get_qa_tools() -> List[Any]:
             validate_fix,
             verify_requirements,
         )
+
         return [
             run_tests,
             validate_fix,
@@ -199,6 +206,7 @@ def get_documentation_tools() -> List[Any]:
             update_changelog,
             update_readme,
         )
+
         return [
             create_documentation,
             update_readme,
@@ -228,6 +236,7 @@ def get_cleanup_tools() -> List[Any]:
             standardize_formatting,
             update_dependencies,
         )
+
         return [
             identify_tech_debt,
             remove_dead_code,
@@ -257,6 +266,7 @@ def get_indexing_tools() -> List[Any]:
             query_knowledge_base,
             sync_vertex_search,
         )
+
         return [
             index_adk_docs,
             index_project_docs,
@@ -286,6 +296,7 @@ def get_delegation_tools() -> List[Any]:
             delegate_to_specialist,
             get_specialist_capabilities,
         )
+
         return [
             delegate_to_specialist,
             delegate_to_multiple,
@@ -299,8 +310,7 @@ def get_delegation_tools() -> List[Any]:
 
             # Manually load from hyphenated directory
             spec = importlib.util.spec_from_file_location(
-                "delegation",
-                "agents/iam-senior-adk-devops-lead/tools/delegation.py"
+                "delegation", "agents/iam-senior-adk-devops-lead/tools/delegation.py"
             )
             if spec and spec.loader:
                 delegation = importlib.util.module_from_spec(spec)

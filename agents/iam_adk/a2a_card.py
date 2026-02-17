@@ -18,14 +18,25 @@ class AgentCard(BaseModel):
 
     Represents iam-adk's identity, capabilities, and skills.
     """
+
     name: str = Field(..., description="Agent name")
     version: str = Field(..., description="Agent version")
     url: str = Field(..., description="Agent public URL")
-    description: str = Field(..., description="Agent description (must include SPIFFE ID per R7)")
-    capabilities: List[str] = Field(default_factory=list, description="Agent capabilities")
-    default_input_modes: List[str] = Field(default_factory=lambda: ["text"], description="Supported input modes")
-    default_output_modes: List[str] = Field(default_factory=lambda: ["text"], description="Supported output modes")
-    skills: List[Dict[str, Any]] = Field(default_factory=list, description="Agent skills")
+    description: str = Field(
+        ..., description="Agent description (must include SPIFFE ID per R7)"
+    )
+    capabilities: List[str] = Field(
+        default_factory=list, description="Agent capabilities"
+    )
+    default_input_modes: List[str] = Field(
+        default_factory=lambda: ["text"], description="Supported input modes"
+    )
+    default_output_modes: List[str] = Field(
+        default_factory=lambda: ["text"], description="Supported output modes"
+    )
+    skills: List[Dict[str, Any]] = Field(
+        default_factory=list, description="Agent skills"
+    )
 
 
 def get_agent_card() -> AgentCard:
@@ -44,7 +55,10 @@ def get_agent_card() -> AgentCard:
     app_name = os.getenv("APP_NAME", "iam-adk")
     app_version = os.getenv("APP_VERSION", "0.10.0")
     public_url = os.getenv("PUBLIC_URL", "https://iam-adk.intent.solutions")
-    spiffe_id = os.getenv("AGENT_SPIFFE_ID", "spiffe://intent.solutions/agent/iam-adk/dev/us-central1/0.10.0")
+    spiffe_id = os.getenv(
+        "AGENT_SPIFFE_ID",
+        "spiffe://intent.solutions/agent/iam-adk/dev/us-central1/0.10.0",
+    )
 
     # Description with SPIFFE ID (R7 requirement)
     description = f"""iam-adk - ADK/Vertex Design & Static Analysis Specialist
@@ -68,7 +82,7 @@ This agent enforces google-adk patterns, Vertex AI Agent Engine compliance, and 
         "agentcard_validation",
         "hard_mode_compliance_checking",
         "audit_report_generation",
-        "issue_spec_creation"
+        "issue_spec_creation",
     ]
 
     # Skills (specific tasks iam-adk can perform)
@@ -83,23 +97,23 @@ This agent enforces google-adk patterns, Vertex AI Agent Engine compliance, and 
                 "properties": {
                     "target": {
                         "type": "string",
-                        "description": "File path or directory to analyze"
+                        "description": "File path or directory to analyze",
                     },
                     "focus_rules": {
                         "type": "array",
                         "items": {
                             "type": "string",
-                            "enum": ["R1", "R2", "R3", "R4", "R5", "R6", "R7", "R8"]
+                            "enum": ["R1", "R2", "R3", "R4", "R5", "R6", "R7", "R8"],
                         },
-                        "description": "Specific Hard Mode rules to focus on (optional)"
+                        "description": "Specific Hard Mode rules to focus on (optional)",
                     },
                     "severity_threshold": {
                         "type": "string",
                         "enum": ["CRITICAL", "HIGH", "MEDIUM", "LOW"],
                         "default": "LOW",
-                        "description": "Only report issues at or above this severity"
-                    }
-                }
+                        "description": "Only report issues at or above this severity",
+                    },
+                },
             },
             "output_schema": {
                 "type": "object",
@@ -107,7 +121,7 @@ This agent enforces google-adk patterns, Vertex AI Agent Engine compliance, and 
                 "properties": {
                     "compliance_status": {
                         "type": "string",
-                        "enum": ["COMPLIANT", "NON_COMPLIANT", "WARNING"]
+                        "enum": ["COMPLIANT", "NON_COMPLIANT", "WARNING"],
                     },
                     "violations": {
                         "type": "array",
@@ -117,24 +131,24 @@ This agent enforces google-adk patterns, Vertex AI Agent Engine compliance, and 
                             "properties": {
                                 "severity": {
                                     "type": "string",
-                                    "enum": ["CRITICAL", "HIGH", "MEDIUM", "LOW"]
+                                    "enum": ["CRITICAL", "HIGH", "MEDIUM", "LOW"],
                                 },
                                 "rule": {
                                     "type": "string",
-                                    "description": "Hard Mode rule violated (R1-R8) or null"
+                                    "description": "Hard Mode rule violated (R1-R8) or null",
                                 },
                                 "message": {"type": "string"},
                                 "file": {"type": "string"},
-                                "line_number": {"type": "integer"}
-                            }
-                        }
+                                "line_number": {"type": "integer"},
+                            },
+                        },
                     },
                     "risk_level": {
                         "type": "string",
-                        "enum": ["LOW", "MEDIUM", "HIGH", "CRITICAL"]
-                    }
-                }
-            }
+                        "enum": ["LOW", "MEDIUM", "HIGH", "CRITICAL"],
+                    },
+                },
+            },
         },
         {
             "skill_id": "iam_adk.validate_agentcard",
@@ -146,14 +160,14 @@ This agent enforces google-adk patterns, Vertex AI Agent Engine compliance, and 
                 "properties": {
                     "agentcard_path": {
                         "type": "string",
-                        "description": "Path to agent directory or agentcard.json file"
+                        "description": "Path to agent directory or agentcard.json file",
                     },
                     "check_skills": {
                         "type": "boolean",
                         "default": True,
-                        "description": "Validate skill schemas"
-                    }
-                }
+                        "description": "Validate skill schemas",
+                    },
+                },
             },
             "output_schema": {
                 "type": "object",
@@ -170,17 +184,14 @@ This agent enforces google-adk patterns, Vertex AI Agent Engine compliance, and 
                                 "message": {"type": "string"},
                                 "severity": {
                                     "type": "string",
-                                    "enum": ["ERROR", "WARNING"]
-                                }
-                            }
-                        }
+                                    "enum": ["ERROR", "WARNING"],
+                                },
+                            },
+                        },
                     },
-                    "warnings": {
-                        "type": "array",
-                        "items": {"type": "string"}
-                    }
-                }
-            }
+                    "warnings": {"type": "array", "items": {"type": "string"}},
+                },
+            },
         },
         {
             "skill_id": "iam_adk.analyze_agent_architecture",
@@ -192,19 +203,19 @@ This agent enforces google-adk patterns, Vertex AI Agent Engine compliance, and 
                 "properties": {
                     "agent_directory": {
                         "type": "string",
-                        "description": "Path to agent directory"
+                        "description": "Path to agent directory",
                     },
                     "check_lazy_loading": {
                         "type": "boolean",
                         "default": True,
-                        "description": "Check 6767-LAZY lazy loading pattern compliance"
+                        "description": "Check 6767-LAZY lazy loading pattern compliance",
                     },
                     "check_memory_wiring": {
                         "type": "boolean",
                         "default": True,
-                        "description": "Check R5 dual memory wiring"
-                    }
-                }
+                        "description": "Check R5 dual memory wiring",
+                    },
+                },
             },
             "output_schema": {
                 "type": "object",
@@ -212,7 +223,7 @@ This agent enforces google-adk patterns, Vertex AI Agent Engine compliance, and 
                 "properties": {
                     "analysis_status": {
                         "type": "string",
-                        "enum": ["PASS", "FAIL", "WARNING"]
+                        "enum": ["PASS", "FAIL", "WARNING"],
                     },
                     "findings": {
                         "type": "array",
@@ -222,19 +233,25 @@ This agent enforces google-adk patterns, Vertex AI Agent Engine compliance, and 
                             "properties": {
                                 "category": {
                                     "type": "string",
-                                    "description": "Finding category (lazy_loading, memory, tools, etc.)"
+                                    "description": "Finding category (lazy_loading, memory, tools, etc.)",
                                 },
                                 "message": {"type": "string"},
                                 "severity": {
                                     "type": "string",
-                                    "enum": ["CRITICAL", "HIGH", "MEDIUM", "LOW", "INFO"]
+                                    "enum": [
+                                        "CRITICAL",
+                                        "HIGH",
+                                        "MEDIUM",
+                                        "LOW",
+                                        "INFO",
+                                    ],
                                 },
-                                "recommendation": {"type": "string"}
-                            }
-                        }
-                    }
-                }
-            }
+                                "recommendation": {"type": "string"},
+                            },
+                        },
+                    },
+                },
+            },
         },
         {
             "skill_id": "iam_adk.generate_audit_report",
@@ -246,14 +263,14 @@ This agent enforces google-adk patterns, Vertex AI Agent Engine compliance, and 
                 "properties": {
                     "scope": {
                         "type": "string",
-                        "description": "Audit scope (repo, directory, agent)"
+                        "description": "Audit scope (repo, directory, agent)",
                     },
                     "include_recommendations": {
                         "type": "boolean",
                         "default": True,
-                        "description": "Include fix recommendations"
-                    }
-                }
+                        "description": "Include fix recommendations",
+                    },
+                },
             },
             "output_schema": {
                 "type": "object",
@@ -261,28 +278,32 @@ This agent enforces google-adk patterns, Vertex AI Agent Engine compliance, and 
                 "properties": {
                     "audit_summary": {
                         "type": "object",
-                        "required": ["compliant_agents", "non_compliant_agents", "total_agents"],
+                        "required": [
+                            "compliant_agents",
+                            "non_compliant_agents",
+                            "total_agents",
+                        ],
                         "properties": {
                             "compliant_agents": {"type": "integer"},
                             "non_compliant_agents": {"type": "integer"},
                             "total_agents": {"type": "integer"},
                             "risk_level": {
                                 "type": "string",
-                                "enum": ["LOW", "MEDIUM", "HIGH", "CRITICAL"]
-                            }
-                        }
+                                "enum": ["LOW", "MEDIUM", "HIGH", "CRITICAL"],
+                            },
+                        },
                     },
                     "findings_count": {"type": "integer"},
                     "findings": {
                         "type": "array",
                         "items": {
                             "type": "object",
-                            "description": "Individual compliance findings"
-                        }
-                    }
-                }
-            }
-        }
+                            "description": "Individual compliance findings",
+                        },
+                    },
+                },
+            },
+        },
     ]
 
     return AgentCard(
@@ -293,7 +314,7 @@ This agent enforces google-adk patterns, Vertex AI Agent Engine compliance, and 
         capabilities=capabilities,
         default_input_modes=["text"],
         default_output_modes=["text"],
-        skills=skills
+        skills=skills,
     )
 
 
@@ -308,7 +329,10 @@ def get_agent_card_dict() -> Dict[str, Any]:
     card_dict = card.model_dump()
 
     # Add explicit SPIFFE ID field (R7 requirement)
-    spiffe_id = os.getenv("AGENT_SPIFFE_ID", "spiffe://intent.solutions/agent/iam-adk/dev/us-central1/0.10.0")
+    spiffe_id = os.getenv(
+        "AGENT_SPIFFE_ID",
+        "spiffe://intent.solutions/agent/iam-adk/dev/us-central1/0.10.0",
+    )
     card_dict["spiffe_id"] = spiffe_id
 
     return card_dict

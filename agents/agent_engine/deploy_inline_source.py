@@ -49,8 +49,10 @@ from typing import Optional
 try:
     from google.cloud import aiplatform
     from google.cloud.aiplatform import gapic  # noqa: F401
-except ImportError as e:
-    print(f"ERROR: Missing required Google Cloud SDK dependencies: {e}", file=sys.stderr)
+except Exception as e:
+    print(
+        f"ERROR: Missing required Google Cloud SDK dependencies: {e}", file=sys.stderr
+    )
     print("Install with: pip install google-cloud-aiplatform", file=sys.stderr)
     sys.exit(1)
 
@@ -122,7 +124,7 @@ AGENT_CONFIGS = {
 
 # Source packages to include in deployment
 SOURCE_PACKAGES = [
-    "agents",       # All agent modules
+    "agents",  # All agent modules
     # Add additional packages as your architecture grows
 ]
 
@@ -152,9 +154,7 @@ def validate_agent_config(agent_name: str, check_imports: bool = False) -> dict:
     """
     if agent_name not in AGENT_CONFIGS:
         available = ", ".join(AGENT_CONFIGS.keys())
-        raise ValueError(
-            f"Unknown agent: {agent_name}. Available agents: {available}"
-        )
+        raise ValueError(f"Unknown agent: {agent_name}. Available agents: {available}")
 
     config = AGENT_CONFIGS[agent_name]
     repo_root = get_repo_root()
@@ -184,6 +184,7 @@ def validate_agent_config(agent_name: str, check_imports: bool = False) -> dict:
     if check_imports:
         try:
             import importlib
+
             module = importlib.import_module(config["entrypoint_module"])
 
             # Check if entrypoint object exists
@@ -192,9 +193,11 @@ def validate_agent_config(agent_name: str, check_imports: bool = False) -> dict:
                     f"Entrypoint object '{config['entrypoint_object']}' not found in module '{config['entrypoint_module']}'"
                 )
 
-            print(f"   ✅ Entrypoint module '{config['entrypoint_module']}' successfully imported")
+            print(
+                f"   ✅ Entrypoint module '{config['entrypoint_module']}' successfully imported"
+            )
             print(f"   ✅ Entrypoint object '{config['entrypoint_object']}' found")
-        except ImportError as e:
+        except Exception as e:
             print(f"   ⚠️  Import check skipped: {e}")
             print("   ℹ️  This is OK for CI without full dependencies installed")
             print("   ℹ️  Install dependencies with: pip install -r requirements.txt")
@@ -276,7 +279,9 @@ def deploy_agent_inline_source(
         # For inline source deployment, we need to package and upload the source first
         # For now, create a minimal reasoning engine
 
-        print("   Note: Full inline source deployment requires packaging agents/ directory")
+        print(
+            "   Note: Full inline source deployment requires packaging agents/ directory"
+        )
         print("   This is a minimal deployment to get Agent Engine IDs")
 
         reasoning_engine = ReasoningEngine(
@@ -287,7 +292,7 @@ def deploy_agent_inline_source(
             print(f"   Updating existing agent: {agent_id}")
             operation = client.update_reasoning_engine(
                 reasoning_engine=reasoning_engine,
-                update_mask={"paths": ["display_name", "spec"]}
+                update_mask={"paths": ["display_name", "spec"]},
             )
             result = operation.result()
             agent_resource_name = result.name
@@ -301,7 +306,7 @@ def deploy_agent_inline_source(
             agent_resource_name = result.name
 
             # Extract the ID from the resource name
-            engine_id = agent_resource_name.split('/')[-1]
+            engine_id = agent_resource_name.split("/")[-1]
             print(f"   Engine ID: {engine_id}")
 
         print("\n✅ Deployment successful!")
@@ -312,6 +317,7 @@ def deploy_agent_inline_source(
     except Exception as e:
         print(f"\n❌ Deployment failed: {e}", file=sys.stderr)
         import traceback
+
         traceback.print_exc()
         raise
 
@@ -413,11 +419,15 @@ References:
             agent_config = validate_agent_config(args.agent_name, check_imports=True)
             print(f"✅ Configuration valid for agent: {args.agent_name}")
             print(f"   Display Name: {agent_config['display_name']}")
-            print(f"   Entrypoint: {agent_config['entrypoint_module']}.{agent_config['entrypoint_object']}")
+            print(
+                f"   Entrypoint: {agent_config['entrypoint_module']}.{agent_config['entrypoint_object']}"
+            )
             print(f"   Class Methods: {', '.join(agent_config['class_methods'])}")
             print(f"   Source Packages: {', '.join(SOURCE_PACKAGES)}")
             print()
-            print("✅ All validations passed. Use --execute to perform actual deployment.")
+            print(
+                "✅ All validations passed. Use --execute to perform actual deployment."
+            )
             return 0
         except Exception as e:
             print(f"❌ Configuration invalid: {e}", file=sys.stderr)

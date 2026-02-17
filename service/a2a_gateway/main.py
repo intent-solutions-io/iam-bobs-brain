@@ -329,7 +329,9 @@ async def a2a_run(call: A2AAgentCall) -> A2AAgentResult:
             response=result.response,
             session_id=result.session_id,
             correlation_id=correlation_id,
-            target_spiffe_id=result.metadata.get("spiffe_id") if result.metadata else None,
+            target_spiffe_id=(
+                result.metadata.get("spiffe_id") if result.metadata else None
+            ),
             metadata=result.metadata,
             error=result.error,
         )

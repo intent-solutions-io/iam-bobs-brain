@@ -52,7 +52,10 @@ try:
     from google.cloud import aiplatform
     from google.cloud.aiplatform import gapic  # noqa: F401
 except ImportError as e:
-    print(f"[SMOKE] ERROR: Missing required Google Cloud SDK dependencies: {e}", file=sys.stderr)
+    print(
+        f"[SMOKE] ERROR: Missing required Google Cloud SDK dependencies: {e}",
+        file=sys.stderr,
+    )
     print("[SMOKE] Install with: pip install google-cloud-aiplatform", file=sys.stderr)
     sys.exit(1)
 
@@ -61,7 +64,10 @@ def get_env_var(name: str, required: bool = True) -> Optional[str]:
     """Get environment variable with clear error messaging."""
     value = os.getenv(name)
     if required and not value:
-        print(f"[SMOKE] ERROR: Missing required environment variable: {name}", file=sys.stderr)
+        print(
+            f"[SMOKE] ERROR: Missing required environment variable: {name}",
+            file=sys.stderr,
+        )
         print(f"[SMOKE] Set it with: export {name}=your-value", file=sys.stderr)
         return None
     return value
@@ -107,7 +113,9 @@ def smoke_test_bob_agent_engine_dev() -> int:
         # For now, we'll create a simple health check query
 
         # Create reasoning engine client
-        from google.cloud.aiplatform_v1beta1 import ReasoningEngineExecutionServiceClient
+        from google.cloud.aiplatform_v1beta1 import (
+            ReasoningEngineExecutionServiceClient,
+        )
         from google.cloud.aiplatform_v1beta1.types import QueryReasoningEngineRequest
 
         client = ReasoningEngineExecutionServiceClient(
@@ -130,7 +138,9 @@ def smoke_test_bob_agent_engine_dev() -> int:
         response = client.query_reasoning_engine(request=request)
 
         # Extract response content
-        response_text = str(response.output) if hasattr(response, 'output') else str(response)
+        response_text = (
+            str(response.output) if hasattr(response, "output") else str(response)
+        )
 
         print("[SMOKE] Response received:")
         print(f"[SMOKE]   {response_text[:200]}...")  # Show first 200 chars
@@ -138,7 +148,9 @@ def smoke_test_bob_agent_engine_dev() -> int:
 
         # Check if response contains expected health check markers
         success_markers = ["status", "ok"]
-        all_present = all(marker.lower() in response_text.lower() for marker in success_markers)
+        all_present = all(
+            marker.lower() in response_text.lower() for marker in success_markers
+        )
 
         if all_present:
             print("[SMOKE] ✅ Health check markers found in response")

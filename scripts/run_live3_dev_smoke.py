@@ -42,7 +42,14 @@ from iam_senior_adk_devops_lead.portfolio_orchestrator import (
 
 class SubsystemResult:
     """Result of a subsystem execution."""
-    def __init__(self, name: str, enabled: bool, success: Optional[bool] = None, details: str = ""):
+
+    def __init__(
+        self,
+        name: str,
+        enabled: bool,
+        success: Optional[bool] = None,
+        details: str = "",
+    ):
         self.name = name
         self.enabled = enabled
         self.success = success  # None = skipped, True = passed, False = failed
@@ -67,6 +74,7 @@ class SubsystemResult:
 
 class SmokeSummary:
     """Summary of entire smoke test run."""
+
     def __init__(self):
         self.subsystems: List[SubsystemResult] = []
         self.start_time = datetime.now()
@@ -109,7 +117,7 @@ class SmokeSummary:
             print(status_line)
             if verbose and subsystem.details:
                 # Indent details
-                for line in subsystem.details.split('\n'):
+                for line in subsystem.details.split("\n"):
                     if line.strip():
                         print(f"   {line}")
 
@@ -125,8 +133,12 @@ def load_env_config() -> Dict[str, str]:
     config = {
         "DEPLOYMENT_ENV": os.getenv("DEPLOYMENT_ENV", "dev"),
         "ORG_STORAGE_WRITE_ENABLED": os.getenv("ORG_STORAGE_WRITE_ENABLED", "false"),
-        "SLACK_NOTIFICATIONS_ENABLED": os.getenv("SLACK_NOTIFICATIONS_ENABLED", "false"),
-        "GITHUB_ISSUE_CREATION_ENABLED": os.getenv("GITHUB_ISSUE_CREATION_ENABLED", "false"),
+        "SLACK_NOTIFICATIONS_ENABLED": os.getenv(
+            "SLACK_NOTIFICATIONS_ENABLED", "false"
+        ),
+        "GITHUB_ISSUE_CREATION_ENABLED": os.getenv(
+            "GITHUB_ISSUE_CREATION_ENABLED", "false"
+        ),
         "GITHUB_ISSUES_DRY_RUN": os.getenv("GITHUB_ISSUES_DRY_RUN", "true"),
         "ORG_STORAGE_BUCKET": os.getenv("ORG_STORAGE_BUCKET", ""),
         "SLACK_SWE_CHANNEL_WEBHOOK_URL": os.getenv("SLACK_SWE_CHANNEL_WEBHOOK_URL", ""),
@@ -140,10 +152,7 @@ def run_portfolio_audit(target_repo: str, env: str, verbose: bool) -> SubsystemR
     Run portfolio audit on target repo.
     This is the CORE subsystem - must succeed for smoke to pass.
     """
-    result = SubsystemResult(
-        name="Portfolio Audit",
-        enabled=True  # Always enabled
-    )
+    result = SubsystemResult(name="Portfolio Audit", enabled=True)  # Always enabled
 
     try:
         if verbose:
@@ -163,7 +172,9 @@ def run_portfolio_audit(target_repo: str, env: str, verbose: bool) -> SubsystemR
             result.success = True
             result.details = f"Audited {len(swe_result['results'])} repo(s)"
             if verbose:
-                print(f"   ✅ Portfolio audit completed: {len(swe_result['results'])} repos")
+                print(
+                    f"   ✅ Portfolio audit completed: {len(swe_result['results'])} repos"
+                )
         else:
             result.success = False
             result.details = "Audit returned no results"
@@ -179,16 +190,15 @@ def run_portfolio_audit(target_repo: str, env: str, verbose: bool) -> SubsystemR
     return result
 
 
-def write_to_gcs(swe_result: Dict[str, Any], config: Dict[str, str], verbose: bool) -> SubsystemResult:
+def write_to_gcs(
+    swe_result: Dict[str, Any], config: Dict[str, str], verbose: bool
+) -> SubsystemResult:
     """
     Write portfolio results to GCS org storage (if enabled).
     Optional subsystem - failure doesn't fail the smoke.
     """
     enabled = config["ORG_STORAGE_WRITE_ENABLED"].lower() == "true"
-    result = SubsystemResult(
-        name="GCS Org Storage",
-        enabled=enabled
-    )
+    result = SubsystemResult(name="GCS Org Storage", enabled=enabled)
 
     if not enabled:
         result.details = "Disabled via ORG_STORAGE_WRITE_ENABLED=false"
@@ -216,8 +226,7 @@ def write_to_gcs(swe_result: Dict[str, Any], config: Dict[str, str], verbose: bo
         bucket_obj = client.bucket(bucket)
         blob = bucket_obj.blob(filename)
         blob.upload_from_string(
-            json.dumps(swe_result, indent=2),
-            content_type="application/json"
+            json.dumps(swe_result, indent=2), content_type="application/json"
         )
 
         result.success = True
@@ -234,16 +243,15 @@ def write_to_gcs(swe_result: Dict[str, Any], config: Dict[str, str], verbose: bo
     return result
 
 
-def send_slack_notification(swe_result: Dict[str, Any], config: Dict[str, str], verbose: bool) -> SubsystemResult:
+def send_slack_notification(
+    swe_result: Dict[str, Any], config: Dict[str, str], verbose: bool
+) -> SubsystemResult:
     """
     Send Slack notification for portfolio completion (if enabled).
     Optional subsystem - failure doesn't fail the smoke.
     """
     enabled = config["SLACK_NOTIFICATIONS_ENABLED"].lower() == "true"
-    result = SubsystemResult(
-        name="Slack Notifications",
-        enabled=enabled
-    )
+    result = SubsystemResult(name="Slack Notifications", enabled=enabled)
 
     if not enabled:
         result.details = "Disabled via SLACK_NOTIFICATIONS_ENABLED=false"
@@ -271,10 +279,10 @@ def send_slack_notification(swe_result: Dict[str, Any], config: Dict[str, str], 
                     "type": "section",
                     "text": {
                         "type": "mrkdwn",
-                        "text": f"*LIVE3 Dev Smoke Test*\n✅ Portfolio audit completed: {repo_count} repo(s)"
-                    }
+                        "text": f"*LIVE3 Dev Smoke Test*\n✅ Portfolio audit completed: {repo_count} repo(s)",
+                    },
                 }
-            ]
+            ],
         }
 
         # Send to Slack
@@ -295,7 +303,9 @@ def send_slack_notification(swe_result: Dict[str, Any], config: Dict[str, str], 
     return result
 
 
-def create_github_issues(swe_result: Dict[str, Any], config: Dict[str, str], verbose: bool) -> SubsystemResult:
+def create_github_issues(
+    swe_result: Dict[str, Any], config: Dict[str, str], verbose: bool
+) -> SubsystemResult:
     """
     Create GitHub issues for findings (if enabled, respects dry-run).
     Optional subsystem - failure doesn't fail the smoke.
@@ -303,10 +313,7 @@ def create_github_issues(swe_result: Dict[str, Any], config: Dict[str, str], ver
     enabled = config["GITHUB_ISSUE_CREATION_ENABLED"].lower() == "true"
     dry_run = config["GITHUB_ISSUES_DRY_RUN"].lower() == "true"
 
-    result = SubsystemResult(
-        name="GitHub Issue Creation",
-        enabled=enabled
-    )
+    result = SubsystemResult(name="GitHub Issue Creation", enabled=enabled)
 
     if not enabled:
         result.details = "Disabled via GITHUB_ISSUE_CREATION_ENABLED=false"
@@ -366,28 +373,24 @@ Environment Variables:
   SLACK_NOTIFICATIONS_ENABLED     Enable Slack (default: false)
   GITHUB_ISSUE_CREATION_ENABLED   Enable GitHub (default: false)
   GITHUB_ISSUES_DRY_RUN          GitHub dry-run mode (default: true)
-        """
+        """,
     )
 
     parser.add_argument(
         "--repo",
         type=str,
         default="bobs-brain",
-        help="Repository to audit (default: bobs-brain)"
+        help="Repository to audit (default: bobs-brain)",
     )
 
     parser.add_argument(
         "--env",
         type=str,
         default=None,
-        help="Environment override (default: from DEPLOYMENT_ENV or 'dev')"
+        help="Environment override (default: from DEPLOYMENT_ENV or 'dev')",
     )
 
-    parser.add_argument(
-        "--verbose",
-        action="store_true",
-        help="Enable verbose output"
-    )
+    parser.add_argument("--verbose", action="store_true", help="Enable verbose output")
 
     args = parser.parse_args()
 
@@ -406,9 +409,15 @@ Environment Variables:
         print(f"Environment: {env}")
         print(f"Timestamp: {summary.start_time.strftime('%Y-%m-%d %H:%M:%S')}")
         print("\nFeature Flags:")
-        print(f"  ORG_STORAGE_WRITE_ENABLED:      {config['ORG_STORAGE_WRITE_ENABLED']}")
-        print(f"  SLACK_NOTIFICATIONS_ENABLED:    {config['SLACK_NOTIFICATIONS_ENABLED']}")
-        print(f"  GITHUB_ISSUE_CREATION_ENABLED:  {config['GITHUB_ISSUE_CREATION_ENABLED']}")
+        print(
+            f"  ORG_STORAGE_WRITE_ENABLED:      {config['ORG_STORAGE_WRITE_ENABLED']}"
+        )
+        print(
+            f"  SLACK_NOTIFICATIONS_ENABLED:    {config['SLACK_NOTIFICATIONS_ENABLED']}"
+        )
+        print(
+            f"  GITHUB_ISSUE_CREATION_ENABLED:  {config['GITHUB_ISSUE_CREATION_ENABLED']}"
+        )
         print(f"  GITHUB_ISSUES_DRY_RUN:          {config['GITHUB_ISSUES_DRY_RUN']}")
         print("=" * 70)
 

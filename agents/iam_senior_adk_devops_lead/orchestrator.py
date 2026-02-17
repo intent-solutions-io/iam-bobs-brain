@@ -21,13 +21,19 @@ if _agents_dir not in sys.path:
 
 # Import structured logging (Phase RC2)
 # Import GitHub feature flags (Phase GHC)
-from agents.config.github_features import can_create_issues_for_repo, get_feature_status_summary
+from agents.config.github_features import (
+    can_create_issues_for_repo,
+    get_feature_status_summary,
+)
 
 # Import repo registry (Phase GH1)
 from agents.config.repos import get_registry, get_repo_by_id
 
 # Import GitHub issue adapter (Phase GH3)
-from agents.iam_issue.github_issue_adapter import issue_spec_to_github_payload, preview_issue_payload
+from agents.iam_issue.github_issue_adapter import (
+    issue_spec_to_github_payload,
+    preview_issue_payload,
+)
 from agents.shared_contracts import (
     AnalysisReport,
     CleanupTask,
@@ -65,6 +71,7 @@ logger = get_logger(__name__)
 # IAM-* AGENT A2A DELEGATION FUNCTIONS (Phase H - Real A2A Wiring)
 # ============================================================================
 
+
 def iam_adk_analyze(repo_hint: str, task: str) -> AnalysisReport:
     """
     Delegate ADK compliance analysis to iam-adk specialist via A2A.
@@ -79,9 +86,9 @@ def iam_adk_analyze(repo_hint: str, task: str) -> AnalysisReport:
         payload={
             "target": repo_hint,
             "focus_rules": ["R1", "R2", "R3", "R4", "R5", "R6", "R7", "R8"],
-            "severity_threshold": "LOW"
+            "severity_threshold": "LOW",
         },
-        context={"task_description": task}
+        context={"task_description": task},
     )
 
     # Handle delegation result
@@ -93,7 +100,7 @@ def iam_adk_analyze(repo_hint: str, task: str) -> AnalysisReport:
             patterns_checked=["ADK compliance check (failed)"],
             violations_found=[],
             compliance_score=0.0,
-            recommendations=[f"A2A delegation failed: {result.get('error')}"]
+            recommendations=[f"A2A delegation failed: {result.get('error')}"],
         )
 
     # Map A2A result to AnalysisReport
@@ -106,14 +113,18 @@ def iam_adk_analyze(repo_hint: str, task: str) -> AnalysisReport:
             "pattern": v.get("rule", "Unknown"),
             "file": v.get("file", "unknown"),
             "line": v.get("line_number", 0),
-            "message": v.get("message", "")
+            "message": v.get("message", ""),
         }
         for v in violations
     ]
 
     # Calculate compliance score based on violations
     compliance_status = a2a_result.get("compliance_status", "WARNING")
-    compliance_score = 1.0 if compliance_status == "COMPLIANT" else (0.5 if compliance_status == "WARNING" else 0.0)
+    compliance_score = (
+        1.0
+        if compliance_status == "COMPLIANT"
+        else (0.5 if compliance_status == "WARNING" else 0.0)
+    )
 
     return AnalysisReport(
         repo_path=repo_hint,
@@ -125,14 +136,14 @@ def iam_adk_analyze(repo_hint: str, task: str) -> AnalysisReport:
             "Dual memory wiring (R5)",
             "Single doc folder (R6)",
             "SPIFFE ID propagation (R7)",
-            "Drift detection (R8)"
+            "Drift detection (R8)",
         ],
         violations_found=violations_found,
         compliance_score=compliance_score,
         recommendations=[
             f"Risk level: {a2a_result.get('risk_level', 'UNKNOWN')}",
-            f"Status: {compliance_status}"
-        ]
+            f"Status: {compliance_status}",
+        ],
     )
 
 
@@ -142,7 +153,12 @@ def iam_issue_create(analysis: AnalysisReport) -> List[IssueSpec]:
 
     Phase H: Real A2A call to iam-issue agent using AgentCard contract.
     """
-    logger.log_info("a2a_delegation", agent="iam-issue", action="create_issues", violations_count=len(analysis.violations_found))
+    logger.log_info(
+        "a2a_delegation",
+        agent="iam-issue",
+        action="create_issues",
+        violations_count=len(analysis.violations_found),
+    )
 
     issues = []
 
@@ -153,21 +169,26 @@ def iam_issue_create(analysis: AnalysisReport) -> List[IssueSpec]:
             skill_id="iam_issue.convert_finding_to_issue",
             payload={
                 "finding": {
-                    "message": violation.get("message", f"Violation of {violation.get('pattern', 'unknown')} pattern"),
+                    "message": violation.get(
+                        "message",
+                        f"Violation of {violation.get('pattern', 'unknown')} pattern",
+                    ),
                     "severity": "MEDIUM" if i == 0 else "LOW",
                     "file": violation.get("file", "unknown"),
                     "rule": violation.get("pattern", "unknown"),
-                    "recommendation": f"Fix {violation.get('pattern', 'unknown')} pattern violation"
+                    "recommendation": f"Fix {violation.get('pattern', 'unknown')} pattern violation",
                 },
-                "repo_context": {
-                    "repo_name": analysis.repo_path,
-                    "branch": "main"
-                }
-            }
+                "repo_context": {"repo_name": analysis.repo_path, "branch": "main"},
+            },
         )
 
         if result.get("status") == "failure":
-            logger.log_warning("a2a_failed", agent="iam-issue", violation_index=i, error=result.get("error"))
+            logger.log_warning(
+                "a2a_failed",
+                agent="iam-issue",
+                violation_index=i,
+                error=result.get("error"),
+            )
             continue
 
         # Map A2A result to IssueSpec
@@ -178,16 +199,26 @@ def iam_issue_create(analysis: AnalysisReport) -> List[IssueSpec]:
             id=f"ISS-{datetime.now().strftime('%Y%m%d')}-{i:03d}",
             type=IssueType.ADK_VIOLATION,
             severity=Severity.MEDIUM if i == 0 else Severity.LOW,
-            title=issue_spec.get("title", f"Pattern violation: {violation.get('pattern', 'unknown')}"),
-            description=issue_spec.get("body", f"Found violation in {violation.get('file', 'unknown')}"),
+            title=issue_spec.get(
+                "title", f"Pattern violation: {violation.get('pattern', 'unknown')}"
+            ),
+            description=issue_spec.get(
+                "body", f"Found violation in {violation.get('file', 'unknown')}"
+            ),
             file_path=violation.get("file"),
             line_start=violation.get("line"),
             pattern_violated=violation.get("pattern"),
             expected_pattern=f"ADK-compliant {violation.get('pattern', '')}",
-            tags=issue_spec.get("labels", [])
+            tags=issue_spec.get("labels", []),
         )
         issues.append(issue)
-        logger.log_info("a2a_result", agent="iam-issue", action="created", issue_id=issue.id, title=issue.title)
+        logger.log_info(
+            "a2a_result",
+            agent="iam-issue",
+            action="created",
+            issue_id=issue.id,
+            title=issue.title,
+        )
 
     return issues
 
@@ -198,7 +229,13 @@ def iam_fix_plan_create(issues: List[IssueSpec], max_fixes: int) -> List[FixPlan
 
     Phase H: Real A2A call to iam-fix-plan agent using AgentCard contract.
     """
-    logger.log_info("a2a_delegation", agent="iam-fix-plan", action="plan_fixes", issues_count=len(issues), max_fixes=max_fixes)
+    logger.log_info(
+        "a2a_delegation",
+        agent="iam-fix-plan",
+        action="plan_fixes",
+        issues_count=len(issues),
+        max_fixes=max_fixes,
+    )
 
     plans = []
 
@@ -215,20 +252,26 @@ def iam_fix_plan_create(issues: List[IssueSpec], max_fixes: int) -> List[FixPlan
                     "id": issue.id,
                     "title": issue.title,
                     "description": issue.description,
-                    "severity": issue.severity.value if hasattr(issue.severity, 'value') else str(issue.severity),
+                    "severity": (
+                        issue.severity.value
+                        if hasattr(issue.severity, "value")
+                        else str(issue.severity)
+                    ),
                     "file_path": issue.file_path,
                     "pattern_violated": issue.pattern_violated,
-                    "expected_pattern": issue.expected_pattern
+                    "expected_pattern": issue.expected_pattern,
                 },
-                "constraints": {
-                    "max_duration_minutes": 30,
-                    "require_tests": True
-                }
-            }
+                "constraints": {"max_duration_minutes": 30, "require_tests": True},
+            },
         )
 
         if result.get("status") == "failure":
-            logger.log_warning("a2a_failed", agent="iam-fix-plan", issue_id=issue.id, error=result.get("error"))
+            logger.log_warning(
+                "a2a_failed",
+                agent="iam-fix-plan",
+                issue_id=issue.id,
+                error=result.get("error"),
+            )
             continue
 
         # Map A2A result to FixPlan
@@ -238,29 +281,64 @@ def iam_fix_plan_create(issues: List[IssueSpec], max_fixes: int) -> List[FixPlan
         # Convert steps from A2A format to internal format
         steps = []
         for i, step in enumerate(fix_plan.get("steps", [])):
-            steps.append({
-                "order": i + 1,
-                "action": "execute",
-                "target": issue.file_path or "unknown",
-                "description": step if isinstance(step, str) else str(step),
-                "estimated_risk": fix_plan.get("risk_level", "medium").lower()
-            })
+            steps.append(
+                {
+                    "order": i + 1,
+                    "action": "execute",
+                    "target": issue.file_path or "unknown",
+                    "description": step if isinstance(step, str) else str(step),
+                    "estimated_risk": fix_plan.get("risk_level", "medium").lower(),
+                }
+            )
 
         plan = FixPlan(
             issue_id=issue.id,
             plan_id=f"FP-{issue.id}",
             approach=fix_plan.get("strategy", f"Refactor to fix: {issue.title}"),
-            steps=steps if steps else [
-                {"order": 1, "action": "analyze", "target": issue.file_path or "unknown", "description": "Analyze", "estimated_risk": "low"},
-                {"order": 2, "action": "fix", "target": issue.file_path or "unknown", "description": "Apply fix", "estimated_risk": "medium"},
-                {"order": 3, "action": "test", "target": "tests/", "description": "Verify", "estimated_risk": "low"}
-            ],
+            steps=(
+                steps
+                if steps
+                else [
+                    {
+                        "order": 1,
+                        "action": "analyze",
+                        "target": issue.file_path or "unknown",
+                        "description": "Analyze",
+                        "estimated_risk": "low",
+                    },
+                    {
+                        "order": 2,
+                        "action": "fix",
+                        "target": issue.file_path or "unknown",
+                        "description": "Apply fix",
+                        "estimated_risk": "medium",
+                    },
+                    {
+                        "order": 3,
+                        "action": "test",
+                        "target": "tests/",
+                        "description": "Verify",
+                        "estimated_risk": "low",
+                    },
+                ]
+            ),
             overall_risk=fix_plan.get("risk_level", "medium").lower(),
-            requires_human_review=fix_plan.get("risk_level", "MEDIUM") in ["HIGH", "CRITICAL"],
-            estimated_duration_minutes=float(fix_plan.get("estimated_effort", "15").replace("min", "").strip()) if fix_plan.get("estimated_effort") else 15.0
+            requires_human_review=fix_plan.get("risk_level", "MEDIUM")
+            in ["HIGH", "CRITICAL"],
+            estimated_duration_minutes=(
+                float(fix_plan.get("estimated_effort", "15").replace("min", "").strip())
+                if fix_plan.get("estimated_effort")
+                else 15.0
+            ),
         )
         plans.append(plan)
-        logger.log_info("a2a_result", agent="iam-fix-plan", action="created", plan_id=plan.plan_id, issue_id=issue.id)
+        logger.log_info(
+            "a2a_result",
+            agent="iam-fix-plan",
+            action="created",
+            plan_id=plan.plan_id,
+            issue_id=issue.id,
+        )
 
     return plans
 
@@ -271,7 +349,12 @@ def iam_fix_impl_execute(plans: List[FixPlan]) -> List[CodeChange]:
 
     Phase H: Real A2A call to iam-fix-impl agent using AgentCard contract.
     """
-    logger.log_info("a2a_delegation", agent="iam-fix-impl", action="implement", plans_count=len(plans))
+    logger.log_info(
+        "a2a_delegation",
+        agent="iam-fix-impl",
+        action="implement",
+        plans_count=len(plans),
+    )
 
     changes = []
 
@@ -285,14 +368,21 @@ def iam_fix_impl_execute(plans: List[FixPlan]) -> List[CodeChange]:
                     "issue_id": plan.issue_id,
                     "approach": plan.approach,
                     "steps": plan.steps,
-                    "risk_level": plan.overall_risk
+                    "risk_level": plan.overall_risk,
                 },
-                "target_files": [step.get("target") for step in plan.steps if step.get("target")]
-            }
+                "target_files": [
+                    step.get("target") for step in plan.steps if step.get("target")
+                ],
+            },
         )
 
         if result.get("status") == "failure":
-            logger.log_warning("a2a_delegation_failed", agent="iam-fix-impl", plan_id=plan.plan_id, error=result.get("error"))
+            logger.log_warning(
+                "a2a_delegation_failed",
+                agent="iam-fix-impl",
+                plan_id=plan.plan_id,
+                error=result.get("error"),
+            )
             continue
 
         # Map A2A result to CodeChange
@@ -301,7 +391,11 @@ def iam_fix_impl_execute(plans: List[FixPlan]) -> List[CodeChange]:
 
         # Create a CodeChange for each file modified
         files_modified = impl_result.get("files_modified", [])
-        target_file = files_modified[0] if files_modified else (plan.steps[0].get("target") if plan.steps else "unknown.py")
+        target_file = (
+            files_modified[0]
+            if files_modified
+            else (plan.steps[0].get("target") if plan.steps else "unknown.py")
+        )
 
         change = CodeChange(
             plan_id=plan.plan_id,
@@ -312,10 +406,16 @@ def iam_fix_impl_execute(plans: List[FixPlan]) -> List[CodeChange]:
             diff_text=f"# Diff generated by iam-fix-impl via A2A\n# Files modified: {', '.join(files_modified)}",
             syntax_valid=impl_result.get("status") == "SUCCESS",
             imports_resolved=impl_result.get("status") == "SUCCESS",
-            confidence=0.9 if impl_result.get("status") == "SUCCESS" else 0.5
+            confidence=0.9 if impl_result.get("status") == "SUCCESS" else 0.5,
         )
         changes.append(change)
-        logger.log_info("a2a_result", agent="iam-fix-impl", action="implemented", file_path=change.file_path, plan_id=plan.plan_id)
+        logger.log_info(
+            "a2a_result",
+            agent="iam-fix-impl",
+            action="implemented",
+            file_path=change.file_path,
+            plan_id=plan.plan_id,
+        )
 
     return changes
 
@@ -326,7 +426,9 @@ def iam_qa_verify(changes: List[CodeChange]) -> List[QAVerdict]:
 
     Phase H: Real A2A call to iam-qa agent using AgentCard contract.
     """
-    logger.log_info("a2a_delegation", agent="iam-qa", action="verify", changes_count=len(changes))
+    logger.log_info(
+        "a2a_delegation", agent="iam-qa", action="verify", changes_count=len(changes)
+    )
 
     verdicts = []
 
@@ -335,24 +437,34 @@ def iam_qa_verify(changes: List[CodeChange]) -> List[QAVerdict]:
         smoke_result = delegate_to_specialist(
             specialist="iam-qa",
             skill_id="iam_qa.run_smoke_tests",
-            payload={
-                "target": change.file_path,
-                "test_scope": "implementation"
-            }
+            payload={"target": change.file_path, "test_scope": "implementation"},
         )
 
         if smoke_result.get("status") == "failure":
-            logger.log_warning("a2a_smoke_test_failed", agent="iam-qa", plan_id=change.plan_id, error=smoke_result.get("error"))
+            logger.log_warning(
+                "a2a_smoke_test_failed",
+                agent="iam-qa",
+                plan_id=change.plan_id,
+                error=smoke_result.get("error"),
+            )
             # Create failed verdict
-            verdicts.append(QAVerdict(
-                change_id=change.plan_id,
-                status=QAStatus.FAILED,
-                tests_run=[{"test_name": "smoke_test", "passed": False, "message": smoke_result.get("error", "A2A error")}],
-                tests_passed=0,
-                tests_failed=1,
-                safe_to_apply=False,
-                requires_manual_review=True
-            ))
+            verdicts.append(
+                QAVerdict(
+                    change_id=change.plan_id,
+                    status=QAStatus.FAILED,
+                    tests_run=[
+                        {
+                            "test_name": "smoke_test",
+                            "passed": False,
+                            "message": smoke_result.get("error", "A2A error"),
+                        }
+                    ],
+                    tests_passed=0,
+                    tests_failed=1,
+                    safe_to_apply=False,
+                    requires_manual_review=True,
+                )
+            )
             continue
 
         # Map smoke test results
@@ -367,13 +479,18 @@ def iam_qa_verify(changes: List[CodeChange]) -> List[QAVerdict]:
                 "test_results": smoke_data,
                 "coverage_analysis": {
                     "file_path": change.file_path,
-                    "confidence": change.confidence
-                }
-            }
+                    "confidence": change.confidence,
+                },
+            },
         )
 
         if verdict_result.get("status") == "failure":
-            logger.log_warning("a2a_verdict_failed", agent="iam-qa", plan_id=change.plan_id, error=verdict_result.get("error"))
+            logger.log_warning(
+                "a2a_verdict_failed",
+                agent="iam-qa",
+                plan_id=change.plan_id,
+                error=verdict_result.get("error"),
+            )
 
         # Map A2A results to QAVerdict
         a2a_verdict = verdict_result.get("result", {}).get("verdict", {})
@@ -391,28 +508,47 @@ def iam_qa_verify(changes: List[CodeChange]) -> List[QAVerdict]:
             change_id=change.plan_id,
             status=status,
             tests_run=[
-                {"test_name": "smoke_test", "passed": smoke_data.get("status") == "PASS", "message": f"Passed: {smoke_data.get('passed', 0)}", "duration_ms": 50}
+                {
+                    "test_name": "smoke_test",
+                    "passed": smoke_data.get("status") == "PASS",
+                    "message": f"Passed: {smoke_data.get('passed', 0)}",
+                    "duration_ms": 50,
+                }
             ],
             tests_passed=smoke_data.get("passed", 0),
             tests_failed=smoke_data.get("failed", 0),
             code_coverage_delta=2.5 if status == QAStatus.PASSED else 0.0,
             complexity_delta=-3 if status == QAStatus.PASSED else 0,
             safe_to_apply=decision == "APPROVE",
-            requires_manual_review=decision != "APPROVE"
+            requires_manual_review=decision != "APPROVE",
         )
         verdicts.append(verdict)
-        logger.log_info("a2a_result", agent="iam-qa", action="verdict", plan_id=change.plan_id, status=verdict.status.value)
+        logger.log_info(
+            "a2a_result",
+            agent="iam-qa",
+            action="verdict",
+            plan_id=change.plan_id,
+            status=verdict.status.value,
+        )
 
     return verdicts
 
 
-def iam_doc_update(issues: List[IssueSpec], plans: List[FixPlan], verdicts: List[QAVerdict]) -> List[DocumentationUpdate]:
+def iam_doc_update(
+    issues: List[IssueSpec], plans: List[FixPlan], verdicts: List[QAVerdict]
+) -> List[DocumentationUpdate]:
     """
     Delegate documentation updates to iam-doc specialist via A2A.
 
     Phase H: Real A2A call to iam-doc agent using AgentCard contract.
     """
-    logger.log_info("a2a_delegation", agent="iam-doc", action="document", issues_count=len(issues), plans_count=len(plans))
+    logger.log_info(
+        "a2a_delegation",
+        agent="iam-doc",
+        action="document",
+        issues_count=len(issues),
+        plans_count=len(plans),
+    )
 
     docs = []
 
@@ -427,24 +563,29 @@ def iam_doc_update(issues: List[IssueSpec], plans: List[FixPlan], verdicts: List
                     "objectives": [
                         "Analyze ADK compliance",
                         f"Fix {len(plans)} pattern violations",
-                        "Document changes"
+                        "Document changes",
                     ],
                     "outcomes": {
                         "issues_found": len(issues),
                         "fixes_planned": len(plans),
                         "qa_verdicts": len(verdicts),
-                        "qa_passed": sum(1 for v in verdicts if v.status == QAStatus.PASSED)
+                        "qa_passed": sum(
+                            1 for v in verdicts if v.status == QAStatus.PASSED
+                        ),
                     },
                     "decisions": [
-                        {"decision": f"Fixed {p.approach}", "rationale": f"Issue {p.issue_id}"}
+                        {
+                            "decision": f"Fixed {p.approach}",
+                            "rationale": f"Issue {p.issue_id}",
+                        }
                         for p in plans[:3]
                     ],
                     "lessons_learned": [
                         f"Pattern violations found in {len(issues)} locations",
-                        f"Fix success rate: {sum(1 for v in verdicts if v.status == QAStatus.PASSED)}/{len(verdicts)}"
-                    ]
+                        f"Fix success rate: {sum(1 for v in verdicts if v.status == QAStatus.PASSED)}/{len(verdicts)}",
+                    ],
                 }
-            }
+            },
         )
 
         if result.get("status") != "failure":
@@ -452,19 +593,31 @@ def iam_doc_update(issues: List[IssueSpec], plans: List[FixPlan], verdicts: List
             aar_doc = a2a_result.get("aar_document", {})
 
             doc = DocumentationUpdate(
-                doc_id=aar_doc.get("doc_id", f"DOC-{datetime.now().strftime('%Y%m%d')}-AAR"),
+                doc_id=aar_doc.get(
+                    "doc_id", f"DOC-{datetime.now().strftime('%Y%m%d')}-AAR"
+                ),
                 related_to=[p.plan_id for p in plans],
                 doc_type="aar",
-                file_path=aar_doc.get("file_path", f"000-docs/{datetime.now().strftime('%Y%m%d')}-AA-REPT-pipeline-run.md"),
+                file_path=aar_doc.get(
+                    "file_path",
+                    f"000-docs/{datetime.now().strftime('%Y%m%d')}-AA-REPT-pipeline-run.md",
+                ),
                 section="## After-Action Report",
                 original_text="",
-                updated_text=aar_doc.get("content", f"# Pipeline Run AAR\n\nGenerated via A2A at {datetime.now().isoformat()}"),
-                auto_generated=True
+                updated_text=aar_doc.get(
+                    "content",
+                    f"# Pipeline Run AAR\n\nGenerated via A2A at {datetime.now().isoformat()}",
+                ),
+                auto_generated=True,
             )
             docs.append(doc)
-            logger.log_info("a2a_result", agent="iam-doc", action="created_aar", doc_id=doc.doc_id)
+            logger.log_info(
+                "a2a_result", agent="iam-doc", action="created_aar", doc_id=doc.doc_id
+            )
         else:
-            logger.log_warning("a2a_aar_generation_failed", agent="iam-doc", error=result.get("error"))
+            logger.log_warning(
+                "a2a_aar_generation_failed", agent="iam-doc", error=result.get("error")
+            )
 
     return docs
 
@@ -475,7 +628,9 @@ def iam_cleanup_identify(repo_hint: str, issues: List[IssueSpec]) -> List[Cleanu
 
     Phase H: Real A2A call to iam-cleanup agent using AgentCard contract.
     """
-    logger.log_info("a2a_delegation", agent="iam-cleanup", action="identify", repo=repo_hint)
+    logger.log_info(
+        "a2a_delegation", agent="iam-cleanup", action="identify", repo=repo_hint
+    )
 
     tasks = []
 
@@ -483,14 +638,15 @@ def iam_cleanup_identify(repo_hint: str, issues: List[IssueSpec]) -> List[Cleanu
     dead_code_result = delegate_to_specialist(
         specialist="iam-cleanup",
         skill_id="iam_cleanup.detect_dead_code",
-        payload={
-            "scope": repo_hint,
-            "include_dependencies": True
-        }
+        payload={"scope": repo_hint, "include_dependencies": True},
     )
 
     if dead_code_result.get("status") == "failure":
-        logger.log_warning("a2a_dead_code_detection_failed", agent="iam-cleanup", error=dead_code_result.get("error"))
+        logger.log_warning(
+            "a2a_dead_code_detection_failed",
+            agent="iam-cleanup",
+            error=dead_code_result.get("error"),
+        )
     else:
         dead_code = dead_code_result.get("result", {}).get("dead_code_report", {})
 
@@ -501,9 +657,12 @@ def iam_cleanup_identify(repo_hint: str, issues: List[IssueSpec]) -> List[Cleanu
             payload={
                 "analysis_results": {
                     "dead_code": dead_code,
-                    "issues": [{"id": i.id, "title": i.title, "file": i.file_path} for i in issues[:5]]
+                    "issues": [
+                        {"id": i.id, "title": i.title, "file": i.file_path}
+                        for i in issues[:5]
+                    ],
                 }
-            }
+            },
         )
 
         if cleanup_result.get("status") != "failure":
@@ -511,20 +670,36 @@ def iam_cleanup_identify(repo_hint: str, issues: List[IssueSpec]) -> List[Cleanu
 
             for i, a2a_task in enumerate(a2a_tasks):
                 task = CleanupTask(
-                    task_id=a2a_task.get("task_id", f"CLEAN-{datetime.now().strftime('%Y%m%d')}-{i:03d}"),
-                    category="dead_code" if "dead" in a2a_task.get("description", "").lower() else "refactor",
+                    task_id=a2a_task.get(
+                        "task_id", f"CLEAN-{datetime.now().strftime('%Y%m%d')}-{i:03d}"
+                    ),
+                    category=(
+                        "dead_code"
+                        if "dead" in a2a_task.get("description", "").lower()
+                        else "refactor"
+                    ),
                     title=a2a_task.get("description", "Cleanup task"),
                     description=a2a_task.get("description", "Generated via A2A"),
                     file_paths=[],  # Would be populated from dead_code analysis
                     estimated_loc_reduction=dead_code.get("total_loc", 0),
                     estimated_complexity_reduction=10,
                     priority=a2a_task.get("priority", "medium").lower(),
-                    safe_to_automate=a2a_task.get("safety_level") == "SAFE"
+                    safe_to_automate=a2a_task.get("safety_level") == "SAFE",
                 )
                 tasks.append(task)
-                logger.log_info("a2a_result", agent="iam-cleanup", action="found", task_id=task.task_id, title=task.title)
+                logger.log_info(
+                    "a2a_result",
+                    agent="iam-cleanup",
+                    action="found",
+                    task_id=task.task_id,
+                    title=task.title,
+                )
         else:
-            logger.log_warning("a2a_task_generation_failed", agent="iam-cleanup", error=cleanup_result.get("error"))
+            logger.log_warning(
+                "a2a_task_generation_failed",
+                agent="iam-cleanup",
+                error=cleanup_result.get("error"),
+            )
 
     return tasks
 
@@ -535,7 +710,13 @@ def iam_index_update(result: PipelineResult) -> List[IndexEntry]:
 
     Phase H: Real A2A call to iam-index agent using AgentCard contract.
     """
-    logger.log_info("a2a_delegation", agent="iam-index", action="index", issues_count=len(result.issues), plans_count=len(result.plans))
+    logger.log_info(
+        "a2a_delegation",
+        agent="iam-index",
+        action="index",
+        issues_count=len(result.issues),
+        plans_count=len(result.plans),
+    )
 
     entries = []
 
@@ -556,21 +737,33 @@ def iam_index_update(result: PipelineResult) -> List[IndexEntry]:
                         "issues_fixed": result.issues_fixed,
                         "timestamp": datetime.now().isoformat(),
                         "issues": [
-                            {"id": i.id, "title": i.title, "severity": i.severity.value if hasattr(i.severity, 'value') else str(i.severity)}
+                            {
+                                "id": i.id,
+                                "title": i.title,
+                                "severity": (
+                                    i.severity.value
+                                    if hasattr(i.severity, "value")
+                                    else str(i.severity)
+                                ),
+                            }
                             for i in result.issues[:10]
                         ],
                         "plans": [
                             {"id": p.plan_id, "approach": p.approach}
                             for p in result.plans[:10]
-                        ]
-                    }
+                        ],
+                    },
                 }
             ]
-        }
+        },
     )
 
     if update_result.get("status") == "failure":
-        logger.log_warning("a2a_index_update_failed", agent="iam-index", error=update_result.get("error"))
+        logger.log_warning(
+            "a2a_index_update_failed",
+            agent="iam-index",
+            error=update_result.get("error"),
+        )
     else:
         # Create index entry for tracking
         entry = IndexEntry(
@@ -582,10 +775,12 @@ def iam_index_update(result: PipelineResult) -> List[IndexEntry]:
             tags=["pipeline", "issues", result.request.env, "a2a"],
             related_files=[i.file_path for i in result.issues if i.file_path],
             storage_path=f"knowledge/pipelines/{datetime.now().strftime('%Y%m')}/",
-            ttl_days=90
+            ttl_days=90,
         )
         entries.append(entry)
-        logger.log_info("a2a_result", agent="iam-index", action="created", entry_id=entry.entry_id)
+        logger.log_info(
+            "a2a_result", agent="iam-index", action="created", entry_id=entry.entry_id
+        )
 
     # Also index patterns learned if we have plans
     if result.plans:
@@ -600,11 +795,11 @@ def iam_index_update(result: PipelineResult) -> List[IndexEntry]:
                         "content": {
                             "type": "patterns_learned",
                             "fixes_applied": len(result.plans),
-                            "patterns": [p.approach for p in result.plans]
-                        }
+                            "patterns": [p.approach for p in result.plans],
+                        },
                     }
                 ]
-            }
+            },
         )
 
         if pattern_result.get("status") != "failure":
@@ -614,10 +809,15 @@ def iam_index_update(result: PipelineResult) -> List[IndexEntry]:
                 title="ADK patterns applied",
                 summary=f"Applied {len(result.plans)} ADK pattern fixes via A2A",
                 tags=["adk", "patterns", "fixes", "a2a"],
-                storage_path="knowledge/patterns/"
+                storage_path="knowledge/patterns/",
             )
             entries.append(pattern_entry)
-            logger.log_info("a2a_result", agent="iam-index", action="patterns_indexed", entry_id=pattern_entry.entry_id)
+            logger.log_info(
+                "a2a_result",
+                agent="iam-index",
+                action="patterns_indexed",
+                entry_id=pattern_entry.entry_id,
+            )
 
     return entries
 
@@ -625,6 +825,7 @@ def iam_index_update(result: PipelineResult) -> List[IndexEntry]:
 # ============================================================================
 # MAIN ORCHESTRATOR
 # ============================================================================
+
 
 def run_swe_pipeline(request: PipelineRequest) -> PipelineResult:
     """
@@ -646,7 +847,7 @@ def run_swe_pipeline(request: PipelineRequest) -> PipelineResult:
         pipeline_run_id=request.pipeline_run_id,
         repo_id=request.repo_id or request.repo_hint,
         task=request.task_description,
-        env=request.env
+        env=request.env,
     )
 
     # Phase GH1: Resolve repo_id if provided
@@ -659,9 +860,9 @@ def run_swe_pipeline(request: PipelineRequest) -> PipelineResult:
             request.github_ref = request.github_ref or repo_config.default_branch
 
             # Update metadata with repo info
-            request.metadata['resolved_from_registry'] = True
-            request.metadata['repo_full_name'] = repo_config.full_name
-            request.metadata['repo_url'] = repo_config.github_url
+            request.metadata["resolved_from_registry"] = True
+            request.metadata["repo_full_name"] = repo_config.full_name
+            request.metadata["repo_url"] = repo_config.github_url
 
             print(f"✓ Resolved repo_id '{request.repo_id}' to {repo_config.full_name}")
         else:
@@ -672,7 +873,9 @@ def run_swe_pipeline(request: PipelineRequest) -> PipelineResult:
     print("=" * 60)
     print(f"Repository: {request.repo_hint}")
     if request.github_owner and request.github_repo:
-        print(f"GitHub: {request.github_owner}/{request.github_repo} @ {request.github_ref or 'default'}")
+        print(
+            f"GitHub: {request.github_owner}/{request.github_repo} @ {request.github_ref or 'default'}"
+        )
     print(f"Task: {request.task_description}")
     print(f"Environment: {request.env}")
     print("=" * 60 + "\n")
@@ -697,16 +900,18 @@ def run_swe_pipeline(request: PipelineRequest) -> PipelineResult:
                 exclude_patterns=settings.analysis_exclude_patterns,
                 max_file_size=settings.max_file_size_bytes,
                 max_total_size=settings.max_total_size_bytes,
-                fetch_content=False  # Only fetch metadata for now
+                fetch_content=False,  # Only fetch metadata for now
             )
 
-            print(f"✓ Fetched {len(repo_tree.files)} files ({repo_tree.total_size / 1024:.1f}KB total)")
+            print(
+                f"✓ Fetched {len(repo_tree.files)} files ({repo_tree.total_size / 1024:.1f}KB total)"
+            )
 
             # Store in metadata for agents to use
-            request.metadata['github_tree'] = {
-                'file_count': len(repo_tree.files),
-                'total_size': repo_tree.total_size,
-                'files': [f.path for f in repo_tree.files[:20]]  # First 20 for preview
+            request.metadata["github_tree"] = {
+                "file_count": len(repo_tree.files),
+                "total_size": repo_tree.total_size,
+                "files": [f.path for f in repo_tree.files[:20]],  # First 20 for preview
             }
 
         except GitHubClientError as e:
@@ -723,7 +928,7 @@ def run_swe_pipeline(request: PipelineRequest) -> PipelineResult:
         qa_report=[],
         docs=[],
         cleanup=[],
-        index_updates=[]
+        index_updates=[],
     )
 
     try:
@@ -734,7 +939,7 @@ def run_swe_pipeline(request: PipelineRequest) -> PipelineResult:
             pipeline_run_id=request.pipeline_run_id,
             agent="iam-adk",
             step="analysis",
-            status="started"
+            status="started",
         )
 
         # Pass GitHub tree info to analysis if available
@@ -750,7 +955,7 @@ def run_swe_pipeline(request: PipelineRequest) -> PipelineResult:
             step="analysis",
             status="completed",
             compliance_score=analysis.compliance_score,
-            violations_found=len(analysis.violations_found)
+            violations_found=len(analysis.violations_found),
         )
 
         # Step 2: Issue Creation (iam-issue)
@@ -760,7 +965,7 @@ def run_swe_pipeline(request: PipelineRequest) -> PipelineResult:
             pipeline_run_id=request.pipeline_run_id,
             agent="iam-issue",
             step="issue_creation",
-            status="started"
+            status="started",
         )
         result.issues = iam_issue_create(analysis)
         result.total_issues_found = len(result.issues)
@@ -770,7 +975,7 @@ def run_swe_pipeline(request: PipelineRequest) -> PipelineResult:
             agent="iam-issue",
             step="issue_creation",
             status="completed",
-            issues_found=result.total_issues_found
+            issues_found=result.total_issues_found,
         )
 
         # Step 2b: GitHub Issue Creation (Phase GHC)
@@ -788,7 +993,9 @@ def run_swe_pipeline(request: PipelineRequest) -> PipelineResult:
                 # Preview mode (default): Just acknowledge issues found
                 print("✓ Preview mode: Issues identified but not created on GitHub")
                 print("  Run with --mode=dry-run to see GitHub issue payloads")
-                print("  Run with --mode=create to create issues (requires feature flags)")
+                print(
+                    "  Run with --mode=create to create issues (requires feature flags)"
+                )
 
             elif mode == "dry-run":
                 # Dry-run mode: Show what would be created
@@ -802,7 +1009,9 @@ def run_swe_pipeline(request: PipelineRequest) -> PipelineResult:
                     print()
 
                 print("✓ Dry-run complete. No issues were created.")
-                print("  To actually create issues, use --mode=create with proper feature flags")
+                print(
+                    "  To actually create issues, use --mode=create with proper feature flags"
+                )
 
             elif mode == "create":
                 # Create mode: Actually create issues (with safety checks)
@@ -814,10 +1023,12 @@ def run_swe_pipeline(request: PipelineRequest) -> PipelineResult:
                     print()
                     status = get_feature_status_summary()
                     print(f"   {status['message']}")
-                    if 'recommendation' in status:
+                    if "recommendation" in status:
                         print(f"   💡 {status['recommendation']}")
                     if repo_id:
-                        print(f"   ℹ️  Add '{repo_id}' to GITHUB_ISSUE_CREATION_ALLOWED_REPOS")
+                        print(
+                            f"   ℹ️  Add '{repo_id}' to GITHUB_ISSUE_CREATION_ALLOWED_REPOS"
+                        )
                     print()
                     print("✓ Issues identified but not created (blocked by safety)")
                 else:
@@ -826,11 +1037,15 @@ def run_swe_pipeline(request: PipelineRequest) -> PipelineResult:
                         gh_client = get_client()
                         if not gh_client.token:
                             print("❌ GitHub token not found")
-                            print("   Set GITHUB_TOKEN environment variable to create issues")
+                            print(
+                                "   Set GITHUB_TOKEN environment variable to create issues"
+                            )
                             print("✓ Issues identified but not created (no token)")
                         else:
                             # All safety checks passed - create issues
-                            print(f"✅ Safety checks passed. Creating {len(result.issues)} issues...")
+                            print(
+                                f"✅ Safety checks passed. Creating {len(result.issues)} issues..."
+                            )
                             print()
 
                             created_count = 0
@@ -841,16 +1056,18 @@ def run_swe_pipeline(request: PipelineRequest) -> PipelineResult:
                                         operation="create_issue",
                                         repo=f"{request.github_owner}/{request.github_repo}",
                                         status="started",
-                                        issue_id=issue.id
+                                        issue_id=issue.id,
                                     )
                                     payload = issue_spec_to_github_payload(issue)
                                     created_issue = gh_client.create_issue(
                                         owner=request.github_owner,
                                         repo=request.github_repo,
-                                        payload=payload
+                                        payload=payload,
                                     )
 
-                                    print(f"  ✅ Created issue #{created_issue.number}: {created_issue.title}")
+                                    print(
+                                        f"  ✅ Created issue #{created_issue.number}: {created_issue.title}"
+                                    )
                                     print(f"     {created_issue.html_url}")
                                     log_github_operation(
                                         pipeline_run_id=request.pipeline_run_id,
@@ -858,13 +1075,15 @@ def run_swe_pipeline(request: PipelineRequest) -> PipelineResult:
                                         repo=f"{request.github_owner}/{request.github_repo}",
                                         status="success",
                                         issue_number=created_issue.number,
-                                        issue_url=created_issue.html_url
+                                        issue_url=created_issue.html_url,
                                     )
 
                                     # Store GitHub URL in issue metadata for tracking
                                     issue.tags = issue.tags or []
                                     if created_issue.html_url not in issue.tags:
-                                        issue.tags.append(f"github:{created_issue.html_url}")
+                                        issue.tags.append(
+                                            f"github:{created_issue.html_url}"
+                                        )
 
                                     created_count += 1
 
@@ -875,11 +1094,13 @@ def run_swe_pipeline(request: PipelineRequest) -> PipelineResult:
                                         operation="create_issue",
                                         repo=f"{request.github_owner}/{request.github_repo}",
                                         status="failed",
-                                        error=str(e)
+                                        error=str(e),
                                     )
 
                             print()
-                            print(f"✓ Created {created_count}/{len(result.issues)} GitHub issues")
+                            print(
+                                f"✓ Created {created_count}/{len(result.issues)} GitHub issues"
+                            )
 
                     except GitHubClientError as e:
                         print(f"❌ GitHub client error: {e}")
@@ -941,9 +1162,10 @@ def run_swe_pipeline(request: PipelineRequest) -> PipelineResult:
             "pipeline_error",
             pipeline_run_id=request.pipeline_run_id,
             error=str(e),
-            repo_id=request.repo_id or request.repo_hint
+            repo_id=request.repo_id or request.repo_hint,
         )
         import traceback
+
         traceback.print_exc()
 
     # Calculate duration
@@ -955,7 +1177,7 @@ def run_swe_pipeline(request: PipelineRequest) -> PipelineResult:
         repo_id=request.repo_id or request.repo_hint,
         duration_seconds=result.pipeline_duration_seconds,
         issues_found=result.total_issues_found,
-        issues_fixed=result.issues_fixed
+        issues_fixed=result.issues_fixed,
     )
 
     # Print summary
@@ -976,6 +1198,7 @@ def run_swe_pipeline(request: PipelineRequest) -> PipelineResult:
 # HELPER FUNCTIONS
 # ============================================================================
 
+
 def run_quick_audit(repo_path: str) -> PipelineResult:
     """
     Run a quick ADK audit on a repository.
@@ -988,7 +1211,7 @@ def run_quick_audit(repo_path: str) -> PipelineResult:
         env="dev",
         max_issues_to_fix=2,
         include_cleanup=False,
-        include_indexing=True
+        include_indexing=True,
     )
     return run_swe_pipeline(request)
 
@@ -1005,7 +1228,7 @@ def run_full_pipeline(repo_path: str, task: str) -> PipelineResult:
         env="staging",
         max_issues_to_fix=5,
         include_cleanup=True,
-        include_indexing=True
+        include_indexing=True,
     )
     return run_swe_pipeline(request)
 
@@ -1014,7 +1237,7 @@ def run_swe_pipeline_for_repo(
     repo_id: str,
     mode: str = "preview",
     task: str = "Audit ADK patterns and compliance",
-    env: str = "dev"
+    env: str = "dev",
 ) -> PipelineResult:
     """
     Run SWE pipeline for a specific repo by ID from the registry.
@@ -1057,7 +1280,7 @@ def run_swe_pipeline_for_repo(
             task_description=task,
             env=env,
             mode=mode,
-            metadata={"error": "repo_not_found"}
+            metadata={"error": "repo_not_found"},
         )
         return PipelineResult(
             request=request,
@@ -1072,7 +1295,7 @@ def run_swe_pipeline_for_repo(
             total_issues_found=0,
             issues_fixed=0,
             issues_documented=0,
-            pipeline_duration_seconds=0.0
+            pipeline_duration_seconds=0.0,
         )
 
     # Check if repo is locally available
@@ -1097,8 +1320,8 @@ def run_swe_pipeline_for_repo(
             metadata={
                 "status": "skipped",
                 "reason": "no_local_path",
-                "local_path": repo_config.local_path
-            }
+                "local_path": repo_config.local_path,
+            },
         )
         return PipelineResult(
             request=request,
@@ -1113,7 +1336,7 @@ def run_swe_pipeline_for_repo(
             total_issues_found=0,
             issues_fixed=0,
             issues_documented=0,
-            pipeline_duration_seconds=0.0
+            pipeline_duration_seconds=0.0,
         )
 
     # Repo is local - run the pipeline!
@@ -1141,13 +1364,33 @@ def run_swe_pipeline_for_repo(
         metadata={
             "display_name": repo_config.display_name,
             "tags": repo_config.tags,
-            "arv_profile": {
-                "requires_rag": repo_config.arv_profile.requires_rag if repo_config.arv_profile else False,
-                "requires_iam_dept": repo_config.arv_profile.requires_iam_dept if repo_config.arv_profile else False,
-                "requires_tests": repo_config.arv_profile.requires_tests if repo_config.arv_profile else False,
-                "requires_dual_memory": repo_config.arv_profile.requires_dual_memory if repo_config.arv_profile else False
-            } if repo_config.arv_profile else {}
-        }
+            "arv_profile": (
+                {
+                    "requires_rag": (
+                        repo_config.arv_profile.requires_rag
+                        if repo_config.arv_profile
+                        else False
+                    ),
+                    "requires_iam_dept": (
+                        repo_config.arv_profile.requires_iam_dept
+                        if repo_config.arv_profile
+                        else False
+                    ),
+                    "requires_tests": (
+                        repo_config.arv_profile.requires_tests
+                        if repo_config.arv_profile
+                        else False
+                    ),
+                    "requires_dual_memory": (
+                        repo_config.arv_profile.requires_dual_memory
+                        if repo_config.arv_profile
+                        else False
+                    ),
+                }
+                if repo_config.arv_profile
+                else {}
+            ),
+        },
     )
 
     # Run the full pipeline

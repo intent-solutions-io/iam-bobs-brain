@@ -14,14 +14,25 @@ from pydantic import BaseModel, Field
 
 class AgentCard(BaseModel):
     """AgentCard model for A2A protocol."""
+
     name: str = Field(..., description="Agent name")
     version: str = Field(..., description="Agent version")
     url: str = Field(..., description="Agent public URL")
-    description: str = Field(..., description="Agent description (must include SPIFFE ID per R7)")
-    capabilities: List[str] = Field(default_factory=list, description="Agent capabilities")
-    default_input_modes: List[str] = Field(default_factory=lambda: ["text"], description="Supported input modes")
-    default_output_modes: List[str] = Field(default_factory=lambda: ["text"], description="Supported output modes")
-    skills: List[Dict[str, Any]] = Field(default_factory=list, description="Agent skills")
+    description: str = Field(
+        ..., description="Agent description (must include SPIFFE ID per R7)"
+    )
+    capabilities: List[str] = Field(
+        default_factory=list, description="Agent capabilities"
+    )
+    default_input_modes: List[str] = Field(
+        default_factory=lambda: ["text"], description="Supported input modes"
+    )
+    default_output_modes: List[str] = Field(
+        default_factory=lambda: ["text"], description="Supported output modes"
+    )
+    skills: List[Dict[str, Any]] = Field(
+        default_factory=list, description="Agent skills"
+    )
 
 
 def get_agent_card() -> AgentCard:
@@ -29,7 +40,10 @@ def get_agent_card() -> AgentCard:
     app_name = os.getenv("APP_NAME", "iam-cleanup")
     app_version = os.getenv("APP_VERSION", "0.10.0")
     public_url = os.getenv("PUBLIC_URL", "https://iam-cleanup.intent.solutions")
-    spiffe_id = os.getenv("AGENT_SPIFFE_ID", "spiffe://intent.solutions/agent/iam-cleanup/dev/us-central1/0.10.0")
+    spiffe_id = os.getenv(
+        "AGENT_SPIFFE_ID",
+        "spiffe://intent.solutions/agent/iam-cleanup/dev/us-central1/0.10.0",
+    )
 
     description = f"""iam-cleanup - Repository Hygiene & Cleanup Specialist
 
@@ -38,7 +52,12 @@ def get_agent_card() -> AgentCard:
 iam-cleanup detects dead code, finds duplicated code, identifies structural issues, and proposes CleanupTask specifications.
 """
 
-    capabilities = ["dead_code_detection", "duplication_detection", "structural_analysis", "cleanup_task_generation"]
+    capabilities = [
+        "dead_code_detection",
+        "duplication_detection",
+        "structural_analysis",
+        "cleanup_task_generation",
+    ]
 
     skills = [
         {
@@ -50,8 +69,8 @@ iam-cleanup detects dead code, finds duplicated code, identifies structural issu
                 "required": ["scope"],
                 "properties": {
                     "scope": {"type": "string"},
-                    "include_dependencies": {"type": "boolean", "default": True}
-                }
+                    "include_dependencies": {"type": "boolean", "default": True},
+                },
             },
             "output_schema": {
                 "type": "object",
@@ -66,18 +85,29 @@ iam-cleanup detects dead code, finds duplicated code, identifies structural issu
                                 "items": {
                                     "type": "object",
                                     "properties": {
-                                        "type": {"type": "string", "enum": ["function", "class", "module", "dependency"]},
+                                        "type": {
+                                            "type": "string",
+                                            "enum": [
+                                                "function",
+                                                "class",
+                                                "module",
+                                                "dependency",
+                                            ],
+                                        },
                                         "name": {"type": "string"},
                                         "file": {"type": "string"},
-                                        "confidence": {"type": "string", "enum": ["HIGH", "MEDIUM", "LOW"]}
-                                    }
-                                }
+                                        "confidence": {
+                                            "type": "string",
+                                            "enum": ["HIGH", "MEDIUM", "LOW"],
+                                        },
+                                    },
+                                },
                             },
-                            "total_loc": {"type": "integer"}
-                        }
+                            "total_loc": {"type": "integer"},
+                        },
                     }
-                }
-            }
+                },
+            },
         },
         {
             "skill_id": "iam_cleanup.find_code_duplication",
@@ -88,8 +118,8 @@ iam-cleanup detects dead code, finds duplicated code, identifies structural issu
                 "required": ["scope"],
                 "properties": {
                     "scope": {"type": "string"},
-                    "min_lines": {"type": "integer", "default": 10}
-                }
+                    "min_lines": {"type": "integer", "default": 10},
+                },
             },
             "output_schema": {
                 "type": "object",
@@ -104,17 +134,20 @@ iam-cleanup detects dead code, finds duplicated code, identifies structural issu
                                 "items": {
                                     "type": "object",
                                     "properties": {
-                                        "locations": {"type": "array", "items": {"type": "string"}},
+                                        "locations": {
+                                            "type": "array",
+                                            "items": {"type": "string"},
+                                        },
                                         "lines": {"type": "integer"},
-                                        "refactor_suggestion": {"type": "string"}
-                                    }
-                                }
+                                        "refactor_suggestion": {"type": "string"},
+                                    },
+                                },
                             },
-                            "total_duplicates": {"type": "integer"}
-                        }
+                            "total_duplicates": {"type": "integer"},
+                        },
                     }
-                }
-            }
+                },
+            },
         },
         {
             "skill_id": "iam_cleanup.generate_cleanup_tasks",
@@ -123,9 +156,7 @@ iam-cleanup detects dead code, finds duplicated code, identifies structural issu
             "input_schema": {
                 "type": "object",
                 "required": ["analysis_results"],
-                "properties": {
-                    "analysis_results": {"type": "object"}
-                }
+                "properties": {"analysis_results": {"type": "object"}},
             },
             "output_schema": {
                 "type": "object",
@@ -135,30 +166,52 @@ iam-cleanup detects dead code, finds duplicated code, identifies structural issu
                         "type": "array",
                         "items": {
                             "type": "object",
-                            "required": ["task_id", "description", "priority", "safety_level"],
+                            "required": [
+                                "task_id",
+                                "description",
+                                "priority",
+                                "safety_level",
+                            ],
                             "properties": {
                                 "task_id": {"type": "string"},
                                 "description": {"type": "string"},
-                                "priority": {"type": "string", "enum": ["HIGH", "MEDIUM", "LOW"]},
-                                "safety_level": {"type": "string", "enum": ["SAFE", "MODERATE_RISK", "HIGH_RISK"]},
-                                "estimated_impact": {"type": "string"}
-                            }
-                        }
+                                "priority": {
+                                    "type": "string",
+                                    "enum": ["HIGH", "MEDIUM", "LOW"],
+                                },
+                                "safety_level": {
+                                    "type": "string",
+                                    "enum": ["SAFE", "MODERATE_RISK", "HIGH_RISK"],
+                                },
+                                "estimated_impact": {"type": "string"},
+                            },
+                        },
                     }
-                }
-            }
-        }
+                },
+            },
+        },
     ]
 
-    return AgentCard(name=app_name, version=app_version, url=public_url, description=description,
-                     capabilities=capabilities, default_input_modes=["text"], default_output_modes=["text"], skills=skills)
+    return AgentCard(
+        name=app_name,
+        version=app_version,
+        url=public_url,
+        description=description,
+        capabilities=capabilities,
+        default_input_modes=["text"],
+        default_output_modes=["text"],
+        skills=skills,
+    )
 
 
 def get_agent_card_dict() -> Dict[str, Any]:
     """Get iam-cleanup's AgentCard as dictionary."""
     card = get_agent_card()
     card_dict = card.model_dump()
-    spiffe_id = os.getenv("AGENT_SPIFFE_ID", "spiffe://intent.solutions/agent/iam-cleanup/dev/us-central1/0.10.0")
+    spiffe_id = os.getenv(
+        "AGENT_SPIFFE_ID",
+        "spiffe://intent.solutions/agent/iam-cleanup/dev/us-central1/0.10.0",
+    )
     card_dict["spiffe_id"] = spiffe_id
     return card_dict
 

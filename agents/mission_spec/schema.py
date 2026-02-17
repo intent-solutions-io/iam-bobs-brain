@@ -43,6 +43,7 @@ from pydantic import BaseModel, Field, field_validator
 
 class StepType(str, Enum):
     """Type of workflow step."""
+
     AGENT = "agent"
     LOOP = "loop"
     GATE = "gate"
@@ -50,6 +51,7 @@ class StepType(str, Enum):
 
 class GateType(str, Enum):
     """Type of gate check."""
+
     TEST_PASS = "test_pass"
     APPROVAL = "approval"
     CUSTOM = "custom"
@@ -57,16 +59,24 @@ class GateType(str, Enum):
 
 class StepOutput(BaseModel):
     """Output definition for a workflow step."""
+
     name: str = Field(..., description="Output name for reference in later steps")
     description: Optional[str] = Field(None, description="Human-readable description")
 
 
 class GateConfig(BaseModel):
     """Configuration for a gate check."""
+
     gate_type: GateType = Field(..., alias="type", description="Type of gate")
-    command: Optional[str] = Field(None, description="Command to run for test_pass gate")
-    approvers: Optional[List[str]] = Field(None, description="Required approvers for approval gate")
-    condition: Optional[str] = Field(None, description="Condition expression for custom gate")
+    command: Optional[str] = Field(
+        None, description="Command to run for test_pass gate"
+    )
+    approvers: Optional[List[str]] = Field(
+        None, description="Required approvers for approval gate"
+    )
+    condition: Optional[str] = Field(
+        None, description="Condition expression for custom gate"
+    )
 
     class Config:
         populate_by_name = True
@@ -74,11 +84,16 @@ class GateConfig(BaseModel):
 
 class WorkflowStep(BaseModel):
     """A single step in the workflow."""
+
     step: str = Field(..., description="Step identifier")
     agent: str = Field(..., description="Agent to invoke (canonical ID)")
-    skill_id: Optional[str] = Field(None, description="Explicit skill ID to invoke (overrides default)")
+    skill_id: Optional[str] = Field(
+        None, description="Explicit skill ID to invoke (overrides default)"
+    )
     inputs: Dict[str, Any] = Field(default_factory=dict, description="Input parameters")
-    outputs: List[StepOutput] = Field(default_factory=list, description="Output definitions")
+    outputs: List[StepOutput] = Field(
+        default_factory=list, description="Output definitions"
+    )
     depends_on: List[str] = Field(default_factory=list, description="Step dependencies")
     condition: Optional[str] = Field(None, description="Condition for step execution")
 
@@ -94,6 +109,7 @@ class WorkflowStep(BaseModel):
 
 class LoopStep(BaseModel):
     """A loop construct in the workflow."""
+
     loop: Dict[str, Any] = Field(..., description="Loop configuration")
 
     @property
@@ -125,25 +141,31 @@ class LoopStep(BaseModel):
         for s in steps_data:
             if isinstance(s, dict) and "agent" in s:
                 # Simple agent reference
-                result.append(WorkflowStep(
-                    step=s.get("step", s["agent"]),
-                    agent=s["agent"],
-                    inputs=s.get("inputs", {}),
-                    outputs=[StepOutput(**o) for o in s.get("outputs", [])],
-                    depends_on=s.get("depends_on", [])
-                ))
+                result.append(
+                    WorkflowStep(
+                        step=s.get("step", s["agent"]),
+                        agent=s["agent"],
+                        inputs=s.get("inputs", {}),
+                        outputs=[StepOutput(**o) for o in s.get("outputs", [])],
+                        depends_on=s.get("depends_on", []),
+                    )
+                )
         return result
 
 
 class RepoScope(BaseModel):
     """Repository scope definition."""
+
     path: str = Field(..., description="Path to repository (. for current)")
     ref: Optional[str] = Field(None, description="Git ref (branch, tag, commit)")
-    worktree: Optional[str] = Field(None, description="Worktree path if using git worktrees")
+    worktree: Optional[str] = Field(
+        None, description="Worktree path if using git worktrees"
+    )
 
 
 class MissionScope(BaseModel):
     """Scope of the mission (which repos to operate on)."""
+
     repos: List[RepoScope] = Field(default_factory=list, description="Repository list")
 
     @field_validator("repos", mode="before")
@@ -168,15 +190,17 @@ class MissionScope(BaseModel):
 
 class MissionMandate(BaseModel):
     """Mandate configuration for the mission."""
+
     budget_limit: float = Field(0.0, description="Maximum budget in budget_unit")
     budget_unit: str = Field("USD", description="Budget unit")
     max_iterations: int = Field(100, description="Maximum specialist invocations")
     authorized_specialists: List[str] = Field(
-        default_factory=list,
-        description="Authorized specialist IDs (empty = all)"
+        default_factory=list, description="Authorized specialist IDs (empty = all)"
     )
     risk_tier: str = Field("R0", description="Risk tier (R0-R4)")
-    data_classification: str = Field("internal", description="Data classification level")
+    data_classification: str = Field(
+        "internal", description="Data classification level"
+    )
 
     @field_validator("risk_tier")
     @classmethod
@@ -190,8 +214,11 @@ class MissionMandate(BaseModel):
 
 class EvidenceConfig(BaseModel):
     """Evidence bundle configuration."""
+
     bundle_required: bool = Field(True, description="Whether to create evidence bundle")
-    include: List[str] = Field(default_factory=list, description="Outputs to include in bundle")
+    include: List[str] = Field(
+        default_factory=list, description="Outputs to include in bundle"
+    )
     export_to_gcs: bool = Field(False, description="Whether to export to GCS")
     gcs_bucket: Optional[str] = Field(None, description="GCS bucket for export")
 
@@ -206,29 +233,26 @@ class MissionSpec(BaseModel):
     - Dry-run to preview execution plan
     - Executed with full audit trail
     """
+
     mission_id: str = Field(..., description="Unique mission identifier")
     title: str = Field(..., description="Human-readable title")
     intent: str = Field(..., description="What this mission accomplishes")
     version: str = Field("1", description="Mission spec version")
 
     scope: MissionScope = Field(
-        default_factory=MissionScope,
-        description="Scope (repos to operate on)"
+        default_factory=MissionScope, description="Scope (repos to operate on)"
     )
 
     workflow: List[Union[WorkflowStep, LoopStep]] = Field(
-        default_factory=list,
-        description="Workflow steps and loops"
+        default_factory=list, description="Workflow steps and loops"
     )
 
     mandate: MissionMandate = Field(
-        default_factory=MissionMandate,
-        description="Mandate configuration"
+        default_factory=MissionMandate, description="Mandate configuration"
     )
 
     evidence: EvidenceConfig = Field(
-        default_factory=EvidenceConfig,
-        description="Evidence bundle configuration"
+        default_factory=EvidenceConfig, description="Evidence bundle configuration"
     )
 
     @field_validator("workflow", mode="before")
@@ -272,8 +296,7 @@ class MissionSpec(BaseModel):
         """Validate all step dependencies exist. Returns list of errors."""
         errors = []
         step_names = {
-            item.step for item in self.workflow
-            if isinstance(item, WorkflowStep)
+            item.step for item in self.workflow if isinstance(item, WorkflowStep)
         }
 
         for item in self.workflow:
@@ -295,9 +318,7 @@ class MissionSpec(BaseModel):
         authorized = set(self.mandate.authorized_specialists)
         for agent in self.get_all_agents():
             if agent not in authorized:
-                errors.append(
-                    f"Agent '{agent}' not in authorized_specialists"
-                )
+                errors.append(f"Agent '{agent}' not in authorized_specialists")
 
         return errors
 

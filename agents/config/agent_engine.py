@@ -68,7 +68,9 @@ class AgentEngineConfig:
 # ==============================================================================
 
 
-def _get_env_var(key: str, default: Optional[str] = None, required: bool = False) -> Optional[str]:
+def _get_env_var(
+    key: str, default: Optional[str] = None, required: bool = False
+) -> Optional[str]:
     """
     Get environment variable with optional default and required check.
 
@@ -106,10 +108,14 @@ def get_location() -> str:
     Returns:
         Location from VERTEX_LOCATION or LOCATION, defaults to us-central1
     """
-    return _get_env_var("VERTEX_LOCATION") or _get_env_var("LOCATION", default="us-central1")
+    return _get_env_var("VERTEX_LOCATION") or _get_env_var(
+        "LOCATION", default="us-central1"
+    )
 
 
-def get_agent_engine_id(agent_role: str, env: Optional[Environment] = None) -> Optional[str]:
+def get_agent_engine_id(
+    agent_role: str, env: Optional[Environment] = None
+) -> Optional[str]:
     """
     Get Agent Engine ID for a specific agent role and environment.
 
@@ -158,9 +164,7 @@ def get_agent_engine_id(agent_role: str, env: Optional[Environment] = None) -> O
 
 
 def make_reasoning_engine_path(
-    engine_id: str,
-    project_id: Optional[str] = None,
-    location: Optional[str] = None
+    engine_id: str, project_id: Optional[str] = None, location: Optional[str] = None
 ) -> str:
     """
     Construct full reasoning engine resource path from components.
@@ -189,9 +193,7 @@ def make_reasoning_engine_path(
 
 
 def get_reasoning_engine_url(
-    engine_id: str,
-    project_id: Optional[str] = None,
-    location: Optional[str] = None
+    engine_id: str, project_id: Optional[str] = None, location: Optional[str] = None
 ) -> str:
     """
     Construct Agent Engine REST API URL for query endpoint.
@@ -219,9 +221,7 @@ def get_reasoning_engine_url(
 
 
 def build_agent_config(
-    agent_role: str,
-    env: Optional[Environment] = None,
-    spiffe_version: str = "0.9.0"
+    agent_role: str, env: Optional[Environment] = None, spiffe_version: str = "0.9.0"
 ) -> Optional[AgentEngineConfig]:
     """
     Build AgentEngineConfig for an agent by reading environment variables.
@@ -261,7 +261,7 @@ def build_agent_config(
         project_id=project_id,
         location=location,
         spiffe_id=spiffe_id,
-        notes=f"Runtime config for {agent_role} in {env}"
+        notes=f"Runtime config for {agent_role} in {env}",
     )
 
 
@@ -291,7 +291,7 @@ def get_canonical_bob_config() -> AgentEngineConfig:
         project_id="205354194989",  # bobs-brain-prod project
         location="us-central1",
         spiffe_id="spiffe://intent.solutions/agent/bobs-brain/prod/us-central1/0.8.0",
-        notes="⭐ CURRENT CANONICAL BOB (pre-ADK architecture) - Active production"
+        notes="⭐ CURRENT CANONICAL BOB (pre-ADK architecture) - Active production",
     )
 
 
@@ -301,8 +301,7 @@ def get_canonical_bob_config() -> AgentEngineConfig:
 
 
 def is_agent_deployed_to_engine(
-    agent_role: str,
-    env: Optional[Environment] = None
+    agent_role: str, env: Optional[Environment] = None
 ) -> bool:
     """
     Check if an agent is deployed to Agent Engine (vs local stub).
@@ -323,7 +322,9 @@ def is_agent_deployed_to_engine(
     return build_agent_config(agent_role, env) is not None
 
 
-def list_configured_agents(env: Optional[Environment] = None) -> Dict[str, AgentEngineConfig]:
+def list_configured_agents(
+    env: Optional[Environment] = None,
+) -> Dict[str, AgentEngineConfig]:
     """
     List all agents configured in a specific environment.
 
@@ -346,7 +347,16 @@ def list_configured_agents(env: Optional[Environment] = None) -> Dict[str, Agent
     configured = {}
 
     # Common agent roles to check
-    agent_roles = ["bob", "bob_current", "bob_next_gen", "foreman", "iam-adk", "iam-issue", "iam-fix", "iam-qa"]
+    agent_roles = [
+        "bob",
+        "bob_current",
+        "bob_next_gen",
+        "foreman",
+        "iam-adk",
+        "iam-issue",
+        "iam-fix",
+        "iam-qa",
+    ]
 
     for role in agent_roles:
         config = build_agent_config(role, env)
@@ -424,7 +434,9 @@ if __name__ == "__main__":
     except ValueError as e:
         print(f"❌ Configuration error: {e}")
         print()
-        print("Set GCP_PROJECT_ID and optionally VERTEX_LOCATION environment variables.")
+        print(
+            "Set GCP_PROJECT_ID and optionally VERTEX_LOCATION environment variables."
+        )
         exit(1)
 
     # Show configured agents

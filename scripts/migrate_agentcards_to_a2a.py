@@ -22,6 +22,7 @@ def load_agentcard(path: Path) -> Dict[str, Any]:
     with open(path) as f:
         return json.load(f)
 
+
 def save_agentcard(path: Path, data: Dict[str, Any], dry_run: bool = False) -> None:
     """Save an AgentCard JSON file."""
     if dry_run:
@@ -29,10 +30,11 @@ def save_agentcard(path: Path, data: Dict[str, Any], dry_run: bool = False) -> N
         print(json.dumps(data, indent=2))
         print("-" * 60)
     else:
-        with open(path, 'w') as f:
+        with open(path, "w") as f:
             json.dump(data, f, indent=2)
-            f.write('\n')  # Add trailing newline
+            f.write("\n")  # Add trailing newline
         print(f"✅ Updated: {path}")
+
 
 def migrate_agentcard_phase1(card: Dict[str, Any], agent_name: str) -> Dict[str, Any]:
     """
@@ -41,46 +43,46 @@ def migrate_agentcard_phase1(card: Dict[str, Any], agent_name: str) -> Dict[str,
     This is backward compatible - only adds new fields.
     """
     # Add protocol version
-    if 'protocol_version' not in card:
-        card['protocol_version'] = '0.3.0'
+    if "protocol_version" not in card:
+        card["protocol_version"] = "0.3.0"
 
     # Add transport settings
-    if 'preferred_transport' not in card:
-        card['preferred_transport'] = 'JSONRPC'
+    if "preferred_transport" not in card:
+        card["preferred_transport"] = "JSONRPC"
 
     # Add provider information
-    if 'provider' not in card:
-        card['provider'] = {
-            'organization': 'Intent Solutions',
-            'url': 'https://intent.solutions'
+    if "provider" not in card:
+        card["provider"] = {
+            "organization": "Intent Solutions",
+            "url": "https://intent.solutions",
         }
 
     # Add security fields (empty for now)
-    if 'security' not in card:
-        card['security'] = None  # Will be list of security requirements when needed
+    if "security" not in card:
+        card["security"] = None  # Will be list of security requirements when needed
 
-    if 'security_schemes' not in card:
-        card['security_schemes'] = None  # Will be dict of schemes when needed
+    if "security_schemes" not in card:
+        card["security_schemes"] = None  # Will be dict of schemes when needed
 
     # Add documentation URL
-    if 'documentation_url' not in card:
-        card['documentation_url'] = 'https://github.com/jeremylongshore/bobs-brain'
+    if "documentation_url" not in card:
+        card["documentation_url"] = "https://github.com/jeremylongshore/bobs-brain"
 
     # Add icon URL (null for now)
-    if 'icon_url' not in card:
-        card['icon_url'] = None
+    if "icon_url" not in card:
+        card["icon_url"] = None
 
     # Add extended card support flag
-    if 'supports_authenticated_extended_card' not in card:
-        card['supports_authenticated_extended_card'] = False
+    if "supports_authenticated_extended_card" not in card:
+        card["supports_authenticated_extended_card"] = False
 
     # Add additional interfaces (supporting both JSONRPC and potential future transports)
-    if 'additional_interfaces' not in card:
+    if "additional_interfaces" not in card:
         # For now, just declare JSONRPC at the main URL
-        card['additional_interfaces'] = [
+        card["additional_interfaces"] = [
             {
-                'url': card.get('url', f'https://{agent_name}.intent.solutions'),
-                'transport': 'JSONRPC'
+                "url": card.get("url", f"https://{agent_name}.intent.solutions"),
+                "transport": "JSONRPC",
             }
         ]
 
@@ -89,45 +91,45 @@ def migrate_agentcard_phase1(card: Dict[str, Any], agent_name: str) -> Dict[str,
     # Phase 2 will convert to proper AgentCapabilities object
 
     # Fix skill field names (Phase 1.5 - low risk rename)
-    if 'skills' in card:
-        for skill in card['skills']:
+    if "skills" in card:
+        for skill in card["skills"]:
             # Rename skill_id to id if present
-            if 'skill_id' in skill and 'id' not in skill:
-                skill['id'] = skill.pop('skill_id')
+            if "skill_id" in skill and "id" not in skill:
+                skill["id"] = skill.pop("skill_id")
 
             # Add required tags field if missing
-            if 'tags' not in skill:
+            if "tags" not in skill:
                 # Generate tags from skill id
-                skill_parts = skill.get('id', '').split('.')
-                skill['tags'] = [part for part in skill_parts if part]
+                skill_parts = skill.get("id", "").split(".")
+                skill["tags"] = [part for part in skill_parts if part]
 
             # Add examples if missing
-            if 'examples' not in skill:
-                skill['examples'] = []  # Will be populated in Phase 2
+            if "examples" not in skill:
+                skill["examples"] = []  # Will be populated in Phase 2
 
     # Ensure field ordering for readability
     ordered_card = {}
 
     # Core identity fields first
     field_order = [
-        'protocol_version',
-        'name',
-        'version',
-        'description',
-        'url',
-        'preferred_transport',
-        'additional_interfaces',
-        'provider',
-        'documentation_url',
-        'icon_url',
-        'capabilities',
-        'default_input_modes',
-        'default_output_modes',
-        'skills',
-        'security',
-        'security_schemes',
-        'supports_authenticated_extended_card',
-        'spiffe_id'  # Keep custom field at end for now
+        "protocol_version",
+        "name",
+        "version",
+        "description",
+        "url",
+        "preferred_transport",
+        "additional_interfaces",
+        "provider",
+        "documentation_url",
+        "icon_url",
+        "capabilities",
+        "default_input_modes",
+        "default_output_modes",
+        "skills",
+        "security",
+        "security_schemes",
+        "supports_authenticated_extended_card",
+        "spiffe_id",  # Keep custom field at end for now
     ]
 
     for field in field_order:
@@ -141,14 +143,16 @@ def migrate_agentcard_phase1(card: Dict[str, Any], agent_name: str) -> Dict[str,
 
     return ordered_card
 
+
 def find_agentcard_files() -> list[Path]:
     """Find all agent-card.json files in the agents directory."""
-    agents_dir = Path(__file__).parent.parent / 'agents'
-    return list(agents_dir.glob('*/.well-known/agent-card.json'))
+    agents_dir = Path(__file__).parent.parent / "agents"
+    return list(agents_dir.glob("*/.well-known/agent-card.json"))
+
 
 def main():
     """Run the migration."""
-    dry_run = '--dry-run' in sys.argv
+    dry_run = "--dry-run" in sys.argv
 
     if dry_run:
         print("🔍 DRY RUN MODE - No files will be modified")
@@ -176,7 +180,7 @@ def main():
             card = load_agentcard(card_path)
 
             # Check if already migrated
-            if card.get('protocol_version') == '0.3.0':
+            if card.get("protocol_version") == "0.3.0":
                 print("  ✓ Already at v0.3.0")
                 success_count += 1
                 continue
@@ -205,9 +209,12 @@ def main():
         print("\nNext steps:")
         print("  1. Run tests: pytest tests/unit/test_agentcard_json.py")
         print("  2. Validate with A2A inspector (when available)")
-        print("  3. Commit changes: git add -A && git commit -m 'feat(agents): migrate AgentCards to A2A v0.3.0 Phase 1'")
+        print(
+            "  3. Commit changes: git add -A && git commit -m 'feat(agents): migrate AgentCards to A2A v0.3.0 Phase 1'"
+        )
 
     return 0 if error_count == 0 else 1
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     sys.exit(main())

@@ -36,7 +36,7 @@ def index_adk_docs(doc_source: str = "google.github.io/adk-docs") -> str:
             "Memory Services",
             "A2A Protocol",
             "Deployment Guide",
-            "Best Practices"
+            "Best Practices",
         ]
 
         result = {
@@ -49,18 +49,14 @@ def index_adk_docs(doc_source: str = "google.github.io/adk-docs") -> str:
             "index_stats": {
                 "total_pages": 47,
                 "total_tokens": 125000,
-                "avg_relevance_score": 0.92
-            }
+                "avg_relevance_score": 0.92,
+            },
         }
 
         return json.dumps(result, indent=2)
 
     except Exception as e:
-        return json.dumps({
-            "status": "error",
-            "error": str(e),
-            "source": doc_source
-        })
+        return json.dumps({"status": "error", "error": str(e), "source": doc_source})
 
 
 def index_project_docs(doc_path: str = "000-docs") -> str:
@@ -94,7 +90,7 @@ def index_project_docs(doc_path: str = "000-docs") -> str:
                         "number": parts[0],
                         "category": parts[1],
                         "type": parts[2] if len(parts) > 2 else "",
-                        "size_bytes": doc_file.stat().st_size
+                        "size_bytes": doc_file.stat().st_size,
                     }
                     indexed_docs.append(doc_info)
 
@@ -106,17 +102,13 @@ def index_project_docs(doc_path: str = "000-docs") -> str:
             "datastore": "project-documentation",
             "timestamp": datetime.utcnow().isoformat(),
             "categories_found": list(set(d.get("category", "") for d in indexed_docs)),
-            "total_size_kb": sum(d.get("size_bytes", 0) for d in indexed_docs) // 1024
+            "total_size_kb": sum(d.get("size_bytes", 0) for d in indexed_docs) // 1024,
         }
 
         return json.dumps(result, indent=2)
 
     except Exception as e:
-        return json.dumps({
-            "status": "error",
-            "error": str(e),
-            "path": doc_path
-        })
+        return json.dumps({"status": "error", "error": str(e), "path": doc_path})
 
 
 def query_knowledge_base(query: str, max_results: int = 5) -> str:
@@ -138,41 +130,49 @@ def query_knowledge_base(query: str, max_results: int = 5) -> str:
 
         # Simple keyword matching for demonstration
         if "memory" in query.lower() or "dual" in query.lower():
-            mock_results.append({
-                "title": "Dual Memory Wiring Pattern",
-                "source": "ADK Documentation",
-                "relevance": 0.95,
-                "snippet": "Implement dual memory with VertexAiSessionService for short-term and VertexAiMemoryBankService for long-term persistence...",
-                "url": "https://google.github.io/adk-docs/memory/dual-wiring"
-            })
+            mock_results.append(
+                {
+                    "title": "Dual Memory Wiring Pattern",
+                    "source": "ADK Documentation",
+                    "relevance": 0.95,
+                    "snippet": "Implement dual memory with VertexAiSessionService for short-term and VertexAiMemoryBankService for long-term persistence...",
+                    "url": "https://google.github.io/adk-docs/memory/dual-wiring",
+                }
+            )
 
         if "a2a" in query.lower() or "agent" in query.lower():
-            mock_results.append({
-                "title": "A2A Protocol Implementation",
-                "source": "000-docs/045-AT-ARCH-a2a-protocol.md",
-                "relevance": 0.89,
-                "snippet": "Agent-to-Agent communication uses AgentCards for discovery and REST endpoints for invocation...",
-                "url": "file://000-docs/045-AT-ARCH-a2a-protocol.md"
-            })
+            mock_results.append(
+                {
+                    "title": "A2A Protocol Implementation",
+                    "source": "000-docs/045-AT-ARCH-a2a-protocol.md",
+                    "relevance": 0.89,
+                    "snippet": "Agent-to-Agent communication uses AgentCards for discovery and REST endpoints for invocation...",
+                    "url": "file://000-docs/045-AT-ARCH-a2a-protocol.md",
+                }
+            )
 
         if "tool" in query.lower():
-            mock_results.append({
-                "title": "Tool Implementation Guide",
-                "source": "ADK Documentation",
-                "relevance": 0.87,
-                "snippet": "Tools in ADK agents must return JSON-serializable results and handle errors gracefully...",
-                "url": "https://google.github.io/adk-docs/tools/implementation"
-            })
+            mock_results.append(
+                {
+                    "title": "Tool Implementation Guide",
+                    "source": "ADK Documentation",
+                    "relevance": 0.87,
+                    "snippet": "Tools in ADK agents must return JSON-serializable results and handle errors gracefully...",
+                    "url": "https://google.github.io/adk-docs/tools/implementation",
+                }
+            )
 
         # Default result if no keyword matches
         if not mock_results:
-            mock_results.append({
-                "title": "ADK Agent Development Overview",
-                "source": "ADK Documentation",
-                "relevance": 0.75,
-                "snippet": "The Agent Development Kit (ADK) provides a framework for building production-grade AI agents...",
-                "url": "https://google.github.io/adk-docs/"
-            })
+            mock_results.append(
+                {
+                    "title": "ADK Agent Development Overview",
+                    "source": "ADK Documentation",
+                    "relevance": 0.75,
+                    "snippet": "The Agent Development Kit (ADK) provides a framework for building production-grade AI agents...",
+                    "url": "https://google.github.io/adk-docs/",
+                }
+            )
 
         result = {
             "status": "success",
@@ -181,17 +181,13 @@ def query_knowledge_base(query: str, max_results: int = 5) -> str:
             "results": mock_results[:max_results],
             "datastore": "unified-knowledge-base",
             "search_latency_ms": 127,
-            "timestamp": datetime.utcnow().isoformat()
+            "timestamp": datetime.utcnow().isoformat(),
         }
 
         return json.dumps(result, indent=2)
 
     except Exception as e:
-        return json.dumps({
-            "status": "error",
-            "error": str(e),
-            "query": query
-        })
+        return json.dumps({"status": "error", "error": str(e), "query": query})
 
 
 def sync_vertex_search(datastore_id: str = "adk-documentation") -> str:
@@ -213,7 +209,7 @@ def sync_vertex_search(datastore_id: str = "adk-documentation") -> str:
             "documents_updated": 5,
             "documents_removed": 2,
             "total_documents": 147,
-            "index_size_mb": 3.4
+            "index_size_mb": 3.4,
         }
 
         result = {
@@ -227,18 +223,16 @@ def sync_vertex_search(datastore_id: str = "adk-documentation") -> str:
                 "project_id": os.getenv("PROJECT_ID", "unknown"),
                 "location": os.getenv("LOCATION", "us-central1"),
                 "search_tier": "FREE_TIER",
-                "data_size_gb": 0.003
-            }
+                "data_size_gb": 0.003,
+            },
         }
 
         return json.dumps(result, indent=2)
 
     except Exception as e:
-        return json.dumps({
-            "status": "error",
-            "error": str(e),
-            "datastore_id": datastore_id
-        })
+        return json.dumps(
+            {"status": "error", "error": str(e), "datastore_id": datastore_id}
+        )
 
 
 def generate_index_entry(
@@ -247,7 +241,7 @@ def generate_index_entry(
     content_type: str,
     summary: str,
     tags: Optional[List[str]] = None,
-    keywords: Optional[List[str]] = None
+    keywords: Optional[List[str]] = None,
 ) -> str:
     """
     Generate an IndexEntry object for new content.
@@ -282,7 +276,7 @@ def generate_index_entry(
             tags=tags or [],
             keywords=keywords or [],
             last_updated=datetime.utcnow(),
-            relevance_score=0.85  # Default relevance
+            relevance_score=0.85,  # Default relevance
         )
 
         result = {
@@ -290,18 +284,15 @@ def generate_index_entry(
             "index_entry": entry.to_dict(),
             "datastore": "unified-knowledge-base",
             "indexed": True,
-            "timestamp": datetime.utcnow().isoformat()
+            "timestamp": datetime.utcnow().isoformat(),
         }
 
         return json.dumps(result, indent=2, default=str)
 
     except Exception as e:
-        return json.dumps({
-            "status": "error",
-            "error": str(e),
-            "title": title,
-            "source": source
-        })
+        return json.dumps(
+            {"status": "error", "error": str(e), "title": title, "source": source}
+        )
 
 
 def analyze_knowledge_gaps(scope: str = "all") -> str:
@@ -324,34 +315,42 @@ def analyze_knowledge_gaps(scope: str = "all") -> str:
 
         # Simulate gap detection based on scope
         if scope in ["all", "agents"]:
-            gaps.append({
-                "area": "Agent Testing",
-                "description": "Limited documentation on unit testing ADK agents",
-                "priority": "high",
-                "suggested_action": "Create testing guide for ADK agents"
-            })
-            gaps.append({
-                "area": "Error Handling",
-                "description": "No comprehensive error handling patterns documented",
-                "priority": "medium",
-                "suggested_action": "Document error handling best practices"
-            })
+            gaps.append(
+                {
+                    "area": "Agent Testing",
+                    "description": "Limited documentation on unit testing ADK agents",
+                    "priority": "high",
+                    "suggested_action": "Create testing guide for ADK agents",
+                }
+            )
+            gaps.append(
+                {
+                    "area": "Error Handling",
+                    "description": "No comprehensive error handling patterns documented",
+                    "priority": "medium",
+                    "suggested_action": "Document error handling best practices",
+                }
+            )
 
         if scope in ["all", "adk"]:
-            outdated.append({
-                "document": "ADK Migration Guide v1.0",
-                "last_updated": "2024-09-15",
-                "issue": "References deprecated APIs",
-                "suggested_action": "Update to v2.0 API references"
-            })
+            outdated.append(
+                {
+                    "document": "ADK Migration Guide v1.0",
+                    "last_updated": "2024-09-15",
+                    "issue": "References deprecated APIs",
+                    "suggested_action": "Update to v2.0 API references",
+                }
+            )
 
         if scope in ["all", "project"]:
-            gaps.append({
-                "area": "A2A Integration",
-                "description": "Missing examples of multi-agent A2A workflows",
-                "priority": "medium",
-                "suggested_action": "Document A2A workflow patterns"
-            })
+            gaps.append(
+                {
+                    "area": "A2A Integration",
+                    "description": "Missing examples of multi-agent A2A workflows",
+                    "priority": "medium",
+                    "suggested_action": "Document A2A workflow patterns",
+                }
+            )
 
         # Generate recommendations
         recommendations.append("Schedule quarterly knowledge base audits")
@@ -371,22 +370,19 @@ def analyze_knowledge_gaps(scope: str = "all") -> str:
                 "adk_docs": "87%",
                 "project_docs": "92%",
                 "agent_docs": "78%",
-                "overall": "86%"
+                "overall": "86%",
             },
-            "next_audit": "2025-02-19"
+            "next_audit": "2025-02-19",
         }
 
         return json.dumps(result, indent=2)
 
     except Exception as e:
-        return json.dumps({
-            "status": "error",
-            "error": str(e),
-            "scope": scope
-        })
+        return json.dumps({"status": "error", "error": str(e), "scope": scope})
 
 
 # Additional helper functions for internal use
+
 
 def _calculate_relevance(query: str, content: str) -> float:
     """Calculate relevance score between query and content."""
@@ -408,13 +404,29 @@ def _extract_keywords(text: str, max_keywords: int = 10) -> List[str]:
     import re
 
     # Remove common words
-    stopwords = {"the", "is", "at", "which", "on", "a", "an", "and", "or", "but", "in", "with", "to", "for"}
+    stopwords = {
+        "the",
+        "is",
+        "at",
+        "which",
+        "on",
+        "a",
+        "an",
+        "and",
+        "or",
+        "but",
+        "in",
+        "with",
+        "to",
+        "for",
+    }
 
-    words = re.findall(r'\b[a-z]+\b', text.lower())
+    words = re.findall(r"\b[a-z]+\b", text.lower())
     keywords = [w for w in words if w not in stopwords and len(w) > 3]
 
     # Count frequencies
     from collections import Counter
+
     word_freq = Counter(keywords)
 
     # Return top keywords

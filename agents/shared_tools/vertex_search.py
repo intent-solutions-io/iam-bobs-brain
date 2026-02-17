@@ -67,7 +67,9 @@ def get_current_environment() -> str:
         return "staging"
 
 
-def get_bob_vertex_search_tool(env: Optional[str] = None) -> Optional[VertexAiSearchTool]:
+def get_bob_vertex_search_tool(
+    env: Optional[str] = None,
+) -> Optional[VertexAiSearchTool]:
     """
     Get Vertex AI Search tool configured for Bob and foreman.
 
@@ -93,7 +95,9 @@ def get_bob_vertex_search_tool(env: Optional[str] = None) -> Optional[VertexAiSe
 
     if not use_org_knowledge:
         # Use legacy configuration for backwards compatibility
-        logger.info("Using legacy Vertex Search configuration (USE_ORG_KNOWLEDGE=false)")
+        logger.info(
+            "Using legacy Vertex Search configuration (USE_ORG_KNOWLEDGE=false)"
+        )
 
         # ✅ Return proper ADK VertexAiSearchTool instance (Phase 13)
         # Note: project_id and location are inferred from GCP credentials/environment
@@ -113,7 +117,9 @@ def get_bob_vertex_search_tool(env: Optional[str] = None) -> Optional[VertexAiSe
     env_config = config["environments"][env]
     datastore_config = env_config["datastore"]
 
-    logger.info(f"Using datastore: {datastore_config['id']} in project: {datastore_config['project_id']}")
+    logger.info(
+        f"Using datastore: {datastore_config['id']} in project: {datastore_config['project_id']}"
+    )
 
     # ✅ Return proper ADK VertexAiSearchTool instance (Phase 13)
     # Note: google-adk 1.18 uses VertexAiSearchTool (singular), not VertexAiSearchToolset
@@ -126,7 +132,9 @@ def get_bob_vertex_search_tool(env: Optional[str] = None) -> Optional[VertexAiSe
     )
 
 
-def get_foreman_vertex_search_tool(env: Optional[str] = None) -> Optional[VertexAiSearchTool]:
+def get_foreman_vertex_search_tool(
+    env: Optional[str] = None,
+) -> Optional[VertexAiSearchTool]:
     """
     Get Vertex AI Search tool for iam-senior-adk-devops-lead (foreman).
 
@@ -171,7 +179,7 @@ def get_datastore_info(env: Optional[str] = None) -> Dict[str, str]:
             "project_id": legacy["datastore"]["project_id"],
             "location": legacy["datastore"]["location"],
             "bucket": legacy["source"]["bucket"],
-            "document_count": str(legacy["source"]["documents"])
+            "document_count": str(legacy["source"]["documents"]),
         }
 
     if "environments" not in config or env not in config["environments"]:
@@ -186,7 +194,7 @@ def get_datastore_info(env: Optional[str] = None) -> Dict[str, str]:
         "location": env_config["datastore"]["location"],
         "source_bucket": env_config["source"]["bucket"],
         "source_prefix": env_config["source"]["prefix"],
-        "uri_pattern": env_config["source"]["uri_pattern"]
+        "uri_pattern": env_config["source"]["uri_pattern"],
     }
 
 
@@ -195,5 +203,5 @@ __all__ = [
     "get_bob_vertex_search_tool",
     "get_current_environment",
     "get_datastore_info",
-    "get_foreman_vertex_search_tool"
+    "get_foreman_vertex_search_tool",
 ]

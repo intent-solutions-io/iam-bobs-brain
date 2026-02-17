@@ -22,12 +22,7 @@ class StructuredLogger:
     for correlation IDs, agent names, and pipeline steps.
     """
 
-    def __init__(
-        self,
-        name: str,
-        level: int = logging.INFO,
-        enable_json: bool = False
-    ):
+    def __init__(self, name: str, level: int = logging.INFO, enable_json: bool = False):
         """
         Initialize structured logger.
 
@@ -47,23 +42,18 @@ class StructuredLogger:
 
             if enable_json:
                 # Pure JSON format
-                formatter = logging.Formatter('%(message)s')
+                formatter = logging.Formatter("%(message)s")
             else:
                 # Human-readable with timestamp
                 formatter = logging.Formatter(
-                    '%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-                    datefmt='%Y-%m-%d %H:%M:%S'
+                    "%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+                    datefmt="%Y-%m-%d %H:%M:%S",
                 )
 
             handler.setFormatter(formatter)
             self.logger.addHandler(handler)
 
-    def _format_message(
-        self,
-        event: str,
-        level: str,
-        **fields
-    ) -> str:
+    def _format_message(self, event: str, level: str, **fields) -> str:
         """
         Format log message with structured fields.
 
@@ -79,7 +69,7 @@ class StructuredLogger:
             "timestamp": datetime.utcnow().isoformat() + "Z",
             "level": level,
             "event": event,
-            **fields
+            **fields,
         }
 
         if self.enable_json:
@@ -176,9 +166,7 @@ _loggers: Dict[str, StructuredLogger] = {}
 
 
 def get_logger(
-    name: str,
-    level: int = logging.INFO,
-    enable_json: bool = False
+    name: str, level: int = logging.INFO, enable_json: bool = False
 ) -> StructuredLogger:
     """
     Get or create a structured logger.
@@ -208,12 +196,7 @@ def get_logger(
 
 
 # Convenience functions for common logging patterns
-def log_pipeline_start(
-    pipeline_run_id: str,
-    repo_id: str,
-    task: str,
-    env: str = "dev"
-):
+def log_pipeline_start(pipeline_run_id: str, repo_id: str, task: str, env: str = "dev"):
     """
     Log pipeline start event.
 
@@ -230,7 +213,7 @@ def log_pipeline_start(
         agent="foreman",
         repo_id=repo_id,
         task=task,
-        env=env
+        env=env,
     )
 
 
@@ -239,7 +222,7 @@ def log_pipeline_complete(
     repo_id: str,
     duration_seconds: float,
     issues_found: int,
-    issues_fixed: int
+    issues_fixed: int,
 ):
     """
     Log pipeline completion event.
@@ -259,16 +242,12 @@ def log_pipeline_complete(
         repo_id=repo_id,
         duration_seconds=duration_seconds,
         issues_found=issues_found,
-        issues_fixed=issues_fixed
+        issues_fixed=issues_fixed,
     )
 
 
 def log_agent_step(
-    pipeline_run_id: str,
-    agent: str,
-    step: str,
-    status: str,
-    **extra_fields
+    pipeline_run_id: str, agent: str, step: str, status: str, **extra_fields
 ):
     """
     Log agent step event.
@@ -286,16 +265,12 @@ def log_agent_step(
         pipeline_run_id=pipeline_run_id,
         agent=agent,
         step=step,
-        **extra_fields
+        **extra_fields,
     )
 
 
 def log_github_operation(
-    pipeline_run_id: str,
-    operation: str,
-    repo: str,
-    status: str,
-    **extra_fields
+    pipeline_run_id: str, operation: str, repo: str, status: str, **extra_fields
 ):
     """
     Log GitHub operation event.
@@ -313,7 +288,7 @@ def log_github_operation(
         pipeline_run_id=pipeline_run_id,
         operation=operation,
         repo=repo,
-        **extra_fields
+        **extra_fields,
     )
 
 
@@ -329,10 +304,7 @@ if __name__ == "__main__":
     run_id = "test-run-123"
 
     logger.log_info(
-        "demo_started",
-        pipeline_run_id=run_id,
-        agent="test",
-        step="initialization"
+        "demo_started", pipeline_run_id=run_id, agent="test", step="initialization"
     )
 
     logger.log_info(
@@ -341,7 +313,7 @@ if __name__ == "__main__":
         agent="iam-adk",
         step="analysis",
         file_path="agents/bob/agent.py",
-        lines=250
+        lines=250,
     )
 
     logger.log_warning(
@@ -349,7 +321,7 @@ if __name__ == "__main__":
         pipeline_run_id=run_id,
         agent="iam-adk",
         violation="missing_memory_bank",
-        severity="medium"
+        severity="medium",
     )
 
     logger.log_error(
@@ -358,14 +330,11 @@ if __name__ == "__main__":
         agent="github",
         operation="create_issue",
         error="Rate limit exceeded",
-        retry_after=60
+        retry_after=60,
     )
 
     logger.log_info(
-        "demo_completed",
-        pipeline_run_id=run_id,
-        agent="test",
-        duration_ms=1500
+        "demo_completed", pipeline_run_id=run_id, agent="test", duration_ms=1500
     )
 
     print("\n" + "=" * 60)

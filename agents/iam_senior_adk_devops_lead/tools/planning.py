@@ -15,6 +15,7 @@ logger = logging.getLogger(__name__)
 
 class TaskPriority(Enum):
     """Task priority levels."""
+
     LOW = "low"
     NORMAL = "normal"
     HIGH = "high"
@@ -23,6 +24,7 @@ class TaskPriority(Enum):
 
 class ExecutionMode(Enum):
     """Task execution modes."""
+
     SEQUENTIAL = "sequential"
     PARALLEL = "parallel"
     ITERATIVE = "iterative"
@@ -32,7 +34,7 @@ def create_task_plan(
     request_description: str,
     request_type: str = "general",
     constraints: Optional[Dict[str, Any]] = None,
-    priority: str = "normal"
+    priority: str = "normal",
 ) -> Dict[str, Any]:
     """
     Create a detailed task execution plan.
@@ -82,7 +84,7 @@ def create_task_plan(
         "estimated_duration": None,
         "success_criteria": [],
         "risk_factors": [],
-        "dependencies": []
+        "dependencies": [],
     }
 
     # Determine steps based on request type
@@ -94,22 +96,22 @@ def create_task_plan(
                 "description": "Analyze codebase for ADK compliance",
                 "specialist": "iam-adk",
                 "priority": "high",
-                "estimated_duration": "30 minutes"
+                "estimated_duration": "30 minutes",
             },
             {
                 "step_id": "audit_2",
                 "description": "Check existing GitHub issues",
                 "specialist": "iam-issue",
                 "priority": "normal",
-                "estimated_duration": "15 minutes"
+                "estimated_duration": "15 minutes",
             },
             {
                 "step_id": "audit_3",
                 "description": "Review documentation completeness",
                 "specialist": "iam-doc",
                 "priority": "normal",
-                "estimated_duration": "20 minutes"
-            }
+                "estimated_duration": "20 minutes",
+            },
         ]
         plan["specialists_required"] = ["iam-adk", "iam-issue", "iam-doc"]
         plan["estimated_duration"] = "30 minutes (parallel)"
@@ -122,7 +124,7 @@ def create_task_plan(
                 "description": "Analyze the problem",
                 "specialist": "iam-adk",
                 "priority": "high",
-                "estimated_duration": "15 minutes"
+                "estimated_duration": "15 minutes",
             },
             {
                 "step_id": "fix_2",
@@ -130,7 +132,7 @@ def create_task_plan(
                 "specialist": "iam-fix-plan",
                 "priority": "high",
                 "estimated_duration": "20 minutes",
-                "dependencies": ["fix_1"]
+                "dependencies": ["fix_1"],
             },
             {
                 "step_id": "fix_3",
@@ -138,7 +140,7 @@ def create_task_plan(
                 "specialist": "iam-fix-impl",
                 "priority": "high",
                 "estimated_duration": "45 minutes",
-                "dependencies": ["fix_2"]
+                "dependencies": ["fix_2"],
             },
             {
                 "step_id": "fix_4",
@@ -146,7 +148,7 @@ def create_task_plan(
                 "specialist": "iam-qa",
                 "priority": "high",
                 "estimated_duration": "15 minutes",
-                "dependencies": ["fix_3"]
+                "dependencies": ["fix_3"],
             },
             {
                 "step_id": "fix_5",
@@ -154,10 +156,16 @@ def create_task_plan(
                 "specialist": "iam-doc",
                 "priority": "normal",
                 "estimated_duration": "15 minutes",
-                "dependencies": ["fix_4"]
-            }
+                "dependencies": ["fix_4"],
+            },
         ]
-        plan["specialists_required"] = ["iam-adk", "iam-fix-plan", "iam-fix-impl", "iam-qa", "iam-doc"]
+        plan["specialists_required"] = [
+            "iam-adk",
+            "iam-fix-plan",
+            "iam-fix-impl",
+            "iam-qa",
+            "iam-doc",
+        ]
         plan["estimated_duration"] = "110 minutes (sequential)"
 
     elif request_type == "implement":
@@ -168,7 +176,7 @@ def create_task_plan(
                 "description": "Design the implementation",
                 "specialist": "iam-fix-plan",
                 "priority": "high",
-                "estimated_duration": "30 minutes"
+                "estimated_duration": "30 minutes",
             },
             {
                 "step_id": "impl_2",
@@ -176,7 +184,7 @@ def create_task_plan(
                 "specialist": "iam-fix-impl",
                 "priority": "high",
                 "estimated_duration": "60 minutes",
-                "dependencies": ["impl_1"]
+                "dependencies": ["impl_1"],
             },
             {
                 "step_id": "impl_3",
@@ -184,7 +192,7 @@ def create_task_plan(
                 "specialist": "iam-qa",
                 "priority": "high",
                 "estimated_duration": "20 minutes",
-                "dependencies": ["impl_2"]
+                "dependencies": ["impl_2"],
             },
             {
                 "step_id": "impl_4",
@@ -192,7 +200,7 @@ def create_task_plan(
                 "specialist": "iam-cleanup",
                 "priority": "normal",
                 "estimated_duration": "15 minutes",
-                "dependencies": ["impl_3"]
+                "dependencies": ["impl_3"],
             },
             {
                 "step_id": "impl_5",
@@ -200,10 +208,16 @@ def create_task_plan(
                 "specialist": "iam-doc",
                 "priority": "normal",
                 "estimated_duration": "25 minutes",
-                "dependencies": ["impl_4"]
-            }
+                "dependencies": ["impl_4"],
+            },
         ]
-        plan["specialists_required"] = ["iam-fix-plan", "iam-fix-impl", "iam-qa", "iam-cleanup", "iam-doc"]
+        plan["specialists_required"] = [
+            "iam-fix-plan",
+            "iam-fix-impl",
+            "iam-qa",
+            "iam-cleanup",
+            "iam-doc",
+        ]
         plan["estimated_duration"] = "150 minutes (sequential)"
 
     elif request_type == "document":
@@ -214,7 +228,7 @@ def create_task_plan(
                 "description": "Analyze what needs documentation",
                 "specialist": "iam-adk",
                 "priority": "normal",
-                "estimated_duration": "15 minutes"
+                "estimated_duration": "15 minutes",
             },
             {
                 "step_id": "doc_2",
@@ -222,7 +236,7 @@ def create_task_plan(
                 "specialist": "iam-doc",
                 "priority": "high",
                 "estimated_duration": "45 minutes",
-                "dependencies": ["doc_1"]
+                "dependencies": ["doc_1"],
             },
             {
                 "step_id": "doc_3",
@@ -230,8 +244,8 @@ def create_task_plan(
                 "specialist": "iam-index",
                 "priority": "normal",
                 "estimated_duration": "10 minutes",
-                "dependencies": ["doc_2"]
-            }
+                "dependencies": ["doc_2"],
+            },
         ]
         plan["specialists_required"] = ["iam-adk", "iam-doc", "iam-index"]
         plan["estimated_duration"] = "70 minutes (mixed)"
@@ -244,7 +258,7 @@ def create_task_plan(
                 "description": "Analyze request and determine approach",
                 "specialist": "iam-adk",
                 "priority": "high",
-                "estimated_duration": "15 minutes"
+                "estimated_duration": "15 minutes",
             }
         ]
         plan["specialists_required"] = ["iam-adk"]
@@ -255,7 +269,7 @@ def create_task_plan(
         "All specialist tasks complete successfully",
         "No test failures introduced",
         "Documentation updated if applicable",
-        "Code follows ADK patterns"
+        "Code follows ADK patterns",
     ]
 
     # Add risk factors
@@ -272,7 +286,7 @@ def create_task_plan(
 def aggregate_results(
     results: List[Dict[str, Any]],
     plan: Optional[Dict[str, Any]] = None,
-    output_format: str = "summary"
+    output_format: str = "summary",
 ) -> Dict[str, Any]:
     """
     Aggregate results from multiple specialist agents.
@@ -308,7 +322,7 @@ def aggregate_results(
         "details": {},
         "artifacts": [],
         "issues": [],
-        "follow_ups": []
+        "follow_ups": [],
     }
 
     # Process each result
@@ -324,10 +338,7 @@ def aggregate_results(
 
         if status == "success":
             successful_count += 1
-            aggregation["details"][specialist] = {
-                "status": "success",
-                "output": output
-            }
+            aggregation["details"][specialist] = {"status": "success", "output": output}
 
             # Extract artifacts if present
             if isinstance(output, dict):
@@ -340,10 +351,7 @@ def aggregate_results(
 
         else:
             failed_count += 1
-            aggregation["details"][specialist] = {
-                "status": "failure",
-                "error": output
-            }
+            aggregation["details"][specialist] = {"status": "failure", "error": output}
             aggregation["issues"].append(f"{specialist} failed: {output}")
 
     # Determine overall status
@@ -388,18 +396,20 @@ def _create_summary(aggregation: Dict[str, Any], plan: Optional[Dict[str, Any]])
     return summary
 
 
-def _create_detailed_summary(aggregation: Dict[str, Any], plan: Optional[Dict[str, Any]]) -> str:
+def _create_detailed_summary(
+    aggregation: Dict[str, Any], plan: Optional[Dict[str, Any]]
+) -> str:
     """Create a detailed summary of aggregated results."""
     lines = ["## Task Execution Summary\n"]
 
     # Overall status
-    status_emoji = {
-        "success": "✅",
-        "partial": "⚠️",
-        "failure": "❌"
-    }.get(aggregation["overall_status"], "❓")
+    status_emoji = {"success": "✅", "partial": "⚠️", "failure": "❌"}.get(
+        aggregation["overall_status"], "❓"
+    )
 
-    lines.append(f"**Overall Status:** {status_emoji} {aggregation['overall_status'].upper()}\n")
+    lines.append(
+        f"**Overall Status:** {status_emoji} {aggregation['overall_status'].upper()}\n"
+    )
 
     # Specialist results
     lines.append("### Specialist Results\n")
@@ -461,8 +471,7 @@ def _generate_follow_ups(aggregation: Dict[str, Any]) -> List[str]:
 
 
 def validate_plan_execution(
-    plan: Dict[str, Any],
-    results: List[Dict[str, Any]]
+    plan: Dict[str, Any], results: List[Dict[str, Any]]
 ) -> Dict[str, Any]:
     """
     Validate that execution followed the plan.
@@ -479,7 +488,7 @@ def validate_plan_execution(
         "planned_steps": len(plan.get("steps", [])),
         "executed_steps": len(results),
         "compliance": "full",
-        "deviations": []
+        "deviations": [],
     }
 
     # Check step count

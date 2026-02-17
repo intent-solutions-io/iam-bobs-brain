@@ -32,7 +32,7 @@ def sample_portfolio_result():
         total_issues_found=42,
         total_issues_fixed=30,
         portfolio_duration_seconds=456.78,
-        timestamp=datetime.now()
+        timestamp=datetime.now(),
     )
 
 
@@ -58,10 +58,13 @@ class TestSendPortfolioNotification:
         """Test calls webhook sender when webhook URL configured."""
         mock_webhook.return_value = True
 
-        with patch.dict(os.environ, {
-            "SLACK_NOTIFICATIONS_ENABLED": "true",
-            "SLACK_SWE_CHANNEL_WEBHOOK_URL": "https://hooks.slack.com/services/TEST"
-        }):
+        with patch.dict(
+            os.environ,
+            {
+                "SLACK_NOTIFICATIONS_ENABLED": "true",
+                "SLACK_SWE_CHANNEL_WEBHOOK_URL": "https://hooks.slack.com/services/TEST",
+            },
+        ):
             result = send_portfolio_notification(sample_portfolio_result, env="dev")
             assert result is True
             mock_webhook.assert_called_once()
@@ -73,39 +76,44 @@ class TestSendPortfolioNotification:
         """Test calls API sender when channel ID configured."""
         mock_api.return_value = True
 
-        with patch.dict(os.environ, {
-            "SLACK_NOTIFICATIONS_ENABLED": "true",
-            "SLACK_SWE_CHANNEL_ID": "C12345678"
-        }):
+        with patch.dict(
+            os.environ,
+            {
+                "SLACK_NOTIFICATIONS_ENABLED": "true",
+                "SLACK_SWE_CHANNEL_ID": "C12345678",
+            },
+        ):
             result = send_portfolio_notification(sample_portfolio_result, env="dev")
             assert result is True
             mock_api.assert_called_once()
 
     @patch("agents.notifications.slack_sender._send_via_webhook")
-    def test_returns_false_on_send_failure(
-        self, mock_webhook, sample_portfolio_result
-    ):
+    def test_returns_false_on_send_failure(self, mock_webhook, sample_portfolio_result):
         """Test returns False when send fails."""
         mock_webhook.return_value = False
 
-        with patch.dict(os.environ, {
-            "SLACK_NOTIFICATIONS_ENABLED": "true",
-            "SLACK_SWE_CHANNEL_WEBHOOK_URL": "https://hooks.slack.com/services/TEST"
-        }):
+        with patch.dict(
+            os.environ,
+            {
+                "SLACK_NOTIFICATIONS_ENABLED": "true",
+                "SLACK_SWE_CHANNEL_WEBHOOK_URL": "https://hooks.slack.com/services/TEST",
+            },
+        ):
             result = send_portfolio_notification(sample_portfolio_result, env="dev")
             assert result is False
 
     @patch("agents.notifications.slack_sender._send_via_webhook")
-    def test_handles_exception_gracefully(
-        self, mock_webhook, sample_portfolio_result
-    ):
+    def test_handles_exception_gracefully(self, mock_webhook, sample_portfolio_result):
         """Test handles exceptions without crashing."""
         mock_webhook.side_effect = Exception("Network error")
 
-        with patch.dict(os.environ, {
-            "SLACK_NOTIFICATIONS_ENABLED": "true",
-            "SLACK_SWE_CHANNEL_WEBHOOK_URL": "https://hooks.slack.com/services/TEST"
-        }):
+        with patch.dict(
+            os.environ,
+            {
+                "SLACK_NOTIFICATIONS_ENABLED": "true",
+                "SLACK_SWE_CHANNEL_WEBHOOK_URL": "https://hooks.slack.com/services/TEST",
+            },
+        ):
             result = send_portfolio_notification(sample_portfolio_result, env="dev")
             assert result is False  # Should not crash
 
@@ -160,6 +168,7 @@ class TestSendViaWebhook:
     def test_handles_timeout(self, mock_post):
         """Test handles timeout gracefully."""
         import requests
+
         mock_post.side_effect = requests.exceptions.Timeout()
 
         webhook_url = "https://hooks.slack.com/services/TEST"
@@ -172,6 +181,7 @@ class TestSendViaWebhook:
     def test_handles_request_exception(self, mock_post):
         """Test handles request exceptions gracefully."""
         import requests
+
         mock_post.side_effect = requests.exceptions.RequestException("Network error")
 
         webhook_url = "https://hooks.slack.com/services/TEST"

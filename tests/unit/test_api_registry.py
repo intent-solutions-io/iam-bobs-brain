@@ -19,6 +19,7 @@ class TestGetApiRegistry:
         # Clear singleton
         import agents.shared_tools.api_registry as module
         from agents.shared_tools.api_registry import get_api_registry
+
         module._registry_instance = None
 
         with patch.dict(os.environ, {}, clear=True):
@@ -29,6 +30,7 @@ class TestGetApiRegistry:
         """Should return None when ApiRegistry import fails."""
         import agents.shared_tools.api_registry as module
         from agents.shared_tools.api_registry import get_api_registry
+
         module._registry_instance = None
 
         with patch.dict(os.environ, {"PROJECT_ID": "test-project"}):
@@ -40,6 +42,7 @@ class TestGetApiRegistry:
     def test_singleton_pattern(self):
         """Should return same instance on repeated calls."""
         import agents.shared_tools.api_registry as module
+
         module._registry_instance = None
 
         mock_registry = MagicMock()
@@ -59,6 +62,7 @@ class TestGetToolsForAgent:
         """Should return empty list when registry unavailable."""
         import agents.shared_tools.api_registry as module
         from agents.shared_tools.api_registry import get_tools_for_agent
+
         module._registry_instance = None
 
         with patch.dict(os.environ, {}, clear=True):
@@ -92,6 +96,7 @@ class TestGetMcpToolset:
         """Should return None when registry unavailable."""
         import agents.shared_tools.api_registry as module
         from agents.shared_tools.api_registry import get_mcp_toolset
+
         module._registry_instance = None
 
         with patch.dict(os.environ, {}, clear=True):
@@ -144,6 +149,7 @@ class TestIsRegistryAvailable:
         """Should return False when registry not configured."""
         import agents.shared_tools.api_registry as module
         from agents.shared_tools.api_registry import is_registry_available
+
         module._registry_instance = None
 
         with patch.dict(os.environ, {}, clear=True):
@@ -154,6 +160,7 @@ class TestIsRegistryAvailable:
         """Should return True when registry is available."""
         import agents.shared_tools.api_registry as module
         from agents.shared_tools.api_registry import is_registry_available
+
         module._registry_instance = MagicMock()
 
         result = is_registry_available()

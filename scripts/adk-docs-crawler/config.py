@@ -91,10 +91,7 @@ def load_config() -> CrawlerConfig:
         raise ValueError(f"MAX_CHUNK_TOKENS must be an integer: {e}")
 
     # Start URL for crawler
-    start_url = os.getenv(
-        "ADK_DOCS_START_URL",
-        "https://google.github.io/adk-docs/"
-    )
+    start_url = os.getenv("ADK_DOCS_START_URL", "https://google.github.io/adk-docs/")
 
     # Temporary directory for intermediate files
     tmp_dir = os.getenv("CRAWLER_TMP_DIR", "./tmp")
@@ -119,6 +116,7 @@ def validate_gcp_credentials() -> bool:
     """
     try:
         from google.auth import default
+
         credentials, project = default()
         logger.info(f"GCP credentials validated. Project: {project}")
         return True

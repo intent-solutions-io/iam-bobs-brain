@@ -61,10 +61,12 @@ def generate_test_suite(fix_data: str) -> str:
         required_fields = ["summary", "impacted_areas", "risk_level"]
         missing_fields = [f for f in required_fields if f not in fix]
         if missing_fields:
-            return json.dumps({
-                "error": f"Missing required fields: {missing_fields}",
-                "received_fields": list(fix.keys())
-            })
+            return json.dumps(
+                {
+                    "error": f"Missing required fields: {missing_fields}",
+                    "received_fields": list(fix.keys()),
+                }
+            )
 
         summary = fix.get("summary", "")
         impacted_areas = fix.get("impacted_areas", [])
@@ -142,20 +144,27 @@ def validate_test_coverage(test_results: str) -> str:
             target_lines = int(results.get("total_lines", 0) * (min_coverage / 100))
             current_lines = results.get("covered_lines", 0)
             needed = target_lines - current_lines
-            recommendations.append(f"Add {needed} more covered lines to reach {min_coverage}%")
+            recommendations.append(
+                f"Add {needed} more covered lines to reach {min_coverage}%"
+            )
 
         if uncovered_areas:
-            recommendations.append(f"Focus on covering: {', '.join(uncovered_areas[:3])}")
+            recommendations.append(
+                f"Focus on covering: {', '.join(uncovered_areas[:3])}"
+            )
 
-        return json.dumps({
-            "valid": meets_standard and critical_coverage,
-            "coverage_percent": coverage_percent,
-            "meets_standard": meets_standard,
-            "critical_paths_covered": critical_coverage,
-            "issues": issues,
-            "recommendations": recommendations,
-            "timestamp": datetime.now().isoformat()
-        }, indent=2)
+        return json.dumps(
+            {
+                "valid": meets_standard and critical_coverage,
+                "coverage_percent": coverage_percent,
+                "meets_standard": meets_standard,
+                "critical_paths_covered": critical_coverage,
+                "issues": issues,
+                "recommendations": recommendations,
+                "timestamp": datetime.now().isoformat(),
+            },
+            indent=2,
+        )
 
     except json.JSONDecodeError as e:
         return json.dumps({"error": f"Invalid JSON: {e}"})
@@ -204,9 +213,7 @@ def run_smoke_tests(implementation_data: str) -> str:
         entry_points = impl.get("entry_points", [])
 
         # Run conceptual smoke tests
-        test_results = _run_smoke_test_suite(
-            files_changed, key_functions, entry_points
-        )
+        test_results = _run_smoke_test_suite(files_changed, key_functions, entry_points)
 
         return json.dumps(test_results, indent=2)
 
@@ -294,19 +301,24 @@ def assess_fix_completeness(implementation_data: str) -> str:
         if not docs_updated:
             recommendations.append("Update documentation to reflect changes")
 
-        return json.dumps({
-            "complete": len(blockers) == 0 and completion_percent >= 90 and not issues,
-            "completion_percent": completion_percent,
-            "steps_completed": len(completed_steps),
-            "steps_total": len(plan_steps),
-            "files_changed": len(files_changed),
-            "issues": issues,
-            "recommendations": recommendations,
-            "blockers": blockers,
-            "has_tests": tests_written,
-            "has_docs": docs_updated,
-            "timestamp": datetime.now().isoformat()
-        }, indent=2)
+        return json.dumps(
+            {
+                "complete": len(blockers) == 0
+                and completion_percent >= 90
+                and not issues,
+                "completion_percent": completion_percent,
+                "steps_completed": len(completed_steps),
+                "steps_total": len(plan_steps),
+                "files_changed": len(files_changed),
+                "issues": issues,
+                "recommendations": recommendations,
+                "blockers": blockers,
+                "has_tests": tests_written,
+                "has_docs": docs_updated,
+                "timestamp": datetime.now().isoformat(),
+            },
+            indent=2,
+        )
 
     except json.JSONDecodeError as e:
         return json.dumps({"error": f"Invalid JSON: {e}"})
@@ -373,12 +385,17 @@ def produce_qa_verdict(assessment_data: str) -> str:
 
         # Determine verdict status
         status = _determine_verdict_status(
-            test_results, coverage_percent, smoke_passed, completeness_percent,
-            blocking_issues
+            test_results,
+            coverage_percent,
+            smoke_passed,
+            completeness_percent,
+            blocking_issues,
         )
 
         # Build evidence
-        test_evidence = _build_test_evidence(test_results, coverage_percent, smoke_passed)
+        test_evidence = _build_test_evidence(
+            test_results, coverage_percent, smoke_passed
+        )
 
         # Determine security review status
         if "no issues" in (security_review or "").lower():
@@ -394,26 +411,31 @@ def produce_qa_verdict(assessment_data: str) -> str:
         )
 
         # Create verdict note
-        notes = _create_verdict_note(status, test_results, coverage_percent, blocking_issues)
+        notes = _create_verdict_note(
+            status, test_results, coverage_percent, blocking_issues
+        )
 
-        return json.dumps({
-            "status": status,
-            "notes": notes,
-            "test_evidence": test_evidence,
-            "test_types": ["unit", "integration", "e2e"],
-            "coverage_report": {
-                "coverage_percent": coverage_percent,
-                "meets_minimum": coverage_percent >= 85.0,
-                "minimum_required": 85.0
+        return json.dumps(
+            {
+                "status": status,
+                "notes": notes,
+                "test_evidence": test_evidence,
+                "test_types": ["unit", "integration", "e2e"],
+                "coverage_report": {
+                    "coverage_percent": coverage_percent,
+                    "meets_minimum": coverage_percent >= 85.0,
+                    "minimum_required": 85.0,
+                },
+                "performance_impact": perf_impact,
+                "security_review": security_status,
+                "recommendations": recommendations,
+                "blocking_issues": blocking_issues,
+                "issue_id": assessment.get("issue_id"),
+                "fix_id": assessment.get("fix_id"),
+                "timestamp": datetime.now().isoformat(),
             },
-            "performance_impact": perf_impact,
-            "security_review": security_status,
-            "recommendations": recommendations,
-            "blocking_issues": blocking_issues,
-            "issue_id": assessment.get("issue_id"),
-            "fix_id": assessment.get("fix_id"),
-            "timestamp": datetime.now().isoformat()
-        }, indent=2)
+            indent=2,
+        )
 
     except json.JSONDecodeError as e:
         return json.dumps({"error": f"Invalid JSON: {e}"})
@@ -426,11 +448,12 @@ def produce_qa_verdict(assessment_data: str) -> str:
 # Helper Functions
 # ============================================================================
 
+
 def _generate_test_specs(
     summary: str,
     impacted_areas: List[str],
     risk_level: str,
-    testing_strategy: List[str]
+    testing_strategy: List[str],
 ) -> Dict[str, Any]:
     """Generate test specifications based on fix characteristics."""
     unit_tests = []
@@ -441,38 +464,44 @@ def _generate_test_specs(
     # Generate tests for each impacted area
     for area in impacted_areas[:5]:  # Limit to 5 areas
         # Unit tests for each area
-        unit_tests.append({
-            "name": f"test_{area.replace('.py', '').replace('/', '_')}_basic",
-            "file": f"test_{area}",
-            "description": f"Test basic functionality of {area}",
-            "assertions": [
-                "Function returns expected type",
-                "No exceptions raised with valid input",
-                "Handles edge cases correctly"
-            ]
-        })
+        unit_tests.append(
+            {
+                "name": f"test_{area.replace('.py', '').replace('/', '_')}_basic",
+                "file": f"test_{area}",
+                "description": f"Test basic functionality of {area}",
+                "assertions": [
+                    "Function returns expected type",
+                    "No exceptions raised with valid input",
+                    "Handles edge cases correctly",
+                ],
+            }
+        )
 
         # Integration tests if risk is medium or high
         if risk_level in ["medium", "high"]:
-            integration_tests.append({
-                "name": f"test_{area.replace('.py', '').replace('/', '_')}_integration",
-                "file": f"test_{area}",
-                "description": f"Test integration of {area} with dependent components",
-                "dependencies": ["dependency 1", "dependency 2"]
-            })
+            integration_tests.append(
+                {
+                    "name": f"test_{area.replace('.py', '').replace('/', '_')}_integration",
+                    "file": f"test_{area}",
+                    "description": f"Test integration of {area} with dependent components",
+                    "dependencies": ["dependency 1", "dependency 2"],
+                }
+            )
 
     # E2E tests if high risk
     if risk_level == "high":
-        e2e_tests.append({
-            "name": "test_e2e_full_workflow",
-            "file": "test_e2e.py",
-            "description": "Test complete workflow with all changes",
-            "assertions": [
-                "All components work together",
-                "No regressions in existing functionality",
-                "Performance acceptable"
-            ]
-        })
+        e2e_tests.append(
+            {
+                "name": "test_e2e_full_workflow",
+                "file": "test_e2e.py",
+                "description": "Test complete workflow with all changes",
+                "assertions": [
+                    "All components work together",
+                    "No regressions in existing functionality",
+                    "Performance acceptable",
+                ],
+            }
+        )
 
     # Add edge case tests
     edge_cases = [
@@ -480,10 +509,12 @@ def _generate_test_specs(
         "Null/None values",
         "Large datasets",
         "Concurrent access",
-        "Error conditions"
+        "Error conditions",
     ]
 
-    total_count = len(unit_tests) + len(integration_tests) + len(e2e_tests) + len(edge_cases)
+    total_count = (
+        len(unit_tests) + len(integration_tests) + len(e2e_tests) + len(edge_cases)
+    )
 
     return {
         "unit_tests": unit_tests,
@@ -493,11 +524,13 @@ def _generate_test_specs(
         "total_test_count": total_count,
         "estimated_coverage": "85-95%",
         "test_strategy": testing_strategy or ["comprehensive"],
-        "generated_at": datetime.now().isoformat()
+        "generated_at": datetime.now().isoformat(),
     }
 
 
-def _check_critical_coverage(uncovered_areas: List[str], critical_paths: List[str]) -> bool:
+def _check_critical_coverage(
+    uncovered_areas: List[str], critical_paths: List[str]
+) -> bool:
     """Check if critical code paths are covered."""
     if not critical_paths:
         return True
@@ -517,9 +550,7 @@ def _check_critical_coverage(uncovered_areas: List[str], critical_paths: List[st
 
 
 def _run_smoke_test_suite(
-    files_changed: List[str],
-    key_functions: List[str],
-    entry_points: List[str]
+    files_changed: List[str], key_functions: List[str], entry_points: List[str]
 ) -> Dict[str, Any]:
     """Run conceptual smoke tests."""
     tests_run = len(files_changed) * 2 + len(key_functions) + len(entry_points)
@@ -531,11 +562,11 @@ def _run_smoke_test_suite(
         "tests_passed": tests_passed,
         "tests_failed": 0,
         "errors": [],
-        "warnings": [
-            "Manual verification recommended for entry points"
-        ] if entry_points else [],
+        "warnings": (
+            ["Manual verification recommended for entry points"] if entry_points else []
+        ),
         "duration_seconds": 2.5,
-        "timestamp": datetime.now().isoformat()
+        "timestamp": datetime.now().isoformat(),
     }
 
 
@@ -544,7 +575,7 @@ def _determine_verdict_status(
     coverage_percent: float,
     smoke_passed: bool,
     completeness_percent: float,
-    blocking_issues: List[str]
+    blocking_issues: List[str],
 ) -> str:
     """Determine the overall verdict status."""
     if blocking_issues:
@@ -564,9 +595,7 @@ def _determine_verdict_status(
 
 
 def _build_test_evidence(
-    test_results: Dict[str, int],
-    coverage_percent: float,
-    smoke_passed: bool
+    test_results: Dict[str, int], coverage_percent: float, smoke_passed: bool
 ) -> List[str]:
     """Build list of test evidence."""
     evidence = []
@@ -594,19 +623,23 @@ def _generate_qa_recommendations(
     test_results: Dict[str, int],
     coverage_percent: float,
     completeness_percent: float,
-    status: str
+    status: str,
 ) -> List[str]:
     """Generate QA recommendations based on assessment."""
     recommendations = []
 
     if coverage_percent < 90:
-        recommendations.append(f"Increase test coverage to 90%+ (currently {coverage_percent}%)")
+        recommendations.append(
+            f"Increase test coverage to 90%+ (currently {coverage_percent}%)"
+        )
 
     if coverage_percent < 85:
         recommendations.append("CRITICAL: Test coverage below minimum threshold")
 
     if completeness_percent < 100:
-        recommendations.append(f"Complete remaining implementation steps ({100-completeness_percent}% incomplete)")
+        recommendations.append(
+            f"Complete remaining implementation steps ({100-completeness_percent}% incomplete)"
+        )
 
     failed = test_results.get("failed", 0)
     if failed > 0:
@@ -625,7 +658,7 @@ def _create_verdict_note(
     status: str,
     test_results: Dict[str, int],
     coverage_percent: float,
-    blocking_issues: List[str]
+    blocking_issues: List[str],
 ) -> str:
     """Create a human-readable verdict note."""
     if blocking_issues:

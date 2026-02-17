@@ -125,9 +125,13 @@ async def run_smoke_test(
     if not agent_config:
         print(f"ℹ️  Agent '{agent_role}' is NOT configured for {current_env}")
         print()
-        print(f"   This is expected if you haven't deployed {agent_role} to Agent Engine yet.")
+        print(
+            f"   This is expected if you haven't deployed {agent_role} to Agent Engine yet."
+        )
         print("   To configure:")
-        print(f"     export AGENT_ENGINE_{agent_role.replace('-', '_').upper()}_ID_DEV=your-engine-id")
+        print(
+            f"     export AGENT_ENGINE_{agent_role.replace('-', '_').upper()}_ID_DEV=your-engine-id"
+        )
         print()
         print("✅ Smoke test completed (agent not configured - non-blocking)")
         return 2  # Non-blocking exit code
@@ -207,6 +211,7 @@ async def run_smoke_test(
         print(f"   {type(e).__name__}: {e}")
         if verbose:
             import traceback
+
             print()
             print("Traceback:")
             traceback.print_exc()

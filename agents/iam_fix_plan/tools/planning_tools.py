@@ -60,10 +60,12 @@ def create_fix_plan(issue_data: str) -> str:
         required_fields = ["title", "description", "component", "severity", "type"]
         missing_fields = [f for f in required_fields if f not in issue]
         if missing_fields:
-            return json.dumps({
-                "error": f"Missing required fields: {missing_fields}",
-                "received_fields": list(issue.keys())
-            })
+            return json.dumps(
+                {
+                    "error": f"Missing required fields: {missing_fields}",
+                    "received_fields": list(issue.keys()),
+                }
+            )
 
         # Extract issue details
         title = issue.get("title", "Unknown issue")
@@ -81,20 +83,21 @@ def create_fix_plan(issue_data: str) -> str:
 
     except json.JSONDecodeError as e:
         logger.error(f"Invalid JSON in issue_data: {e}")
-        return json.dumps({
-            "error": f"Invalid JSON: {e!s}",
-            "received": issue_data[:100]
-        })
+        return json.dumps(
+            {"error": f"Invalid JSON: {e!s}", "received": issue_data[:100]}
+        )
     except Exception as e:
         logger.error(f"Error creating fix plan: {e}")
-        return json.dumps({
-            "error": str(e),
-            "error_type": type(e).__name__
-        })
+        return json.dumps({"error": str(e), "error_type": type(e).__name__})
 
 
 def _generate_plan_strategy(
-    title: str, description: str, component: str, severity: str, issue_type: str, issue: Dict[str, Any]
+    title: str,
+    description: str,
+    component: str,
+    severity: str,
+    issue_type: str,
+    issue: Dict[str, Any],
 ) -> Dict[str, Any]:
     """
     Generate a fix plan strategy based on issue characteristics.
@@ -122,7 +125,11 @@ def _generate_plan_strategy(
     # Component-specific impact areas
     impact_by_component = {
         "agents": ["agents/*/agent.py", "agents/*/tools/", "tests/unit/agents/"],
-        "service": ["service/*/main.py", "service/*/requirements.txt", "tests/integration/service/"],
+        "service": [
+            "service/*/main.py",
+            "service/*/requirements.txt",
+            "tests/integration/service/",
+        ],
         "infra": ["infra/terraform/", "scripts/ci/", "tests/infra/"],
         "ci": [".github/workflows/", "scripts/ci/", "tests/ci/"],
         "docs": ["000-docs/", "README.md", ".md files"],
@@ -139,8 +146,16 @@ def _generate_plan_strategy(
 
     # Testing strategy by component
     testing_by_component = {
-        "agents": ["unit tests (agent behavior)", "integration tests (A2A communication)", "memory wiring tests"],
-        "service": ["unit tests (endpoints)", "integration tests (gateway behavior)", "load tests"],
+        "agents": [
+            "unit tests (agent behavior)",
+            "integration tests (A2A communication)",
+            "memory wiring tests",
+        ],
+        "service": [
+            "unit tests (endpoints)",
+            "integration tests (gateway behavior)",
+            "load tests",
+        ],
         "infra": ["terraform validation", "deployment tests", "security scanning"],
         "ci": ["workflow validation", "drift detection tests", "deployment tests"],
         "docs": ["markdown validation", "link validation", "content review"],
@@ -164,7 +179,9 @@ def _generate_plan_strategy(
         "impacted_areas": impact_by_component.get(component, ["various areas"]),
         "steps": steps,
         "risk_level": risk_by_severity.get(severity, "medium"),
-        "testing_strategy": testing_by_component.get(component, ["unit tests", "integration tests"]),
+        "testing_strategy": testing_by_component.get(
+            component, ["unit tests", "integration tests"]
+        ),
         "issue_id": issue.get("id"),
         "estimated_effort": effort_by_type.get(issue_type, "1 day"),
         "rollout_notes": rollout_notes,
@@ -174,70 +191,84 @@ def _generate_plan_strategy(
     }
 
 
-def _generate_implementation_steps(component: str, issue_type: str, description: str) -> List[str]:
+def _generate_implementation_steps(
+    component: str, issue_type: str, description: str
+) -> List[str]:
     """Generate specific implementation steps based on component and type."""
     steps = ["1. Analyze root cause and impact"]
 
     if component == "agents":
-        steps.extend([
-            "2. Review agent.py structure for ADK compliance",
-            "3. Update agent system prompt and instructions",
-            "4. Modify or add tools as needed",
-            "5. Update tool implementations",
-            "6. Verify R1-R8 rule compliance",
-            "7. Test agent locally (smoke test)",
-            "8. Run drift detection check",
-        ])
+        steps.extend(
+            [
+                "2. Review agent.py structure for ADK compliance",
+                "3. Update agent system prompt and instructions",
+                "4. Modify or add tools as needed",
+                "5. Update tool implementations",
+                "6. Verify R1-R8 rule compliance",
+                "7. Test agent locally (smoke test)",
+                "8. Run drift detection check",
+            ]
+        )
     elif component == "service":
-        steps.extend([
-            "2. Review service endpoints and routes",
-            "3. Update gateway implementations",
-            "4. Ensure no Runner imports (R3 compliance)",
-            "5. Add proper error handling and logging",
-            "6. Update service documentation",
-            "7. Test endpoints with sample requests",
-            "8. Validate API contracts",
-        ])
+        steps.extend(
+            [
+                "2. Review service endpoints and routes",
+                "3. Update gateway implementations",
+                "4. Ensure no Runner imports (R3 compliance)",
+                "5. Add proper error handling and logging",
+                "6. Update service documentation",
+                "7. Test endpoints with sample requests",
+                "8. Validate API contracts",
+            ]
+        )
     elif component == "infra":
-        steps.extend([
-            "2. Review Terraform configuration",
-            "3. Update resource definitions",
-            "4. Validate Terraform syntax (terraform validate)",
-            "5. Plan changes (terraform plan)",
-            "6. Update environment-specific configs",
-            "7. Test in dev environment first",
-            "8. Document infrastructure changes",
-        ])
+        steps.extend(
+            [
+                "2. Review Terraform configuration",
+                "3. Update resource definitions",
+                "4. Validate Terraform syntax (terraform validate)",
+                "5. Plan changes (terraform plan)",
+                "6. Update environment-specific configs",
+                "7. Test in dev environment first",
+                "8. Document infrastructure changes",
+            ]
+        )
     elif component == "ci":
-        steps.extend([
-            "2. Review workflow definitions",
-            "3. Update job definitions",
-            "4. Validate workflow syntax",
-            "5. Test CI changes (if possible)",
-            "6. Verify WIF authentication setup",
-            "7. Check drift detection integration",
-            "8. Document CI changes",
-        ])
+        steps.extend(
+            [
+                "2. Review workflow definitions",
+                "3. Update job definitions",
+                "4. Validate workflow syntax",
+                "5. Test CI changes (if possible)",
+                "6. Verify WIF authentication setup",
+                "7. Check drift detection integration",
+                "8. Document CI changes",
+            ]
+        )
     elif component == "docs":
-        steps.extend([
-            "2. Review existing documentation",
-            "3. Update or create new docs",
-            "4. Follow NNN-CC-ABCD naming convention",
-            "5. Add markdown with proper formatting",
-            "6. Validate links and references",
-            "7. Update 000-docs index",
-            "8. Merge changes to main",
-        ])
+        steps.extend(
+            [
+                "2. Review existing documentation",
+                "3. Update or create new docs",
+                "4. Follow NNN-CC-ABCD naming convention",
+                "5. Add markdown with proper formatting",
+                "6. Validate links and references",
+                "7. Update 000-docs index",
+                "8. Merge changes to main",
+            ]
+        )
     else:
-        steps.extend([
-            "2. Identify specific files to modify",
-            "3. Plan changes by priority",
-            "4. Implement changes incrementally",
-            "5. Test each change",
-            "6. Validate against acceptance criteria",
-            "7. Create pull request with summary",
-            "8. Get review and merge",
-        ])
+        steps.extend(
+            [
+                "2. Identify specific files to modify",
+                "3. Plan changes by priority",
+                "4. Implement changes incrementally",
+                "5. Test each change",
+                "6. Validate against acceptance criteria",
+                "7. Create pull request with summary",
+                "8. Get review and merge",
+            ]
+        )
 
     return steps
 
@@ -275,33 +306,41 @@ def _generate_success_metrics(component: str, issue_type: str) -> List[str]:
     metrics = ["All tests pass"]
 
     if component == "agents":
-        metrics.extend([
-            "Agent initializes without errors",
-            "R1-R8 drift detection passes",
-            "Tools execute correctly",
-            "Memory persistence works",
-        ])
+        metrics.extend(
+            [
+                "Agent initializes without errors",
+                "R1-R8 drift detection passes",
+                "Tools execute correctly",
+                "Memory persistence works",
+            ]
+        )
     elif component == "service":
-        metrics.extend([
-            "Endpoints respond with correct status codes",
-            "No Runner imports detected",
-            "Error handling works correctly",
-            "Load tests show acceptable performance",
-        ])
+        metrics.extend(
+            [
+                "Endpoints respond with correct status codes",
+                "No Runner imports detected",
+                "Error handling works correctly",
+                "Load tests show acceptable performance",
+            ]
+        )
     elif component == "infra":
-        metrics.extend([
-            "Terraform validates successfully",
-            "Resources created/modified as planned",
-            "Security scanning passes",
-            "Integration tests pass",
-        ])
+        metrics.extend(
+            [
+                "Terraform validates successfully",
+                "Resources created/modified as planned",
+                "Security scanning passes",
+                "Integration tests pass",
+            ]
+        )
     elif component == "ci":
-        metrics.extend([
-            "Workflow passes on test runs",
-            "Drift detection works correctly",
-            "Deployment succeeds",
-            "No new failures in CI",
-        ])
+        metrics.extend(
+            [
+                "Workflow passes on test runs",
+                "Drift detection works correctly",
+                "Deployment succeeds",
+                "No new failures in CI",
+            ]
+        )
 
     if issue_type == "bug":
         metrics.append("Reproduction steps from issue no longer trigger bug")
@@ -346,34 +385,44 @@ def validate_fix_plan(plan_data: str) -> str:
         required_fields = ["summary", "steps", "risk_level", "testing_strategy"]
         for field in required_fields:
             if field not in plan:
-                errors.append({
-                    "field": field,
-                    "message": f"Required field '{field}' is missing"
-                })
+                errors.append(
+                    {"field": field, "message": f"Required field '{field}' is missing"}
+                )
 
         # Validate risk level
         if "risk_level" in plan:
             valid_risks = ["low", "medium", "high"]
             if plan["risk_level"] not in valid_risks:
-                errors.append({
-                    "field": "risk_level",
-                    "message": f"Invalid risk level. Must be one of: {valid_risks}"
-                })
+                errors.append(
+                    {
+                        "field": "risk_level",
+                        "message": f"Invalid risk level. Must be one of: {valid_risks}",
+                    }
+                )
 
         # Validate steps
         if "steps" in plan:
             if not isinstance(plan["steps"], list) or len(plan["steps"]) < 2:
-                warnings.append("Steps should be a list with at least 2 items for clarity")
+                warnings.append(
+                    "Steps should be a list with at least 2 items for clarity"
+                )
             else:
                 # Check if steps are numbered
                 non_numbered = [s for s in plan["steps"] if not s[0].isdigit()]
                 if non_numbered:
-                    recommendations.append("Consider numbering steps for better clarity")
+                    recommendations.append(
+                        "Consider numbering steps for better clarity"
+                    )
 
         # Validate testing strategy
         if "testing_strategy" in plan:
-            if not isinstance(plan["testing_strategy"], list) or len(plan["testing_strategy"]) < 1:
-                warnings.append("Testing strategy should include at least one test type")
+            if (
+                not isinstance(plan["testing_strategy"], list)
+                or len(plan["testing_strategy"]) < 1
+            ):
+                warnings.append(
+                    "Testing strategy should include at least one test type"
+                )
             expected_tests = ["unit tests", "integration tests"]
             included_tests = [t.lower() for t in plan.get("testing_strategy", [])]
             if not any(t in " ".join(included_tests) for t in expected_tests):
@@ -381,7 +430,9 @@ def validate_fix_plan(plan_data: str) -> str:
 
         # Validate success metrics
         if "success_metrics" not in plan or not plan.get("success_metrics"):
-            warnings.append("Success metrics are not defined - how will we know the fix worked?")
+            warnings.append(
+                "Success metrics are not defined - how will we know the fix worked?"
+            )
         elif len(plan["success_metrics"]) < 1:
             recommendations.append("Add more specific success metrics")
 
@@ -395,27 +446,23 @@ def validate_fix_plan(plan_data: str) -> str:
         quality_score -= len(warnings) * 0.1
         quality_score = max(0.0, min(1.0, quality_score))
 
-        return json.dumps({
-            "is_valid": len(errors) == 0,
-            "errors": errors,
-            "warnings": warnings,
-            "quality_score": quality_score,
-            "recommendations": recommendations,
-            "summary": f"Plan has {len(errors)} error(s) and {len(warnings)} warning(s)"
-        })
+        return json.dumps(
+            {
+                "is_valid": len(errors) == 0,
+                "errors": errors,
+                "warnings": warnings,
+                "quality_score": quality_score,
+                "recommendations": recommendations,
+                "summary": f"Plan has {len(errors)} error(s) and {len(warnings)} warning(s)",
+            }
+        )
 
     except json.JSONDecodeError as e:
         logger.error(f"Invalid JSON in plan_data: {e}")
-        return json.dumps({
-            "is_valid": False,
-            "error": f"Invalid JSON: {e!s}"
-        })
+        return json.dumps({"is_valid": False, "error": f"Invalid JSON: {e!s}"})
     except Exception as e:
         logger.error(f"Error validating fix plan: {e}")
-        return json.dumps({
-            "is_valid": False,
-            "error": str(e)
-        })
+        return json.dumps({"is_valid": False, "error": str(e)})
 
 
 def assess_risk_level(issue_data: str, plan_data: str) -> str:
@@ -455,72 +502,86 @@ def assess_risk_level(issue_data: str, plan_data: str) -> str:
         impacted_areas = plan.get("impacted_areas", [])
         scope_risk = len(impacted_areas) > 3
         if scope_risk:
-            risk_factors.append({
-                "factor": "Scope",
-                "impact": f"{len(impacted_areas)} impacted areas",
-                "severity": "medium"
-            })
+            risk_factors.append(
+                {
+                    "factor": "Scope",
+                    "impact": f"{len(impacted_areas)} impacted areas",
+                    "severity": "medium",
+                }
+            )
             mitigations.append("Test integration points thoroughly")
 
         # Analyze component
         component = issue.get("component", "general")
         critical_components = ["infra", "ci"]
         if component in critical_components:
-            risk_factors.append({
-                "factor": "Component",
-                "impact": f"{component} is critical infrastructure",
-                "severity": "high"
-            })
+            risk_factors.append(
+                {
+                    "factor": "Component",
+                    "impact": f"{component} is critical infrastructure",
+                    "severity": "high",
+                }
+            )
             mitigations.append("Use staged rollout with drift detection")
 
         # Analyze severity
         severity = issue.get("severity", "medium")
         if severity in ["high", "critical"]:
-            risk_factors.append({
-                "factor": "Issue Severity",
-                "impact": f"Fixing {severity} severity issue",
-                "severity": "medium"
-            })
+            risk_factors.append(
+                {
+                    "factor": "Issue Severity",
+                    "impact": f"Fixing {severity} severity issue",
+                    "severity": "medium",
+                }
+            )
             mitigations.append("Ensure comprehensive testing before rollout")
 
         # Analyze steps for complexity
         steps = plan.get("steps", [])
         if len(steps) > 6:
-            risk_factors.append({
-                "factor": "Complexity",
-                "impact": f"{len(steps)} implementation steps",
-                "severity": "low"
-            })
+            risk_factors.append(
+                {
+                    "factor": "Complexity",
+                    "impact": f"{len(steps)} implementation steps",
+                    "severity": "low",
+                }
+            )
             mitigations.append("Break implementation into smaller PRs if possible")
 
         # Determine overall risk
         if any(r["severity"] == "high" for r in risk_factors):
             risk_level = "high"
-        elif any(r["severity"] == "medium" for r in risk_factors) or len(risk_factors) > 2:
+        elif (
+            any(r["severity"] == "medium" for r in risk_factors)
+            or len(risk_factors) > 2
+        ):
             risk_level = "medium"
         else:
             risk_level = "low"
 
         recommendation = _generate_risk_recommendation(risk_level, component, severity)
 
-        return json.dumps({
-            "risk_level": risk_level,
-            "risk_factors": risk_factors,
-            "mitigations": mitigations,
-            "recommendation": recommendation,
-            "requires_staged_rollout": risk_level in ["medium", "high"],
-            "requires_monitoring": risk_level in ["high"],
-        })
+        return json.dumps(
+            {
+                "risk_level": risk_level,
+                "risk_factors": risk_factors,
+                "mitigations": mitigations,
+                "recommendation": recommendation,
+                "requires_staged_rollout": risk_level in ["medium", "high"],
+                "requires_monitoring": risk_level in ["high"],
+            }
+        )
 
     except Exception as e:
         logger.error(f"Error assessing risk: {e}")
-        return json.dumps({
-            "error": str(e),
-            "risk_level": "high"  # Default to high for safety
-        })
+        return json.dumps(
+            {"error": str(e), "risk_level": "high"}  # Default to high for safety
+        )
 
 
-def _generate_risk_recommendation(risk_level: str, component: str, severity: str) -> str:
+def _generate_risk_recommendation(
+    risk_level: str, component: str, severity: str
+) -> str:
     """Generate a risk-based recommendation for rollout."""
     if risk_level == "high":
         return f"High-risk change in {component}. Recommend: staged rollout with monitoring, automated rollback on error, and post-deployment validation."
@@ -530,7 +591,9 @@ def _generate_risk_recommendation(risk_level: str, component: str, severity: str
         return "Low-risk fix. Can proceed with standard merge and deployment via CI/CD."
 
 
-def define_testing_strategy(component: str, issue_type: str, impacted_areas: str) -> str:
+def define_testing_strategy(
+    component: str, issue_type: str, impacted_areas: str
+) -> str:
     """
     Define a comprehensive testing strategy for a fix.
 
@@ -558,7 +621,11 @@ def define_testing_strategy(component: str, issue_type: str, impacted_areas: str
         }
     """
     try:
-        areas = json.loads(impacted_areas) if isinstance(impacted_areas, str) else impacted_areas or []
+        areas = (
+            json.loads(impacted_areas)
+            if isinstance(impacted_areas, str)
+            else impacted_areas or []
+        )
 
         strategy = {
             "unit_tests": _generate_unit_tests(component, issue_type),
@@ -575,11 +642,13 @@ def define_testing_strategy(component: str, issue_type: str, impacted_areas: str
 
     except Exception as e:
         logger.error(f"Error defining testing strategy: {e}")
-        return json.dumps({
-            "error": str(e),
-            "unit_tests": ["Test basic functionality"],
-            "integration_tests": ["Test component interactions"],
-        })
+        return json.dumps(
+            {
+                "error": str(e),
+                "unit_tests": ["Test basic functionality"],
+                "integration_tests": ["Test component interactions"],
+            }
+        )
 
 
 def _generate_unit_tests(component: str, issue_type: str) -> List[str]:
@@ -765,21 +834,21 @@ def estimate_effort(plan_data: str, team_expertise: str = "medium") -> str:
         else:
             duration = f"{int(total_hours / 8)} days"
 
-        return json.dumps({
-            "implementation_hours": round(impl_hours, 1),
-            "testing_hours": round(testing_hours, 1),
-            "review_hours": round(review_hours, 1),
-            "deployment_hours": round(deployment_hours, 1),
-            "total_hours": round(total_hours, 1),
-            "estimated_duration": duration,
-            "confidence": round(confidence, 2),
-            "notes": f"Estimate based on {len(steps)} implementation steps and {testing_count} testing types. Confidence {round(confidence*100)}%.",
-        })
+        return json.dumps(
+            {
+                "implementation_hours": round(impl_hours, 1),
+                "testing_hours": round(testing_hours, 1),
+                "review_hours": round(review_hours, 1),
+                "deployment_hours": round(deployment_hours, 1),
+                "total_hours": round(total_hours, 1),
+                "estimated_duration": duration,
+                "confidence": round(confidence, 2),
+                "notes": f"Estimate based on {len(steps)} implementation steps and {testing_count} testing types. Confidence {round(confidence*100)}%.",
+            }
+        )
 
     except Exception as e:
         logger.error(f"Error estimating effort: {e}")
-        return json.dumps({
-            "error": str(e),
-            "total_hours": 8,
-            "estimated_duration": "1-2 days"
-        })
+        return json.dumps(
+            {"error": str(e), "total_hours": 8, "estimated_duration": "1-2 days"}
+        )

@@ -15,17 +15,20 @@ import pytest
 @pytest.fixture
 def mock_env():
     """Mock environment variables for testing"""
-    with patch.dict(os.environ, {
-        # Required by agent.py
-        "PROJECT_ID": "test-project",
-        "LOCATION": "us-central1",
-        "AGENT_ENGINE_ID": "test-engine-id",
-        "AGENT_SPIFFE_ID": "spiffe://test.intent.solutions/agent/bobs-brain/test/us-central1/0.6.0",
-        # Required by a2a_card.py
-        "APP_NAME": "bobs-brain-test",
-        "APP_VERSION": "0.6.0-test",
-        "PUBLIC_URL": "https://test.example.com"
-    }):
+    with patch.dict(
+        os.environ,
+        {
+            # Required by agent.py
+            "PROJECT_ID": "test-project",
+            "LOCATION": "us-central1",
+            "AGENT_ENGINE_ID": "test-engine-id",
+            "AGENT_SPIFFE_ID": "spiffe://test.intent.solutions/agent/bobs-brain/test/us-central1/0.6.0",
+            # Required by a2a_card.py
+            "APP_NAME": "bobs-brain-test",
+            "APP_VERSION": "0.6.0-test",
+            "PUBLIC_URL": "https://test.example.com",
+        },
+    ):
         yield
 
 
@@ -49,7 +52,10 @@ def test_agent_card_spiffe_id(mock_env):
     card = get_agent_card()
 
     # R7: SPIFFE ID must be in description
-    assert "spiffe://test.intent.solutions/agent/bobs-brain/test/us-central1/0.6.0" in card.description
+    assert (
+        "spiffe://test.intent.solutions/agent/bobs-brain/test/us-central1/0.6.0"
+        in card.description
+    )
 
 
 def test_get_agent_card_dict(mock_env):
@@ -73,7 +79,10 @@ def test_agent_card_dict_spiffe_field(mock_env):
 
     card_dict = get_agent_card_dict()
 
-    assert card_dict["spiffe_id"] == "spiffe://test.intent.solutions/agent/bobs-brain/test/us-central1/0.6.0"
+    assert (
+        card_dict["spiffe_id"]
+        == "spiffe://test.intent.solutions/agent/bobs-brain/test/us-central1/0.6.0"
+    )
 
 
 def test_agent_card_skills_array(mock_env):
@@ -88,15 +97,18 @@ def test_agent_card_skills_array(mock_env):
 
 def test_agent_card_required_fields():
     """Test AgentCard has all required A2A protocol fields"""
-    with patch.dict(os.environ, {
-        "PROJECT_ID": "test-project",
-        "LOCATION": "us-central1",
-        "AGENT_ENGINE_ID": "test-engine-id",
-        "AGENT_SPIFFE_ID": "spiffe://test.intent.solutions/agent/bobs-brain/test/us-central1/0.6.0",
-        "APP_NAME": "test-agent",
-        "APP_VERSION": "1.0.0",
-        "PUBLIC_URL": "https://test.com"
-    }):
+    with patch.dict(
+        os.environ,
+        {
+            "PROJECT_ID": "test-project",
+            "LOCATION": "us-central1",
+            "AGENT_ENGINE_ID": "test-engine-id",
+            "AGENT_SPIFFE_ID": "spiffe://test.intent.solutions/agent/bobs-brain/test/us-central1/0.6.0",
+            "APP_NAME": "test-agent",
+            "APP_VERSION": "1.0.0",
+            "PUBLIC_URL": "https://test.com",
+        },
+    ):
         from agents.bob.a2a_card import get_agent_card
 
         card = get_agent_card()
@@ -122,7 +134,11 @@ def test_agent_card_required_fields():
 
 ALL_AGENTS = [
     ("bob", "bob", "bobs-brain"),
-    ("iam-senior-adk-devops-lead", "iam-senior-adk-devops-lead", "iam-senior-adk-devops-lead"),
+    (
+        "iam-senior-adk-devops-lead",
+        "iam-senior-adk-devops-lead",
+        "iam-senior-adk-devops-lead",
+    ),
     ("iam_adk", "iam_adk", "iam-adk"),
     ("iam_issue", "iam_issue", "iam-issue"),
     ("iam_fix_plan", "iam_fix_plan", "iam-fix-plan"),
@@ -154,17 +170,22 @@ def load_agent_card_module(agent_dir: str):
 @pytest.mark.parametrize("agent_dir,module_name,expected_name_prefix", ALL_AGENTS)
 def test_all_agents_have_agentcard(agent_dir, module_name, expected_name_prefix):
     """Test all agents have get_agent_card() function"""
-    with patch.dict(os.environ, {
-        "PROJECT_ID": "test-project",
-        "LOCATION": "us-central1",
-        "AGENT_ENGINE_ID": "test-engine-id",
-        "AGENT_SPIFFE_ID": f"spiffe://test.intent.solutions/agent/{agent_dir}/test/us-central1/0.10.0",
-        "APP_NAME": f"{agent_dir}-test",
-        "APP_VERSION": "0.10.0-test",
-        "PUBLIC_URL": f"https://{agent_dir}.test.com"
-    }):
+    with patch.dict(
+        os.environ,
+        {
+            "PROJECT_ID": "test-project",
+            "LOCATION": "us-central1",
+            "AGENT_ENGINE_ID": "test-engine-id",
+            "AGENT_SPIFFE_ID": f"spiffe://test.intent.solutions/agent/{agent_dir}/test/us-central1/0.10.0",
+            "APP_NAME": f"{agent_dir}-test",
+            "APP_VERSION": "0.10.0-test",
+            "PUBLIC_URL": f"https://{agent_dir}.test.com",
+        },
+    ):
         module = load_agent_card_module(agent_dir)
-        assert hasattr(module, "get_agent_card"), f"{agent_dir} missing get_agent_card()"
+        assert hasattr(
+            module, "get_agent_card"
+        ), f"{agent_dir} missing get_agent_card()"
 
         card = module.get_agent_card()
         assert card is not None
@@ -175,40 +196,54 @@ def test_all_agents_have_agentcard(agent_dir, module_name, expected_name_prefix)
 @pytest.mark.parametrize("agent_dir,module_name,expected_name_prefix", ALL_AGENTS)
 def test_all_agents_spiffe_in_description(agent_dir, module_name, expected_name_prefix):
     """Test all agents include SPIFFE ID in description (R7)"""
-    test_spiffe = f"spiffe://test.intent.solutions/agent/{agent_dir}/test/us-central1/0.10.0"
+    test_spiffe = (
+        f"spiffe://test.intent.solutions/agent/{agent_dir}/test/us-central1/0.10.0"
+    )
 
-    with patch.dict(os.environ, {
-        "PROJECT_ID": "test-project",
-        "LOCATION": "us-central1",
-        "AGENT_ENGINE_ID": "test-engine-id",
-        "AGENT_SPIFFE_ID": test_spiffe,
-        "APP_NAME": f"{agent_dir}-test",
-        "APP_VERSION": "0.10.0-test",
-        "PUBLIC_URL": f"https://{agent_dir}.test.com"
-    }):
+    with patch.dict(
+        os.environ,
+        {
+            "PROJECT_ID": "test-project",
+            "LOCATION": "us-central1",
+            "AGENT_ENGINE_ID": "test-engine-id",
+            "AGENT_SPIFFE_ID": test_spiffe,
+            "APP_NAME": f"{agent_dir}-test",
+            "APP_VERSION": "0.10.0-test",
+            "PUBLIC_URL": f"https://{agent_dir}.test.com",
+        },
+    ):
         module = load_agent_card_module(agent_dir)
         card = module.get_agent_card()
 
         # R7: SPIFFE ID must be in description
-        assert test_spiffe in card.description, f"{agent_dir} missing SPIFFE ID in description"
+        assert (
+            test_spiffe in card.description
+        ), f"{agent_dir} missing SPIFFE ID in description"
 
 
 @pytest.mark.parametrize("agent_dir,module_name,expected_name_prefix", ALL_AGENTS)
 def test_all_agents_have_card_dict(agent_dir, module_name, expected_name_prefix):
     """Test all agents have get_agent_card_dict() function with spiffe_id field (R7)"""
-    test_spiffe = f"spiffe://test.intent.solutions/agent/{agent_dir}/test/us-central1/0.10.0"
+    test_spiffe = (
+        f"spiffe://test.intent.solutions/agent/{agent_dir}/test/us-central1/0.10.0"
+    )
 
-    with patch.dict(os.environ, {
-        "PROJECT_ID": "test-project",
-        "LOCATION": "us-central1",
-        "AGENT_ENGINE_ID": "test-engine-id",
-        "AGENT_SPIFFE_ID": test_spiffe,
-        "APP_NAME": f"{agent_dir}-test",
-        "APP_VERSION": "0.10.0-test",
-        "PUBLIC_URL": f"https://{agent_dir}.test.com"
-    }):
+    with patch.dict(
+        os.environ,
+        {
+            "PROJECT_ID": "test-project",
+            "LOCATION": "us-central1",
+            "AGENT_ENGINE_ID": "test-engine-id",
+            "AGENT_SPIFFE_ID": test_spiffe,
+            "APP_NAME": f"{agent_dir}-test",
+            "APP_VERSION": "0.10.0-test",
+            "PUBLIC_URL": f"https://{agent_dir}.test.com",
+        },
+    ):
         module = load_agent_card_module(agent_dir)
-        assert hasattr(module, "get_agent_card_dict"), f"{agent_dir} missing get_agent_card_dict()"
+        assert hasattr(
+            module, "get_agent_card_dict"
+        ), f"{agent_dir} missing get_agent_card_dict()"
 
         card_dict = module.get_agent_card_dict()
 
@@ -220,21 +255,32 @@ def test_all_agents_have_card_dict(agent_dir, module_name, expected_name_prefix)
 @pytest.mark.parametrize("agent_dir,module_name,expected_name_prefix", ALL_AGENTS)
 def test_all_agents_required_fields(agent_dir, module_name, expected_name_prefix):
     """Test all agents have required A2A protocol fields"""
-    with patch.dict(os.environ, {
-        "PROJECT_ID": "test-project",
-        "LOCATION": "us-central1",
-        "AGENT_ENGINE_ID": "test-engine-id",
-        "AGENT_SPIFFE_ID": f"spiffe://test.intent.solutions/agent/{agent_dir}/test/us-central1/0.10.0",
-        "APP_NAME": f"{agent_dir}-test",
-        "APP_VERSION": "0.10.0-test",
-        "PUBLIC_URL": f"https://{agent_dir}.test.com"
-    }):
+    with patch.dict(
+        os.environ,
+        {
+            "PROJECT_ID": "test-project",
+            "LOCATION": "us-central1",
+            "AGENT_ENGINE_ID": "test-engine-id",
+            "AGENT_SPIFFE_ID": f"spiffe://test.intent.solutions/agent/{agent_dir}/test/us-central1/0.10.0",
+            "APP_NAME": f"{agent_dir}-test",
+            "APP_VERSION": "0.10.0-test",
+            "PUBLIC_URL": f"https://{agent_dir}.test.com",
+        },
+    ):
         module = load_agent_card_module(agent_dir)
         card = module.get_agent_card()
 
         # All required A2A fields must be present
-        required_fields = ["name", "description", "url", "version", "capabilities",
-                          "default_input_modes", "default_output_modes", "skills"]
+        required_fields = [
+            "name",
+            "description",
+            "url",
+            "version",
+            "capabilities",
+            "default_input_modes",
+            "default_output_modes",
+            "skills",
+        ]
 
         for field in required_fields:
             assert hasattr(card, field), f"{agent_dir} missing required field: {field}"
@@ -250,24 +296,33 @@ def test_all_agents_required_fields(agent_dir, module_name, expected_name_prefix
 @pytest.mark.parametrize("agent_dir,module_name,expected_name_prefix", ALL_AGENTS)
 def test_all_agents_have_skills(agent_dir, module_name, expected_name_prefix):
     """Test all agents have at least 3 skills defined"""
-    with patch.dict(os.environ, {
-        "PROJECT_ID": "test-project",
-        "LOCATION": "us-central1",
-        "AGENT_ENGINE_ID": "test-engine-id",
-        "AGENT_SPIFFE_ID": f"spiffe://test.intent.solutions/agent/{agent_dir}/test/us-central1/0.10.0",
-        "APP_NAME": f"{agent_dir}-test",
-        "APP_VERSION": "0.10.0-test",
-        "PUBLIC_URL": f"https://{agent_dir}.test.com"
-    }):
+    with patch.dict(
+        os.environ,
+        {
+            "PROJECT_ID": "test-project",
+            "LOCATION": "us-central1",
+            "AGENT_ENGINE_ID": "test-engine-id",
+            "AGENT_SPIFFE_ID": f"spiffe://test.intent.solutions/agent/{agent_dir}/test/us-central1/0.10.0",
+            "APP_NAME": f"{agent_dir}-test",
+            "APP_VERSION": "0.10.0-test",
+            "PUBLIC_URL": f"https://{agent_dir}.test.com",
+        },
+    ):
         module = load_agent_card_module(agent_dir)
         card = module.get_agent_card()
 
-        assert len(card.skills) >= 3, f"{agent_dir} has fewer than 3 skills (found {len(card.skills)})"
+        assert (
+            len(card.skills) >= 3
+        ), f"{agent_dir} has fewer than 3 skills (found {len(card.skills)})"
 
         # Verify each skill has required fields
         for i, skill in enumerate(card.skills):
             assert "skill_id" in skill, f"{agent_dir} skill {i} missing skill_id"
             assert "name" in skill, f"{agent_dir} skill {i} missing name"
             assert "description" in skill, f"{agent_dir} skill {i} missing description"
-            assert "input_schema" in skill, f"{agent_dir} skill {i} missing input_schema"
-            assert "output_schema" in skill, f"{agent_dir} skill {i} missing output_schema"
+            assert (
+                "input_schema" in skill
+            ), f"{agent_dir} skill {i} missing input_schema"
+            assert (
+                "output_schema" in skill
+            ), f"{agent_dir} skill {i} missing output_schema"

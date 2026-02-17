@@ -200,7 +200,7 @@ def update_readme(
         if append:
             # Append to existing section
             updated_lines = (
-                lines[: section_end]
+                lines[:section_end]
                 + [new_content]
                 + (lines[section_end:] if section_end < len(lines) else [])
             )

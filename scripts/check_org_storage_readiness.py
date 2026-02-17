@@ -60,6 +60,7 @@ def check_gcs_library():
 
     try:
         from google.cloud import storage  # noqa: F401
+
         print("✅ google-cloud-storage is installed")
         return True
     except ImportError:
@@ -152,18 +153,19 @@ def test_write_permissions():
         bucket = client.bucket(bucket_name)
 
         # Create test file path
-        test_path = f"_readiness_check/test_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json"
+        test_path = (
+            f"_readiness_check/test_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json"
+        )
         test_data = {
             "test": "org_storage_readiness_check",
             "timestamp": datetime.now().isoformat(),
-            "status": "success"
+            "status": "success",
         }
 
         # Upload test file
         blob = bucket.blob(test_path)
         blob.upload_from_string(
-            json.dumps(test_data, indent=2),
-            content_type="application/json"
+            json.dumps(test_data, indent=2), content_type="application/json"
         )
 
         print("✅ Write access confirmed")
@@ -194,12 +196,12 @@ def main():
         "--env",
         type=str,
         default=os.getenv("ENV", "dev"),
-        help="Environment (dev, staging, prod). Default: dev"
+        help="Environment (dev, staging, prod). Default: dev",
     )
     parser.add_argument(
         "--write-test",
         action="store_true",
-        help="Perform write test (creates and deletes test file)"
+        help="Perform write test (creates and deletes test file)",
     )
 
     args = parser.parse_args()
@@ -238,7 +240,9 @@ def main():
 
     if passed == total:
         print("\n🎉 Org storage is READY for use!")
-        print("   You can now enable writes with: export ORG_STORAGE_WRITE_ENABLED=true")
+        print(
+            "   You can now enable writes with: export ORG_STORAGE_WRITE_ENABLED=true"
+        )
         sys.exit(0)
     else:
         print("\n⚠️  Org storage is NOT ready. Fix the failures above.")

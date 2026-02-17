@@ -86,7 +86,11 @@ def analyze_agent_code(file_path: str) -> str:
 
         # Check imports (R1: ADK-only)
         forbidden_imports = ["langchain", "crewai", "autogen", "llama_index"]
-        required_imports = ["google.adk.agents", "google.adk.sessions", "google.adk.memory"]
+        required_imports = [
+            "google.adk.agents",
+            "google.adk.sessions",
+            "google.adk.memory",
+        ]
 
         imports_found = []
         for node in ast.walk(tree):
@@ -130,8 +134,12 @@ def analyze_agent_code(file_path: str) -> str:
                 )
 
         # Check for dual memory (R5)
-        has_session_service = any("VertexAiSessionService" in imp for imp in imports_found)
-        has_memory_bank = any("VertexAiMemoryBankService" in imp for imp in imports_found)
+        has_session_service = any(
+            "VertexAiSessionService" in imp for imp in imports_found
+        )
+        has_memory_bank = any(
+            "VertexAiMemoryBankService" in imp for imp in imports_found
+        )
         metrics["has_dual_memory"] = has_session_service and has_memory_bank
 
         if not metrics["has_dual_memory"]:
@@ -221,11 +229,15 @@ def analyze_agent_code(file_path: str) -> str:
                 "Implement dual memory wiring with VertexAiSessionService and VertexAiMemoryBankService"
             )
         if not metrics["has_callback"]:
-            recommendations.append("Add after_agent_callback to persist sessions to Memory Bank")
+            recommendations.append(
+                "Add after_agent_callback to persist sessions to Memory Bank"
+            )
         if not metrics["uses_type_hints"]:
             recommendations.append("Add type hints to get_agent() -> LlmAgent")
         if not metrics["has_spiffe_id"]:
-            recommendations.append("Add AGENT_SPIFFE_ID to environment variables and logging")
+            recommendations.append(
+                "Add AGENT_SPIFFE_ID to environment variables and logging"
+            )
 
         result = {
             "compliance_status": compliance_status,
@@ -367,7 +379,7 @@ def my_tool(param: str, count: int = 1) -> str:
                 )
                 valid = False
 
-            example = '''
+            example = """
 from google.adk.sessions import VertexAiSessionService
 from google.adk.memory import VertexAiMemoryBankService
 
@@ -388,7 +400,7 @@ runner = Runner(
     session_service=session_service,
     memory_service=memory_service
 )
-'''
+"""
 
         elif pattern_name == "llm_agent_creation":
             # Check LlmAgent structure
@@ -397,7 +409,9 @@ runner = Runner(
             has_instruction = "instruction=" in code_snippet
 
             if not has_model:
-                issues.append({"severity": "HIGH", "message": "Missing model parameter"})
+                issues.append(
+                    {"severity": "HIGH", "message": "Missing model parameter"}
+                )
                 valid = False
 
             if not has_name:
@@ -409,7 +423,7 @@ runner = Runner(
                     {"severity": "MEDIUM", "message": "Missing instruction parameter"}
                 )
 
-            example = '''
+            example = """
 from google.adk.agents import LlmAgent
 
 agent = LlmAgent(
@@ -419,7 +433,7 @@ agent = LlmAgent(
     instruction="Agent system prompt...",
     after_agent_callback=auto_save_session_to_memory
 )
-'''
+"""
 
         else:
             return f'{{"valid": false, "pattern": "{pattern_name}", "issues": [{{"severity": "HIGH", "message": "Unknown pattern name"}}]}}'

@@ -20,7 +20,10 @@ from pathlib import Path
 # Add agents to path
 sys.path.insert(0, str(Path(__file__).parent.parent / "agents"))
 
-from iam_senior_adk_devops_lead.portfolio_orchestrator import get_portfolio_repos_by_tag, run_portfolio_swe
+from iam_senior_adk_devops_lead.portfolio_orchestrator import (
+    get_portfolio_repos_by_tag,
+    run_portfolio_swe,
+)
 
 
 def parse_args():
@@ -50,21 +53,21 @@ Examples:
 
   # Combine options
   %(prog)s --repos bobs-brain --mode dry-run --output report.json --markdown report.md
-        """
+        """,
     )
 
     parser.add_argument(
         "--repos",
         type=str,
         default=None,
-        help='Repo IDs to audit (comma-separated) or "all". If not specified, runs on all local repos.'
+        help='Repo IDs to audit (comma-separated) or "all". If not specified, runs on all local repos.',
     )
 
     parser.add_argument(
         "--tag",
         type=str,
         default=None,
-        help="Filter repos by tag (e.g., 'adk', 'production'). Cannot be used with --repos."
+        help="Filter repos by tag (e.g., 'adk', 'production'). Cannot be used with --repos.",
     )
 
     parser.add_argument(
@@ -72,14 +75,14 @@ Examples:
         type=str,
         choices=["preview", "dry-run", "create"],
         default="preview",
-        help="Pipeline mode: preview (default), dry-run (show what would happen), create (actually create issues)"
+        help="Pipeline mode: preview (default), dry-run (show what would happen), create (actually create issues)",
     )
 
     parser.add_argument(
         "--task",
         type=str,
         default="Portfolio quality audit",
-        help="Task description for the audit"
+        help="Task description for the audit",
     )
 
     parser.add_argument(
@@ -87,27 +90,27 @@ Examples:
         type=str,
         choices=["dev", "staging", "prod"],
         default="dev",
-        help="Environment: dev (default), staging, prod"
+        help="Environment: dev (default), staging, prod",
     )
 
     parser.add_argument(
         "--output",
         type=str,
         default=None,
-        help="Save JSON results to file (e.g., portfolio-report.json)"
+        help="Save JSON results to file (e.g., portfolio-report.json)",
     )
 
     parser.add_argument(
         "--markdown",
         type=str,
         default=None,
-        help="Generate markdown report to file (e.g., portfolio-report.md)"
+        help="Generate markdown report to file (e.g., portfolio-report.md)",
     )
 
     parser.add_argument(
         "--parallel",
         action="store_true",
-        help="Run repos in parallel (future enhancement, not yet implemented)"
+        help="Run repos in parallel (future enhancement, not yet implemented)",
     )
 
     return parser.parse_args()
@@ -128,8 +131,11 @@ def export_json(result, output_path: str):
             "total_repos_errored": result.total_repos_errored,
             "total_issues_found": result.total_issues_found,
             "total_issues_fixed": result.total_issues_fixed,
-            "fix_rate": (result.total_issues_fixed / result.total_issues_found * 100)
-                        if result.total_issues_found > 0 else 0.0
+            "fix_rate": (
+                (result.total_issues_fixed / result.total_issues_found * 100)
+                if result.total_issues_found > 0
+                else 0.0
+            ),
         },
         "issues_by_severity": result.issues_by_severity,
         "issues_by_type": result.issues_by_type,
@@ -143,13 +149,13 @@ def export_json(result, output_path: str):
                 "duration_seconds": r.duration_seconds,
                 "issues_found": r.issues_found,
                 "issues_fixed": r.issues_fixed,
-                "error_message": r.error_message
+                "error_message": r.error_message,
             }
             for r in result.repos
-        ]
+        ],
     }
 
-    with open(output_path, 'w') as f:
+    with open(output_path, "w") as f:
         json.dump(output, f, indent=2)
 
     print(f"✅ JSON exported to {output_path}")
@@ -179,7 +185,11 @@ def export_markdown(result, output_path: str):
     lines.append(f"| Repos Errored | {result.total_repos_errored} |")
     lines.append(f"| Total Issues | {result.total_issues_found} |")
     lines.append(f"| Issues Fixed | {result.total_issues_fixed} |")
-    fix_rate = (result.total_issues_fixed / result.total_issues_found * 100) if result.total_issues_found > 0 else 0.0
+    fix_rate = (
+        (result.total_issues_fixed / result.total_issues_found * 100)
+        if result.total_issues_found > 0
+        else 0.0
+    )
     lines.append(f"| Fix Rate | {fix_rate:.1f}% |")
     lines.append("")
 
@@ -201,7 +211,9 @@ def export_markdown(result, output_path: str):
         lines.append("")
         lines.append("| Type | Count |")
         lines.append("|------|-------|")
-        for issue_type, count in sorted(result.issues_by_type.items(), key=lambda x: x[1], reverse=True):
+        for issue_type, count in sorted(
+            result.issues_by_type.items(), key=lambda x: x[1], reverse=True
+        ):
             lines.append(f"| {issue_type} | {count} |")
         lines.append("")
 
@@ -221,7 +233,9 @@ def export_markdown(result, output_path: str):
         lines.append("")
         lines.append("| Rank | Repository | Compliance |")
         lines.append("|------|------------|------------|")
-        for i, (repo_id, compliance_score) in enumerate(result.repos_by_compliance_score, 1):
+        for i, (repo_id, compliance_score) in enumerate(
+            result.repos_by_compliance_score, 1
+        ):
             lines.append(f"| {i} | {repo_id} | {compliance_score:.2f} |")
         lines.append("")
 
@@ -229,7 +243,11 @@ def export_markdown(result, output_path: str):
     lines.append("## Per-Repository Results")
     lines.append("")
     for repo_result in result.repos:
-        icon = "✅" if repo_result.status == "completed" else "⏭️" if repo_result.status == "skipped" else "❌"
+        icon = (
+            "✅"
+            if repo_result.status == "completed"
+            else "⏭️" if repo_result.status == "skipped" else "❌"
+        )
         lines.append(f"### {icon} {repo_result.display_name} (`{repo_result.repo_id}`)")
         lines.append("")
         lines.append(f"**Status:** {repo_result.status.upper()}")
@@ -241,8 +259,8 @@ def export_markdown(result, output_path: str):
             lines.append(f"**Error:** {repo_result.error_message}")
         lines.append("")
 
-    with open(output_path, 'w') as f:
-        f.write('\n'.join(lines))
+    with open(output_path, "w") as f:
+        f.write("\n".join(lines))
 
     print(f"✅ Markdown report generated at {output_path}")
 
@@ -278,7 +296,7 @@ def main():
         mode=args.mode,
         task=args.task,
         env=args.env,
-        parallel=args.parallel
+        parallel=args.parallel,
     )
 
     # Export results if requested

@@ -28,11 +28,11 @@ class VertexSearchConfig:
             "your-datastore",
             "placeholder",
             "TODO",
-            "FIXME"
+            "FIXME",
         ]
         return any(
-            indicator in self.project_id.lower() or
-            indicator in self.datastore_id.lower()
+            indicator in self.project_id.lower()
+            or indicator in self.datastore_id.lower()
             for indicator in placeholder_indicators
         )
 
@@ -68,7 +68,7 @@ def get_current_env() -> Literal["dev", "staging", "prod"]:
 
 
 def get_vertex_search_config(
-    env: Optional[Literal["dev", "staging", "prod"]] = None
+    env: Optional[Literal["dev", "staging", "prod"]] = None,
 ) -> VertexSearchConfig:
     """
     Get Vertex AI Search configuration for the specified environment.
@@ -113,15 +113,12 @@ def get_vertex_search_config(
         )
 
     return VertexSearchConfig(
-        project_id=project_id,
-        location=location,
-        datastore_id=datastore_id,
-        env=env
+        project_id=project_id, location=location, datastore_id=datastore_id, env=env
     )
 
 
 def get_bob_vertex_search_config(
-    env: Optional[Literal["dev", "staging", "prod"]] = None
+    env: Optional[Literal["dev", "staging", "prod"]] = None,
 ) -> VertexSearchConfig:
     """
     Get Vertex AI Search configuration for Bob (orchestrator).
@@ -139,7 +136,7 @@ def get_bob_vertex_search_config(
 
 
 def get_foreman_vertex_search_config(
-    env: Optional[Literal["dev", "staging", "prod"]] = None
+    env: Optional[Literal["dev", "staging", "prod"]] = None,
 ) -> VertexSearchConfig:
     """
     Get Vertex AI Search configuration for iam-senior-adk-devops-lead (foreman).
@@ -206,7 +203,7 @@ def validate_rag_config(env: Optional[str] = None) -> dict:
         "env": env,
         "config": config,
         "errors": errors,
-        "warnings": warnings
+        "warnings": warnings,
     }
 
 

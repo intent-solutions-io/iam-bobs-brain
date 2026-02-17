@@ -21,7 +21,7 @@ logger = logging.getLogger(__name__)
 # R7: Get foreman's SPIFFE ID for propagation
 FOREMAN_SPIFFE_ID = os.getenv(
     "AGENT_SPIFFE_ID",
-    "spiffe://intent.solutions/agent/iam-senior-adk-devops-lead/dev/us-central1/0.10.0"
+    "spiffe://intent.solutions/agent/iam-senior-adk-devops-lead/dev/us-central1/0.10.0",
 )
 
 
@@ -29,7 +29,7 @@ def delegate_to_specialist(
     specialist: str,
     skill_id: str,
     payload: Dict[str, Any],
-    context: Optional[Dict[str, Any]] = None
+    context: Optional[Dict[str, Any]] = None,
 ) -> Dict[str, Any]:
     """
     Delegate a task to a specialist agent via A2A protocol.
@@ -71,8 +71,8 @@ def delegate_to_specialist(
         extra={
             "specialist": specialist,
             "skill_id": skill_id,
-            "foreman_spiffe": FOREMAN_SPIFFE_ID
-        }
+            "foreman_spiffe": FOREMAN_SPIFFE_ID,
+        },
     )
 
     try:
@@ -82,7 +82,7 @@ def delegate_to_specialist(
             skill_id=skill_id,
             payload=payload,
             context=context or {},
-            spiffe_id=FOREMAN_SPIFFE_ID  # R7: Propagate foreman's SPIFFE ID
+            spiffe_id=FOREMAN_SPIFFE_ID,  # R7: Propagate foreman's SPIFFE ID
         )
 
         # Invoke specialist via A2A dispatcher (sync wrapper for async dispatch)
@@ -99,18 +99,14 @@ def delegate_to_specialist(
                 "duration_ms": result.duration_ms,
                 "timestamp": result.timestamp,
                 "a2a_protocol": True,
-                "phase": "Phase 17 - Real A2A Wiring"
-            }
+                "phase": "Phase 17 - Real A2A Wiring",
+            },
         }
 
     except A2AError as e:
         logger.error(
             f"A2A: Delegation failed: {e}",
-            extra={
-                "specialist": specialist,
-                "skill_id": skill_id,
-                "error": str(e)
-            }
+            extra={"specialist": specialist, "skill_id": skill_id, "error": str(e)},
         )
 
         return {
@@ -121,14 +117,13 @@ def delegate_to_specialist(
             "metadata": {
                 "skill_id": skill_id,
                 "a2a_error": True,
-                "phase": "Phase 17 - Real A2A Wiring"
-            }
+                "phase": "Phase 17 - Real A2A Wiring",
+            },
         }
 
 
 def delegate_to_multiple(
-    delegations: List[Dict[str, Any]],
-    execution_mode: str = "sequential"
+    delegations: List[Dict[str, Any]], execution_mode: str = "sequential"
 ) -> List[Dict[str, Any]]:
     """
     Delegate tasks to multiple specialists.
@@ -161,7 +156,9 @@ def delegate_to_multiple(
         ... ])
     """
     if execution_mode == "parallel":
-        logger.warning("Parallel execution not yet implemented in Phase 17; using sequential")
+        logger.warning(
+            "Parallel execution not yet implemented in Phase 17; using sequential"
+        )
 
     results = []
 
@@ -170,7 +167,7 @@ def delegate_to_multiple(
             specialist=delegation["specialist"],
             skill_id=delegation["skill_id"],
             payload=delegation["payload"],
-            context=delegation.get("context")
+            context=delegation.get("context"),
         )
         results.append(result)
 
@@ -195,10 +192,13 @@ def check_specialist_availability(specialist: str) -> bool:
     try:
         # Try to load AgentCard - if it exists and is valid, specialist is available
         from agents.a2a.dispatcher import load_agentcard
+
         load_agentcard(specialist)
         return True
     except A2AError:
-        logger.debug(f"Specialist '{specialist}' not available: AgentCard not found or invalid")
+        logger.debug(
+            f"Specialist '{specialist}' not available: AgentCard not found or invalid"
+        )
         return False
     except Exception as e:
         logger.warning(f"Unexpected error checking specialist '{specialist}': {e}")
@@ -226,7 +226,9 @@ def get_specialist_capabilities(specialist: str) -> Dict[str, Any]:
 
         # Extract capabilities from AgentCard
         return {
-            "description": agentcard.get("description", "").split("\n")[0],  # First line only
+            "description": agentcard.get("description", "").split("\n")[
+                0
+            ],  # First line only
             "capabilities": agentcard.get("capabilities", []),
             "skills": [skill.get("id") for skill in agentcard.get("skills", [])],
             "agentcard_version": agentcard.get("version", "unknown"),
@@ -234,12 +236,14 @@ def get_specialist_capabilities(specialist: str) -> Dict[str, Any]:
         }
 
     except A2AError as e:
-        logger.warning(f"Failed to load capabilities for specialist '{specialist}': {e}")
+        logger.warning(
+            f"Failed to load capabilities for specialist '{specialist}': {e}"
+        )
         return {
             "description": f"Unknown specialist '{specialist}'",
             "capabilities": [],
             "skills": [],
-            "error": str(e)
+            "error": str(e),
         }
     except Exception as e:
         logger.error(f"Unexpected error loading capabilities for '{specialist}': {e}")
@@ -247,5 +251,5 @@ def get_specialist_capabilities(specialist: str) -> Dict[str, Any]:
             "description": f"Error loading specialist '{specialist}'",
             "capabilities": [],
             "skills": [],
-            "error": str(e)
+            "error": str(e),
         }

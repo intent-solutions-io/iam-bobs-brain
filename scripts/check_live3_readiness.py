@@ -139,7 +139,9 @@ def check_github_readiness() -> Tuple[str, str, List[str]]:
         mode_str = f"DRY_RUN ({env} - logs only)"
 
         if env == "dev":
-            warnings.append("ℹ️  GitHub DRY_RUN in dev (set DRY_RUN=false for real issues)")
+            warnings.append(
+                "ℹ️  GitHub DRY_RUN in dev (set DRY_RUN=false for real issues)"
+            )
         elif env == "staging":
             warnings.append(
                 "ℹ️  GitHub DRY_RUN in staging (safe default - override with GITHUB_ENABLE_STAGING=true)"
@@ -294,7 +296,9 @@ def main():
     # Non-blocking check - always exit 0 (success)
     # Even if features are misconfigured, this is informational only
     if misconfigured_count > 0:
-        print("ℹ️  This is a NON-BLOCKING check - misconfigured features won't fail build")
+        print(
+            "ℹ️  This is a NON-BLOCKING check - misconfigured features won't fail build"
+        )
         print("   Fix configuration issues before enabling features in production")
 
     print("\n✅ LIVE3 readiness check completed\n")
@@ -305,8 +309,12 @@ if __name__ == "__main__":
     try:
         sys.exit(main())
     except Exception as e:
-        print("\n❌ ERROR: LIVE3 readiness check failed with exception:", file=sys.stderr)
+        print(
+            "\n❌ ERROR: LIVE3 readiness check failed with exception:", file=sys.stderr
+        )
         print(f"   {type(e).__name__}: {e}", file=sys.stderr)
-        print("\nThis indicates an infrastructure or import issue, not a config problem.")
+        print(
+            "\nThis indicates an infrastructure or import issue, not a config problem."
+        )
         print("Check that all dependencies are installed and imports are correct.\n")
         sys.exit(1)

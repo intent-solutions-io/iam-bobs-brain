@@ -25,8 +25,9 @@ from datetime import datetime
 # Import GCS client
 try:
     from google.cloud import storage
+
     GCS_AVAILABLE = True
-except ImportError:
+except Exception:
     GCS_AVAILABLE = False
 
 # Import config helpers
@@ -43,11 +44,7 @@ from ..config.storage import (
 logger = logging.getLogger(__name__)
 
 
-def write_portfolio_result_to_gcs(
-    result: PortfolioResult,
-    *,
-    env: str
-) -> None:
+def write_portfolio_result_to_gcs(result: PortfolioResult, *, env: str) -> None:
     """
     Write portfolio result to org-wide GCS bucket if enabled.
 
@@ -75,9 +72,7 @@ def write_portfolio_result_to_gcs(
     """
     # Check if GCS client library is available
     if not GCS_AVAILABLE:
-        logger.warning(
-            "google-cloud-storage not installed; skipping org storage write"
-        )
+        logger.warning("google-cloud-storage not installed; skipping org storage write")
         return
 
     # Check if org storage writes are enabled
@@ -101,18 +96,13 @@ def write_portfolio_result_to_gcs(
     try:
         summary_data = _build_portfolio_summary_json(result, env)
     except Exception as e:
-        logger.error(
-            f"Failed to serialize portfolio result: {e}",
-            exc_info=True
-        )
+        logger.error(f"Failed to serialize portfolio result: {e}", exc_info=True)
         return
 
     # Write to GCS
     try:
         _upload_to_gcs(
-            bucket_name=bucket_name,
-            result=result,
-            summary_data=summary_data
+            bucket_name=bucket_name, result=result, summary_data=summary_data
         )
         logger.info(
             f"✅ Portfolio result written to org storage: "
@@ -121,7 +111,7 @@ def write_portfolio_result_to_gcs(
     except Exception as e:
         logger.error(
             f"Failed to write portfolio result to GCS bucket {bucket_name}: {e}",
-            exc_info=True
+            exc_info=True,
         )
         # Do NOT raise; allow portfolio pipeline to complete
 
@@ -139,7 +129,11 @@ def _build_portfolio_summary_json(result: PortfolioResult, env: str) -> dict:
     """
     return {
         "portfolio_run_id": result.portfolio_run_id,
-        "timestamp": result.timestamp.isoformat() if isinstance(result.timestamp, datetime) else str(result.timestamp),
+        "timestamp": (
+            result.timestamp.isoformat()
+            if isinstance(result.timestamp, datetime)
+            else str(result.timestamp)
+        ),
         "environment": env,
         "duration_seconds": result.portfolio_duration_seconds,
         "summary": {
@@ -180,9 +174,7 @@ def _build_portfolio_summary_json(result: PortfolioResult, env: str) -> dict:
 
 
 def _upload_to_gcs(
-    bucket_name: str,
-    result: PortfolioResult,
-    summary_data: dict
+    bucket_name: str, result: PortfolioResult, summary_data: dict
 ) -> None:
     """
     Upload portfolio result to GCS bucket.
@@ -203,8 +195,7 @@ def _upload_to_gcs(
     summary_path = make_portfolio_run_summary_path(result.portfolio_run_id)
     summary_blob = bucket.blob(summary_path)
     summary_blob.upload_from_string(
-        json.dumps(summary_data, indent=2),
-        content_type="application/json"
+        json.dumps(summary_data, indent=2), content_type="application/json"
     )
     logger.info(f"  Wrote summary: gs://{bucket_name}/{summary_path}")
 
@@ -212,8 +203,7 @@ def _upload_to_gcs(
     for repo_result in result.repos:
         if repo_result.status == "completed":
             repo_path = make_portfolio_run_repo_path(
-                result.portfolio_run_id,
-                repo_result.repo_id
+                result.portfolio_run_id, repo_result.repo_id
             )
             repo_data = {
                 "repo_id": repo_result.repo_id,
@@ -231,8 +221,7 @@ def _upload_to_gcs(
 
             repo_blob = bucket.blob(repo_path)
             repo_blob.upload_from_string(
-                json.dumps(repo_data, indent=2),
-                content_type="application/json"
+                json.dumps(repo_data, indent=2), content_type="application/json"
             )
             logger.debug(f"  Wrote per-repo: gs://{bucket_name}/{repo_path}")
 
@@ -253,15 +242,27 @@ def _serialize_pipeline_result(pipeline_result) -> dict:
         "total_issues_found": pipeline_result.total_issues_found,
         "issues_fixed": pipeline_result.issues_fixed,
         "pipeline_duration_seconds": pipeline_result.pipeline_duration_seconds,
-        "issues": [
-            {
-                "severity": issue.severity.value if hasattr(issue.severity, 'value') else str(issue.severity),
-                "type": issue.type.value if hasattr(issue.type, 'value') else str(issue.type),
-                "title": getattr(issue, 'title', 'N/A'),
-                "description": getattr(issue, 'description', 'N/A'),
-            }
-            for issue in pipeline_result.issues
-        ] if pipeline_result.issues else [],
+        "issues": (
+            [
+                {
+                    "severity": (
+                        issue.severity.value
+                        if hasattr(issue.severity, "value")
+                        else str(issue.severity)
+                    ),
+                    "type": (
+                        issue.type.value
+                        if hasattr(issue.type, "value")
+                        else str(issue.type)
+                    ),
+                    "title": getattr(issue, "title", "N/A"),
+                    "description": getattr(issue, "description", "N/A"),
+                }
+                for issue in pipeline_result.issues
+            ]
+            if pipeline_result.issues
+            else []
+        ),
     }
 
 

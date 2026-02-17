@@ -95,7 +95,8 @@ def run_check(check: ArvCheck, env: Environment, verbose: bool = False) -> ArvRe
         # Run the command
         result = subprocess.run(
             check.command,
-            check=False, shell=True,
+            check=False,
+            shell=True,
             capture_output=True,
             text=True,
             timeout=300,  # 5 minute timeout

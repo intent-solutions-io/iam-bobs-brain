@@ -52,9 +52,7 @@ def validate_issue_spec(issue_data: str) -> str:
 
         # Required fields
         if not issue.get("title"):
-            errors.append(
-                {"field": "title", "message": "title is required"}
-            )
+            errors.append({"field": "title", "message": "title is required"})
         elif len(issue["title"]) < 10:
             errors.append(
                 {
@@ -112,15 +110,11 @@ def validate_issue_spec(issue_data: str) -> str:
 
         # Optional field validation
         if not issue.get("acceptance_criteria"):
-            warnings.append(
-                "Missing acceptance_criteria - helps define done state"
-            )
+            warnings.append("Missing acceptance_criteria - helps define done state")
             score -= 0.05
 
         if not issue.get("repro_steps"):
-            warnings.append(
-                "Missing repro_steps - useful for bug issues"
-            )
+            warnings.append("Missing repro_steps - useful for bug issues")
             score -= 0.03
 
         if not issue.get("labels"):

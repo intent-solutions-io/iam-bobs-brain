@@ -29,14 +29,16 @@ logger = logging.getLogger(__name__)
 
 class GitHubMode(Enum):
     """GitHub issue creation mode based on environment and flags."""
+
     DISABLED = "disabled"  # Feature off or blocked
-    DRY_RUN = "dry_run"    # Log only, no API calls
-    REAL = "real"           # Create actual issues
+    DRY_RUN = "dry_run"  # Log only, no API calls
+    REAL = "real"  # Create actual issues
 
 
 def _get_current_environment() -> Literal["dev", "staging", "prod"]:
     """Get current environment (imported from features module to avoid circular imports)."""
     from agents.config.features import get_current_environment
+
     return get_current_environment()
 
 
@@ -107,7 +109,9 @@ def get_github_mode(repo_id: Optional[str] = None) -> GitHubMode:
     elif env == "staging":
         enable_staging = os.getenv("GITHUB_ENABLE_STAGING", "false").lower() == "true"
         if not enable_staging:
-            logger.info("GitHub mode: DRY_RUN (staging, requires GITHUB_ENABLE_STAGING=true for real)")
+            logger.info(
+                "GitHub mode: DRY_RUN (staging, requires GITHUB_ENABLE_STAGING=true for real)"
+            )
             return GitHubMode.DRY_RUN
 
         # Staging enabled - check DRY_RUN flag
@@ -118,7 +122,9 @@ def get_github_mode(repo_id: Optional[str] = None) -> GitHubMode:
             # Check token for real creation
             token = os.getenv("GITHUB_TOKEN")
             if not token:
-                logger.warning("GitHub mode: DRY_RUN (staging enabled, DRY_RUN=false but no token)")
+                logger.warning(
+                    "GitHub mode: DRY_RUN (staging enabled, DRY_RUN=false but no token)"
+                )
                 return GitHubMode.DRY_RUN
 
             logger.warning("⚠️  GitHub mode: REAL (STAGING - explicit override)")
@@ -139,10 +145,14 @@ def get_github_mode(repo_id: Optional[str] = None) -> GitHubMode:
             # Check token for real creation
             token = os.getenv("GITHUB_TOKEN")
             if not token:
-                logger.error("GitHub mode: DISABLED (prod enabled, DRY_RUN=false but no token)")
+                logger.error(
+                    "GitHub mode: DISABLED (prod enabled, DRY_RUN=false but no token)"
+                )
                 return GitHubMode.DISABLED
 
-            logger.error("🚨 GitHub mode: REAL (PRODUCTION - explicit override - USE WITH EXTREME CAUTION)")
+            logger.error(
+                "🚨 GitHub mode: REAL (PRODUCTION - explicit override - USE WITH EXTREME CAUTION)"
+            )
             return GitHubMode.REAL
 
     # Unknown environment: disable for safety
@@ -213,18 +223,17 @@ def load_github_feature_config() -> GitHubFeatureConfig:
     else:
         # Parse comma-separated list
         allowed_repos = {
-            repo.strip()
-            for repo in allowed_str.split(",")
-            if repo.strip()
+            repo.strip() for repo in allowed_str.split(",") if repo.strip()
         }
 
     return GitHubFeatureConfig(
-        issue_creation_enabled=issue_creation_enabled,
-        allowed_repos=allowed_repos
+        issue_creation_enabled=issue_creation_enabled, allowed_repos=allowed_repos
     )
 
 
-def can_create_issues_for_repo(repo_id: str, config: Optional[GitHubFeatureConfig] = None) -> bool:
+def can_create_issues_for_repo(
+    repo_id: str, config: Optional[GitHubFeatureConfig] = None
+) -> bool:
     """
     Check if GitHub issue creation is allowed for a specific repository.
 
@@ -272,7 +281,7 @@ def get_feature_status_summary() -> dict:
             "enabled": False,
             "allowed_repos": [],
             "message": "🚫 GitHub issue creation is DISABLED (safe mode)",
-            "recommendation": "Set GITHUB_ISSUE_CREATION_ENABLED=true to enable"
+            "recommendation": "Set GITHUB_ISSUE_CREATION_ENABLED=true to enable",
         }
 
     if "*" in config.allowed_repos:
@@ -280,7 +289,7 @@ def get_feature_status_summary() -> dict:
             "enabled": True,
             "allowed_repos": ["*"],
             "message": "⚠️  GitHub issue creation ENABLED for ALL REPOS",
-            "warning": "Use with caution - this allows creation in any repository"
+            "warning": "Use with caution - this allows creation in any repository",
         }
 
     repos_list = sorted(config.allowed_repos)
@@ -288,7 +297,7 @@ def get_feature_status_summary() -> dict:
         "enabled": True,
         "allowed_repos": repos_list,
         "message": f"✅ GitHub issue creation ENABLED for: {', '.join(repos_list)}",
-        "info": f"Allowed repos: {len(repos_list)}"
+        "info": f"Allowed repos: {len(repos_list)}",
     }
 
 
@@ -300,7 +309,9 @@ if __name__ == "__main__":
     # Load current config
     config = load_github_feature_config()
 
-    print(f"\nFeature Flag: GITHUB_ISSUE_CREATION_ENABLED = {config.issue_creation_enabled}")
+    print(
+        f"\nFeature Flag: GITHUB_ISSUE_CREATION_ENABLED = {config.issue_creation_enabled}"
+    )
     print(f"Allowed Repos: {config.allowed_repos}")
 
     # Show status

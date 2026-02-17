@@ -32,8 +32,7 @@ from .agent import create_runner
 
 # Configure logging
 logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+    level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 )
 logger = logging.getLogger(__name__)
 
@@ -66,7 +65,16 @@ logger.info(
         "spiffe_id": AGENT_SPIFFE_ID,
         "has_session_service": True,
         "has_memory_service": True,
-        "orchestrates": ["iam-adk", "iam-issue", "iam-fix-plan", "iam-fix-impl", "iam-qa", "iam-doc", "iam-cleanup", "iam-index"],
+        "orchestrates": [
+            "iam-adk",
+            "iam-issue",
+            "iam-fix-plan",
+            "iam-fix-impl",
+            "iam-qa",
+            "iam-doc",
+            "iam-cleanup",
+            "iam-index",
+        ],
     },
 )
 

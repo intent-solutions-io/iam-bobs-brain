@@ -41,8 +41,7 @@ logger = logging.getLogger(__name__)
 BOBS_MCP_URL = os.getenv("BOBS_MCP_URL", "")
 MCP_AUTH_TOKEN = os.getenv("MCP_AUTH_TOKEN", "")
 AGENT_SPIFFE_ID = os.getenv(
-    "AGENT_SPIFFE_ID",
-    "spiffe://intent.solutions/agent/unknown/dev/us-central1/0.10.0"
+    "AGENT_SPIFFE_ID", "spiffe://intent.solutions/agent/unknown/dev/us-central1/0.10.0"
 )
 
 # HTTP client timeout (seconds)
@@ -52,6 +51,7 @@ MCP_TIMEOUT = float(os.getenv("MCP_TIMEOUT", "30"))
 # ============================================================================
 # MCP Client - Bob's MCP Server
 # ============================================================================
+
 
 class BobsMCPClient:
     """
@@ -72,7 +72,9 @@ class BobsMCPClient:
     - shell_exec
     """
 
-    def __init__(self, base_url: Optional[str] = None, auth_token: Optional[str] = None):
+    def __init__(
+        self, base_url: Optional[str] = None, auth_token: Optional[str] = None
+    ):
         """
         Initialize MCP client.
 
@@ -114,8 +116,7 @@ class BobsMCPClient:
         async with httpx.AsyncClient(timeout=MCP_TIMEOUT) as client:
             try:
                 response = await client.get(
-                    f"{self.base_url}/health",
-                    headers=self._get_headers()
+                    f"{self.base_url}/health", headers=self._get_headers()
                 )
                 response.raise_for_status()
                 return response.json()
@@ -136,8 +137,7 @@ class BobsMCPClient:
         async with httpx.AsyncClient(timeout=MCP_TIMEOUT) as client:
             try:
                 response = await client.get(
-                    f"{self.base_url}/tools",
-                    headers=self._get_headers()
+                    f"{self.base_url}/tools", headers=self._get_headers()
                 )
                 response.raise_for_status()
                 data = response.json()
@@ -146,7 +146,9 @@ class BobsMCPClient:
                 logger.error(f"Failed to list MCP tools: {e}")
                 return []
 
-    async def invoke_tool(self, tool_name: str, params: Dict[str, Any]) -> Dict[str, Any]:
+    async def invoke_tool(
+        self, tool_name: str, params: Dict[str, Any]
+    ) -> Dict[str, Any]:
         """
         Invoke a tool on the MCP server.
 
@@ -165,12 +167,14 @@ class BobsMCPClient:
                 response = await client.post(
                     f"{self.base_url}/tools/{tool_name}",
                     json=params,
-                    headers=self._get_headers()
+                    headers=self._get_headers(),
                 )
                 response.raise_for_status()
                 return response.json()
             except httpx.HTTPStatusError as e:
-                logger.error(f"MCP tool {tool_name} HTTP error: {e.response.status_code}")
+                logger.error(
+                    f"MCP tool {tool_name} HTTP error: {e.response.status_code}"
+                )
                 return {"error": f"HTTP {e.response.status_code}", "tool": tool_name}
             except Exception as e:
                 logger.error(f"MCP tool {tool_name} failed: {e}")
@@ -179,10 +183,7 @@ class BobsMCPClient:
     # Convenience methods for specific tools
 
     async def search_codebase(
-        self,
-        query: str,
-        path: str = ".",
-        file_pattern: str = "*.py"
+        self, query: str, path: str = ".", file_pattern: str = "*.py"
     ) -> Dict[str, Any]:
         """
         Search repository for code patterns.
@@ -195,11 +196,10 @@ class BobsMCPClient:
         Returns:
             Search results with matching files and snippets
         """
-        return await self.invoke_tool("search_codebase", {
-            "query": query,
-            "path": path,
-            "file_pattern": file_pattern
-        })
+        return await self.invoke_tool(
+            "search_codebase",
+            {"query": query, "path": path, "file_pattern": file_pattern},
+        )
 
     async def get_file(self, path: str) -> Dict[str, Any]:
         """
@@ -226,9 +226,7 @@ class BobsMCPClient:
         return await self.invoke_tool("analyze_dependencies", {"path": path})
 
     async def check_patterns(
-        self,
-        path: str = ".",
-        rules: Optional[List[str]] = None
+        self, path: str = ".", rules: Optional[List[str]] = None
     ) -> Dict[str, Any]:
         """
         Check code against ADK patterns (Hard Mode R1-R8).
@@ -240,10 +238,9 @@ class BobsMCPClient:
         Returns:
             Pattern check results with violations
         """
-        return await self.invoke_tool("check_patterns", {
-            "path": path,
-            "rules": rules or ["R1", "R2", "R3"]
-        })
+        return await self.invoke_tool(
+            "check_patterns", {"path": path, "rules": rules or ["R1", "R2", "R3"]}
+        )
 
     # =========================================================================
     # Universal tools (Phase H)
@@ -258,7 +255,7 @@ class BobsMCPClient:
         title: Optional[str] = None,
         body: Optional[str] = None,
         labels: Optional[List[str]] = None,
-        limit: int = 10
+        limit: int = 10,
     ) -> Dict[str, Any]:
         """
         Perform GitHub API operations.
@@ -292,10 +289,7 @@ class BobsMCPClient:
         return await self.invoke_tool("github_api", params)
 
     async def web_search(
-        self,
-        query: str,
-        limit: int = 10,
-        backend: Optional[str] = None
+        self, query: str, limit: int = 10, backend: Optional[str] = None
     ) -> Dict[str, Any]:
         """
         Search the web.
@@ -317,11 +311,7 @@ class BobsMCPClient:
         return await self.invoke_tool("web_search", params)
 
     async def write_file(
-        self,
-        path: str,
-        content: str,
-        mode: str = "write",
-        create_dirs: bool = True
+        self, path: str, content: str, mode: str = "write", create_dirs: bool = True
     ) -> Dict[str, Any]:
         """
         Write content to a file.
@@ -335,19 +325,22 @@ class BobsMCPClient:
         Returns:
             Write operation result
         """
-        return await self.invoke_tool("write_file", {
-            "path": path,
-            "content": content,
-            "mode": mode,
-            "create_dirs": create_dirs,
-        })
+        return await self.invoke_tool(
+            "write_file",
+            {
+                "path": path,
+                "content": content,
+                "mode": mode,
+                "create_dirs": create_dirs,
+            },
+        )
 
     async def shell_exec(
         self,
         command: str,
         cwd: Optional[str] = None,
         timeout: int = 60,
-        env: Optional[Dict[str, str]] = None
+        env: Optional[Dict[str, str]] = None,
     ) -> Dict[str, Any]:
         """
         Execute a shell command.
@@ -392,6 +385,7 @@ def get_mcp_client() -> BobsMCPClient:
 # ============================================================================
 # Legacy compatibility functions
 # ============================================================================
+
 
 def get_mcp_filesystem_tool() -> Optional[BobsMCPClient]:
     """
@@ -458,6 +452,7 @@ def list_available_mcp_servers() -> List[str]:
 # Tool Registration for Agents
 # ============================================================================
 
+
 def get_mcp_tools_for_agent(agent_name: str) -> List[Any]:
     """
     Get MCP-backed tools appropriate for a specific agent.
@@ -490,11 +485,13 @@ def get_mcp_tools_for_agent(agent_name: str) -> List[Any]:
     ]
 
     # Universal tools (Phase H) - available to all agents
-    tools.extend([
-        client.github_api,
-        client.web_search,
-        client.write_file,
-        client.shell_exec,
-    ])
+    tools.extend(
+        [
+            client.github_api,
+            client.web_search,
+            client.write_file,
+            client.shell_exec,
+        ]
+    )
 
     return tools

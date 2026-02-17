@@ -37,6 +37,7 @@ def _json_serializer(obj: Any) -> Any:
 @dataclass
 class PlannedTask:
     """A task planned for execution."""
+
     task_id: str
     step_name: str
     agent: str
@@ -59,6 +60,7 @@ class ExecutionPlan:
     This is the output of the compiler - a deterministic plan that
     can be previewed (dry-run) or executed.
     """
+
     plan_id: str
     mission_id: str
     mission_title: str
@@ -90,6 +92,7 @@ class ExecutionPlan:
 @dataclass
 class CompilerResult:
     """Result of compiling a MissionSpec."""
+
     success: bool
     plan: Optional[ExecutionPlan] = None
     pipeline_request: Optional[PipelineRequest] = None
@@ -151,8 +154,7 @@ class MissionCompiler:
         )
 
     def _expand_workflow(
-        self,
-        mission: MissionSpec
+        self, mission: MissionSpec
     ) -> tuple[List[PlannedTask], List[str]]:
         """
         Expand workflow into flat list of tasks with execution order.
@@ -189,7 +191,7 @@ class MissionCompiler:
                         task_id = self._generate_task_id(
                             mission.mission_id,
                             f"{item.name}:{step.step}:{iteration}",
-                            task_index
+                            task_index,
                         )
                         task = PlannedTask(
                             task_id=task_id,
@@ -206,10 +208,7 @@ class MissionCompiler:
 
         return tasks, execution_order
 
-    def _topological_sort(
-        self,
-        tasks: List[PlannedTask]
-    ) -> List[str]:
+    def _topological_sort(self, tasks: List[PlannedTask]) -> List[str]:
         """
         Sort tasks topologically based on dependencies.
 
@@ -293,13 +292,14 @@ class MissionCompiler:
         execution_order = self._topological_sort(tasks)
 
         # Detect loops
-        has_loops = any(
-            isinstance(item, LoopStep) for item in mission.workflow
-        )
+        has_loops = any(isinstance(item, LoopStep) for item in mission.workflow)
         max_loop_iterations = max(
-            (item.max_iterations for item in mission.workflow
-             if isinstance(item, LoopStep)),
-            default=0
+            (
+                item.max_iterations
+                for item in mission.workflow
+                if isinstance(item, LoopStep)
+            ),
+            default=0,
         )
 
         # Create plan

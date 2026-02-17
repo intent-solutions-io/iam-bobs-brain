@@ -31,7 +31,9 @@ class TestWritePortfolioResultToGCS:
     @patch("iam_senior_adk_devops_lead.storage_writer.GCS_AVAILABLE", False)
     def test_skips_when_gcs_not_available(self, caplog):
         """Test skips write when google-cloud-storage not installed"""
-        from iam_senior_adk_devops_lead.storage_writer import write_portfolio_result_to_gcs
+        from iam_senior_adk_devops_lead.storage_writer import (
+            write_portfolio_result_to_gcs,
+        )
 
         result = self._create_sample_portfolio_result()
         write_portfolio_result_to_gcs(result, env="dev")
@@ -45,9 +47,13 @@ class TestWritePortfolioResultToGCS:
         """Test skips write when ORG_STORAGE_WRITE_ENABLED is false"""
         import logging
 
-        from iam_senior_adk_devops_lead.storage_writer import write_portfolio_result_to_gcs
+        from iam_senior_adk_devops_lead.storage_writer import (
+            write_portfolio_result_to_gcs,
+        )
 
-        caplog.set_level(logging.INFO, logger="agents.iam_senior_adk_devops_lead.storage_writer")
+        caplog.set_level(
+            logging.INFO, logger="agents.iam_senior_adk_devops_lead.storage_writer"
+        )
         mock_enabled.return_value = False
 
         result = self._create_sample_portfolio_result()
@@ -61,7 +67,9 @@ class TestWritePortfolioResultToGCS:
     @patch("iam_senior_adk_devops_lead.storage_writer.get_org_storage_bucket")
     def test_skips_when_bucket_not_set(self, mock_bucket, mock_enabled, caplog):
         """Test skips write when ORG_STORAGE_BUCKET not set"""
-        from iam_senior_adk_devops_lead.storage_writer import write_portfolio_result_to_gcs
+        from iam_senior_adk_devops_lead.storage_writer import (
+            write_portfolio_result_to_gcs,
+        )
 
         mock_enabled.return_value = True
         mock_bucket.return_value = None
@@ -80,7 +88,9 @@ class TestWritePortfolioResultToGCS:
         self, mock_build_json, mock_bucket, mock_enabled, caplog
     ):
         """Test handles serialization errors without crashing"""
-        from iam_senior_adk_devops_lead.storage_writer import write_portfolio_result_to_gcs
+        from iam_senior_adk_devops_lead.storage_writer import (
+            write_portfolio_result_to_gcs,
+        )
 
         mock_enabled.return_value = True
         mock_bucket.return_value = "test-bucket"
@@ -101,7 +111,9 @@ class TestWritePortfolioResultToGCS:
         self, mock_build_json, mock_upload, mock_bucket, mock_enabled, caplog
     ):
         """Test handles GCS upload errors without crashing"""
-        from iam_senior_adk_devops_lead.storage_writer import write_portfolio_result_to_gcs
+        from iam_senior_adk_devops_lead.storage_writer import (
+            write_portfolio_result_to_gcs,
+        )
 
         mock_enabled.return_value = True
         mock_bucket.return_value = "test-bucket"
@@ -125,9 +137,13 @@ class TestWritePortfolioResultToGCS:
         """Test successful write to GCS"""
         import logging
 
-        from iam_senior_adk_devops_lead.storage_writer import write_portfolio_result_to_gcs
+        from iam_senior_adk_devops_lead.storage_writer import (
+            write_portfolio_result_to_gcs,
+        )
 
-        caplog.set_level(logging.INFO, logger="agents.iam_senior_adk_devops_lead.storage_writer")
+        caplog.set_level(
+            logging.INFO, logger="agents.iam_senior_adk_devops_lead.storage_writer"
+        )
         mock_enabled.return_value = True
         mock_bucket.return_value = "test-bucket"
         mock_build_json.return_value = {"test": "data"}
@@ -173,7 +189,9 @@ class TestBuildPortfolioSummaryJson:
 
     def test_serializes_portfolio_result(self):
         """Test serializes PortfolioResult to JSON-safe dict"""
-        from iam_senior_adk_devops_lead.storage_writer import _build_portfolio_summary_json
+        from iam_senior_adk_devops_lead.storage_writer import (
+            _build_portfolio_summary_json,
+        )
 
         result = self._create_sample_portfolio_result()
         json_data = _build_portfolio_summary_json(result, env="dev")
@@ -187,7 +205,9 @@ class TestBuildPortfolioSummaryJson:
 
     def test_calculates_fix_rate(self):
         """Test calculates fix rate correctly"""
-        from iam_senior_adk_devops_lead.storage_writer import _build_portfolio_summary_json
+        from iam_senior_adk_devops_lead.storage_writer import (
+            _build_portfolio_summary_json,
+        )
 
         result = self._create_sample_portfolio_result()
         json_data = _build_portfolio_summary_json(result, env="dev")
@@ -197,7 +217,9 @@ class TestBuildPortfolioSummaryJson:
 
     def test_handles_zero_issues(self):
         """Test handles zero issues (no division by zero)"""
-        from iam_senior_adk_devops_lead.storage_writer import _build_portfolio_summary_json
+        from iam_senior_adk_devops_lead.storage_writer import (
+            _build_portfolio_summary_json,
+        )
 
         result = self._create_sample_portfolio_result()
         result.total_issues_found = 0
@@ -210,7 +232,9 @@ class TestBuildPortfolioSummaryJson:
 
     def test_serializes_datetime(self):
         """Test serializes datetime to ISO format"""
-        from iam_senior_adk_devops_lead.storage_writer import _build_portfolio_summary_json
+        from iam_senior_adk_devops_lead.storage_writer import (
+            _build_portfolio_summary_json,
+        )
 
         result = self._create_sample_portfolio_result()
         result.timestamp = datetime(2025, 1, 20, 12, 0, 0)
@@ -222,7 +246,9 @@ class TestBuildPortfolioSummaryJson:
 
     def test_includes_per_repo_results(self):
         """Test includes per-repo results in JSON"""
-        from iam_senior_adk_devops_lead.storage_writer import _build_portfolio_summary_json
+        from iam_senior_adk_devops_lead.storage_writer import (
+            _build_portfolio_summary_json,
+        )
 
         result = self._create_sample_portfolio_result()
         json_data = _build_portfolio_summary_json(result, env="dev")
@@ -267,7 +293,9 @@ class TestUploadToGCS:
     @patch("iam_senior_adk_devops_lead.storage_writer.storage")
     @patch("iam_senior_adk_devops_lead.storage_writer.make_portfolio_run_summary_path")
     @patch("iam_senior_adk_devops_lead.storage_writer.make_portfolio_run_repo_path")
-    def test_uploads_summary_json(self, mock_repo_path, mock_summary_path, mock_storage):
+    def test_uploads_summary_json(
+        self, mock_repo_path, mock_summary_path, mock_storage
+    ):
         """Test uploads summary JSON to GCS"""
         from iam_senior_adk_devops_lead.storage_writer import _upload_to_gcs
 
@@ -320,7 +348,9 @@ class TestUploadToGCS:
 
     @patch("iam_senior_adk_devops_lead.storage_writer.storage")
     @patch("iam_senior_adk_devops_lead.storage_writer.make_portfolio_run_summary_path")
-    def test_skips_per_repo_json_for_failed_repos(self, mock_summary_path, mock_storage):
+    def test_skips_per_repo_json_for_failed_repos(
+        self, mock_summary_path, mock_storage
+    ):
         """Test skips per-repo JSON for failed/skipped repos"""
         from iam_senior_adk_devops_lead.storage_writer import _upload_to_gcs
 

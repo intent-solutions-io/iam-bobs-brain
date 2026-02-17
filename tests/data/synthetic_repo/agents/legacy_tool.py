@@ -14,6 +14,7 @@ def search_database(query: str) -> str:
     # VIOLATION: No validation or sanitization
     return response.text
 
+
 # VIOLATION: Synchronous tool instead of async
 def process_data(data: dict) -> dict:
     """Process data synchronously."""
@@ -27,8 +28,10 @@ def process_data(data: dict) -> dict:
             result[key] = value
     return result
 
+
 # VIOLATION: Global state
 CACHE = {}
+
 
 def cached_operation(key: str, value: str = None):
     """Operation with global state."""

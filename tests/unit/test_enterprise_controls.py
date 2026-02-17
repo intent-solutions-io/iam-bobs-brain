@@ -33,6 +33,7 @@ from agents.shared_contracts.policy_gates import (
 # MANDATE ENTERPRISE CONTROLS TESTS
 # ============================================================================
 
+
 class TestMandateEnterpriseFields:
     """Test enhanced Mandate with enterprise control fields."""
 
@@ -116,48 +117,31 @@ class TestMandateEnterpriseApproval:
     def test_is_approved_when_approved(self):
         """R3/R4 with approved state returns True."""
         mandate = Mandate(
-            mandate_id="m-001",
-            intent="test",
-            risk_tier="R3",
-            approval_state="approved"
+            mandate_id="m-001", intent="test", risk_tier="R3", approval_state="approved"
         )
         assert mandate.is_approved() is True
 
     def test_is_approved_when_pending(self):
         """R3/R4 with pending state returns False."""
         mandate = Mandate(
-            mandate_id="m-001",
-            intent="test",
-            risk_tier="R3",
-            approval_state="pending"
+            mandate_id="m-001", intent="test", risk_tier="R3", approval_state="pending"
         )
         assert mandate.is_approved() is False
 
     def test_is_pending_approval(self):
         """Test is_pending_approval method."""
-        mandate = Mandate(
-            mandate_id="m-001",
-            intent="test",
-            approval_state="pending"
-        )
+        mandate = Mandate(mandate_id="m-001", intent="test", approval_state="pending")
         assert mandate.is_pending_approval() is True
 
     def test_is_denied(self):
         """Test is_denied method."""
-        mandate = Mandate(
-            mandate_id="m-001",
-            intent="test",
-            approval_state="denied"
-        )
+        mandate = Mandate(mandate_id="m-001", intent="test", approval_state="denied")
         assert mandate.is_denied() is True
 
     def test_approve_sets_state_and_approver(self):
         """approve() sets state, approver_id, and timestamp."""
         mandate = Mandate(
-            mandate_id="m-001",
-            intent="test",
-            risk_tier="R3",
-            approval_state="pending"
+            mandate_id="m-001", intent="test", risk_tier="R3", approval_state="pending"
         )
         mandate.approve("user@example.com")
         assert mandate.approval_state == "approved"
@@ -167,10 +151,7 @@ class TestMandateEnterpriseApproval:
     def test_deny_sets_state_and_approver(self):
         """deny() sets state, approver_id, and timestamp."""
         mandate = Mandate(
-            mandate_id="m-001",
-            intent="test",
-            risk_tier="R3",
-            approval_state="pending"
+            mandate_id="m-001", intent="test", risk_tier="R3", approval_state="pending"
         )
         mandate.deny("user@example.com")
         assert mandate.approval_state == "denied"
@@ -192,7 +173,7 @@ class TestMandateEnterpriseToolAllowlist:
         mandate = Mandate(
             mandate_id="m-001",
             intent="test",
-            tool_allowlist=["search_code", "read_file"]
+            tool_allowlist=["search_code", "read_file"],
         )
         assert mandate.can_use_tool("search_code") is True
         assert mandate.can_use_tool("read_file") is True
@@ -202,7 +183,7 @@ class TestMandateEnterpriseToolAllowlist:
         mandate = Mandate(
             mandate_id="m-001",
             intent="test",
-            tool_allowlist=["search_code", "read_file"]
+            tool_allowlist=["search_code", "read_file"],
         )
         assert mandate.can_use_tool("write_file") is False
         assert mandate.can_use_tool("delete_file") is False
@@ -218,7 +199,7 @@ class TestMandateEnterpriseCanInvokeSpecialist:
             intent="test",
             risk_tier="R3",
             approval_state="pending",
-            authorized_specialists=["iam-compliance"]
+            authorized_specialists=["iam-compliance"],
         )
         assert mandate.can_invoke_specialist("iam-compliance") is False
 
@@ -229,7 +210,7 @@ class TestMandateEnterpriseCanInvokeSpecialist:
             intent="test",
             risk_tier="R3",
             approval_state="approved",
-            authorized_specialists=["iam-compliance"]
+            authorized_specialists=["iam-compliance"],
         )
         assert mandate.can_invoke_specialist("iam-compliance") is True
 
@@ -240,7 +221,7 @@ class TestMandateEnterpriseCanInvokeSpecialist:
             intent="test",
             risk_tier="R0",
             approval_state="auto",
-            authorized_specialists=["iam-compliance"]
+            authorized_specialists=["iam-compliance"],
         )
         assert mandate.can_invoke_specialist("iam-compliance") is True
 
@@ -248,6 +229,7 @@ class TestMandateEnterpriseCanInvokeSpecialist:
 # ============================================================================
 # POLICY GATES TESTS
 # ============================================================================
+
 
 class TestRiskTierEnum:
     """Test RiskTier enum."""
@@ -272,20 +254,14 @@ class TestGateResult:
     def test_gate_result_allowed_is_truthy(self):
         """GateResult with allowed=True is truthy."""
         result = GateResult(
-            allowed=True,
-            reason="Test",
-            risk_tier="R0",
-            gate_name="test"
+            allowed=True, reason="Test", risk_tier="R0", gate_name="test"
         )
         assert bool(result) is True
 
     def test_gate_result_blocked_is_falsy(self):
         """GateResult with allowed=False is falsy."""
         result = GateResult(
-            allowed=False,
-            reason="Blocked",
-            risk_tier="R0",
-            gate_name="test"
+            allowed=False, reason="Blocked", risk_tier="R0", gate_name="test"
         )
         assert bool(result) is False
 
@@ -333,10 +309,7 @@ class TestPolicyGateApprovalRequired:
     def test_r3_blocks_pending_approval(self):
         """R3 blocks with pending approval."""
         mandate = Mandate(
-            mandate_id="m-001",
-            intent="test",
-            risk_tier="R3",
-            approval_state="pending"
+            mandate_id="m-001", intent="test", risk_tier="R3", approval_state="pending"
         )
         result = PolicyGate.check_approval_required("R3", mandate)
         assert result.allowed is False
@@ -345,10 +318,7 @@ class TestPolicyGateApprovalRequired:
     def test_r3_blocks_denied(self):
         """R3 blocks if denied."""
         mandate = Mandate(
-            mandate_id="m-001",
-            intent="test",
-            risk_tier="R3",
-            approval_state="denied"
+            mandate_id="m-001", intent="test", risk_tier="R3", approval_state="denied"
         )
         result = PolicyGate.check_approval_required("R3", mandate)
         assert result.allowed is False
@@ -357,10 +327,7 @@ class TestPolicyGateApprovalRequired:
     def test_r3_allows_approved(self):
         """R3 allows with approved state."""
         mandate = Mandate(
-            mandate_id="m-001",
-            intent="test",
-            risk_tier="R3",
-            approval_state="approved"
+            mandate_id="m-001", intent="test", risk_tier="R3", approval_state="approved"
         )
         result = PolicyGate.check_approval_required("R3", mandate)
         assert result.allowed is True
@@ -383,9 +350,7 @@ class TestPolicyGateToolAllowed:
     def test_tool_in_allowlist_allowed(self):
         """Tool in allowlist is allowed."""
         mandate = Mandate(
-            mandate_id="m-001",
-            intent="test",
-            tool_allowlist=["search_code"]
+            mandate_id="m-001", intent="test", tool_allowlist=["search_code"]
         )
         result = PolicyGate.check_tool_allowed("search_code", mandate)
         assert result.allowed is True
@@ -393,9 +358,7 @@ class TestPolicyGateToolAllowed:
     def test_tool_not_in_allowlist_blocked(self):
         """Tool not in allowlist is blocked."""
         mandate = Mandate(
-            mandate_id="m-001",
-            intent="test",
-            tool_allowlist=["search_code"]
+            mandate_id="m-001", intent="test", tool_allowlist=["search_code"]
         )
         result = PolicyGate.check_tool_allowed("delete_file", mandate)
         assert result.allowed is False
@@ -413,10 +376,7 @@ class TestPolicyGatePreflightCheck:
     def test_preflight_r3_without_approval_fails(self):
         """R3 preflight fails without approval."""
         mandate = Mandate(
-            mandate_id="m-001",
-            intent="test",
-            risk_tier="R3",
-            approval_state="pending"
+            mandate_id="m-001", intent="test", risk_tier="R3", approval_state="pending"
         )
         results = preflight_check("iam-compliance", "R3", mandate)
         assert PolicyGate.is_all_gates_passed(results) is False
@@ -429,13 +389,10 @@ class TestPolicyGatePreflightCheck:
             mandate_id="m-001",
             intent="test",
             risk_tier="R1",
-            tool_allowlist=["search_code"]
+            tool_allowlist=["search_code"],
         )
         results = preflight_check(
-            "iam-compliance",
-            "R1",
-            mandate,
-            tools_to_use=["search_code", "delete_file"]
+            "iam-compliance", "R1", mandate, tools_to_use=["search_code", "delete_file"]
         )
         # delete_file should be blocked
         blocking = PolicyGate.get_blocking_gates(results)
@@ -446,6 +403,7 @@ class TestPolicyGatePreflightCheck:
 # EVIDENCE BUNDLE TESTS
 # ============================================================================
 
+
 class TestArtifactRecord:
     """Test ArtifactRecord dataclass."""
 
@@ -455,7 +413,7 @@ class TestArtifactRecord:
             path="/path/to/file.txt",
             sha256="abc123",
             size_bytes=1024,
-            artifact_type="file"
+            artifact_type="file",
         )
         assert record.path == "/path/to/file.txt"
         assert record.sha256 == "abc123"
@@ -468,7 +426,7 @@ class TestArtifactRecord:
             path="/path/to/file.txt",
             sha256="abc123",
             size_bytes=1024,
-            artifact_type="file"
+            artifact_type="file",
         )
         data = record.to_dict()
         assert isinstance(data, dict)
@@ -560,8 +518,7 @@ class TestEvidenceBundle:
         with tempfile.TemporaryDirectory() as tmpdir:
             # Create and save bundle
             bundle = create_evidence_bundle(
-                mission_id="test-mission",
-                base_path=Path(tmpdir)
+                mission_id="test-mission", base_path=Path(tmpdir)
             )
             bundle.record_task_planned("task-1")
             bundle.record_agent_invoked("iam-compliance")
@@ -576,11 +533,7 @@ class TestEvidenceBundle:
     def test_bundle_set_mandate_snapshot(self):
         """Bundle stores mandate snapshot."""
         bundle = EvidenceBundle()
-        mandate_dict = {
-            "mandate_id": "m-001",
-            "intent": "test",
-            "risk_tier": "R2"
-        }
+        mandate_dict = {"mandate_id": "m-001", "intent": "test", "risk_tier": "R2"}
         bundle.set_mandate_snapshot(mandate_dict)
 
         assert bundle.manifest.mandate_snapshot == mandate_dict
@@ -605,6 +558,7 @@ class TestCreateEvidenceBundle:
 # BUG FIX TESTS - Risk Tier Enforcement Gaps
 # ============================================================================
 
+
 class TestBug1MalformedMandateFailsClosed:
     """Bug 1: Malformed mandate must raise A2AError, not silently bypass."""
 
@@ -621,7 +575,7 @@ class TestBug1MalformedMandateFailsClosed:
                 "mandate_id": "m-bad",
                 "intent": "test",
                 "expires_at": "not-a-date",  # Malformed
-            }
+            },
         )
         with pytest.raises(A2AError, match="Malformed mandate"):
             validate_mandate(task)
@@ -639,7 +593,7 @@ class TestBug1MalformedMandateFailsClosed:
                 "mandate_id": "m-bad",
                 "intent": "test",
                 "approval_timestamp": 12345,  # Wrong type
-            }
+            },
         )
         with pytest.raises(A2AError, match="Malformed mandate"):
             validate_mandate(task)
@@ -657,7 +611,7 @@ class TestBug1MalformedMandateFailsClosed:
                 "mandate_id": "m-good",
                 "intent": "test",
                 "risk_tier": "R0",
-            }
+            },
         )
         # Should not raise
         validate_mandate(task)
@@ -675,7 +629,7 @@ class TestBug1MalformedMandateFailsClosed:
                 "mandate_id": "m-bad",
                 "intent": "test",
                 "expires_at": "not-a-date",
-            }
+            },
         )
         with pytest.raises(A2AError) as exc_info:
             validate_mandate(task)
@@ -742,7 +696,7 @@ class TestBug2MandateExpirationGate:
                 "intent": "test",
                 "risk_tier": "R2",
                 "expires_at": "2020-01-01T00:00:00+00:00",
-            }
+            },
         )
         with pytest.raises(A2AError, match="Policy gate check failed"):
             validate_mandate(task)
@@ -827,7 +781,7 @@ class TestValidateMandateReturnValue:
                 "risk_tier": "R1",
                 "budget_limit": 5.0,
                 "iterations_used": 3,
-            }
+            },
         )
         result = validate_mandate(task)
         assert result is not None
@@ -857,19 +811,21 @@ class TestMandateFromDictHelper:
         """All enterprise control fields are parsed by shared helper."""
         from agents.a2a.dispatcher import _mandate_from_dict
 
-        mandate = _mandate_from_dict({
-            "mandate_id": "m-full",
-            "intent": "full test",
-            "risk_tier": "R3",
-            "tool_allowlist": ["search_code"],
-            "data_classification": "confidential",
-            "approval_state": "approved",
-            "approver_id": "admin@example.com",
-            "budget_limit": 10.0,
-            "budget_spent": 2.5,
-            "max_iterations": 50,
-            "iterations_used": 7,
-        })
+        mandate = _mandate_from_dict(
+            {
+                "mandate_id": "m-full",
+                "intent": "full test",
+                "risk_tier": "R3",
+                "tool_allowlist": ["search_code"],
+                "data_classification": "confidential",
+                "approval_state": "approved",
+                "approver_id": "admin@example.com",
+                "budget_limit": 10.0,
+                "budget_spent": 2.5,
+                "max_iterations": 50,
+                "iterations_used": 7,
+            }
+        )
         assert mandate.mandate_id == "m-full"
         assert mandate.risk_tier == "R3"
         assert mandate.tool_allowlist == ["search_code"]
@@ -885,11 +841,13 @@ class TestMandateFromDictHelper:
         from agents.a2a.dispatcher import _mandate_from_dict
 
         with pytest.raises((ValueError, TypeError, AttributeError)):
-            _mandate_from_dict({
-                "mandate_id": "m-bad",
-                "intent": "test",
-                "expires_at": "garbage",
-            })
+            _mandate_from_dict(
+                {
+                    "mandate_id": "m-bad",
+                    "intent": "test",
+                    "expires_at": "garbage",
+                }
+            )
 
 
 class TestBug4ToolAllowlistPreflightCount:
@@ -915,8 +873,7 @@ class TestBug4ToolAllowlistPreflightCount:
             tool_allowlist=["search_code"],
         )
         results = preflight_check(
-            "iam-compliance", "R1", mandate,
-            tools_to_use=["search_code", "write_file"]
+            "iam-compliance", "R1", mandate, tools_to_use=["search_code", "write_file"]
         )
         # 4 base gates + 2 tool gates
         assert len(results) == 6

@@ -20,6 +20,7 @@ logger = logging.getLogger(__name__)
 # OPENAPI TOOLS - Connect to Cloud Run API gateways
 # ============================================================================
 
+
 def get_github_api_tool() -> Optional[Any]:
     """
     Get GitHub API tool (FUTURE).

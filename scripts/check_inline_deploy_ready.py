@@ -136,7 +136,9 @@ def check_environment_variables(env: str) -> Tuple[bool, List[str]]:
     # Check GCP_PROJECT_ID
     project_id = os.getenv("GCP_PROJECT_ID") or os.getenv("PROJECT_ID")
     if not project_id:
-        errors.append("Missing required environment variable: GCP_PROJECT_ID or PROJECT_ID")
+        errors.append(
+            "Missing required environment variable: GCP_PROJECT_ID or PROJECT_ID"
+        )
     elif project_id == "test-project-placeholder":
         if not rules["allow_placeholder_project"]:
             errors.append(
@@ -165,9 +167,13 @@ def check_source_packages() -> Tuple[bool, List[str]]:
     for package in SOURCE_PACKAGES:
         package_path = repo_root / package
         if not package_path.exists():
-            errors.append(f"Source package not found: {package} (expected at {package_path})")
+            errors.append(
+                f"Source package not found: {package} (expected at {package_path})"
+            )
         elif not package_path.is_dir():
-            errors.append(f"Source package is not a directory: {package} ({package_path})")
+            errors.append(
+                f"Source package is not a directory: {package} ({package_path})"
+            )
 
     return len(errors) == 0, errors
 
@@ -209,6 +215,7 @@ def check_agent_entrypoint(agent_name: str) -> Tuple[bool, List[str]]:
         sys.path.insert(0, str(repo_root))
 
         import importlib
+
         module = importlib.import_module(config["entrypoint_module"])
 
         # Check if entrypoint object exists
@@ -333,7 +340,9 @@ def run_arv_checks(agent_name: str, env: str) -> int:
         print()
         print("Next steps:")
         print("  - Dry-run: make deploy-inline-dry-run")
-        print("  - Execute: python -m agents.agent_engine.deploy_inline_source --execute")
+        print(
+            "  - Execute: python -m agents.agent_engine.deploy_inline_source --execute"
+        )
         return EXIT_OK
     elif has_safety_violation:
         print("🚨 ARV checks FAILED - SAFETY VIOLATION")

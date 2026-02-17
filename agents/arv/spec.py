@@ -32,6 +32,7 @@ class ArvCheck:
         required_when: Optional condition (e.g., "LIVE_RAG_BOB_ENABLED=true")
         envs: Environments where this check applies
     """
+
     id: str
     description: str
     category: Category
@@ -53,6 +54,7 @@ class ArvResult:
         details: Additional information (error message, output, etc.)
         exit_code: Exit code from the check command (if applicable)
     """
+
     check: ArvCheck
     passed: bool
     skipped: bool = False
@@ -76,7 +78,6 @@ ALL_CHECKS: List[ArvCheck] = [
         command="python3 scripts/check_config_all.py",
         envs=["dev", "staging", "prod"],
     ),
-
     # ========================================
     # TESTS CATEGORY
     # ========================================
@@ -88,7 +89,6 @@ ALL_CHECKS: List[ArvCheck] = [
         command="pytest tests/unit -v --tb=short",
         envs=["dev", "staging", "prod"],
     ),
-
     ArvCheck(
         id="tests-swe-pipeline",
         description="Portfolio/SWE pipeline tests",
@@ -97,7 +97,6 @@ ALL_CHECKS: List[ArvCheck] = [
         command="pytest tests/test_swe_pipeline.py -v --tb=short",
         envs=["dev", "staging", "prod"],
     ),
-
     # ========================================
     # RAG CATEGORY (Feature-gated)
     # ========================================
@@ -110,7 +109,6 @@ ALL_CHECKS: List[ArvCheck] = [
         required_when="LIVE_RAG_BOB_ENABLED=true OR LIVE_RAG_FOREMAN_ENABLED=true",
         envs=["dev", "staging", "prod"],
     ),
-
     # ========================================
     # ENGINE CATEGORY
     # ========================================
@@ -122,7 +120,6 @@ ALL_CHECKS: List[ArvCheck] = [
         command="python3 scripts/check_arv_engine_flags.py",
         envs=["dev", "staging", "prod"],
     ),
-
     ArvCheck(
         id="arv-minimum-requirements",
         description="ARV minimum structural requirements",
@@ -131,7 +128,6 @@ ALL_CHECKS: List[ArvCheck] = [
         command="python3 scripts/check_arv_minimum.py",
         envs=["dev", "staging", "prod"],
     ),
-
     # ========================================
     # STORAGE CATEGORY (Feature-gated)
     # ========================================
@@ -144,7 +140,6 @@ ALL_CHECKS: List[ArvCheck] = [
         required_when="ORG_STORAGE_WRITE_ENABLED=true",
         envs=["dev", "staging", "prod"],
     ),
-
     # ========================================
     # NOTIFICATIONS CATEGORY (LIVE3)
     # ========================================
@@ -157,7 +152,6 @@ ALL_CHECKS: List[ArvCheck] = [
         required_when="SLACK_NOTIFICATIONS_ENABLED=true OR GITHUB_ISSUE_CREATION_ENABLED=true",
         envs=["dev", "staging", "prod"],
     ),
-
     # ========================================
     # LIVE3 E2E CATEGORY (Optional, LIVE3-E2E-DEV)
     # ========================================
@@ -170,7 +164,6 @@ ALL_CHECKS: List[ArvCheck] = [
         required_when="ANY LIVE3 FEATURE ENABLED (SLACK/GITHUB/ORG_STORAGE)",
         envs=["dev"],  # Only runs in dev for now
     ),
-
     # ========================================
     # AGENT ENGINE E2E CATEGORY (Optional, AE3)
     # ========================================
@@ -212,11 +205,7 @@ def get_required_checks(env: Environment) -> List[ArvCheck]:
     Returns:
         List of required ArvCheck objects
     """
-    return [
-        check
-        for check in get_checks_for_env(env)
-        if check.required
-    ]
+    return [check for check in get_checks_for_env(env) if check.required]
 
 
 def get_optional_checks(env: Environment) -> List[ArvCheck]:
@@ -229,11 +218,7 @@ def get_optional_checks(env: Environment) -> List[ArvCheck]:
     Returns:
         List of optional ArvCheck objects
     """
-    return [
-        check
-        for check in get_checks_for_env(env)
-        if not check.required
-    ]
+    return [check for check in get_checks_for_env(env) if not check.required]
 
 
 def get_checks_by_category(env: Environment, category: Category) -> List[ArvCheck]:
@@ -247,11 +232,7 @@ def get_checks_by_category(env: Environment, category: Category) -> List[ArvChec
     Returns:
         List of ArvCheck objects in the specified category
     """
-    return [
-        check
-        for check in get_checks_for_env(env)
-        if check.category == category
-    ]
+    return [check for check in get_checks_for_env(env) if check.category == category]
 
 
 def get_check_by_id(check_id: str) -> Optional[ArvCheck]:
@@ -292,6 +273,7 @@ def get_category_description(category: Category) -> str:
 # ==================================================
 # SUMMARY HELPERS
 # ==================================================
+
 
 def get_check_summary() -> dict:
     """

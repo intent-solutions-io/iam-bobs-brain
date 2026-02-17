@@ -111,8 +111,10 @@ def run_config_only_tests(config: Dict) -> bool:
     print("\n✅ Checking Python imports...")
     try:
         import sys
+
         sys.path.insert(0, str(Path(__file__).parent.parent))
         from agents.config.agent_engine import get_agent_engine_config  # noqa: F401
+
         print("   agents.config.agent_engine: OK")
     except ImportError as e:
         print(f"   ❌ Import error: {e}")
@@ -156,8 +158,8 @@ def run_live_smoke_tests(config: Dict) -> bool:
 
     # Initialize Vertex AI
     vertexai.init(
-        project=config['project'],
-        location=config['region'],
+        project=config["project"],
+        location=config["region"],
     )
 
     # Get agent configurations
@@ -166,14 +168,13 @@ def run_live_smoke_tests(config: Dict) -> bool:
     test_results = []
 
     # Test each agent
-    for agent_role in config['agents_to_test']:
+    for agent_role in config["agents_to_test"]:
         print(f"\n🧪 Testing {agent_role}...")
 
         try:
             # Get agent config
             agent_config = get_agent_engine_config(
-                env=config['environment'],
-                agent_role=agent_role
+                env=config["environment"], agent_role=agent_role
             )
 
             if not agent_config:
@@ -218,12 +219,12 @@ def run_live_smoke_tests(config: Dict) -> bool:
                         session_id=session_id,
                         message=test_prompt,
                     ):
-                        if hasattr(event, 'text'):
+                        if hasattr(event, "text"):
                             response_parts.append(event.text)
-                        elif isinstance(event, dict) and 'text' in event:
-                            response_parts.append(event['text'])
+                        elif isinstance(event, dict) and "text" in event:
+                            response_parts.append(event["text"])
 
-                    return ''.join(response_parts)
+                    return "".join(response_parts)
 
                 response = asyncio.run(test_query())
 
@@ -279,30 +280,24 @@ Examples:
         --project bobs-brain \\
         --region us-central1 \\
         --env dev
-        """
+        """,
     )
 
     parser.add_argument(
         "--config-only",
         action="store_true",
-        help="Validate configuration only, do not call APIs"
+        help="Validate configuration only, do not call APIs",
     )
 
-    parser.add_argument(
-        "--project",
-        help="GCP project ID (or use PROJECT_ID env var)"
-    )
+    parser.add_argument("--project", help="GCP project ID (or use PROJECT_ID env var)")
 
-    parser.add_argument(
-        "--region",
-        help="GCP region (or use LOCATION env var)"
-    )
+    parser.add_argument("--region", help="GCP region (or use LOCATION env var)")
 
     parser.add_argument(
         "--env",
         choices=["dev", "staging", "prod"],
         default="dev",
-        help="Environment to test"
+        help="Environment to test",
     )
 
     args = parser.parse_args()
@@ -311,7 +306,7 @@ Examples:
     config = validate_config(args)
 
     # Run appropriate test mode
-    if config['mode'] == 'config-only':
+    if config["mode"] == "config-only":
         success = run_config_only_tests(config)
     else:
         success = run_live_smoke_tests(config)

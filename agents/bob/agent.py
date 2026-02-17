@@ -64,7 +64,7 @@ def auto_save_session_to_memory(callback_context=None, **kwargs):
     """
     try:
         # Handle both old (ctx) and new (callback_context) API
-        ctx = callback_context or kwargs.get('ctx')
+        ctx = callback_context or kwargs.get("ctx")
         if ctx is None:
             logger.debug("No callback context provided, skipping memory save")
             return
@@ -103,6 +103,7 @@ def auto_save_session_to_memory(callback_context=None, **kwargs):
 # ============================================================================
 # LAZY AGENT CREATION (6767-LAZY Pattern)
 # ============================================================================
+
 
 def create_agent() -> LlmAgent:
     """
@@ -268,10 +269,7 @@ def create_app() -> App:
         - Session/memory services NOT configured (Agent Engine provides them)
         - For local testing with dual memory, use create_runner()
     """
-    logger.info(
-        "Creating App container for Bob",
-        extra={"spiffe_id": AGENT_SPIFFE_ID}
-    )
+    logger.info("Creating App container for Bob", extra={"spiffe_id": AGENT_SPIFFE_ID})
 
     # ✅ Call create_agent() to get instance (cheap operation)
     agent_instance = create_agent()
@@ -287,7 +285,7 @@ def create_app() -> App:
         extra={
             "spiffe_id": AGENT_SPIFFE_ID,
             "app_name": APP_NAME,
-        }
+        },
     )
 
     return app_instance
@@ -296,6 +294,7 @@ def create_app() -> App:
 # ============================================================================
 # BACKWARDS COMPATIBILITY (Optional)
 # ============================================================================
+
 
 def create_runner() -> Runner:
     """
@@ -320,7 +319,7 @@ def create_runner() -> Runner:
     logger.warning(
         "⚠️  create_runner() is deprecated for Agent Engine deployment. "
         "Use create_app() for Agent Engine. create_runner() is for local/CI testing only.",
-        extra={"spiffe_id": AGENT_SPIFFE_ID}
+        extra={"spiffe_id": AGENT_SPIFFE_ID},
     )
 
     logger.info(
@@ -335,7 +334,9 @@ def create_runner() -> Runner:
 
     # ✅ Validate env vars HERE (Runner requires them for memory services)
     if not PROJECT_ID or not AGENT_ENGINE_ID:
-        raise ValueError("PROJECT_ID and AGENT_ENGINE_ID required for Runner with dual memory")
+        raise ValueError(
+            "PROJECT_ID and AGENT_ENGINE_ID required for Runner with dual memory"
+        )
 
     # R5: VertexAiSessionService (short-term conversation cache)
     session_service = VertexAiSessionService(
@@ -385,7 +386,7 @@ app = create_app()
 
 logger.info(
     "✅ App instance created for Agent Engine deployment (Bob)",
-    extra={"spiffe_id": AGENT_SPIFFE_ID}
+    extra={"spiffe_id": AGENT_SPIFFE_ID},
 )
 
 
@@ -421,7 +422,7 @@ if __name__ == "__main__":
         # App is already created at module level
         logger.info(
             "✅ App instance ready for Agent Engine",
-            extra={"spiffe_id": AGENT_SPIFFE_ID}
+            extra={"spiffe_id": AGENT_SPIFFE_ID},
         )
 
         # For local testing only - Agent Engine manages this in production

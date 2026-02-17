@@ -41,13 +41,15 @@ logger = logging.getLogger(__name__)
 
 class SlackMode(Enum):
     """Slack notification mode based on environment and flags."""
+
     DISABLED = "disabled"  # Feature off or blocked by environment
-    ENABLED = "enabled"    # Ready to send notifications
+    ENABLED = "enabled"  # Ready to send notifications
 
 
 def _get_current_environment() -> Literal["dev", "staging", "prod"]:
     """Get current environment (imported from features module to avoid circular imports)."""
     from agents.config.features import get_current_environment
+
     return get_current_environment()
 
 
@@ -100,7 +102,9 @@ def get_slack_mode() -> SlackMode:
     elif env == "staging":
         enable_staging = os.getenv("SLACK_ENABLE_STAGING", "false").lower() == "true"
         if not enable_staging:
-            logger.info("Slack mode: DISABLED (staging requires SLACK_ENABLE_STAGING=true)")
+            logger.info(
+                "Slack mode: DISABLED (staging requires SLACK_ENABLE_STAGING=true)"
+            )
             return SlackMode.DISABLED
 
         dest = get_swe_slack_destination()
@@ -166,6 +170,7 @@ class SlackDestination:
 
     Either webhook_url OR channel_id should be set, not both.
     """
+
     webhook_url: Optional[str] = None
     channel_id: Optional[str] = None
 
@@ -176,7 +181,11 @@ class SlackDestination:
     def __repr__(self) -> str:
         if self.webhook_url:
             # Mask webhook URL for security
-            masked = self.webhook_url[:30] + "..." if len(self.webhook_url) > 30 else self.webhook_url
+            masked = (
+                self.webhook_url[:30] + "..."
+                if len(self.webhook_url) > 30
+                else self.webhook_url
+            )
             return f"SlackDestination(webhook={masked})"
         elif self.channel_id:
             return f"SlackDestination(channel={self.channel_id})"
@@ -198,7 +207,9 @@ def are_slack_notifications_enabled() -> bool:
     if is_enabled:
         logger.info("Slack notifications are ENABLED")
     else:
-        logger.debug("Slack notifications are DISABLED (set SLACK_NOTIFICATIONS_ENABLED=true to enable)")
+        logger.debug(
+            "Slack notifications are DISABLED (set SLACK_NOTIFICATIONS_ENABLED=true to enable)"
+        )
 
     return is_enabled
 
@@ -295,6 +306,7 @@ def log_notification_config() -> None:
 if __name__ == "__main__":
     # Quick test/diagnostic when run directly
     import sys
+
     logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
 
     print(get_notification_summary())
@@ -308,5 +320,7 @@ if __name__ == "__main__":
         print()
         print("To enable:")
         print("  export SLACK_NOTIFICATIONS_ENABLED=true")
-        print("  export SLACK_SWE_CHANNEL_WEBHOOK_URL=https://hooks.slack.com/services/...")
+        print(
+            "  export SLACK_SWE_CHANNEL_WEBHOOK_URL=https://hooks.slack.com/services/..."
+        )
         sys.exit(1)

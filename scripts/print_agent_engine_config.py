@@ -21,13 +21,15 @@ from typing import Dict
 # Add repo root to path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from agents.config.agent_engine import ALL_ENVIRONMENTS, AgentEngineConfig, validate_config
+from agents.config.agent_engine import (
+    ALL_ENVIRONMENTS,
+    AgentEngineConfig,
+    validate_config,
+)
 
 
 def print_environment_config(
-    env_name: str,
-    agents: Dict[str, AgentEngineConfig],
-    verbose: bool = False
+    env_name: str, agents: Dict[str, AgentEngineConfig], verbose: bool = False
 ) -> None:
     """
     Print configuration for a single environment.
@@ -60,12 +62,12 @@ def print_environment_config(
             if config.notes:
                 print("  Notes:")
                 # Indent multi-line notes
-                for line in config.notes.split('\n'):
+                for line in config.notes.split("\n"):
                     print(f"    {line}")
         else:
             # Concise: One line per agent
             # Extract just the engine ID from the full resource name
-            engine_id = config.reasoning_engine_id.split('/')[-1]
+            engine_id = config.reasoning_engine_id.split("/")[-1]
             print(f"  Engine ID: {engine_id}")
             print(f"  Region: {config.region}")
 
@@ -103,7 +105,7 @@ def print_summary_table(verbose: bool = False) -> None:
         for env in ["dev", "staging", "prod"]:
             if agent_role in ALL_ENVIRONMENTS[env]:
                 config = ALL_ENVIRONMENTS[env][agent_role]
-                engine_id = config.reasoning_engine_id.split('/')[-1]
+                engine_id = config.reasoning_engine_id.split("/")[-1]
 
                 # Special marker for canonical Bob
                 if "CANONICAL" in (config.notes or "").upper():
@@ -165,9 +167,10 @@ def main():
         description="Print Agent Engine configuration for all environments"
     )
     parser.add_argument(
-        "--verbose", "-v",
+        "--verbose",
+        "-v",
         action="store_true",
-        help="Show full details (reasoning engine IDs, SPIFFE IDs, notes)"
+        help="Show full details (reasoning engine IDs, SPIFFE IDs, notes)",
     )
 
     args = parser.parse_args()

@@ -11,6 +11,7 @@ import pytest
 # ModuleNotFoundError, or other errors depending on Python version
 try:
     import google.adk  # noqa: F401
+
     HAS_ADK = True
 except Exception:
     HAS_ADK = False
@@ -18,20 +19,17 @@ except Exception:
 # Check if google-cloud-apihub is available (for API Registry)
 try:
     from google.cloud import apihub_v1  # noqa: F401
+
     HAS_APIHUB = True
 except Exception:
     HAS_APIHUB = False
 
 
 # Markers for skipping tests based on optional dependencies
-requires_adk = pytest.mark.skipif(
-    not HAS_ADK,
-    reason="Requires google-adk package"
-)
+requires_adk = pytest.mark.skipif(not HAS_ADK, reason="Requires google-adk package")
 
 requires_apihub = pytest.mark.skipif(
-    not HAS_APIHUB,
-    reason="Requires google-cloud-apihub package"
+    not HAS_APIHUB, reason="Requires google-cloud-apihub package"
 )
 
 

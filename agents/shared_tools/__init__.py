@@ -86,7 +86,9 @@ def _load_mcp_tools(agent_name: str) -> List[Any]:
     try:
         mcp_tools = get_tools_for_agent(agent_name)
         if mcp_tools:
-            logger.info(f"✅ Loaded {len(mcp_tools)} MCP tools for {agent_name} from registry")
+            logger.info(
+                f"✅ Loaded {len(mcp_tools)} MCP tools for {agent_name} from registry"
+            )
         return mcp_tools
     except Exception as e:
         logger.warning(f"Could not load MCP tools for {agent_name}: {e}")

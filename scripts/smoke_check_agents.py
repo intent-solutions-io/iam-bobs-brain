@@ -29,11 +29,7 @@ def test_agent_lazy_loading(agent_module_path: str) -> dict:
     Returns:
         dict: Test results with keys: passed, errors, warnings
     """
-    results = {
-        "passed": [],
-        "errors": [],
-        "warnings": []
-    }
+    results = {"passed": [], "errors": [], "warnings": []}
 
     print(f"\n🔍 Testing {agent_module_path}...")
 
@@ -51,6 +47,7 @@ def test_agent_lazy_loading(agent_module_path: str) -> dict:
 
         # Try import
         import importlib
+
         module = importlib.import_module(agent_module_path)
 
         # Restore env
@@ -161,14 +158,18 @@ def main():
         warnings = len(results["warnings"])
 
         status = "✅ PASS" if errors == 0 else "❌ FAIL"
-        print(f"{status} {agent_name:<30} ({passed} passed, {errors} errors, {warnings} warnings)")
+        print(
+            f"{status} {agent_name:<30} ({passed} passed, {errors} errors, {warnings} warnings)"
+        )
 
         # Show errors
         for error in results["errors"]:
             print(f"     ❌ {error}")
 
     print("\n" + "=" * 60)
-    print(f"Total: {total_passed} passed, {total_errors} errors, {total_warnings} warnings")
+    print(
+        f"Total: {total_passed} passed, {total_errors} errors, {total_warnings} warnings"
+    )
 
     if total_errors == 0:
         print("\n✅ All agents follow lazy-loading App pattern (6774)")

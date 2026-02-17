@@ -26,6 +26,7 @@ class ExampleAgent:
         response = f"Mock response for: {prompt}"
         return response
 
+
 # VIOLATION: Missing proper ADK memory setup
 def create_agent():
     """Create an agent instance."""
@@ -37,6 +38,7 @@ def create_agent():
 
     agent.add_tool(custom_tool)
     return agent
+
 
 # VIOLATION: Missing A2A protocol support
 # VIOLATION: No AgentCard definition

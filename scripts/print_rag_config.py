@@ -22,7 +22,11 @@ from pathlib import Path
 # Add parent directory to path so we can import agents modules
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from agents.shared_tools.vertex_search import get_current_environment, get_datastore_info, load_vertex_search_config
+from agents.shared_tools.vertex_search import (
+    get_current_environment,
+    get_datastore_info,
+    load_vertex_search_config,
+)
 
 
 def print_header(title: str):
@@ -118,7 +122,10 @@ def main():
     print_header("VALIDATION CHECKLIST")
 
     checks = [
-        ("Environment variable set", env != "staging" or os.getenv("APP_ENV") is not None),
+        (
+            "Environment variable set",
+            env != "staging" or os.getenv("APP_ENV") is not None,
+        ),
         ("Configuration file exists", Path("config/vertex_search.yaml").exists()),
         ("Environment config exists", env in config.get("environments", {})),
         ("Migration flag configured", True),  # Always true, just checking it exists

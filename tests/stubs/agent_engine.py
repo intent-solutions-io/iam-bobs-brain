@@ -72,12 +72,14 @@ class StubAgentEngineClient:
             Canned response dict matching Agent Engine REST API shape.
         """
         self._call_count += 1
-        self.call_log.append({
-            "call_number": self._call_count,
-            "message": message,
-            "session_id": session_id,
-            "user_id": user_id,
-        })
+        self.call_log.append(
+            {
+                "call_number": self._call_count,
+                "message": message,
+                "session_id": session_id,
+                "user_id": user_id,
+            }
+        )
 
         # Track session
         if session_id:

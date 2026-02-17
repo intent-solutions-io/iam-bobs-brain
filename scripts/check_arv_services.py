@@ -33,7 +33,9 @@ RESET = "\033[0m"
 class ServiceViolation:
     """Represents a violation of service/gateway rules."""
 
-    def __init__(self, file_path: str, rule: str, message: str, line_number: int = None):
+    def __init__(
+        self, file_path: str, rule: str, message: str, line_number: int = None
+    ):
         self.file_path = file_path
         self.rule = rule
         self.message = message
@@ -50,7 +52,9 @@ def find_service_files() -> List[Path]:
     """Find all Python files in service/ directory."""
     service_dir = Path("service")
     if not service_dir.exists():
-        print(f"{YELLOW}⚠{RESET} service/ directory not found (okay if no gateways yet)")
+        print(
+            f"{YELLOW}⚠{RESET} service/ directory not found (okay if no gateways yet)"
+        )
         return []
 
     service_files = []
@@ -63,7 +67,9 @@ def find_service_files() -> List[Path]:
     return service_files
 
 
-def check_prohibited_runner_imports(file_path: Path, content: str) -> List[ServiceViolation]:
+def check_prohibited_runner_imports(
+    file_path: Path, content: str
+) -> List[ServiceViolation]:
     """Check for prohibited Runner imports (R3 violation)."""
     violations = []
 
@@ -75,32 +81,35 @@ def check_prohibited_runner_imports(file_path: Path, content: str) -> List[Servi
                 if node.module and "google.adk" in node.module:
                     for alias in node.names:
                         if alias.name == "Runner":
-                            violations.append(ServiceViolation(
-                                str(file_path),
-                                "R3-RUNNER-IMPORT",
-                                "Runner imported in service/ (gateways must not run Runners locally)",
-                                node.lineno
-                            ))
+                            violations.append(
+                                ServiceViolation(
+                                    str(file_path),
+                                    "R3-RUNNER-IMPORT",
+                                    "Runner imported in service/ (gateways must not run Runners locally)",
+                                    node.lineno,
+                                )
+                            )
 
             # Check for LlmAgent imports (agents should not be constructed in services)
             elif isinstance(node, ast.ImportFrom):
                 if node.module and "google.adk.agents" in node.module:
                     for alias in node.names:
                         if alias.name == "LlmAgent":
-                            violations.append(ServiceViolation(
-                                str(file_path),
-                                "R3-LLMAGENT-IMPORT",
-                                "LlmAgent imported in service/ (agents belong in agents/, not services)",
-                                node.lineno
-                            ))
+                            violations.append(
+                                ServiceViolation(
+                                    str(file_path),
+                                    "R3-LLMAGENT-IMPORT",
+                                    "LlmAgent imported in service/ (agents belong in agents/, not services)",
+                                    node.lineno,
+                                )
+                            )
 
     except SyntaxError as e:
-        violations.append(ServiceViolation(
-            str(file_path),
-            "R3-SYNTAX-ERROR",
-            f"Syntax error: {e}",
-            e.lineno
-        ))
+        violations.append(
+            ServiceViolation(
+                str(file_path), "R3-SYNTAX-ERROR", f"Syntax error: {e}", e.lineno
+            )
+        )
 
     return violations
 
@@ -111,23 +120,34 @@ def check_direct_model_calls(file_path: Path, content: str) -> List[ServiceViola
 
     # Patterns that indicate direct model calls in gateways
     prohibited_patterns = [
-        ("model.generate_content", "Direct model.generate_content() call (use Agent Engine REST API instead)"),
-        ("GenerativeModel", "Direct GenerativeModel usage (gateways should call Agent Engine, not models)"),
-        ("genai.GenerativeModel", "Direct genai.GenerativeModel usage (gateways should call Agent Engine)"),
-        (".predict(", "Direct Vertex AI predict call (use Agent Engine REST API instead)"),
+        (
+            "model.generate_content",
+            "Direct model.generate_content() call (use Agent Engine REST API instead)",
+        ),
+        (
+            "GenerativeModel",
+            "Direct GenerativeModel usage (gateways should call Agent Engine, not models)",
+        ),
+        (
+            "genai.GenerativeModel",
+            "Direct genai.GenerativeModel usage (gateways should call Agent Engine)",
+        ),
+        (
+            ".predict(",
+            "Direct Vertex AI predict call (use Agent Engine REST API instead)",
+        ),
     ]
 
     for pattern, message in prohibited_patterns:
         if pattern in content:
             # Find line number (simple search, not AST)
-            for i, line in enumerate(content.split('\n'), 1):
-                if pattern in line and not line.strip().startswith('#'):
-                    violations.append(ServiceViolation(
-                        str(file_path),
-                        "R3-DIRECT-MODEL-CALL",
-                        message,
-                        i
-                    ))
+            for i, line in enumerate(content.split("\n"), 1):
+                if pattern in line and not line.strip().startswith("#"):
+                    violations.append(
+                        ServiceViolation(
+                            str(file_path), "R3-DIRECT-MODEL-CALL", message, i
+                        )
+                    )
                     break
 
     return violations
@@ -141,25 +161,27 @@ def check_runner_usage(file_path: Path, content: str) -> List[ServiceViolation]:
     prohibited_patterns = [
         ("Runner(", "Runner instantiation (gateways must not run Runners)"),
         ("runner.run(", "Runner.run() call (gateways must proxy to Agent Engine)"),
-        ("runner.run_async(", "Runner.run_async() call (gateways must proxy to Agent Engine)"),
+        (
+            "runner.run_async(",
+            "Runner.run_async() call (gateways must proxy to Agent Engine)",
+        ),
     ]
 
     for pattern, message in prohibited_patterns:
         if pattern in content:
-            for i, line in enumerate(content.split('\n'), 1):
-                if pattern in line and not line.strip().startswith('#'):
-                    violations.append(ServiceViolation(
-                        str(file_path),
-                        "R3-RUNNER-USAGE",
-                        message,
-                        i
-                    ))
+            for i, line in enumerate(content.split("\n"), 1):
+                if pattern in line and not line.strip().startswith("#"):
+                    violations.append(
+                        ServiceViolation(str(file_path), "R3-RUNNER-USAGE", message, i)
+                    )
                     break
 
     return violations
 
 
-def check_agent_engine_patterns(file_path: Path, content: str) -> List[ServiceViolation]:
+def check_agent_engine_patterns(
+    file_path: Path, content: str
+) -> List[ServiceViolation]:
     """Check for proper Agent Engine REST API patterns (positive check)."""
     violations = []
 
@@ -178,12 +200,14 @@ def check_agent_engine_patterns(file_path: Path, content: str) -> List[ServiceVi
     # If file is a main service file (main.py, app.py) and has no good patterns, warn
     if file_path.name in ["main.py", "app.py"] and len(content) > 100:
         if not has_good_pattern:
-            violations.append(ServiceViolation(
-                str(file_path),
-                "R3-MISSING-AGENT-ENGINE-PATTERN",
-                "No Agent Engine REST API patterns detected (expected HTTP calls to aiplatform.googleapis.com)",
-                None
-            ))
+            violations.append(
+                ServiceViolation(
+                    str(file_path),
+                    "R3-MISSING-AGENT-ENGINE-PATTERN",
+                    "No Agent Engine REST API patterns detected (expected HTTP calls to aiplatform.googleapis.com)",
+                    None,
+                )
+            )
 
     return violations
 
@@ -195,11 +219,11 @@ def check_service_file(file_path: Path) -> List[ServiceViolation]:
     try:
         content = file_path.read_text()
     except Exception as e:
-        violations.append(ServiceViolation(
-            str(file_path),
-            "R3-FILE-ERROR",
-            f"Could not read file: {e}"
-        ))
+        violations.append(
+            ServiceViolation(
+                str(file_path), "R3-FILE-ERROR", f"Could not read file: {e}"
+            )
+        )
         return violations
 
     # Run all checks
@@ -220,7 +244,9 @@ def main():
     service_files = find_service_files()
 
     if not service_files:
-        print(f"{GREEN}✓{RESET} No service files found (or service/ directory doesn't exist)")
+        print(
+            f"{GREEN}✓{RESET} No service files found (or service/ directory doesn't exist)"
+        )
         print("  This is okay if all services use Agent Engine directly")
         return 0
 
@@ -236,8 +262,16 @@ def main():
         if violations:
             all_violations.extend(violations)
             # Separate warnings from errors
-            errors = [v for v in violations if not v.rule.endswith("-MISSING-AGENT-ENGINE-PATTERN")]
-            warnings = [v for v in violations if v.rule.endswith("-MISSING-AGENT-ENGINE-PATTERN")]
+            errors = [
+                v
+                for v in violations
+                if not v.rule.endswith("-MISSING-AGENT-ENGINE-PATTERN")
+            ]
+            warnings = [
+                v
+                for v in violations
+                if v.rule.endswith("-MISSING-AGENT-ENGINE-PATTERN")
+            ]
 
             if errors:
                 print(f"  {RED}✗{RESET} {len(errors)} violation(s) found")
@@ -253,8 +287,14 @@ def main():
     print(f"{BLUE}{'=' * 70}{RESET}\n")
 
     # Separate warnings from errors
-    errors = [v for v in all_violations if not v.rule.endswith("-MISSING-AGENT-ENGINE-PATTERN")]
-    warnings = [v for v in all_violations if v.rule.endswith("-MISSING-AGENT-ENGINE-PATTERN")]
+    errors = [
+        v
+        for v in all_violations
+        if not v.rule.endswith("-MISSING-AGENT-ENGINE-PATTERN")
+    ]
+    warnings = [
+        v for v in all_violations if v.rule.endswith("-MISSING-AGENT-ENGINE-PATTERN")
+    ]
 
     if errors:
         print(f"{RED}✗ FAILED{RESET} - {len(errors)} violation(s) found:\n")

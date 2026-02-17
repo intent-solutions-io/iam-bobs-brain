@@ -14,7 +14,7 @@ import sys
 from pathlib import Path
 
 # Add parent directory to path for imports
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
 from agents.iam_senior_adk_devops_lead.orchestrator import run_swe_pipeline
 from agents.shared_contracts import PipelineRequest, PipelineResult, QAStatus, Severity
@@ -22,8 +22,8 @@ from agents.shared_contracts import PipelineRequest, PipelineResult, QAStatus, S
 # Configure logging
 logging.basicConfig(
     level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-    datefmt='%Y-%m-%d %H:%M:%S'
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+    datefmt="%Y-%m-%d %H:%M:%S",
 )
 logger = logging.getLogger(__name__)
 
@@ -40,7 +40,7 @@ def format_issue_summary(result: PipelineResult) -> str:
             Severity.HIGH: "🟠",
             Severity.MEDIUM: "🟡",
             Severity.LOW: "🟢",
-            Severity.INFO: "ℹ️"
+            Severity.INFO: "ℹ️",
         }.get(issue.severity, "❓")
 
         lines.append(f"  {i}. {severity_icon} [{issue.severity.value}] {issue.title}")
@@ -59,18 +59,18 @@ def format_fix_summary(result: PipelineResult) -> str:
 
     lines = [f"\n🔧 Fixes Applied ({len(result.plans)}):"]
     for i, plan in enumerate(result.plans, 1):
-        risk_icon = {
-            "low": "✅",
-            "medium": "⚠️",
-            "high": "⚡"
-        }.get(plan.overall_risk, "❓")
+        risk_icon = {"low": "✅", "medium": "⚠️", "high": "⚡"}.get(
+            plan.overall_risk, "❓"
+        )
 
         lines.append(f"  {i}. {risk_icon} {plan.approach}")
         lines.append(f"     Risk: {plan.overall_risk}")
         lines.append(f"     Steps: {len(plan.steps)}")
 
         # Show implementation status
-        impl = next((c for c in result.implementations if c.plan_id == plan.plan_id), None)
+        impl = next(
+            (c for c in result.implementations if c.plan_id == plan.plan_id), None
+        )
         if impl:
             lines.append(f"     Implementation: ✅ {impl.change_type} {impl.file_path}")
 
@@ -81,7 +81,7 @@ def format_fix_summary(result: PipelineResult) -> str:
                 QAStatus.PASSED: "✅",
                 QAStatus.FAILED: "❌",
                 QAStatus.PARTIAL: "⚠️",
-                QAStatus.SKIPPED: "⏭️"
+                QAStatus.SKIPPED: "⏭️",
             }.get(qa.status, "❓")
             lines.append(f"     QA: {status_icon} {qa.status.value}")
             if qa.safe_to_apply:
@@ -100,7 +100,7 @@ def format_metrics_summary(result: PipelineResult) -> str:
         f"  Issues Fixed: {result.issues_fixed}",
         f"  Issues Documented: {result.issues_documented}",
         f"  Pipeline Duration: {result.pipeline_duration_seconds:.2f} seconds",
-        f"  Timestamp: {result.timestamp.strftime('%Y-%m-%d %H:%M:%S')}"
+        f"  Timestamp: {result.timestamp.strftime('%Y-%m-%d %H:%M:%S')}",
     ]
 
     if result.cleanup:
@@ -128,7 +128,7 @@ def save_result_to_file(result: PipelineResult, output_path: Path) -> None:
         "qa_failed": sum(1 for qa in result.qa_report if qa.status == QAStatus.FAILED),
     }
 
-    with open(output_path, 'w') as f:
+    with open(output_path, "w") as f:
         json.dump(result_dict, f, indent=2)
 
     logger.info(f"Result saved to {output_path}")
@@ -152,72 +152,60 @@ Examples:
 
   # Include cleanup and save results
   %(prog)s --repo-path . --cleanup --output pipeline_result.json
-        """
+        """,
     )
 
     parser.add_argument(
         "--repo-path",
         type=str,
         default="tests/data/synthetic_repo",
-        help="Path to the repository to analyze (default: tests/data/synthetic_repo)"
+        help="Path to the repository to analyze (default: tests/data/synthetic_repo)",
     )
 
     parser.add_argument(
         "--task",
         type=str,
         default="Audit ADK compliance and fix violations",
-        help="Task description for the pipeline"
+        help="Task description for the pipeline",
     )
 
     parser.add_argument(
         "--env",
         choices=["dev", "staging", "prod"],
         default="dev",
-        help="Environment to run in (default: dev)"
+        help="Environment to run in (default: dev)",
     )
 
     parser.add_argument(
         "--max-issues",
         type=int,
         default=2,
-        help="Maximum number of issues to fix (default: 2)"
+        help="Maximum number of issues to fix (default: 2)",
     )
 
     parser.add_argument(
         "--cleanup",
         action="store_true",
-        help="Include cleanup phase to identify tech debt"
+        help="Include cleanup phase to identify tech debt",
     )
 
     parser.add_argument(
-        "--no-index",
-        action="store_true",
-        help="Skip knowledge indexing phase"
+        "--no-index", action="store_true", help="Skip knowledge indexing phase"
     )
 
     parser.add_argument(
         "--mode",
         choices=["preview", "dry-run", "create"],
         default="preview",
-        help="GitHub issue creation mode: preview (default, no creation), dry-run (show payloads), create (actually create issues)"
+        help="GitHub issue creation mode: preview (default, no creation), dry-run (show payloads), create (actually create issues)",
     )
 
-    parser.add_argument(
-        "--output",
-        type=str,
-        help="Save result to JSON file"
-    )
+    parser.add_argument("--output", type=str, help="Save result to JSON file")
+
+    parser.add_argument("--verbose", action="store_true", help="Enable verbose logging")
 
     parser.add_argument(
-        "--verbose",
-        action="store_true",
-        help="Enable verbose logging"
-    )
-
-    parser.add_argument(
-        "--dry-run",
-        action="store_true",
-        help="Print request without running pipeline"
+        "--dry-run", action="store_true", help="Print request without running pipeline"
     )
 
     args = parser.parse_args()
@@ -241,16 +229,13 @@ Examples:
         include_cleanup=args.cleanup,
         include_indexing=not args.no_index,
         mode=args.mode,  # Phase GHC: GitHub issue creation mode
-        metadata={
-            "triggered_by": "CLI",
-            "script": "run_swe_pipeline_once.py"
-        }
+        metadata={"triggered_by": "CLI", "script": "run_swe_pipeline_once.py"},
     )
 
     # Print request
-    print("\n" + "="*60)
+    print("\n" + "=" * 60)
     print("🚀 IAM SWE Pipeline Demo")
-    print("="*60)
+    print("=" * 60)
     print(f"\n📁 Repository: {repo_path}")
     print(f"📝 Task: {request.task_description}")
     print(f"🌍 Environment: {request.env}")
@@ -261,15 +246,20 @@ Examples:
     if args.dry_run:
         print("\n⚠️  DRY RUN - Not executing pipeline")
         print("\nRequest object:")
-        print(json.dumps({
-            "repo_hint": request.repo_hint,
-            "task_description": request.task_description,
-            "env": request.env,
-            "max_issues_to_fix": request.max_issues_to_fix,
-            "include_cleanup": request.include_cleanup,
-            "include_indexing": request.include_indexing,
-            "metadata": request.metadata
-        }, indent=2))
+        print(
+            json.dumps(
+                {
+                    "repo_hint": request.repo_hint,
+                    "task_description": request.task_description,
+                    "env": request.env,
+                    "max_issues_to_fix": request.max_issues_to_fix,
+                    "include_cleanup": request.include_cleanup,
+                    "include_indexing": request.include_indexing,
+                    "metadata": request.metadata,
+                },
+                indent=2,
+            )
+        )
         return
 
     print("\n⏳ Running pipeline...")
@@ -280,9 +270,9 @@ Examples:
         result = run_swe_pipeline(request)
 
         # Print results
-        print("\n" + "="*60)
+        print("\n" + "=" * 60)
         print("✅ Pipeline Completed Successfully!")
-        print("="*60)
+        print("=" * 60)
 
         # Show issue summary
         print(format_issue_summary(result))
@@ -299,8 +289,13 @@ Examples:
             save_result_to_file(result, output_path)
 
         # Exit code based on issues found
-        if result.total_issues_found > 0 and result.issues_fixed < result.total_issues_found:
-            print(f"\n⚠️  {result.total_issues_found - result.issues_fixed} issues remain unfixed")
+        if (
+            result.total_issues_found > 0
+            and result.issues_fixed < result.total_issues_found
+        ):
+            print(
+                f"\n⚠️  {result.total_issues_found - result.issues_fixed} issues remain unfixed"
+            )
             sys.exit(1)
         else:
             print("\n✅ All detected issues have been addressed")

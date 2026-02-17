@@ -23,6 +23,7 @@ AGENTS = [
     ("iam-index", "IAM Index (Specialist)"),
 ]
 
+
 def list_engines():
     """List all reasoning engines"""
     print("📋 Listing reasoning engines...")
@@ -39,7 +40,7 @@ def list_engines():
         print(f"✅ Found {len(engines)} engines\n")
 
         for engine in engines:
-            engine_id = engine.name.split('/')[-1]
+            engine_id = engine.name.split("/")[-1]
             print(f"  - {engine.display_name}")
             print(f"    ID: {engine_id}")
             print()
@@ -48,6 +49,7 @@ def list_engines():
     except Exception as e:
         print(f"❌ Error: {e}")
         return []
+
 
 def deploy_agent(agent_name, display_name):
     """Deploy a single agent"""
@@ -69,13 +71,14 @@ def deploy_agent(agent_name, display_name):
         print("   Creating... (this may take a minute)")
         result = operation.result(timeout=180)
 
-        engine_id = result.name.split('/')[-1]
+        engine_id = result.name.split("/")[-1]
         print(f"✅ Deployed! ID: {engine_id}\n")
 
         return engine_id
     except Exception as e:
         print(f"❌ Failed: {e}\n")
         return None
+
 
 def main():
     if len(sys.argv) > 1 and sys.argv[1] == "list":
@@ -89,9 +92,9 @@ def main():
             if engine_id:
                 results[agent_name] = engine_id
 
-        print("\n" + "="*50)
+        print("\n" + "=" * 50)
         print("📊 Deployment Summary")
-        print("="*50)
+        print("=" * 50)
         print(f"✅ Deployed: {len(results)}/{len(AGENTS)}\n")
 
         for agent_name, engine_id in results.items():
@@ -102,6 +105,7 @@ def main():
         print("Usage:")
         print("  python3 scripts/quick_deploy.py list")
         print("  python3 scripts/quick_deploy.py deploy-all")
+
 
 if __name__ == "__main__":
     main()

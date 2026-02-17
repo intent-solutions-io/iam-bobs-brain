@@ -62,6 +62,7 @@ class RAGReadinessChecker:
                 get_vertex_search_config,  # noqa: F401
                 validate_rag_config,
             )
+
             self.log("✓ Imported RAG config functions")
         except ImportError as e:
             self.failed.append(f"Cannot import RAG config: {e}")
@@ -133,6 +134,7 @@ class RAGReadinessChecker:
                 get_foreman_vertex_search_tool,
                 get_vertex_search_tool_for_env,  # noqa: F401
             )
+
             self.log("✓ Imported tool factory functions")
         except ImportError as e:
             self.failed.append(f"Cannot import tool factory: {e}")
@@ -147,9 +149,9 @@ class RAGReadinessChecker:
             self.log(f"✓ Foreman's tool created: {foreman_tool}")
 
             # Test that tools have expected methods
-            if not hasattr(bob_tool, 'search'):
+            if not hasattr(bob_tool, "search"):
                 self.failed.append("Bob's tool missing 'search' method")
-            if not hasattr(foreman_tool, 'search'):
+            if not hasattr(foreman_tool, "search"):
                 self.failed.append("Foreman's tool missing 'search' method")
 
             self.passed.append("Tool factory working correctly")
@@ -224,8 +226,9 @@ class RAGReadinessChecker:
             return False
 
         # Check for RAG-related docs
-        rag_docs = list(docs_path.glob("*rag*.md")) + \
-                  list(docs_path.glob("*knowledge*.md"))
+        rag_docs = list(docs_path.glob("*rag*.md")) + list(
+            docs_path.glob("*knowledge*.md")
+        )
 
         if rag_docs:
             self.log(f"✓ Found {len(rag_docs)} RAG-related docs:")
@@ -254,9 +257,11 @@ class RAGReadinessChecker:
                 self.log("✓ RAG configuration documented in .env.example")
 
                 # Check for environment-specific datastores
-                if "DATASTORE_ID_DEV" in content and \
-                   "DATASTORE_ID_STAGING" in content and \
-                   "DATASTORE_ID_PROD" in content:
+                if (
+                    "DATASTORE_ID_DEV" in content
+                    and "DATASTORE_ID_STAGING" in content
+                    and "DATASTORE_ID_PROD" in content
+                ):
                     self.log("✓ Environment-specific datastore IDs documented")
                     self.passed.append("Configuration template complete")
                 else:
@@ -282,13 +287,16 @@ class RAGReadinessChecker:
         report += "\n" + "=" * 60
 
         # Status indicators
-        config_ok = all("config" not in f.lower() or "module" not in f.lower()
-                       for f in self.failed)
-        tools_ok = all("tool" not in f.lower() and "factory" not in f.lower()
-                      for f in self.failed)
+        config_ok = all(
+            "config" not in f.lower() or "module" not in f.lower() for f in self.failed
+        )
+        tools_ok = all(
+            "tool" not in f.lower() and "factory" not in f.lower() for f in self.failed
+        )
         docs_ok = all("doc" not in f.lower() for f in self.failed)
-        template_ok = all("template" not in f.lower() and ".env" not in f.lower()
-                         for f in self.failed)
+        template_ok = all(
+            "template" not in f.lower() and ".env" not in f.lower() for f in self.failed
+        )
 
         report += f"\n{'✅' if config_ok else '❌'} Configuration Module: {'VALID' if config_ok else 'INVALID'}"
         report += f"\n{'✅' if tools_ok else '❌'} Tool Factory: {'WORKING' if tools_ok else 'BROKEN'}"
@@ -347,6 +355,7 @@ class RAGReadinessChecker:
             print(f"\n❌ Error during checks: {e}")
             if self.verbose:
                 import traceback
+
                 traceback.print_exc()
             return 2
 
@@ -357,9 +366,7 @@ def main():
         description="Check RAG readiness for Bob and foreman (Phase RC1)"
     )
     parser.add_argument(
-        "--verbose", "-v",
-        action="store_true",
-        help="Show detailed output"
+        "--verbose", "-v", action="store_true", help="Show detailed output"
     )
 
     args = parser.parse_args()

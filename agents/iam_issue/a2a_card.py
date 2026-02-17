@@ -18,14 +18,25 @@ class AgentCard(BaseModel):
 
     Represents iam-issue's identity, capabilities, and skills.
     """
+
     name: str = Field(..., description="Agent name")
     version: str = Field(..., description="Agent version")
     url: str = Field(..., description="Agent public URL")
-    description: str = Field(..., description="Agent description (must include SPIFFE ID per R7)")
-    capabilities: List[str] = Field(default_factory=list, description="Agent capabilities")
-    default_input_modes: List[str] = Field(default_factory=lambda: ["text"], description="Supported input modes")
-    default_output_modes: List[str] = Field(default_factory=lambda: ["text"], description="Supported output modes")
-    skills: List[Dict[str, Any]] = Field(default_factory=list, description="Agent skills")
+    description: str = Field(
+        ..., description="Agent description (must include SPIFFE ID per R7)"
+    )
+    capabilities: List[str] = Field(
+        default_factory=list, description="Agent capabilities"
+    )
+    default_input_modes: List[str] = Field(
+        default_factory=lambda: ["text"], description="Supported input modes"
+    )
+    default_output_modes: List[str] = Field(
+        default_factory=lambda: ["text"], description="Supported output modes"
+    )
+    skills: List[Dict[str, Any]] = Field(
+        default_factory=list, description="Agent skills"
+    )
 
 
 def get_agent_card() -> AgentCard:
@@ -44,7 +55,10 @@ def get_agent_card() -> AgentCard:
     app_name = os.getenv("APP_NAME", "iam-issue")
     app_version = os.getenv("APP_VERSION", "0.10.0")
     public_url = os.getenv("PUBLIC_URL", "https://iam-issue.intent.solutions")
-    spiffe_id = os.getenv("AGENT_SPIFFE_ID", "spiffe://intent.solutions/agent/iam-issue/dev/us-central1/0.10.0")
+    spiffe_id = os.getenv(
+        "AGENT_SPIFFE_ID",
+        "spiffe://intent.solutions/agent/iam-issue/dev/us-central1/0.10.0",
+    )
 
     # Description with SPIFFE ID (R7 requirement)
     description = f"""iam-issue - Issue Author & Formatter Specialist
@@ -68,7 +82,7 @@ This agent produces structured IssueSpec artifacts that can be directly submitte
         "markdown_formatting",
         "issue_validation",
         "label_generation",
-        "github_issue_formatting"
+        "github_issue_formatting",
     ]
 
     # Skills (specific tasks iam-issue can perform)
@@ -88,21 +102,21 @@ This agent produces structured IssueSpec artifacts that can be directly submitte
                             "message": {"type": "string"},
                             "severity": {
                                 "type": "string",
-                                "enum": ["CRITICAL", "HIGH", "MEDIUM", "LOW"]
+                                "enum": ["CRITICAL", "HIGH", "MEDIUM", "LOW"],
                             },
                             "file": {"type": "string"},
                             "rule": {"type": "string"},
-                            "recommendation": {"type": "string"}
-                        }
+                            "recommendation": {"type": "string"},
+                        },
                     },
                     "repo_context": {
                         "type": "object",
                         "properties": {
                             "repo_name": {"type": "string"},
-                            "branch": {"type": "string"}
-                        }
-                    }
-                }
+                            "branch": {"type": "string"},
+                        },
+                    },
+                },
             },
             "output_schema": {
                 "type": "object",
@@ -114,19 +128,13 @@ This agent produces structured IssueSpec artifacts that can be directly submitte
                         "properties": {
                             "title": {"type": "string"},
                             "body": {"type": "string"},
-                            "labels": {
-                                "type": "array",
-                                "items": {"type": "string"}
-                            },
-                            "assignees": {
-                                "type": "array",
-                                "items": {"type": "string"}
-                            },
-                            "milestone": {"type": "string"}
-                        }
+                            "labels": {"type": "array", "items": {"type": "string"}},
+                            "assignees": {"type": "array", "items": {"type": "string"}},
+                            "milestone": {"type": "string"},
+                        },
                     }
-                }
-            }
+                },
+            },
         },
         {
             "skill_id": "iam_issue.format_issue_body",
@@ -141,8 +149,8 @@ This agent produces structured IssueSpec artifacts that can be directly submitte
                     "steps_to_reproduce": {"type": "string"},
                     "expected_behavior": {"type": "string"},
                     "actual_behavior": {"type": "string"},
-                    "additional_context": {"type": "string"}
-                }
+                    "additional_context": {"type": "string"},
+                },
             },
             "output_schema": {
                 "type": "object",
@@ -150,15 +158,15 @@ This agent produces structured IssueSpec artifacts that can be directly submitte
                 "properties": {
                     "formatted_body": {
                         "type": "string",
-                        "description": "Markdown-formatted issue body"
+                        "description": "Markdown-formatted issue body",
                     },
                     "sections": {
                         "type": "array",
                         "items": {"type": "string"},
-                        "description": "List of included sections"
-                    }
-                }
-            }
+                        "description": "List of included sections",
+                    },
+                },
+            },
         },
         {
             "skill_id": "iam_issue.generate_labels",
@@ -176,24 +184,21 @@ This agent produces structured IssueSpec artifacts that can be directly submitte
                             "category": {"type": "string"},
                             "severity": {
                                 "type": "string",
-                                "enum": ["CRITICAL", "HIGH", "MEDIUM", "LOW"]
-                            }
-                        }
+                                "enum": ["CRITICAL", "HIGH", "MEDIUM", "LOW"],
+                            },
+                        },
                     }
-                }
+                },
             },
             "output_schema": {
                 "type": "object",
                 "required": ["labels"],
                 "properties": {
-                    "labels": {
-                        "type": "array",
-                        "items": {"type": "string"}
-                    },
+                    "labels": {"type": "array", "items": {"type": "string"}},
                     "priority_label": {"type": "string"},
-                    "type_label": {"type": "string"}
-                }
-            }
+                    "type_label": {"type": "string"},
+                },
+            },
         },
         {
             "skill_id": "iam_issue.validate_issue_spec",
@@ -209,13 +214,10 @@ This agent produces structured IssueSpec artifacts that can be directly submitte
                         "properties": {
                             "title": {"type": "string"},
                             "body": {"type": "string"},
-                            "labels": {
-                                "type": "array",
-                                "items": {"type": "string"}
-                            }
-                        }
+                            "labels": {"type": "array", "items": {"type": "string"}},
+                        },
                     }
-                }
+                },
             },
             "output_schema": {
                 "type": "object",
@@ -226,23 +228,17 @@ This agent produces structured IssueSpec artifacts that can be directly submitte
                         "type": "object",
                         "required": ["errors", "warnings"],
                         "properties": {
-                            "errors": {
-                                "type": "array",
-                                "items": {"type": "string"}
-                            },
-                            "warnings": {
-                                "type": "array",
-                                "items": {"type": "string"}
-                            },
+                            "errors": {"type": "array", "items": {"type": "string"}},
+                            "warnings": {"type": "array", "items": {"type": "string"}},
                             "suggestions": {
                                 "type": "array",
-                                "items": {"type": "string"}
-                            }
-                        }
-                    }
-                }
-            }
-        }
+                                "items": {"type": "string"},
+                            },
+                        },
+                    },
+                },
+            },
+        },
     ]
 
     return AgentCard(
@@ -253,7 +249,7 @@ This agent produces structured IssueSpec artifacts that can be directly submitte
         capabilities=capabilities,
         default_input_modes=["text"],
         default_output_modes=["text"],
-        skills=skills
+        skills=skills,
     )
 
 
@@ -268,7 +264,10 @@ def get_agent_card_dict() -> Dict[str, Any]:
     card_dict = card.model_dump()
 
     # Add explicit SPIFFE ID field (R7 requirement)
-    spiffe_id = os.getenv("AGENT_SPIFFE_ID", "spiffe://intent.solutions/agent/iam-issue/dev/us-central1/0.10.0")
+    spiffe_id = os.getenv(
+        "AGENT_SPIFFE_ID",
+        "spiffe://intent.solutions/agent/iam-issue/dev/us-central1/0.10.0",
+    )
     card_dict["spiffe_id"] = spiffe_id
 
     return card_dict

@@ -13,11 +13,11 @@ from .github_client import (
 )
 
 __all__ = [
-    'GitHubAuthError',
-    'GitHubClient',
-    'GitHubClientError',
-    'GitHubRateLimitError',
-    'RepoFile',
-    'RepoTree',
-    'get_client'
+    "GitHubAuthError",
+    "GitHubClient",
+    "GitHubClientError",
+    "GitHubRateLimitError",
+    "RepoFile",
+    "RepoTree",
+    "get_client",
 ]

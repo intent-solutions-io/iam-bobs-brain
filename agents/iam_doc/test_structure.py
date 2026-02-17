@@ -9,11 +9,11 @@ import sys
 from unittest.mock import MagicMock
 
 # Mock google.adk modules
-sys.modules['google'] = MagicMock()
-sys.modules['google.adk'] = MagicMock()
-sys.modules['google.adk.agents'] = MagicMock()
-sys.modules['google.adk.sessions'] = MagicMock()
-sys.modules['google.adk.memory'] = MagicMock()
+sys.modules["google"] = MagicMock()
+sys.modules["google.adk"] = MagicMock()
+sys.modules["google.adk.agents"] = MagicMock()
+sys.modules["google.adk.sessions"] = MagicMock()
+sys.modules["google.adk.memory"] = MagicMock()
 
 # Now we can import our agent
 from agents.iam_doc.tools.documentation_tools import (
@@ -42,9 +42,7 @@ design = create_design_doc(
     title="Test Design",
     purpose="Test purpose",
     architecture="Test architecture",
-    decisions=[
-        {"decision": "Decision 1", "rationale": "Rationale 1"}
-    ],
+    decisions=[{"decision": "Decision 1", "rationale": "Rationale 1"}],
 )
 
 print(f"✅ Design doc created: {design['file_name']}")

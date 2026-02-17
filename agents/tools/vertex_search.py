@@ -60,7 +60,7 @@ class VertexSearchToolStub:
             "results": [],
             "datastore": self.config.datastore_id,
             "env": self.config.env,
-            "message": "TODO: Wire to real Vertex AI Search API"
+            "message": "TODO: Wire to real Vertex AI Search API",
         }
 
     def __repr__(self) -> str:
@@ -73,7 +73,7 @@ class VertexSearchToolStub:
 
 
 def get_bob_vertex_search_tool(
-    env: Optional[Literal["dev", "staging", "prod"]] = None
+    env: Optional[Literal["dev", "staging", "prod"]] = None,
 ) -> VertexSearchToolStub:
     """
     Get Vertex AI Search tool for Bob (orchestrator).
@@ -104,14 +104,11 @@ def get_bob_vertex_search_tool(
 
     config = get_bob_vertex_search_config(env)
 
-    return VertexSearchToolStub(
-        config=config,
-        agent_name="bob"
-    )
+    return VertexSearchToolStub(config=config, agent_name="bob")
 
 
 def get_foreman_vertex_search_tool(
-    env: Optional[Literal["dev", "staging", "prod"]] = None
+    env: Optional[Literal["dev", "staging", "prod"]] = None,
 ) -> VertexSearchToolStub:
     """
     Get Vertex AI Search tool for iam-senior-adk-devops-lead (foreman).
@@ -139,15 +136,11 @@ def get_foreman_vertex_search_tool(
 
     config = get_foreman_vertex_search_config(env)
 
-    return VertexSearchToolStub(
-        config=config,
-        agent_name="iam-senior-adk-devops-lead"
-    )
+    return VertexSearchToolStub(config=config, agent_name="iam-senior-adk-devops-lead")
 
 
 def get_vertex_search_tool_for_env(
-    agent_name: str,
-    env: Literal["dev", "staging", "prod"]
+    agent_name: str, env: Literal["dev", "staging", "prod"]
 ) -> VertexSearchToolStub:
     """
     Get Vertex AI Search tool for any agent in a specific environment.
@@ -172,12 +165,10 @@ def get_vertex_search_tool_for_env(
     else:
         # Default: use base config
         from config.rag import get_vertex_search_config
+
         config = get_vertex_search_config(env)
 
-    return VertexSearchToolStub(
-        config=config,
-        agent_name=agent_name
-    )
+    return VertexSearchToolStub(config=config, agent_name=agent_name)
 
 
 # TODO: When wiring to real Vertex AI Search

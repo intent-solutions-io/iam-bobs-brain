@@ -112,7 +112,11 @@ class ARVEngineFlagsChecker:
         if self.verbose:
             print("\n📋 All Feature Flags:")
             for name, value in all_flags.items():
-                status = "✅ ENABLED" if (value is True or (isinstance(value, int) and value > 0)) else "⬜ DISABLED"
+                status = (
+                    "✅ ENABLED"
+                    if (value is True or (isinstance(value, int) and value > 0))
+                    else "⬜ DISABLED"
+                )
                 print(f"  {name}: {value} ({status})")
             print()
 
@@ -133,14 +137,18 @@ class ARVEngineFlagsChecker:
         enabled = get_enabled_flags()
 
         if env != "prod":
-            self.log_info(f"Environment is {env} (not prod) - skipping strict prod checks")
+            self.log_info(
+                f"Environment is {env} (not prod) - skipping strict prod checks"
+            )
             return True
 
         if not enabled:
             self.log_info("✅ Production is SAFE: All flags disabled")
             return True
 
-        self.log_info(f"Production has {len(enabled)} enabled flag(s): {', '.join(enabled)}")
+        self.log_info(
+            f"Production has {len(enabled)} enabled flag(s): {', '.join(enabled)}"
+        )
 
         # Check 1: RAG flags in prod
         if LIVE_RAG_BOB_ENABLED or LIVE_RAG_FOREMAN_ENABLED:
@@ -153,7 +161,11 @@ class ARVEngineFlagsChecker:
             )
 
         # Check 2: Engine mode flags in prod
-        if ENGINE_MODE_FOREMAN_TO_IAM_ADK or ENGINE_MODE_FOREMAN_TO_IAM_ISSUE or ENGINE_MODE_FOREMAN_TO_IAM_FIX:
+        if (
+            ENGINE_MODE_FOREMAN_TO_IAM_ADK
+            or ENGINE_MODE_FOREMAN_TO_IAM_ISSUE
+            or ENGINE_MODE_FOREMAN_TO_IAM_FIX
+        ):
             # Engine mode can be enabled in prod IF:
             # - Agents are deployed to Agent Engine
             # - A2A adapter is configured correctly
@@ -276,7 +288,11 @@ class ARVEngineFlagsChecker:
                 )
 
         # Check Agent Engine prerequisites
-        if ENGINE_MODE_FOREMAN_TO_IAM_ADK or ENGINE_MODE_FOREMAN_TO_IAM_ISSUE or ENGINE_MODE_FOREMAN_TO_IAM_FIX:
+        if (
+            ENGINE_MODE_FOREMAN_TO_IAM_ADK
+            or ENGINE_MODE_FOREMAN_TO_IAM_ISSUE
+            or ENGINE_MODE_FOREMAN_TO_IAM_FIX
+        ):
             # Would need to check if agents are deployed to Agent Engine
             # For now, just log info
             self.log_info(

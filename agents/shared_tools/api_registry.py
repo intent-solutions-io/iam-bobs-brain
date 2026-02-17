@@ -51,17 +51,15 @@ def get_api_registry() -> Optional[Any]:
         header_provider = _get_header_provider()
 
         _registry_instance = ApiRegistry(
-            project_id=project_id,
-            header_provider=header_provider
+            project_id=project_id, header_provider=header_provider
         )
         logger.info(f"Initialized ApiRegistry for project: {project_id}")
         return _registry_instance
 
-    except ImportError:
-        logger.info("ApiRegistry not available in this ADK version - using fallback")
-        return None
     except Exception as e:
-        logger.error(f"Failed to initialize ApiRegistry: {e}")
+        logger.info(
+            f"ApiRegistry not available in this ADK version - using fallback: {e}"
+        )
         return None
 
 
@@ -154,7 +152,9 @@ def _get_tools_via_toolset(registry: Any, agent_name: str) -> List[Any]:
 
         for server_name in mcp_servers:
             try:
-                server_resource = f"projects/{project_id}/locations/global/mcpServers/{server_name}"
+                server_resource = (
+                    f"projects/{project_id}/locations/global/mcpServers/{server_name}"
+                )
                 toolset = registry.get_toolset(mcp_server_name=server_resource)
                 tools.append(toolset)
                 logger.info(f"Loaded toolset from {server_name} for {agent_name}")
@@ -168,8 +168,7 @@ def _get_tools_via_toolset(registry: Any, agent_name: str) -> List[Any]:
 
 
 def get_mcp_toolset(
-    mcp_server_name: str,
-    tool_filter: Optional[List[str]] = None
+    mcp_server_name: str, tool_filter: Optional[List[str]] = None
 ) -> Optional[Any]:
     """
     Fetch tools from a specific registered MCP server.
@@ -189,13 +188,14 @@ def get_mcp_toolset(
 
     # Build full resource name if needed
     if not mcp_server_name.startswith("projects/"):
-        mcp_server_name = f"projects/{project_id}/locations/global/mcpServers/{mcp_server_name}"
+        mcp_server_name = (
+            f"projects/{project_id}/locations/global/mcpServers/{mcp_server_name}"
+        )
 
     try:
         if tool_filter:
             toolset = registry.get_toolset(
-                mcp_server_name=mcp_server_name,
-                tool_filter=tool_filter
+                mcp_server_name=mcp_server_name, tool_filter=tool_filter
             )
         else:
             toolset = registry.get_toolset(mcp_server_name=mcp_server_name)

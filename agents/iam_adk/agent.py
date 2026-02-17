@@ -60,6 +60,7 @@ AGENTCARD_PATH = os.path.join(
 # CALLBACKS
 # ============================================================================
 
+
 def auto_save_session_to_memory(callback_context=None, **kwargs):
     """
     After-agent callback to persist session to Memory Bank.
@@ -79,7 +80,7 @@ def auto_save_session_to_memory(callback_context=None, **kwargs):
     """
     try:
         # Handle both old (ctx) and new (callback_context) API
-        ctx = callback_context or kwargs.get('ctx')
+        ctx = callback_context or kwargs.get("ctx")
         if ctx is None:
             logger.debug("No callback context provided, skipping memory save")
             return
@@ -92,8 +93,8 @@ def auto_save_session_to_memory(callback_context=None, **kwargs):
             logger.debug("No invocation context in callback")
             return
 
-        memory_svc = getattr(invocation_ctx, 'memory_service', None)
-        session = getattr(invocation_ctx, 'session', None)
+        memory_svc = getattr(invocation_ctx, "memory_service", None)
+        session = getattr(invocation_ctx, "session", None)
 
         if memory_svc and session:
             memory_svc.add_session_to_memory(session)
@@ -114,9 +115,11 @@ def auto_save_session_to_memory(callback_context=None, **kwargs):
         )
         # Never block agent execution
 
+
 # ============================================================================
 # LAZY AGENT CREATION (6767-LAZY Pattern)
 # ============================================================================
+
 
 def create_agent() -> LlmAgent:
     """
@@ -240,6 +243,7 @@ If the input doesn't match any of your skills:
 
     return agent
 
+
 def create_app() -> App:
     """
     Create the App container for Agent Engine deployment.
@@ -262,8 +266,7 @@ def create_app() -> App:
         - For local testing with dual memory, use create_runner()
     """
     logger.info(
-        "Creating App container for iam-adk",
-        extra={"spiffe_id": AGENT_SPIFFE_ID}
+        "Creating App container for iam-adk", extra={"spiffe_id": AGENT_SPIFFE_ID}
     )
 
     # ✅ Call create_agent() to get instance (cheap operation)
@@ -280,10 +283,11 @@ def create_app() -> App:
         extra={
             "spiffe_id": AGENT_SPIFFE_ID,
             "app_name": APP_NAME,
-        }
+        },
     )
 
     return app_instance
+
 
 # ============================================================================
 # AGENT ENGINE ENTRYPOINT (6767-LAZY Pattern)
@@ -295,12 +299,13 @@ app = create_app()
 
 logger.info(
     "✅ App instance created for Agent Engine deployment (iam-adk)",
-    extra={"spiffe_id": AGENT_SPIFFE_ID}
+    extra={"spiffe_id": AGENT_SPIFFE_ID},
 )
 
 # ============================================================================
 # BACKWARDS COMPATIBILITY (Optional)
 # ============================================================================
+
 
 def create_runner() -> Runner:
     """
@@ -325,7 +330,7 @@ def create_runner() -> Runner:
     logger.warning(
         "⚠️  create_runner() is deprecated for Agent Engine deployment. "
         "Use create_app() for Agent Engine. create_runner() is for local/CI testing only.",
-        extra={"spiffe_id": AGENT_SPIFFE_ID}
+        extra={"spiffe_id": AGENT_SPIFFE_ID},
     )
 
     logger.info(
@@ -340,7 +345,9 @@ def create_runner() -> Runner:
 
     # ✅ Validate env vars HERE (Runner requires them for memory services)
     if not PROJECT_ID or not AGENT_ENGINE_ID:
-        raise ValueError("PROJECT_ID and AGENT_ENGINE_ID required for Runner with dual memory")
+        raise ValueError(
+            "PROJECT_ID and AGENT_ENGINE_ID required for Runner with dual memory"
+        )
 
     # R5: VertexAiSessionService (short-term conversation cache)
     session_service = VertexAiSessionService(
@@ -379,6 +386,7 @@ def create_runner() -> Runner:
 
     return runner
 
+
 # ============================================================================
 # MAIN (For local testing only)
 # ============================================================================
@@ -411,7 +419,7 @@ if __name__ == "__main__":
         # App is already created at module level
         logger.info(
             "✅ App instance ready for Agent Engine",
-            extra={"spiffe_id": AGENT_SPIFFE_ID}
+            extra={"spiffe_id": AGENT_SPIFFE_ID},
         )
 
         # For local testing only - Agent Engine manages this in production

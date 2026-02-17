@@ -36,8 +36,10 @@ from typing import Any, Dict, List, Literal, Optional
 # ENUMS AND CONSTANTS
 # ============================================================================
 
+
 class Severity(Enum):
     """Issue severity levels."""
+
     CRITICAL = "critical"
     HIGH = "high"
     MEDIUM = "medium"
@@ -47,6 +49,7 @@ class Severity(Enum):
 
 class IssueType(Enum):
     """Types of issues that can be detected."""
+
     ADK_VIOLATION = "adk_violation"
     PATTERN_DRIFT = "pattern_drift"
     SECURITY = "security"
@@ -58,6 +61,7 @@ class IssueType(Enum):
 
 class QAStatus(Enum):
     """QA verdict outcomes."""
+
     PASSED = "passed"
     FAILED = "failed"
     PARTIAL = "partial"
@@ -66,6 +70,7 @@ class QAStatus(Enum):
 
 class CheckpointReason(Enum):
     """Reasons for creating a checkpoint."""
+
     ITERATION_LIMIT = "iteration_limit"
     BUDGET_LIMIT = "budget_limit"
     USER_INTERRUPT = "user_interrupt"
@@ -78,6 +83,7 @@ class CheckpointReason(Enum):
 # CHECKPOINTING & PROGRESS (Phase C - Long-Running Tasks)
 # ============================================================================
 
+
 @dataclass
 class TaskCheckpoint:
     """
@@ -86,6 +92,7 @@ class TaskCheckpoint:
     Inspired by Ralph Wiggum patterns for autonomous task loops.
     Enables workflows to pause and resume across sessions.
     """
+
     checkpoint_id: str  # Unique identifier for this checkpoint
     pipeline_run_id: str  # Original pipeline run this belongs to
     created_at: datetime = field(default_factory=datetime.now)
@@ -127,6 +134,7 @@ class ProgressStatus:
 
     Included in responses to show workflow progress.
     """
+
     percentage: int  # 0-100
     steps_completed: int
     steps_total: int
@@ -138,9 +146,15 @@ class ProgressStatus:
     estimated_remaining_seconds: Optional[float] = None
 
     @classmethod
-    def from_checkpoint(cls, checkpoint: TaskCheckpoint, current_op: str) -> "ProgressStatus":
+    def from_checkpoint(
+        cls, checkpoint: TaskCheckpoint, current_op: str
+    ) -> "ProgressStatus":
         """Create ProgressStatus from a TaskCheckpoint."""
-        pct = int((checkpoint.current_step / checkpoint.total_steps) * 100) if checkpoint.total_steps > 0 else 0
+        pct = (
+            int((checkpoint.current_step / checkpoint.total_steps) * 100)
+            if checkpoint.total_steps > 0
+            else 0
+        )
         remaining = checkpoint.total_steps - checkpoint.current_step
         return cls(
             percentage=pct,
@@ -155,6 +169,7 @@ class ProgressStatus:
 # MANDATE & BUDGET TRACKING (AP2-Inspired)
 # ============================================================================
 
+
 @dataclass
 class Mandate:
     """
@@ -163,6 +178,7 @@ class Mandate:
     Inspired by AP2 (Agent Payments Protocol) patterns for authorized spending.
     The foreman uses this to track budget and enforce authorization limits.
     """
+
     mandate_id: str  # Unique identifier for this mandate
     intent: str  # Human-readable description of authorized work
 
@@ -174,12 +190,18 @@ class Mandate:
     max_iterations: int = 100  # Maximum total specialist invocations
 
     # Authorization scope
-    authorized_specialists: List[str] = field(default_factory=list)  # Empty = all allowed
+    authorized_specialists: List[str] = field(
+        default_factory=list
+    )  # Empty = all allowed
 
     # Enterprise controls (Phase E - Vision Alignment)
-    risk_tier: Literal["R0", "R1", "R2", "R3", "R4"] = "R0"  # R0 = no restrictions (default)
+    risk_tier: Literal["R0", "R1", "R2", "R3", "R4"] = (
+        "R0"  # R0 = no restrictions (default)
+    )
     tool_allowlist: List[str] = field(default_factory=list)  # Empty = all tools allowed
-    data_classification: Literal["public", "internal", "confidential", "restricted"] = "internal"
+    data_classification: Literal["public", "internal", "confidential", "restricted"] = (
+        "internal"
+    )
 
     # Approval workflow (for R3/R4 operations)
     approval_state: Literal["pending", "approved", "denied", "auto"] = "auto"
@@ -245,7 +267,10 @@ class Mandate:
             return False
         if self.is_iterations_exhausted():
             return False
-        if self.authorized_specialists and specialist_name not in self.authorized_specialists:
+        if (
+            self.authorized_specialists
+            and specialist_name not in self.authorized_specialists
+        ):
             return False
         # Enterprise control: check approval for R3/R4
         if self.requires_approval() and not self.is_approved():
@@ -287,6 +312,7 @@ class BudgetStatus:
 
     Included in foreman responses when mandate is provided.
     """
+
     mandate_id: str
     limit: float
     spent: float
@@ -300,6 +326,7 @@ class BudgetStatus:
 # PIPELINE REQUEST AND RESULT
 # ============================================================================
 
+
 @dataclass
 class PipelineRequest:
     """
@@ -307,6 +334,7 @@ class PipelineRequest:
 
     This is the entry point for the foreman's orchestration.
     """
+
     repo_hint: str  # Path or identifier for the target repo (local path or fallback)
     task_description: str  # High-level task (e.g., "audit ADK patterns")
 
@@ -346,6 +374,7 @@ class PipelineResult:
 
     Contains outputs from all iam-* agents involved.
     """
+
     request: PipelineRequest
     pipeline_run_id: str  # Correlation ID (copied from request for tracing)
     issues: List["IssueSpec"]
@@ -367,13 +396,16 @@ class PipelineResult:
     budget_status: Optional["BudgetStatus"] = None  # Included when mandate provided
 
     # Progress & Checkpointing (Phase C - Long-Running Tasks)
-    progress: Optional["ProgressStatus"] = None  # Current progress for in-flight pipelines
+    progress: Optional["ProgressStatus"] = (
+        None  # Current progress for in-flight pipelines
+    )
     checkpoint: Optional["TaskCheckpoint"] = None  # Checkpoint for resumable pipelines
 
 
 # ============================================================================
 # PORTFOLIO CONTRACTS (PHASE PORT2)
 # ============================================================================
+
 
 @dataclass
 class PerRepoResult:
@@ -382,6 +414,7 @@ class PerRepoResult:
 
     Used by portfolio orchestrator to track results per repo.
     """
+
     repo_id: str
     display_name: str
     status: Literal["completed", "skipped", "error"]
@@ -407,6 +440,7 @@ class PortfolioResult:
 
     Contains results for all repositories analyzed in a single portfolio sweep.
     """
+
     portfolio_run_id: str  # UUID for this portfolio run
     repos: List[PerRepoResult]
 
@@ -438,9 +472,11 @@ class PortfolioResult:
 # IAM-ADK: ANALYSIS CONTRACTS
 # ============================================================================
 
+
 @dataclass
 class AnalysisReport:
     """Output from iam-adk agent's analysis phase."""
+
     repo_path: str
     patterns_checked: List[str]
     violations_found: List[Dict[str, Any]]
@@ -453,6 +489,7 @@ class AnalysisReport:
 # IAM-ISSUE: ISSUE MANAGEMENT CONTRACTS
 # ============================================================================
 
+
 @dataclass
 class IssueSpec:
     """
@@ -460,6 +497,7 @@ class IssueSpec:
 
     Represents a single issue found during analysis.
     """
+
     id: str  # Unique identifier
     type: IssueType
     severity: Severity
@@ -485,9 +523,11 @@ class IssueSpec:
 # IAM-FIX-PLAN: PLANNING CONTRACTS
 # ============================================================================
 
+
 @dataclass
 class FixStep:
     """Single step in a fix plan."""
+
     order: int
     action: str  # e.g., "edit", "create", "delete", "move"
     target: str  # File or resource
@@ -502,6 +542,7 @@ class FixPlan:
 
     Describes how to resolve the issue step by step.
     """
+
     issue_id: str  # References IssueSpec.id
     plan_id: str
 
@@ -526,6 +567,7 @@ class FixPlan:
 # IAM-FIX-IMPL: IMPLEMENTATION CONTRACTS
 # ============================================================================
 
+
 @dataclass
 class CodeChange:
     """
@@ -533,6 +575,7 @@ class CodeChange:
 
     Represents actual code modifications to implement a fix plan.
     """
+
     plan_id: str  # References FixPlan.plan_id
     file_path: str
 
@@ -555,9 +598,11 @@ class CodeChange:
 # IAM-QA: QUALITY ASSURANCE CONTRACTS
 # ============================================================================
 
+
 @dataclass
 class TestResult:
     """Result of a single test."""
+
     test_name: str
     passed: bool
     message: str
@@ -571,6 +616,7 @@ class QAVerdict:
 
     Determines if changes are safe to apply.
     """
+
     change_id: str  # References CodeChange or plan_id
     status: QAStatus
 
@@ -596,6 +642,7 @@ class QAVerdict:
 # IAM-DOC: DOCUMENTATION CONTRACTS
 # ============================================================================
 
+
 @dataclass
 class DocumentationUpdate:
     """
@@ -603,6 +650,7 @@ class DocumentationUpdate:
 
     Updates to docs based on fixes and changes.
     """
+
     doc_id: str
     related_to: List[str]  # Issue/plan/change IDs
 
@@ -626,6 +674,7 @@ class DocumentationUpdate:
 # IAM-CLEANUP: TECH DEBT CONTRACTS
 # ============================================================================
 
+
 @dataclass
 class CleanupTask:
     """
@@ -633,6 +682,7 @@ class CleanupTask:
 
     Tech debt and cleanup opportunities.
     """
+
     task_id: str
     category: Literal["dead_code", "unused_deps", "duplicate", "deprecated", "refactor"]
 
@@ -657,6 +707,7 @@ class CleanupTask:
 # IAM-INDEX: KNOWLEDGE INDEXING CONTRACTS
 # ============================================================================
 
+
 @dataclass
 class IndexEntry:
     """
@@ -664,6 +715,7 @@ class IndexEntry:
 
     Updates to knowledge base from pipeline results.
     """
+
     entry_id: str
     knowledge_type: Literal["pattern", "issue", "fix", "learning", "decision"]
 
@@ -690,6 +742,7 @@ class IndexEntry:
 # HELPER FUNCTIONS
 # ============================================================================
 
+
 def create_mock_issue(issue_type: IssueType = IssueType.ADK_VIOLATION) -> IssueSpec:
     """Create a mock issue for testing."""
     return IssueSpec(
@@ -702,7 +755,7 @@ def create_mock_issue(issue_type: IssueType = IssueType.ADK_VIOLATION) -> IssueS
         line_start=10,
         line_end=15,
         pattern_violated="ADK LlmAgent pattern",
-        expected_pattern="Use google.adk.agents.LlmAgent"
+        expected_pattern="Use google.adk.agents.LlmAgent",
     )
 
 
@@ -718,16 +771,16 @@ def create_mock_fix_plan(issue_id: str) -> FixPlan:
                 action="edit",
                 target="agents/example.py",
                 description="Import ADK LlmAgent",
-                estimated_risk="low"
+                estimated_risk="low",
             ),
             FixStep(
                 order=2,
                 action="edit",
                 target="agents/example.py",
                 description="Refactor agent class to use LlmAgent",
-                estimated_risk="medium"
-            )
+                estimated_risk="medium",
+            ),
         ],
         overall_risk="medium",
-        requires_human_review=True
+        requires_human_review=True,
     )

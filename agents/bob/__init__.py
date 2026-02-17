@@ -29,5 +29,6 @@ def __getattr__(name):
     """Lazy-load ADK-dependent exports (6767-LAZY pattern)."""
     if name in __all__:
         from . import agent
+
         return getattr(agent, name)
     raise AttributeError(f"module {__name__!r} has no attribute {name!r}")

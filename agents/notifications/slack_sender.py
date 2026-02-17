@@ -15,7 +15,11 @@ from typing import Any, Dict, List, Optional
 
 import requests
 
-from agents.config.notifications import SlackDestination, get_swe_slack_destination, should_send_slack_notifications
+from agents.config.notifications import (
+    SlackDestination,
+    get_swe_slack_destination,
+    should_send_slack_notifications,
+)
 from agents.notifications.slack_formatter import format_portfolio_completion
 from agents.shared_contracts import PortfolioResult
 
@@ -23,10 +27,7 @@ logger = logging.getLogger(__name__)
 
 
 def send_portfolio_notification(
-    result: PortfolioResult,
-    env: str = "dev",
-    *,
-    timeout: int = 10
+    result: PortfolioResult, env: str = "dev", *, timeout: int = 10
 ) -> bool:
     """
     Send a portfolio completion notification to Slack.
@@ -62,7 +63,9 @@ def send_portfolio_notification(
 
         # Send via appropriate method
         if destination.webhook_url:
-            success = _send_via_webhook(destination.webhook_url, blocks, timeout=timeout)
+            success = _send_via_webhook(
+                destination.webhook_url, blocks, timeout=timeout
+            )
         elif destination.channel_id:
             success = _send_via_api(destination.channel_id, blocks, timeout=timeout)
         else:
@@ -83,10 +86,7 @@ def send_portfolio_notification(
 
 
 def _send_via_webhook(
-    webhook_url: str,
-    blocks: List[Dict[str, Any]],
-    *,
-    timeout: int = 10
+    webhook_url: str, blocks: List[Dict[str, Any]], *, timeout: int = 10
 ) -> bool:
     """
     Send message via Slack webhook URL.
@@ -106,7 +106,7 @@ def _send_via_webhook(
             webhook_url,
             json=payload,
             timeout=timeout,
-            headers={"Content-Type": "application/json"}
+            headers={"Content-Type": "application/json"},
         )
 
         if response.status_code == 200 and response.text == "ok":
@@ -131,10 +131,7 @@ def _send_via_webhook(
 
 
 def _send_via_api(
-    channel_id: str,
-    blocks: List[Dict[str, Any]],
-    *,
-    timeout: int = 10
+    channel_id: str, blocks: List[Dict[str, Any]], *, timeout: int = 10
 ) -> bool:
     """
     Send message via Slack API (requires bot token).
@@ -156,20 +153,12 @@ def _send_via_api(
     url = "https://slack.com/api/chat.postMessage"
     headers = {
         "Authorization": f"Bearer {bot_token}",
-        "Content-Type": "application/json"
+        "Content-Type": "application/json",
     }
-    payload = {
-        "channel": channel_id,
-        "blocks": blocks
-    }
+    payload = {"channel": channel_id, "blocks": blocks}
 
     try:
-        response = requests.post(
-            url,
-            json=payload,
-            headers=headers,
-            timeout=timeout
-        )
+        response = requests.post(url, json=payload, headers=headers, timeout=timeout)
 
         if response.status_code == 200:
             data = response.json()
@@ -198,10 +187,9 @@ def _send_via_api(
 # TESTING & DIAGNOSTICS
 # ============================================================================
 
+
 def test_slack_connection(
-    destination: Optional[SlackDestination] = None,
-    *,
-    timeout: int = 10
+    destination: Optional[SlackDestination] = None, *, timeout: int = 10
 ) -> bool:
     """
     Test Slack connection with a simple message.
@@ -229,25 +217,29 @@ def test_slack_connection(
             "text": {
                 "type": "mrkdwn",
                 "text": ":white_check_mark: *Slack Connection Test*\n"
-                        "This is a test message from Bob's Brain notification system."
-            }
+                "This is a test message from Bob's Brain notification system.",
+            },
         },
         {
             "type": "context",
             "elements": [
                 {
                     "type": "mrkdwn",
-                    "text": "If you see this, Slack notifications are working!"
+                    "text": "If you see this, Slack notifications are working!",
                 }
-            ]
-        }
+            ],
+        },
     ]
 
     try:
         if destination.webhook_url:
-            success = _send_via_webhook(destination.webhook_url, test_blocks, timeout=timeout)
+            success = _send_via_webhook(
+                destination.webhook_url, test_blocks, timeout=timeout
+            )
         elif destination.channel_id:
-            success = _send_via_api(destination.channel_id, test_blocks, timeout=timeout)
+            success = _send_via_api(
+                destination.channel_id, test_blocks, timeout=timeout
+            )
         else:
             logger.error("Destination has neither webhook_url nor channel_id")
             return False
@@ -267,6 +259,7 @@ def test_slack_connection(
 if __name__ == "__main__":
     # Quick test/demo
     import sys
+
     logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
 
     print("Slack Sender Test")
@@ -279,7 +272,9 @@ if __name__ == "__main__":
         print()
         print("To enable:")
         print("  export SLACK_NOTIFICATIONS_ENABLED=true")
-        print("  export SLACK_SWE_CHANNEL_WEBHOOK_URL=https://hooks.slack.com/services/...")
+        print(
+            "  export SLACK_SWE_CHANNEL_WEBHOOK_URL=https://hooks.slack.com/services/..."
+        )
         sys.exit(1)
 
     # Test connection

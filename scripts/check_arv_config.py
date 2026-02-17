@@ -32,7 +32,9 @@ RESET = "\033[0m"
 class ConfigViolation:
     """Represents a violation of config safety rules."""
 
-    def __init__(self, file_path: str, rule: str, message: str, line_number: int = None):
+    def __init__(
+        self, file_path: str, rule: str, message: str, line_number: int = None
+    ):
         self.file_path = file_path
         self.rule = rule
         self.message = message
@@ -64,7 +66,9 @@ def find_config_files() -> List[Path]:
     return config_files
 
 
-def check_feature_flag_defaults_in_python(file_path: Path, content: str) -> List[ConfigViolation]:
+def check_feature_flag_defaults_in_python(
+    file_path: Path, content: str
+) -> List[ConfigViolation]:
     """Check Python config files for proper feature flag defaults."""
     violations = []
 
@@ -86,8 +90,7 @@ def check_feature_flag_defaults_in_python(file_path: Path, content: str) -> List
         for node in ast.walk(tree):
             # Look for getenv calls with defaults
             if isinstance(node, ast.Call):
-                if (isinstance(node.func, ast.Attribute) and
-                    node.func.attr == "getenv"):
+                if isinstance(node.func, ast.Attribute) and node.func.attr == "getenv":
 
                     if len(node.args) >= 2:
                         # Get the env var name and default value
@@ -101,18 +104,26 @@ def check_feature_flag_defaults_in_python(file_path: Path, content: str) -> List
                                 # Check if default is "false" or False
                                 is_false = False
                                 if isinstance(default_val, ast.Constant):
-                                    if isinstance(default_val.value, bool) and not default_val.value:
+                                    if (
+                                        isinstance(default_val.value, bool)
+                                        and not default_val.value
+                                    ):
                                         is_false = True
-                                    elif isinstance(default_val.value, str) and default_val.value.lower() == "false":
+                                    elif (
+                                        isinstance(default_val.value, str)
+                                        and default_val.value.lower() == "false"
+                                    ):
                                         is_false = True
 
                                 if not is_false:
-                                    violations.append(ConfigViolation(
-                                        str(file_path),
-                                        "CONFIG-UNSAFE-DEFAULT",
-                                        f"{env_var} must default to false/False (safety: external integrations OFF by default)",
-                                        node.lineno
-                                    ))
+                                    violations.append(
+                                        ConfigViolation(
+                                            str(file_path),
+                                            "CONFIG-UNSAFE-DEFAULT",
+                                            f"{env_var} must default to false/False (safety: external integrations OFF by default)",
+                                            node.lineno,
+                                        )
+                                    )
 
                             elif env_var in dry_run_flags_must_be_true:
                                 default_val = node.args[1]
@@ -120,26 +131,33 @@ def check_feature_flag_defaults_in_python(file_path: Path, content: str) -> List
                                 # Check if default is "true" or True
                                 is_true = False
                                 if isinstance(default_val, ast.Constant):
-                                    if isinstance(default_val.value, bool) and default_val.value:
+                                    if (
+                                        isinstance(default_val.value, bool)
+                                        and default_val.value
+                                    ):
                                         is_true = True
-                                    elif isinstance(default_val.value, str) and default_val.value.lower() == "true":
+                                    elif (
+                                        isinstance(default_val.value, str)
+                                        and default_val.value.lower() == "true"
+                                    ):
                                         is_true = True
 
                                 if not is_true:
-                                    violations.append(ConfigViolation(
-                                        str(file_path),
-                                        "CONFIG-UNSAFE-DEFAULT",
-                                        f"{env_var} must default to true/True (safety: dry-run ON by default)",
-                                        node.lineno
-                                    ))
+                                    violations.append(
+                                        ConfigViolation(
+                                            str(file_path),
+                                            "CONFIG-UNSAFE-DEFAULT",
+                                            f"{env_var} must default to true/True (safety: dry-run ON by default)",
+                                            node.lineno,
+                                        )
+                                    )
 
     except SyntaxError as e:
-        violations.append(ConfigViolation(
-            str(file_path),
-            "CONFIG-SYNTAX-ERROR",
-            f"Syntax error: {e}",
-            e.lineno
-        ))
+        violations.append(
+            ConfigViolation(
+                str(file_path), "CONFIG-SYNTAX-ERROR", f"Syntax error: {e}", e.lineno
+            )
+        )
 
     return violations
 
@@ -157,19 +175,18 @@ def check_env_example_defaults(file_path: Path, content: str) -> List[ConfigViol
         "GITHUB_ISSUES_DRY_RUN=false": "GITHUB_ISSUES_DRY_RUN must default to true",
     }
 
-    for line_num, line in enumerate(content.split('\n'), 1):
+    for line_num, line in enumerate(content.split("\n"), 1):
         # Skip comments and empty lines
-        if line.strip().startswith('#') or not line.strip():
+        if line.strip().startswith("#") or not line.strip():
             continue
 
         for pattern, message in unsafe_patterns.items():
             if pattern in line:
-                violations.append(ConfigViolation(
-                    str(file_path),
-                    "CONFIG-UNSAFE-ENV-DEFAULT",
-                    message,
-                    line_num
-                ))
+                violations.append(
+                    ConfigViolation(
+                        str(file_path), "CONFIG-UNSAFE-ENV-DEFAULT", message, line_num
+                    )
+                )
 
     return violations
 
@@ -197,9 +214,9 @@ def check_hard_coded_secrets(file_path: Path, content: str) -> List[ConfigViolat
         "example-",
     ]
 
-    for line_num, line in enumerate(content.split('\n'), 1):
+    for line_num, line in enumerate(content.split("\n"), 1):
         # Skip comments
-        if line.strip().startswith('#'):
+        if line.strip().startswith("#"):
             continue
 
         # Check for secret patterns
@@ -208,12 +225,14 @@ def check_hard_coded_secrets(file_path: Path, content: str) -> List[ConfigViolat
                 # Check if it's in a safe context
                 is_safe = any(safe in line for safe in safe_contexts)
                 if not is_safe:
-                    violations.append(ConfigViolation(
-                        str(file_path),
-                        "CONFIG-HARD-CODED-SECRET",
-                        message,
-                        line_num
-                    ))
+                    violations.append(
+                        ConfigViolation(
+                            str(file_path),
+                            "CONFIG-HARD-CODED-SECRET",
+                            message,
+                            line_num,
+                        )
+                    )
 
     return violations
 
@@ -225,11 +244,11 @@ def check_config_file(file_path: Path) -> List[ConfigViolation]:
     try:
         content = file_path.read_text()
     except Exception as e:
-        violations.append(ConfigViolation(
-            str(file_path),
-            "CONFIG-FILE-ERROR",
-            f"Could not read file: {e}"
-        ))
+        violations.append(
+            ConfigViolation(
+                str(file_path), "CONFIG-FILE-ERROR", f"Could not read file: {e}"
+            )
+        )
         return violations
 
     # Run checks based on file type

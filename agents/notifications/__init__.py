@@ -9,8 +9,14 @@ Usage:
     success = send_portfolio_notification(portfolio_result, env="dev")
 """
 
-from agents.notifications.slack_formatter import format_portfolio_completion, format_portfolio_completion_simple
-from agents.notifications.slack_sender import send_portfolio_notification, test_slack_connection
+from agents.notifications.slack_formatter import (
+    format_portfolio_completion,
+    format_portfolio_completion_simple,
+)
+from agents.notifications.slack_sender import (
+    send_portfolio_notification,
+    test_slack_connection,
+)
 
 __all__ = [
     "format_portfolio_completion",

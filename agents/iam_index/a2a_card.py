@@ -14,14 +14,25 @@ from pydantic import BaseModel, Field
 
 class AgentCard(BaseModel):
     """AgentCard model for A2A protocol."""
+
     name: str = Field(..., description="Agent name")
     version: str = Field(..., description="Agent version")
     url: str = Field(..., description="Agent public URL")
-    description: str = Field(..., description="Agent description (must include SPIFFE ID per R7)")
-    capabilities: List[str] = Field(default_factory=list, description="Agent capabilities")
-    default_input_modes: List[str] = Field(default_factory=lambda: ["text"], description="Supported input modes")
-    default_output_modes: List[str] = Field(default_factory=lambda: ["text"], description="Supported output modes")
-    skills: List[Dict[str, Any]] = Field(default_factory=list, description="Agent skills")
+    description: str = Field(
+        ..., description="Agent description (must include SPIFFE ID per R7)"
+    )
+    capabilities: List[str] = Field(
+        default_factory=list, description="Agent capabilities"
+    )
+    default_input_modes: List[str] = Field(
+        default_factory=lambda: ["text"], description="Supported input modes"
+    )
+    default_output_modes: List[str] = Field(
+        default_factory=lambda: ["text"], description="Supported output modes"
+    )
+    skills: List[Dict[str, Any]] = Field(
+        default_factory=list, description="Agent skills"
+    )
 
 
 def get_agent_card() -> AgentCard:
@@ -29,7 +40,10 @@ def get_agent_card() -> AgentCard:
     app_name = os.getenv("APP_NAME", "iam-index")
     app_version = os.getenv("APP_VERSION", "0.10.0")
     public_url = os.getenv("PUBLIC_URL", "https://iam-index.intent.solutions")
-    spiffe_id = os.getenv("AGENT_SPIFFE_ID", "spiffe://intent.solutions/agent/iam-index/dev/us-central1/0.10.0")
+    spiffe_id = os.getenv(
+        "AGENT_SPIFFE_ID",
+        "spiffe://intent.solutions/agent/iam-index/dev/us-central1/0.10.0",
+    )
 
     description = f"""iam-index - Knowledge Management Specialist
 
@@ -38,7 +52,12 @@ def get_agent_card() -> AgentCard:
 iam-index manages Vertex AI Search integration, indexes code and documentation, and maintains the knowledge base for department access.
 """
 
-    capabilities = ["vertex_search_management", "code_indexing", "doc_indexing", "knowledge_base_maintenance"]
+    capabilities = [
+        "vertex_search_management",
+        "code_indexing",
+        "doc_indexing",
+        "knowledge_base_maintenance",
+    ]
 
     skills = [
         {
@@ -51,8 +70,8 @@ iam-index manages Vertex AI Search integration, indexes code and documentation, 
                 "properties": {
                     "repo_path": {"type": "string"},
                     "file_patterns": {"type": "array", "items": {"type": "string"}},
-                    "exclude_patterns": {"type": "array", "items": {"type": "string"}}
-                }
+                    "exclude_patterns": {"type": "array", "items": {"type": "string"}},
+                },
             },
             "output_schema": {
                 "type": "object",
@@ -62,14 +81,17 @@ iam-index manages Vertex AI Search integration, indexes code and documentation, 
                         "type": "object",
                         "required": ["status", "files_indexed"],
                         "properties": {
-                            "status": {"type": "string", "enum": ["SUCCESS", "PARTIAL", "FAILED"]},
+                            "status": {
+                                "type": "string",
+                                "enum": ["SUCCESS", "PARTIAL", "FAILED"],
+                            },
                             "files_indexed": {"type": "integer"},
                             "datastore_id": {"type": "string"},
-                            "index_timestamp": {"type": "string"}
-                        }
+                            "index_timestamp": {"type": "string"},
+                        },
                     }
-                }
-            }
+                },
+            },
         },
         {
             "skill_id": "iam_index.index_documentation",
@@ -80,8 +102,8 @@ iam-index manages Vertex AI Search integration, indexes code and documentation, 
                 "required": ["docs_path"],
                 "properties": {
                     "docs_path": {"type": "string"},
-                    "doc_types": {"type": "array", "items": {"type": "string"}}
-                }
+                    "doc_types": {"type": "array", "items": {"type": "string"}},
+                },
             },
             "output_schema": {
                 "type": "object",
@@ -93,11 +115,11 @@ iam-index manages Vertex AI Search integration, indexes code and documentation, 
                         "properties": {
                             "status": {"type": "string"},
                             "docs_indexed": {"type": "integer"},
-                            "datastore_id": {"type": "string"}
-                        }
+                            "datastore_id": {"type": "string"},
+                        },
                     }
-                }
-            }
+                },
+            },
         },
         {
             "skill_id": "iam_index.search_knowledge_base",
@@ -109,8 +131,8 @@ iam-index manages Vertex AI Search integration, indexes code and documentation, 
                 "properties": {
                     "query": {"type": "string"},
                     "max_results": {"type": "integer", "default": 10},
-                    "filter": {"type": "object"}
-                }
+                    "filter": {"type": "object"},
+                },
             },
             "output_schema": {
                 "type": "object",
@@ -128,15 +150,15 @@ iam-index manages Vertex AI Search integration, indexes code and documentation, 
                                         "title": {"type": "string"},
                                         "snippet": {"type": "string"},
                                         "source": {"type": "string"},
-                                        "relevance_score": {"type": "number"}
-                                    }
-                                }
+                                        "relevance_score": {"type": "number"},
+                                    },
+                                },
                             },
-                            "total_count": {"type": "integer"}
-                        }
+                            "total_count": {"type": "integer"},
+                        },
                     }
-                }
-            }
+                },
+            },
         },
         {
             "skill_id": "iam_index.update_knowledge_base",
@@ -151,13 +173,16 @@ iam-index manages Vertex AI Search integration, indexes code and documentation, 
                         "items": {
                             "type": "object",
                             "properties": {
-                                "operation": {"type": "string", "enum": ["add", "update", "delete"]},
+                                "operation": {
+                                    "type": "string",
+                                    "enum": ["add", "update", "delete"],
+                                },
                                 "document_id": {"type": "string"},
-                                "content": {"type": "object"}
-                            }
-                        }
+                                "content": {"type": "object"},
+                            },
+                        },
                     }
-                }
+                },
             },
             "output_schema": {
                 "type": "object",
@@ -169,23 +194,34 @@ iam-index manages Vertex AI Search integration, indexes code and documentation, 
                         "properties": {
                             "status": {"type": "string"},
                             "updates_applied": {"type": "integer"},
-                            "failed_updates": {"type": "integer"}
-                        }
+                            "failed_updates": {"type": "integer"},
+                        },
                     }
-                }
-            }
-        }
+                },
+            },
+        },
     ]
 
-    return AgentCard(name=app_name, version=app_version, url=public_url, description=description,
-                     capabilities=capabilities, default_input_modes=["text"], default_output_modes=["text"], skills=skills)
+    return AgentCard(
+        name=app_name,
+        version=app_version,
+        url=public_url,
+        description=description,
+        capabilities=capabilities,
+        default_input_modes=["text"],
+        default_output_modes=["text"],
+        skills=skills,
+    )
 
 
 def get_agent_card_dict() -> Dict[str, Any]:
     """Get iam-index's AgentCard as dictionary."""
     card = get_agent_card()
     card_dict = card.model_dump()
-    spiffe_id = os.getenv("AGENT_SPIFFE_ID", "spiffe://intent.solutions/agent/iam-index/dev/us-central1/0.10.0")
+    spiffe_id = os.getenv(
+        "AGENT_SPIFFE_ID",
+        "spiffe://intent.solutions/agent/iam-index/dev/us-central1/0.10.0",
+    )
     card_dict["spiffe_id"] = spiffe_id
     return card_dict
 

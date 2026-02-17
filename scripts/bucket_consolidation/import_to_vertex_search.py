@@ -19,6 +19,7 @@ LOCATION = "us"  # Datastore is in US region
 DATASTORE_ID = "bob-vertex-agent-datastore"
 RAG_BUCKET = "bobs-brain-bob-vertex-agent-rag"
 
+
 def list_bucket_files(bucket_name: str) -> List[str]:
     """List all files in a GCS bucket."""
     client = storage.Client(project=PROJECT_ID)
@@ -30,6 +31,7 @@ def list_bucket_files(bucket_name: str) -> List[str]:
 
     return files
 
+
 def import_documents_from_gcs(gcs_uris: List[str]):
     """Import documents from GCS to Vertex AI Search."""
     client = discoveryengine.DocumentServiceClient()
@@ -39,9 +41,7 @@ def import_documents_from_gcs(gcs_uris: List[str]):
     # Create import request
     request = discoveryengine.ImportDocumentsRequest(
         parent=parent,
-        gcs_source=discoveryengine.GcsSource(
-            input_uris=gcs_uris
-        ),
+        gcs_source=discoveryengine.GcsSource(input_uris=gcs_uris),
         reconciliation_mode="INCREMENTAL",  # Don't overwrite existing docs
     )
 
@@ -53,11 +53,14 @@ def import_documents_from_gcs(gcs_uris: List[str]):
 
     return operation
 
+
 def check_datastore_status():
     """Check current status of the datastore."""
     client = discoveryengine.DataStoreServiceClient()
 
-    datastore_name = f"projects/{PROJECT_ID}/locations/{LOCATION}/dataStores/{DATASTORE_ID}"
+    datastore_name = (
+        f"projects/{PROJECT_ID}/locations/{LOCATION}/dataStores/{DATASTORE_ID}"
+    )
 
     try:
         datastore = client.get_data_store(name=datastore_name)
@@ -68,11 +71,12 @@ def check_datastore_status():
         logger.error(f"Error accessing datastore: {e}")
         return False
 
+
 def main():
     """Main consolidation workflow."""
-    print("="*60)
+    print("=" * 60)
     print("VERTEX AI SEARCH CONSOLIDATION")
-    print("="*60)
+    print("=" * 60)
     print(f"\nTarget Datastore: {DATASTORE_ID}")
     print("Current: 8,718 documents, 109.87 MiB")
     print("")
@@ -91,7 +95,7 @@ def main():
         print(f"Found {len(rag_files)} files in gs://{RAG_BUCKET}")
 
         # Filter for markdown and text files
-        docs_to_import = [f for f in rag_files if f.endswith(('.md', '.txt', '.json'))]
+        docs_to_import = [f for f in rag_files if f.endswith((".md", ".txt", ".json"))]
         print(f"Documents to import: {len(docs_to_import)}")
     except Exception as e:
         print(f"❌ Error listing bucket: {e}")
@@ -107,16 +111,18 @@ def main():
             print(f"  ... and {len(docs_to_import) - 5} more")
 
         confirm = input("\nProceed with import? (y/n): ")
-        if confirm.lower() == 'y':
+        if confirm.lower() == "y":
             operation = import_documents_from_gcs(docs_to_import)
             print(f"\n✅ Import started: {operation.name}")
             print("Monitor progress in the Cloud Console:")
-            print(f"https://console.cloud.google.com/vertex-ai/search/dataStores/{DATASTORE_ID}")
+            print(
+                f"https://console.cloud.google.com/vertex-ai/search/dataStores/{DATASTORE_ID}"
+            )
 
     # Step 4: Cleanup plan
-    print("\n" + "="*60)
+    print("\n" + "=" * 60)
     print("CLEANUP PLAN")
-    print("="*60)
+    print("=" * 60)
     print("\nAfter import completes, delete these empty buckets:")
     print("  gsutil rm -r gs://bobs-brain-knowledge")
     print("  gsutil rm -r gs://bobs-brain-adk-staging")
@@ -125,6 +131,7 @@ def main():
     print("  gsutil rm -r gs://bobs-brain-bob-vertex-agent-rag")
 
     print("\n✅ Final state: ALL data in bob-vertex-agent-datastore")
+
 
 if __name__ == "__main__":
     main()
