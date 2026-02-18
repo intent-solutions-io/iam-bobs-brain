@@ -8,11 +8,10 @@ organization and versioning.
 import json
 import logging
 from datetime import datetime
-from pathlib import Path
 from typing import Dict, List
 
-from google.cloud import storage
 from google.api_core import exceptions as gcp_exceptions
+from google.cloud import storage
 
 from .config import CrawlerConfig
 
@@ -73,16 +72,13 @@ class GCSUploader:
         """
         try:
             # Convert to JSONL
-            jsonl_content = '\n'.join(
+            jsonl_content = "\n".join(
                 json.dumps(item, ensure_ascii=False) for item in data
             )
 
             # Upload to GCS
             blob = self.bucket.blob(gcs_path)
-            blob.upload_from_string(
-                jsonl_content,
-                content_type='application/jsonl'
-            )
+            blob.upload_from_string(jsonl_content, content_type="application/jsonl")
 
             gcs_uri = f"gs://{self.config.docs_bucket}/{gcs_path}"
             logger.info(f"Uploaded {len(data)} items to {gcs_uri}")
@@ -112,10 +108,7 @@ class GCSUploader:
 
             # Upload to GCS
             blob = self.bucket.blob(gcs_path)
-            blob.upload_from_string(
-                json_content,
-                content_type='application/json'
-            )
+            blob.upload_from_string(json_content, content_type="application/json")
 
             gcs_uri = f"gs://{self.config.docs_bucket}/{gcs_path}"
             logger.info(f"Uploaded JSON to {gcs_uri}")
@@ -126,10 +119,7 @@ class GCSUploader:
             raise RuntimeError(f"GCS upload failed: {e}")
 
     def upload_pipeline_results(
-        self,
-        documents: List[Dict],
-        chunks: List[Dict],
-        manifest: Dict
+        self, documents: List[Dict], chunks: List[Dict], manifest: Dict
     ) -> Dict[str, str]:
         """
         Upload all pipeline results to GCS.
@@ -153,28 +143,20 @@ class GCSUploader:
         results = {}
 
         # Upload documents (overwrite main file)
-        results['documents'] = self.upload_jsonl(
-            documents,
-            'adk-docs/raw/docs.jsonl'
-        )
+        results["documents"] = self.upload_jsonl(documents, "adk-docs/raw/docs.jsonl")
 
         # Upload chunks (overwrite main file)
-        results['chunks'] = self.upload_jsonl(
-            chunks,
-            'adk-docs/chunks/chunks.jsonl'
-        )
+        results["chunks"] = self.upload_jsonl(chunks, "adk-docs/chunks/chunks.jsonl")
 
         # Upload manifest (keep timestamped versions)
-        timestamp = datetime.utcnow().strftime('%Y%m%d_%H%M%S')
-        results['manifest'] = self.upload_json(
-            manifest,
-            f'adk-docs/manifests/crawl-manifest-{timestamp}.json'
+        timestamp = datetime.utcnow().strftime("%Y%m%d_%H%M%S")
+        results["manifest"] = self.upload_json(
+            manifest, f"adk-docs/manifests/crawl-manifest-{timestamp}.json"
         )
 
         # Also upload latest manifest (overwrite)
-        results['manifest_latest'] = self.upload_json(
-            manifest,
-            'adk-docs/manifests/crawl-manifest-latest.json'
+        results["manifest_latest"] = self.upload_json(
+            manifest, "adk-docs/manifests/crawl-manifest-latest.json"
         )
 
         logger.info("Pipeline results uploaded successfully:")
@@ -185,10 +167,7 @@ class GCSUploader:
 
 
 def upload_to_gcs(
-    documents: List[Dict],
-    chunks: List[Dict],
-    manifest: Dict,
-    config: CrawlerConfig
+    documents: List[Dict], chunks: List[Dict], manifest: Dict, config: CrawlerConfig
 ) -> Dict[str, str]:
     """
     Main entry point for uploading to GCS.

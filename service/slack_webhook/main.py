@@ -21,15 +21,15 @@ Environment Variables:
 - A2A_GATEWAY_URL: A2A gateway URL (for engine mode) - Phase AE2
 """
 
-import os
-import logging
 import hashlib
 import hmac
+import logging
+import os
 import time
-from typing import Dict, Any
-from fastapi import FastAPI, HTTPException, Request, Header
-from fastapi.responses import JSONResponse
+from typing import Any, Dict
+
 import httpx
+from fastapi import FastAPI, Header, HTTPException, Request
 
 # Configure logging
 logging.basicConfig(
@@ -57,6 +57,7 @@ if LOCATION and PROJECT_ID and AGENT_ENGINE_ID:
         "AGENT_ENGINE_URL",
         f"https://{LOCATION}-aiplatform.googleapis.com/v1/projects/{PROJECT_ID}/locations/{LOCATION}/reasoningEngines/{AGENT_ENGINE_ID}:query",
     )
+
 
 # Validate required environment variables
 def validate_config() -> tuple[bool, list[str]]:
@@ -98,6 +99,7 @@ def validate_config() -> tuple[bool, list[str]]:
         f"(routing: {'a2a_gateway' if has_gateway else 'direct Agent Engine'})"
     )
     return True, []
+
 
 config_valid, missing_vars = validate_config()
 
@@ -427,7 +429,9 @@ async def health() -> Dict[str, Any]:
         "missing_vars": missing_vars if not config_valid else [],
         "routing": routing,
         "a2a_gateway_url": A2A_GATEWAY_URL if A2A_GATEWAY_URL else None,
-        "agent_engine_url": AGENT_ENGINE_URL if AGENT_ENGINE_URL and not A2A_GATEWAY_URL else None,
+        "agent_engine_url": (
+            AGENT_ENGINE_URL if AGENT_ENGINE_URL and not A2A_GATEWAY_URL else None
+        ),
     }
 
 

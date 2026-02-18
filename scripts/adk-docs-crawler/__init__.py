@@ -14,6 +14,6 @@ Modules:
 __version__ = "1.0.0"
 __author__ = "Bob's Brain Team"
 
-from .config import load_config, CrawlerConfig
+from .config import CrawlerConfig, load_config
 
-__all__ = ["load_config", "CrawlerConfig"]
+__all__ = ["CrawlerConfig", "load_config"]

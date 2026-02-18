@@ -7,47 +7,37 @@ an entire portfolio of repositories, producing aggregated quality reports.
 Future: Can be parallelized for faster execution across many repos.
 """
 
-import time
-import uuid
-from typing import List, Optional, Dict, Tuple
-from datetime import datetime
-from collections import Counter
-
 # Import shared contracts
 import sys
+import time
+import uuid
+from collections import Counter
+from datetime import datetime
 from pathlib import Path
+from typing import Dict, List, Optional, Tuple
+
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from shared_contracts import (
-    PortfolioResult, PerRepoResult, PipelineResult,
-    Severity, IssueType, IssueSpec
-)
+from config.github_features import can_create_issues_for_repo, get_github_mode
+from config.notifications import should_send_slack_notifications
 
 # Import repo registry
-from config.repos import list_repos, get_repo_by_id, RepoConfig
+from config.repos import get_repo_by_id, list_repos
+from config.storage import get_org_storage_bucket, is_org_storage_write_enabled
+
+# Import GitHub issue creation (LIVE3B/LIVE3C-GITHUB-ISSUES)
+from iam_issue.github_issue_adapter import batch_create_github_issues
+
+# Import notifications (LIVE3A)
+from notifications import send_portfolio_notification
+
+from shared_contracts import IssueSpec, PerRepoResult, PortfolioResult
 
 # Import single-repo orchestrator (relative import to avoid module path issues)
 from .orchestrator import run_swe_pipeline_for_repo
 
 # Import org storage writer (LIVE1-GCS)
 from .storage_writer import write_portfolio_result_to_gcs
-from config.storage import is_org_storage_write_enabled, get_org_storage_bucket
-
-# Import notifications (LIVE3A)
-from notifications import send_portfolio_notification
-from config.notifications import should_send_slack_notifications
-
-# Import GitHub issue creation (LIVE3B/LIVE3C-GITHUB-ISSUES)
-from iam_issue.github_issue_adapter import (
-    create_github_issue,
-    batch_create_github_issues,
-    IssueCreationResult
-)
-from config.github_features import (
-    can_create_issues_for_repo,
-    get_github_mode,
-    GitHubMode
-)
 
 
 def run_portfolio_swe(
@@ -55,7 +45,7 @@ def run_portfolio_swe(
     mode: str = "preview",
     task: str = "Portfolio quality audit",
     env: str = "dev",
-    parallel: bool = False
+    parallel: bool = False,
 ) -> PortfolioResult:
     """
     Run SWE pipeline across multiple repositories and aggregate results.
@@ -102,7 +92,7 @@ def run_portfolio_swe(
         return PortfolioResult(
             portfolio_run_id=portfolio_run_id,
             repos=[],
-            portfolio_duration_seconds=time.time() - start_time
+            portfolio_duration_seconds=time.time() - start_time,
         )
 
     print()
@@ -120,10 +110,7 @@ def run_portfolio_swe(
         try:
             # Run the single-repo pipeline
             pipeline_result = run_swe_pipeline_for_repo(
-                repo_id=repo.id,
-                mode=mode,
-                task=task,
-                env=env
+                repo_id=repo.id, mode=mode, task=task, env=env
             )
 
             # Determine status from pipeline result
@@ -143,15 +130,17 @@ def run_portfolio_swe(
                 status=status,
                 pipeline_result=pipeline_result,
                 duration_seconds=time.time() - repo_start,
-                error_message=error_msg
+                error_message=error_msg,
             )
 
             per_repo_results.append(per_repo_result)
 
             # Print summary for this repo
             if status == "completed":
-                print(f"\n✅ {repo.id}: {pipeline_result.total_issues_found} issues, "
-                      f"{pipeline_result.issues_fixed} fixed")
+                print(
+                    f"\n✅ {repo.id}: {pipeline_result.total_issues_found} issues, "
+                    f"{pipeline_result.issues_fixed} fixed"
+                )
             elif status == "skipped":
                 print(f"\n⏭️  {repo.id}: SKIPPED (no local path)")
             elif status == "error":
@@ -160,6 +149,7 @@ def run_portfolio_swe(
         except Exception as e:
             print(f"\n❌ {repo.id}: EXCEPTION - {e}")
             import traceback
+
             traceback.print_exc()
 
             # Create error result
@@ -169,7 +159,7 @@ def run_portfolio_swe(
                 status="error",
                 pipeline_result=None,
                 duration_seconds=time.time() - repo_start,
-                error_message=str(e)
+                error_message=str(e),
             )
             per_repo_results.append(per_repo_result)
 
@@ -181,7 +171,7 @@ def run_portfolio_swe(
     portfolio_result = _aggregate_results(
         portfolio_run_id=portfolio_run_id,
         per_repo_results=per_repo_results,
-        total_duration=time.time() - start_time
+        total_duration=time.time() - start_time,
     )
 
     # Step 4: Print portfolio summary
@@ -216,23 +206,27 @@ def run_portfolio_swe(
                 issues=issues,
                 repo_id=repo_id,
                 github_owner=github_owner,
-                github_repo=github_repo
+                github_repo=github_repo,
             )
 
             # Count successes
             for result in results:
                 if result.success and result.mode == "real":
                     portfolio_result.issues_created += 1
-                    print(f"    ✅ Created issue #{result.issue_number}: {result.issue_url}")
+                    print(
+                        f"    ✅ Created issue #{result.issue_number}: {result.issue_url}"
+                    )
                 elif result.success and result.mode == "dry_run":
-                    print(f"    📝 DRY-RUN: Would create issue")
+                    print("    📝 DRY-RUN: Would create issue")
                 elif result.mode == "disabled":
-                    print(f"    ⏭️  DISABLED: Skipped issue creation")
+                    print("    ⏭️  DISABLED: Skipped issue creation")
                 else:
                     print(f"    ❌ FAILED: {result.error}")
 
-        print(f"\nSummary: {portfolio_result.issues_created} issues created "
-              f"(out of {portfolio_result.issues_planned} planned)")
+        print(
+            f"\nSummary: {portfolio_result.issues_created} issues created "
+            f"(out of {portfolio_result.issues_planned} planned)"
+        )
         print(f"{'=' * 70}\n")
     else:
         print("\n📋 No GitHub issues planned (all repos disabled or no findings)\n")
@@ -248,7 +242,9 @@ def run_portfolio_swe(
         print(f"{'=' * 70}\n")
     else:
         if not is_org_storage_write_enabled():
-            print("\n📊 Org storage write disabled (set ORG_STORAGE_WRITE_ENABLED=true to enable)")
+            print(
+                "\n📊 Org storage write disabled (set ORG_STORAGE_WRITE_ENABLED=true to enable)"
+            )
         elif not get_org_storage_bucket():
             print("\n⚠️  Org storage write enabled but ORG_STORAGE_BUCKET not set")
 
@@ -264,15 +260,15 @@ def run_portfolio_swe(
             print("⚠️  Slack notification failed (see logs)")
         print(f"{'=' * 70}\n")
     else:
-        print("\n💬 Slack notifications disabled (set SLACK_NOTIFICATIONS_ENABLED=true to enable)")
+        print(
+            "\n💬 Slack notifications disabled (set SLACK_NOTIFICATIONS_ENABLED=true to enable)"
+        )
 
     return portfolio_result
 
 
 def _aggregate_results(
-    portfolio_run_id: str,
-    per_repo_results: List[PerRepoResult],
-    total_duration: float
+    portfolio_run_id: str, per_repo_results: List[PerRepoResult], total_duration: float
 ) -> PortfolioResult:
     """
     Aggregate per-repo results into a portfolio-level summary.
@@ -283,8 +279,12 @@ def _aggregate_results(
     status_counts = Counter(r.status for r in per_repo_results)
 
     # Aggregate issue counts
-    total_issues = sum(r.issues_found for r in per_repo_results if r.status == "completed")
-    total_fixes = sum(r.issues_fixed for r in per_repo_results if r.status == "completed")
+    total_issues = sum(
+        r.issues_found for r in per_repo_results if r.status == "completed"
+    )
+    total_fixes = sum(
+        r.issues_fixed for r in per_repo_results if r.status == "completed"
+    )
 
     # Aggregate issues by severity
     severity_counts: Dict[str, int] = {}
@@ -304,9 +304,7 @@ def _aggregate_results(
 
     # Rank repos by issue count (descending)
     repos_with_issues = [
-        (r.repo_id, r.issues_found)
-        for r in per_repo_results
-        if r.status == "completed"
+        (r.repo_id, r.issues_found) for r in per_repo_results if r.status == "completed"
     ]
     repos_by_issue_count = sorted(repos_with_issues, key=lambda x: x[1], reverse=True)
 
@@ -335,7 +333,7 @@ def _aggregate_results(
         repos_by_issue_count=repos_by_issue_count,
         repos_by_compliance_score=repos_by_compliance_score,
         portfolio_duration_seconds=total_duration,
-        timestamp=datetime.now()
+        timestamp=datetime.now(),
     )
 
 
@@ -362,8 +360,11 @@ def _print_portfolio_summary(result: PortfolioResult):
     print("🔍 Issues Found:")
     print(f"  Total Issues: {result.total_issues_found}")
     print(f"  Issues Fixed: {result.total_issues_fixed}")
-    print(f"  Fix Rate: {result.total_issues_fixed / result.total_issues_found * 100:.1f}%"
-          if result.total_issues_found > 0 else "  Fix Rate: N/A")
+    print(
+        f"  Fix Rate: {result.total_issues_fixed / result.total_issues_found * 100:.1f}%"
+        if result.total_issues_found > 0
+        else "  Fix Rate: N/A"
+    )
     print()
 
     # Issues by severity
@@ -372,14 +373,22 @@ def _print_portfolio_summary(result: PortfolioResult):
         for severity in ["critical", "high", "medium", "low", "info"]:
             count = result.issues_by_severity.get(severity, 0)
             if count > 0:
-                icon = {"critical": "🔴", "high": "🟠", "medium": "🟡", "low": "🟢", "info": "⚪"}.get(severity, "•")
+                icon = {
+                    "critical": "🔴",
+                    "high": "🟠",
+                    "medium": "🟡",
+                    "low": "🟢",
+                    "info": "⚪",
+                }.get(severity, "•")
                 print(f"  {icon} {severity.title()}: {count}")
         print()
 
     # Issues by type
     if result.issues_by_type:
         print("🏷️  Issues by Type:")
-        for issue_type, count in sorted(result.issues_by_type.items(), key=lambda x: x[1], reverse=True):
+        for issue_type, count in sorted(
+            result.issues_by_type.items(), key=lambda x: x[1], reverse=True
+        ):
             print(f"  • {issue_type}: {count}")
         print()
 
@@ -395,7 +404,11 @@ def _print_portfolio_summary(result: PortfolioResult):
     if result.repos_by_compliance_score:
         print("⚠️  Repos Needing Attention (by compliance):")
         for repo_id, compliance_score in result.repos_by_compliance_score[:5]:
-            icon = "🔴" if compliance_score < 0.7 else "🟡" if compliance_score < 0.9 else "🟢"
+            icon = (
+                "🔴"
+                if compliance_score < 0.7
+                else "🟡" if compliance_score < 0.9 else "🟢"
+            )
             print(f"  {icon} {repo_id}: {compliance_score:.2f} compliance")
         print()
 
@@ -405,6 +418,7 @@ def _print_portfolio_summary(result: PortfolioResult):
 # ============================================================================
 # HELPER FUNCTIONS
 # ============================================================================
+
 
 def get_portfolio_local_repos() -> List[str]:
     """
@@ -432,9 +446,7 @@ def get_portfolio_repos_by_tag(tag: str) -> List[str]:
 
 
 def _convert_findings_to_issue_specs(
-    portfolio_result: PortfolioResult,
-    github_owner: str,
-    max_issues_per_repo: int = 10
+    portfolio_result: PortfolioResult, github_owner: str, max_issues_per_repo: int = 10
 ) -> List[Tuple[str, str, IssueSpec]]:
     """
     Convert portfolio findings to GitHub IssueSpecs.
@@ -466,11 +478,13 @@ def _convert_findings_to_issue_specs(
 
         for issue in issues:
             # Convert to IssueSpec format (issue is already an IssueSpec from pipeline)
-            issue_specs.append((
-                repo_result.repo_id,
-                repo_config.display_name,  # Use as GitHub repo name
-                issue
-            ))
+            issue_specs.append(
+                (
+                    repo_result.repo_id,
+                    repo_config.display_name,  # Use as GitHub repo name
+                    issue,
+                )
+            )
 
     return issue_specs
 
@@ -479,5 +493,7 @@ if __name__ == "__main__":
     # Demo: Run portfolio audit on all local repos
     print("Running portfolio demo...")
     result = run_portfolio_swe(mode="preview")
-    print(f"\nDemo complete! Analyzed {result.total_repos_analyzed} repos, "
-          f"found {result.total_issues_found} issues.")
+    print(
+        f"\nDemo complete! Analyzed {result.total_repos_analyzed} repos, "
+        f"found {result.total_issues_found} issues."
+    )

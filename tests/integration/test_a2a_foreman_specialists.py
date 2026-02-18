@@ -12,50 +12,58 @@ Tests:
 - Error handling
 """
 
-import pytest
-import json
-import sys
 import os
+import sys
 from pathlib import Path
-from typing import Dict, Any
+
+import pytest
 
 # Add repo root to path for imports
 REPO_ROOT = Path(__file__).parent.parent.parent
 sys.path.insert(0, str(REPO_ROOT))
 
 # Import A2A components (using sync wrapper for test compatibility)
-from agents.a2a import A2ATask, A2AResult, A2AError, call_specialist_sync, discover_specialists
+from agents.a2a import (
+    A2AError,
+    A2AResult,
+    A2ATask,
+    call_specialist_sync,
+    discover_specialists,
+)
 from agents.a2a.dispatcher import (
     load_agentcard,
-    validate_skill_exists,
     validate_input_structure,
+    validate_skill_exists,
 )
 
 # Repository root already defined above
 
 # Check if google.adk is available (Phase 18)
 try:
-    import google.adk
+    import google.adk  # noqa: F401
+
     ADK_AVAILABLE = True
-except ImportError:
+except Exception:
     ADK_AVAILABLE = False
 
 # Check if Vertex AI environment is configured (for real agent execution)
-VERTEX_AI_CONFIGURED = all([
-    os.getenv("PROJECT_ID") or os.getenv("GOOGLE_CLOUD_PROJECT"),
-    os.getenv("GOOGLE_APPLICATION_CREDENTIALS") or os.getenv("GOOGLE_CLOUD_REGION"),
-])
+VERTEX_AI_CONFIGURED = all(
+    [
+        os.getenv("PROJECT_ID") or os.getenv("GOOGLE_CLOUD_PROJECT"),
+        os.getenv("GOOGLE_APPLICATION_CREDENTIALS") or os.getenv("GOOGLE_CLOUD_REGION"),
+    ]
+)
 
 # Pytest marker for tests requiring ADK
 requires_adk = pytest.mark.skipif(
     not ADK_AVAILABLE,
-    reason="google.adk not installed (expected in local environment, runs in Agent Engine)"
+    reason="google.adk not installed (expected in local environment, runs in Agent Engine)",
 )
 
 # Pytest marker for tests that need Vertex AI credentials to run real agents
 requires_vertex_ai = pytest.mark.skipif(
     not VERTEX_AI_CONFIGURED,
-    reason="Vertex AI not configured (set PROJECT_ID and credentials for real agent execution)"
+    reason="Vertex AI not configured (set PROJECT_ID and credentials for real agent execution)",
 )
 
 
@@ -113,9 +121,7 @@ class TestSkillValidation:
 
         # iam_adk should have check_adk_compliance skill
         skill = validate_skill_exists(
-            agentcard,
-            "iam_adk.check_adk_compliance",
-            "iam_adk"
+            agentcard, "iam_adk.check_adk_compliance", "iam_adk"
         )
 
         # AgentCard uses "id" field, not "skill_id"
@@ -128,26 +134,17 @@ class TestSkillValidation:
         agentcard = load_agentcard("iam_adk")
 
         with pytest.raises(A2AError, match="Skill .* not found"):
-            validate_skill_exists(
-                agentcard,
-                "iam_adk.non_existent_skill",
-                "iam_adk"
-            )
+            validate_skill_exists(agentcard, "iam_adk.non_existent_skill", "iam_adk")
 
     def test_validate_input_structure_happy_path(self):
         """Verify input validation passes with correct payload."""
         agentcard = load_agentcard("iam_adk")
         skill = validate_skill_exists(
-            agentcard,
-            "iam_adk.check_adk_compliance",
-            "iam_adk"
+            agentcard, "iam_adk.check_adk_compliance", "iam_adk"
         )
 
         input_schema = skill["input_schema"]
-        payload = {
-            "target": "agents/bob/agent.py",
-            "focus_rules": ["R1", "R5"]
-        }
+        payload = {"target": "agents/bob/agent.py", "focus_rules": ["R1", "R5"]}
 
         # Should not raise
         validate_input_structure(payload, input_schema, "iam_adk.check_adk_compliance")
@@ -156,9 +153,7 @@ class TestSkillValidation:
         """Verify input validation fails when required field is missing."""
         agentcard = load_agentcard("iam_adk")
         skill = validate_skill_exists(
-            agentcard,
-            "iam_adk.check_adk_compliance",
-            "iam_adk"
+            agentcard, "iam_adk.check_adk_compliance", "iam_adk"
         )
 
         input_schema = skill["input_schema"]
@@ -168,7 +163,9 @@ class TestSkillValidation:
         }
 
         with pytest.raises(A2AError, match="missing required fields"):
-            validate_input_structure(payload, input_schema, "iam_adk.check_adk_compliance")
+            validate_input_structure(
+                payload, input_schema, "iam_adk.check_adk_compliance"
+            )
 
 
 class TestA2ADelegation:
@@ -185,12 +182,9 @@ class TestA2ADelegation:
         task = A2ATask(
             specialist="iam_adk",
             skill_id="iam_adk.check_adk_compliance",
-            payload={
-                "target": "agents/bob/agent.py",
-                "focus_rules": ["R1", "R5"]
-            },
+            payload={"target": "agents/bob/agent.py", "focus_rules": ["R1", "R5"]},
             context={"request_id": "test_123"},
-            spiffe_id="spiffe://intent.solutions/agent/iam-senior-adk-devops-lead/dev/us-central1/0.10.0"
+            spiffe_id="spiffe://intent.solutions/agent/iam-senior-adk-devops-lead/dev/us-central1/0.10.0",
         )
 
         result = call_specialist_sync(task)
@@ -207,7 +201,9 @@ class TestA2ADelegation:
         # Check if this is mock or real execution
         if ADK_AVAILABLE:
             # Real execution - result should NOT have 'mock' flag
-            assert result.result.get("mock") is None or result.result.get("mock") is False
+            assert (
+                result.result.get("mock") is None or result.result.get("mock") is False
+            )
         else:
             # Mock execution - result should have 'mock' flag
             assert result.result.get("mock") is True
@@ -218,7 +214,7 @@ class TestA2ADelegation:
             specialist="non_existent",
             skill_id="non_existent.some_skill",
             payload={},
-            spiffe_id="spiffe://intent.solutions/agent/test/dev/us-central1/0.1.0"
+            spiffe_id="spiffe://intent.solutions/agent/test/dev/us-central1/0.1.0",
         )
 
         with pytest.raises(A2AError, match="AgentCard not found"):
@@ -230,7 +226,7 @@ class TestA2ADelegation:
             specialist="iam_adk",
             skill_id="iam_adk.non_existent_skill",
             payload={"target": "agents/bob/agent.py"},
-            spiffe_id="spiffe://intent.solutions/agent/test/dev/us-central1/0.1.0"
+            spiffe_id="spiffe://intent.solutions/agent/test/dev/us-central1/0.1.0",
         )
 
         with pytest.raises(A2AError, match="Skill .* not found"):
@@ -245,7 +241,7 @@ class TestA2ADelegation:
                 # Missing 'target' field
                 "focus_rules": ["R1"]
             },
-            spiffe_id="spiffe://intent.solutions/agent/test/dev/us-central1/0.1.0"
+            spiffe_id="spiffe://intent.solutions/agent/test/dev/us-central1/0.1.0",
         )
 
         with pytest.raises(A2AError, match="missing required fields"):
@@ -259,9 +255,16 @@ class TestForemanDelegationTools:
     def _load_delegation_module():
         """Helper to load delegation module using importlib."""
         import importlib.util
+
         spec = importlib.util.spec_from_file_location(
             "delegation",
-            str(REPO_ROOT / "agents" / "iam_senior_adk_devops_lead" / "tools" / "delegation.py")
+            str(
+                REPO_ROOT
+                / "agents"
+                / "iam_senior_adk_devops_lead"
+                / "tools"
+                / "delegation.py"
+            ),
         )
         if spec and spec.loader:
             delegation = importlib.util.module_from_spec(spec)
@@ -308,11 +311,8 @@ class TestForemanDelegationTools:
         result = delegation.delegate_to_specialist(
             specialist="iam_adk",
             skill_id="iam_adk.check_adk_compliance",
-            payload={
-                "target": "agents/bob/agent.py",
-                "focus_rules": ["R1", "R5"]
-            },
-            context={"request_id": "test_456"}
+            payload={"target": "agents/bob/agent.py", "focus_rules": ["R1", "R5"]},
+            context={"request_id": "test_456"},
         )
 
         # Verify result structure (works in both mock and real mode)
@@ -328,7 +328,10 @@ class TestForemanDelegationTools:
         # Check if this is mock or real execution
         if ADK_AVAILABLE:
             # Real execution - result should NOT have 'mock' flag
-            assert result["result"].get("mock") is None or result["result"].get("mock") is False
+            assert (
+                result["result"].get("mock") is None
+                or result["result"].get("mock") is False
+            )
         else:
             # Mock execution - result should have 'mock' flag
             assert result["result"].get("mock") is True
@@ -342,19 +345,18 @@ class TestForemanDelegationTools:
             {
                 "specialist": "iam_adk",
                 "skill_id": "iam_adk.check_adk_compliance",
-                "payload": {"target": "agents/bob/agent.py"}
+                "payload": {"target": "agents/bob/agent.py"},
             },
             {
                 "specialist": "iam_issue",
                 "skill_id": "iam_issue.create_issue_spec",
-                "payload": {
-                    "title": "Test issue",
-                    "description": "Test description"
-                }
-            }
+                "payload": {"title": "Test issue", "description": "Test description"},
+            },
         ]
 
-        results = delegation.delegate_to_multiple(delegations, execution_mode="sequential")
+        results = delegation.delegate_to_multiple(
+            delegations, execution_mode="sequential"
+        )
 
         # Verify results
         assert len(results) == 2
@@ -373,7 +375,7 @@ class TestR7SPIFFEPropagation:
             specialist="iam_adk",
             skill_id="iam_adk.check_adk_compliance",
             payload={"target": "agents/bob/agent.py"},
-            spiffe_id=foreman_spiffe
+            spiffe_id=foreman_spiffe,
         )
 
         assert task.spiffe_id == foreman_spiffe
@@ -394,8 +396,9 @@ class TestR7SPIFFEPropagation:
         for specialist in specialists:
             agentcard = load_agentcard(specialist)
             assert "spiffe_id" in agentcard, f"{specialist} missing SPIFFE ID"
-            assert agentcard["spiffe_id"].startswith("spiffe://"), \
-                f"{specialist} SPIFFE ID doesn't start with spiffe://"
+            assert agentcard["spiffe_id"].startswith(
+                "spiffe://"
+            ), f"{specialist} SPIFFE ID doesn't start with spiffe://"
 
 
 class TestAgentCardSkillsAlignment:
@@ -414,10 +417,10 @@ class TestAgentCardSkillsAlignment:
 
             for skill_id in skills:
                 # Skill ID should start with directory name (iam_adk, iam_issue, etc.)
-                assert skill_id is not None, \
-                    f"Skill ID is None for {directory}"
-                assert skill_id.startswith(f"{directory}."), \
-                    f"Skill '{skill_id}' doesn't follow naming convention for {directory}"
+                assert skill_id is not None, f"Skill ID is None for {directory}"
+                assert skill_id.startswith(
+                    f"{directory}."
+                ), f"Skill '{skill_id}' doesn't follow naming convention for {directory}"
 
     def test_all_skills_have_schemas(self):
         """Verify all skills have input_schema and output_schema."""
@@ -430,13 +433,17 @@ class TestAgentCardSkillsAlignment:
             for skill in agentcard.get("skills", []):
                 skill_id = skill.get("id")  # AgentCard uses "id" not "skill_id"
 
-                assert "input_schema" in skill, \
-                    f"Skill '{skill_id}' missing input_schema"
-                assert "output_schema" in skill, \
-                    f"Skill '{skill_id}' missing output_schema"
+                assert (
+                    "input_schema" in skill
+                ), f"Skill '{skill_id}' missing input_schema"
+                assert (
+                    "output_schema" in skill
+                ), f"Skill '{skill_id}' missing output_schema"
 
                 # Verify schemas have required fields
-                assert "type" in skill["input_schema"], \
-                    f"Skill '{skill_id}' input_schema missing 'type'"
-                assert "type" in skill["output_schema"], \
-                    f"Skill '{skill_id}' output_schema missing 'type'"
+                assert (
+                    "type" in skill["input_schema"]
+                ), f"Skill '{skill_id}' input_schema missing 'type'"
+                assert (
+                    "type" in skill["output_schema"]
+                ), f"Skill '{skill_id}' output_schema missing 'type'"

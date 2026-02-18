@@ -7,12 +7,9 @@ These tools enable iam-adk to perform static analysis and produce structured
 audit reports and issue specifications.
 """
 
-import os
 import ast
-import re
-from pathlib import Path
-from typing import Dict, List, Any, Optional
 import logging
+import os
 
 logger = logging.getLogger(__name__)
 
@@ -68,14 +65,14 @@ def analyze_agent_code(file_path: str) -> str:
         if not os.path.exists(file_path):
             return f'{{"error": "File not found: {file_path}"}}'
 
-        with open(file_path, "r") as f:
+        with open(file_path) as f:
             code = f.read()
 
         # Parse AST
         try:
             tree = ast.parse(code)
         except SyntaxError as e:
-            return f'{{"error": "Syntax error in file: {str(e)}"}}'
+            return f'{{"error": "Syntax error in file: {e!s}"}}'
 
         violations = []
         metrics = {
@@ -89,7 +86,11 @@ def analyze_agent_code(file_path: str) -> str:
 
         # Check imports (R1: ADK-only)
         forbidden_imports = ["langchain", "crewai", "autogen", "llama_index"]
-        required_imports = ["google.adk.agents", "google.adk.sessions", "google.adk.memory"]
+        required_imports = [
+            "google.adk.agents",
+            "google.adk.sessions",
+            "google.adk.memory",
+        ]
 
         imports_found = []
         for node in ast.walk(tree):
@@ -133,8 +134,12 @@ def analyze_agent_code(file_path: str) -> str:
                 )
 
         # Check for dual memory (R5)
-        has_session_service = any("VertexAiSessionService" in imp for imp in imports_found)
-        has_memory_bank = any("VertexAiMemoryBankService" in imp for imp in imports_found)
+        has_session_service = any(
+            "VertexAiSessionService" in imp for imp in imports_found
+        )
+        has_memory_bank = any(
+            "VertexAiMemoryBankService" in imp for imp in imports_found
+        )
         metrics["has_dual_memory"] = has_session_service and has_memory_bank
 
         if not metrics["has_dual_memory"]:
@@ -224,11 +229,15 @@ def analyze_agent_code(file_path: str) -> str:
                 "Implement dual memory wiring with VertexAiSessionService and VertexAiMemoryBankService"
             )
         if not metrics["has_callback"]:
-            recommendations.append("Add after_agent_callback to persist sessions to Memory Bank")
+            recommendations.append(
+                "Add after_agent_callback to persist sessions to Memory Bank"
+            )
         if not metrics["uses_type_hints"]:
             recommendations.append("Add type hints to get_agent() -> LlmAgent")
         if not metrics["has_spiffe_id"]:
-            recommendations.append("Add AGENT_SPIFFE_ID to environment variables and logging")
+            recommendations.append(
+                "Add AGENT_SPIFFE_ID to environment variables and logging"
+            )
 
         result = {
             "compliance_status": compliance_status,
@@ -243,7 +252,7 @@ def analyze_agent_code(file_path: str) -> str:
 
     except Exception as e:
         logger.error(f"Error analyzing agent code: {e}", exc_info=True)
-        return f'{{"error": "Analysis failed: {str(e)}"}}'
+        return f'{{"error": "Analysis failed: {e!s}"}}'
 
 
 def validate_adk_pattern(pattern_name: str, code_snippet: str) -> str:
@@ -291,7 +300,7 @@ def validate_adk_pattern(pattern_name: str, code_snippet: str) -> str:
         try:
             tree = ast.parse(code_snippet)
         except SyntaxError as e:
-            return f'{{"valid": false, "pattern": "{pattern_name}", "issues": [{{"severity": "HIGH", "message": "Syntax error: {str(e)}"}}]}}'
+            return f'{{"valid": false, "pattern": "{pattern_name}", "issues": [{{"severity": "HIGH", "message": "Syntax error: {e!s}"}}]}}'
 
         if pattern_name == "tool_definition":
             # Check for function with docstring and type hints
@@ -370,7 +379,7 @@ def my_tool(param: str, count: int = 1) -> str:
                 )
                 valid = False
 
-            example = '''
+            example = """
 from google.adk.sessions import VertexAiSessionService
 from google.adk.memory import VertexAiMemoryBankService
 
@@ -391,7 +400,7 @@ runner = Runner(
     session_service=session_service,
     memory_service=memory_service
 )
-'''
+"""
 
         elif pattern_name == "llm_agent_creation":
             # Check LlmAgent structure
@@ -400,7 +409,9 @@ runner = Runner(
             has_instruction = "instruction=" in code_snippet
 
             if not has_model:
-                issues.append({"severity": "HIGH", "message": "Missing model parameter"})
+                issues.append(
+                    {"severity": "HIGH", "message": "Missing model parameter"}
+                )
                 valid = False
 
             if not has_name:
@@ -412,7 +423,7 @@ runner = Runner(
                     {"severity": "MEDIUM", "message": "Missing instruction parameter"}
                 )
 
-            example = '''
+            example = """
 from google.adk.agents import LlmAgent
 
 agent = LlmAgent(
@@ -422,7 +433,7 @@ agent = LlmAgent(
     instruction="Agent system prompt...",
     after_agent_callback=auto_save_session_to_memory
 )
-'''
+"""
 
         else:
             return f'{{"valid": false, "pattern": "{pattern_name}", "issues": [{{"severity": "HIGH", "message": "Unknown pattern name"}}]}}'
@@ -438,7 +449,7 @@ agent = LlmAgent(
 
     except Exception as e:
         logger.error(f"Error validating pattern: {e}", exc_info=True)
-        return f'{{"valid": false, "pattern": "{pattern_name}", "issues": [{{"severity": "HIGH", "message": "Validation failed: {str(e)}"}}]}}'
+        return f'{{"valid": false, "pattern": "{pattern_name}", "issues": [{{"severity": "HIGH", "message": "Validation failed: {e!s}"}}]}}'
 
 
 def check_a2a_compliance(agent_dir: str) -> str:
@@ -499,7 +510,7 @@ def check_a2a_compliance(agent_dir: str) -> str:
         elif os.path.exists(card_py):
             has_agent_card = True
             # Check Python AgentCard definition
-            with open(card_py, "r") as f:
+            with open(card_py) as f:
                 card_code = f.read()
 
             if "AgentCard" not in card_code:
@@ -564,4 +575,4 @@ def check_a2a_compliance(agent_dir: str) -> str:
 
     except Exception as e:
         logger.error(f"Error checking A2A compliance: {e}", exc_info=True)
-        return f'{{"error": "A2A compliance check failed: {str(e)}"}}'
+        return f'{{"error": "A2A compliance check failed: {e!s}"}}'

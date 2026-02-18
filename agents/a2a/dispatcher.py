@@ -21,13 +21,13 @@ Phase H+: Implements async A2A dispatch using InMemoryRunner.run_debug()
 """
 
 import asyncio
+import importlib
 import json
 import logging
-import importlib
 from pathlib import Path
-from typing import Dict, Any, List
+from typing import Any, Dict, List
 
-from .types import A2ATask, A2AResult, A2AError
+from .types import A2AError, A2AResult, A2ATask
 
 logger = logging.getLogger(__name__)
 
@@ -38,6 +38,7 @@ REPO_ROOT = Path(__file__).parent.parent.parent
 # =============================================================================
 # CANONICAL ID RESOLUTION (Phase D - Agent Identity Migration)
 # =============================================================================
+
 
 def _resolve_specialist_id(specialist: str) -> tuple[str, str]:
     """
@@ -72,7 +73,7 @@ def _resolve_specialist_id(specialist: str) -> tuple[str, str]:
         raise A2AError(
             f"Unknown specialist ID: '{specialist}'. Use canonical IDs like "
             f"'iam-compliance', 'iam-triage', etc.",
-            specialist=specialist
+            specialist=specialist,
         )
 
     canonical_id = canonicalize(specialist, warn=True)
@@ -87,17 +88,25 @@ SPECIALIST_MODULES = {
     "iam-compliance": {"directory": "iam_adk", "module": "agents.iam_adk.agent"},
     "iam-triage": {"directory": "iam_issue", "module": "agents.iam_issue.agent"},
     "iam-planner": {"directory": "iam_fix_plan", "module": "agents.iam_fix_plan.agent"},
-    "iam-engineer": {"directory": "iam_fix_impl", "module": "agents.iam_fix_impl.agent"},
+    "iam-engineer": {
+        "directory": "iam_fix_impl",
+        "module": "agents.iam_fix_impl.agent",
+    },
     "iam-qa": {"directory": "iam_qa", "module": "agents.iam_qa.agent"},
     "iam-docs": {"directory": "iam_doc", "module": "agents.iam_doc.agent"},
     "iam-hygiene": {"directory": "iam_cleanup", "module": "agents.iam_cleanup.agent"},
     "iam-index": {"directory": "iam_index", "module": "agents.iam_index.agent"},
-
     # Legacy IDs (deprecated, for backwards compatibility)
     "iam_adk": {"directory": "iam_adk", "module": "agents.iam_adk.agent"},
     "iam_issue": {"directory": "iam_issue", "module": "agents.iam_issue.agent"},
-    "iam_fix_plan": {"directory": "iam_fix_plan", "module": "agents.iam_fix_plan.agent"},
-    "iam_fix_impl": {"directory": "iam_fix_impl", "module": "agents.iam_fix_impl.agent"},
+    "iam_fix_plan": {
+        "directory": "iam_fix_plan",
+        "module": "agents.iam_fix_plan.agent",
+    },
+    "iam_fix_impl": {
+        "directory": "iam_fix_impl",
+        "module": "agents.iam_fix_impl.agent",
+    },
     "iam_qa": {"directory": "iam_qa", "module": "agents.iam_qa.agent"},
     "iam_doc": {"directory": "iam_doc", "module": "agents.iam_doc.agent"},
     "iam_cleanup": {"directory": "iam_cleanup", "module": "agents.iam_cleanup.agent"},
@@ -129,25 +138,29 @@ def load_agentcard(specialist: str) -> Dict[str, Any]:
         except A2AError:
             directory = specialist  # Fall back to direct use
 
-    agentcard_path = REPO_ROOT / "agents" / directory / ".well-known" / "agent-card.json"
+    agentcard_path = (
+        REPO_ROOT / "agents" / directory / ".well-known" / "agent-card.json"
+    )
 
     if not agentcard_path.exists():
         raise A2AError(
             f"AgentCard not found for specialist '{specialist}' at {agentcard_path}",
-            specialist=specialist
+            specialist=specialist,
         )
 
     try:
-        with open(agentcard_path, "r") as f:
+        with open(agentcard_path) as f:
             return json.load(f)
     except json.JSONDecodeError as e:
         raise A2AError(
             f"Invalid AgentCard JSON for specialist '{specialist}': {e}",
-            specialist=specialist
+            specialist=specialist,
         )
 
 
-def validate_skill_exists(agentcard: Dict[str, Any], skill_id: str, specialist: str) -> Dict[str, Any]:
+def validate_skill_exists(
+    agentcard: Dict[str, Any], skill_id: str, specialist: str
+) -> Dict[str, Any]:
     """
     Verify that a skill exists in the AgentCard.
 
@@ -173,11 +186,13 @@ def validate_skill_exists(agentcard: Dict[str, Any], skill_id: str, specialist: 
     raise A2AError(
         f"Skill '{skill_id}' not found in AgentCard for '{specialist}'. Available skills: {available_skills}",
         specialist=specialist,
-        skill_id=skill_id
+        skill_id=skill_id,
     )
 
 
-def validate_input_structure(payload: Dict[str, Any], input_schema: Dict[str, Any], skill_id: str) -> None:
+def validate_input_structure(
+    payload: Dict[str, Any], input_schema: Dict[str, Any], skill_id: str
+) -> None:
     """
     Perform lightweight structural validation of input payload.
 
@@ -243,7 +258,7 @@ async def invoke_specialist_local(specialist: str, task: A2ATask) -> Dict[str, A
         raise A2AError(
             f"Specialist '{specialist}' not registered. "
             f"Use canonical IDs: {canonical_ids}",
-            specialist=specialist
+            specialist=specialist,
         )
 
     module_path = spec_info["module"]
@@ -251,8 +266,9 @@ async def invoke_specialist_local(specialist: str, task: A2ATask) -> Dict[str, A
     # Check ADK availability first before importing specialist module
     try:
         from google.adk.runners import InMemoryRunner
+
         adk_available = True
-    except ImportError:
+    except Exception:
         adk_available = False
         logger.debug(
             f"google.adk not available, using mock execution for {specialist}.{task.skill_id}"
@@ -265,21 +281,21 @@ async def invoke_specialist_local(specialist: str, task: A2ATask) -> Dict[str, A
         if not hasattr(module, "create_agent"):
             raise A2AError(
                 f"Specialist module '{module_path}' missing create_agent() function",
-                specialist=specialist
+                specialist=specialist,
             )
 
         if adk_available:
             # Phase H+: Real async ADK execution using InMemoryRunner.run_debug()
             logger.info(
                 f"A2A: Executing {specialist}.{task.skill_id} via InMemoryRunner",
-                extra={"specialist": specialist, "skill_id": task.skill_id}
+                extra={"specialist": specialist, "skill_id": task.skill_id},
             )
 
             # Create agent instance
             agent = module.create_agent()
             logger.info(
                 f"A2A: Agent '{specialist}' instantiated",
-                extra={"specialist": specialist, "agent_type": type(agent).__name__}
+                extra={"specialist": specialist, "agent_type": type(agent).__name__},
             )
 
             # Create InMemoryRunner (no persistent memory - test/local only)
@@ -294,20 +310,24 @@ async def invoke_specialist_local(specialist: str, task: A2ATask) -> Dict[str, A
                 events = await runner.run_debug(
                     user_messages=prompt,
                     user_id=task.context.get("user_id", "a2a_dispatcher"),
-                    session_id=task.context.get("session_id", f"a2a_{specialist}_{task.skill_id}"),
-                    quiet=True  # Suppress console output
+                    session_id=task.context.get(
+                        "session_id", f"a2a_{specialist}_{task.skill_id}"
+                    ),
+                    quiet=True,  # Suppress console output
                 )
 
                 # Extract final response from events
-                result = _extract_response_from_events(events, specialist, task.skill_id)
+                result = _extract_response_from_events(
+                    events, specialist, task.skill_id
+                )
 
                 logger.info(
                     f"A2A: Successfully executed {specialist}.{task.skill_id}",
                     extra={
                         "specialist": specialist,
                         "skill_id": task.skill_id,
-                        "event_count": len(events)
-                    }
+                        "event_count": len(events),
+                    },
                 )
 
                 return result
@@ -316,19 +336,19 @@ async def invoke_specialist_local(specialist: str, task: A2ATask) -> Dict[str, A
                 logger.error(
                     f"A2A: InMemoryRunner.run_debug() failed for {specialist}.{task.skill_id}: {run_error}",
                     extra={"specialist": specialist, "skill_id": task.skill_id},
-                    exc_info=True
+                    exc_info=True,
                 )
                 raise A2AError(
                     f"Agent execution failed for {specialist}.{task.skill_id}: {run_error}",
                     specialist=specialist,
-                    skill_id=task.skill_id
+                    skill_id=task.skill_id,
                 )
 
         else:
             # Mock fallback path (when ADK not installed)
             logger.info(
                 f"A2A: Mock execution of {specialist}.{task.skill_id} (google.adk not available)",
-                extra={"specialist": specialist, "skill_id": task.skill_id}
+                extra={"specialist": specialist, "skill_id": task.skill_id},
             )
 
             # Return mock result structure
@@ -336,38 +356,33 @@ async def invoke_specialist_local(specialist: str, task: A2ATask) -> Dict[str, A
                 "status": "SUCCESS",
                 "message": f"Mock execution of {task.skill_id} (ADK not installed)",
                 "payload_echo": task.payload,
-                "mock": True
+                "mock": True,
             }
 
-    except ImportError as e:
+    except A2AError:
+        # Re-raise A2A errors as-is
+        raise
+    except Exception as e:
         # If module import fails due to missing google.adk, fall back to mock
         if "google.adk" in str(e) and not adk_available:
             logger.info(
                 f"A2A: Specialist module '{module_path}' requires google.adk (not available). "
                 f"Using mock execution for {specialist}.{task.skill_id}",
-                extra={"specialist": specialist, "skill_id": task.skill_id}
+                extra={"specialist": specialist, "skill_id": task.skill_id},
             )
 
             return {
                 "status": "SUCCESS",
                 "message": f"Mock execution of {task.skill_id} (specialist module requires ADK)",
                 "payload_echo": task.payload,
-                "mock": True
+                "mock": True,
             }
         else:
             raise A2AError(
-                f"Failed to import specialist module '{module_path}': {e}",
-                specialist=specialist
+                f"Failed to invoke specialist '{specialist}': {e}",
+                specialist=specialist,
+                skill_id=task.skill_id,
             )
-    except A2AError:
-        # Re-raise A2A errors as-is
-        raise
-    except Exception as e:
-        raise A2AError(
-            f"Failed to invoke specialist '{specialist}': {e}",
-            specialist=specialist,
-            skill_id=task.skill_id
-        )
 
 
 def _build_specialist_prompt(task: A2ATask) -> str:
@@ -388,7 +403,7 @@ def _build_specialist_prompt(task: A2ATask) -> str:
         "skill_id": task.skill_id,
         "payload": task.payload,
         "context": task.context,
-        "spiffe_id": task.spiffe_id
+        "spiffe_id": task.spiffe_id,
     }
 
     # The specialist is instructed to accept JSON tasks and return JSON responses
@@ -403,7 +418,9 @@ Respond with valid JSON matching the skill's output schema."""
     return prompt
 
 
-def _extract_response_from_events(events: list, specialist: str, skill_id: str) -> Dict[str, Any]:
+def _extract_response_from_events(
+    events: list, specialist: str, skill_id: str
+) -> Dict[str, Any]:
     """
     Extract the agent's final response from run_debug() events.
 
@@ -423,26 +440,30 @@ def _extract_response_from_events(events: list, specialist: str, skill_id: str) 
 
     for event in events:
         # Check if this is the final response
-        if hasattr(event, 'is_final_response') and event.is_final_response():
-            if hasattr(event, 'content'):
+        if hasattr(event, "is_final_response") and event.is_final_response():
+            if hasattr(event, "content"):
                 final_content = event.content
                 break
 
     if final_content is None:
         # Fallback: look for any event with content
         for event in events:
-            if hasattr(event, 'content') and event.content:
+            if hasattr(event, "content") and event.content:
                 final_content = event.content
 
     if final_content is None:
         logger.warning(
             f"A2A: No response content found in events for {specialist}.{skill_id}",
-            extra={"specialist": specialist, "skill_id": skill_id, "event_count": len(events)}
+            extra={
+                "specialist": specialist,
+                "skill_id": skill_id,
+                "event_count": len(events),
+            },
         )
         return {
             "status": "SUCCESS",
             "message": "Agent executed but returned no content",
-            "raw_events": len(events)
+            "raw_events": len(events),
         }
 
     # Try to parse as JSON (specialists return JSON)
@@ -464,12 +485,12 @@ def _extract_response_from_events(events: list, specialist: str, skill_id: str) 
         # Return raw content if not valid JSON
         logger.warning(
             f"A2A: Response from {specialist}.{skill_id} is not valid JSON",
-            extra={"specialist": specialist, "skill_id": skill_id}
+            extra={"specialist": specialist, "skill_id": skill_id},
         )
         return {
             "status": "SUCCESS",
             "raw_response": str(final_content),
-            "parse_error": "Response was not valid JSON"
+            "parse_error": "Response was not valid JSON",
         }
 
 
@@ -489,8 +510,9 @@ def _mandate_from_dict(mandate_dict: Dict[str, Any]):
     Raises:
         ValueError, TypeError, AttributeError: On malformed fields
     """
-    from agents.shared_contracts.pipeline_contracts import Mandate
     from datetime import datetime
+
+    from agents.shared_contracts.pipeline_contracts import Mandate
 
     # Parse expires_at if present
     expires_at = None
@@ -562,7 +584,8 @@ def validate_mandate(task: A2ATask):
         except (ValueError, TypeError, AttributeError) as e:
             # Log full details internally for debugging
             logger.warning(
-                "Malformed mandate rejected (fail-closed): %s", e,
+                "Malformed mandate rejected (fail-closed): %s",
+                e,
                 extra={"specialist": task.specialist},
                 exc_info=True,
             )
@@ -570,7 +593,7 @@ def validate_mandate(task: A2ATask):
             raise A2AError(
                 f"Malformed mandate for specialist '{task.specialist}'. "
                 "Mandate validation cannot be skipped (fail-closed policy).",
-                specialist=task.specialist
+                specialist=task.specialist,
             )
 
     # Run policy gate preflight checks (Phase E)
@@ -578,9 +601,7 @@ def validate_mandate(task: A2ATask):
     # which tools the specialist will use before invocation. Tool allowlist
     # enforcement is handled as a post-invocation audit log (see call_specialist).
     gate_results = PolicyGate.preflight_check(
-        specialist_name=task.specialist,
-        risk_tier=risk_tier,
-        mandate=mandate
+        specialist_name=task.specialist, risk_tier=risk_tier, mandate=mandate
     )
 
     # Check for any blocking gates
@@ -590,13 +611,13 @@ def validate_mandate(task: A2ATask):
         blocks = [f"{g.gate_name}: {g.reason}" for g in blocking]
         raise A2AError(
             f"Policy gate check failed for specialist '{task.specialist}': {'; '.join(blocks)}",
-            specialist=task.specialist
+            specialist=task.specialist,
         )
 
     # Log successful gate passage
     logger.debug(
         f"Policy gates passed for {task.specialist} (risk_tier={risk_tier})",
-        extra={"specialist": task.specialist, "risk_tier": risk_tier}
+        extra={"specialist": task.specialist, "risk_tier": risk_tier},
     )
 
     return mandate
@@ -626,6 +647,7 @@ async def call_specialist(task: A2ATask) -> A2AResult:
         A2AError: On any validation or execution failure
     """
     import time
+
     start_time = time.time()
 
     try:
@@ -673,8 +695,7 @@ async def call_specialist(task: A2ATask) -> A2AResult:
         if mandate is not None and mandate.tool_allowlist:
             # Sanitize: only log list-of-strings, cap length
             safe_allowlist = [
-                str(t)[:64] for t in mandate.tool_allowlist[:20]
-                if isinstance(t, str)
+                str(t)[:64] for t in mandate.tool_allowlist[:20] if isinstance(t, str)
             ]
             logger.info(
                 "A2A: Mandate has tool_allowlist for %s. "
@@ -697,8 +718,8 @@ async def call_specialist(task: A2ATask) -> A2AResult:
                 "specialist": task.specialist,
                 "skill_id": task.skill_id,
                 "duration_ms": duration_ms,
-                "caller_spiffe": task.spiffe_id
-            }
+                "caller_spiffe": task.spiffe_id,
+            },
         )
 
         return A2AResult(
@@ -706,7 +727,7 @@ async def call_specialist(task: A2ATask) -> A2AResult:
             specialist=task.specialist,
             skill_id=task.skill_id,
             result=result_data,
-            duration_ms=duration_ms
+            duration_ms=duration_ms,
         )
 
     except A2AError:
@@ -722,9 +743,9 @@ async def call_specialist(task: A2ATask) -> A2AResult:
             extra={
                 "specialist": task.specialist,
                 "skill_id": task.skill_id,
-                "error": str(e)
+                "error": str(e),
             },
-            exc_info=True
+            exc_info=True,
         )
 
         return A2AResult(
@@ -732,7 +753,7 @@ async def call_specialist(task: A2ATask) -> A2AResult:
             specialist=task.specialist,
             skill_id=task.skill_id,
             error=str(e),
-            duration_ms=duration_ms
+            duration_ms=duration_ms,
         )
 
 
@@ -754,6 +775,7 @@ def call_specialist_sync(task: A2ATask) -> A2AResult:
         asyncio.get_running_loop()
         # If we're already in an async context, create a new thread
         import concurrent.futures
+
         with concurrent.futures.ThreadPoolExecutor() as executor:
             future = executor.submit(asyncio.run, call_specialist(task))
             return future.result()
@@ -795,14 +817,20 @@ def discover_specialists() -> List[Dict[str, Any]]:
         try:
             agentcard = load_agentcard(specialist_id)
 
-            specialists.append({
-                "canonical_id": specialist_id,
-                "name": specialist_id,  # Alias for backwards compatibility
-                "directory": directory,
-                "capabilities": agentcard.get("capabilities", []),
-                "skills": [skill.get("id") for skill in agentcard.get("skills", [])],
-                "description": agentcard.get("description", "").split("\n")[0],  # First line only
-            })
+            specialists.append(
+                {
+                    "canonical_id": specialist_id,
+                    "name": specialist_id,  # Alias for backwards compatibility
+                    "directory": directory,
+                    "capabilities": agentcard.get("capabilities", []),
+                    "skills": [
+                        skill.get("id") for skill in agentcard.get("skills", [])
+                    ],
+                    "description": agentcard.get("description", "").split("\n")[
+                        0
+                    ],  # First line only
+                }
+            )
 
         except A2AError as e:
             logger.warning(f"Failed to discover specialist '{specialist_id}': {e}")

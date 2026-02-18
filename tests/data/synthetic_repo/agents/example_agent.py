@@ -3,9 +3,6 @@ Example agent with ADK violations for testing.
 This file deliberately contains anti-patterns for the pipeline to detect.
 """
 
-import os
-import json
-from typing import List, Dict, Any
 
 # VIOLATION: Not using ADK LlmAgent pattern
 class ExampleAgent:
@@ -29,6 +26,7 @@ class ExampleAgent:
         response = f"Mock response for: {prompt}"
         return response
 
+
 # VIOLATION: Missing proper ADK memory setup
 def create_agent():
     """Create an agent instance."""
@@ -40,6 +38,7 @@ def create_agent():
 
     agent.add_tool(custom_tool)
     return agent
+
 
 # VIOLATION: Missing A2A protocol support
 # VIOLATION: No AgentCard definition

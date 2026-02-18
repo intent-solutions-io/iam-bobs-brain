@@ -19,13 +19,11 @@ These tests validate:
 Note: Full ADK tests require google-adk package.
 """
 
-import pytest
-import os
-import sys
 import ast
 import json
 from pathlib import Path
-from unittest.mock import patch
+
+import pytest
 
 # All IAM specialist agents (excluding foreman/orchestrator)
 IAM_SPECIALISTS = [
@@ -91,9 +89,10 @@ class TestIAMSpecialistStructure:
         has_new = new_pattern.issubset(symbols)
         has_old = old_pattern.issubset(symbols)
 
-        assert has_new or has_old, \
-            f"{agent_name} must define either 6767-LAZY pattern (create_agent, create_app, app) " \
+        assert has_new or has_old, (
+            f"{agent_name} must define either 6767-LAZY pattern (create_agent, create_app, app) "
             f"or old pattern (get_agent, create_runner, root_agent). Found: {symbols}"
+        )
 
     @pytest.mark.parametrize("agent_name", IAM_SPECIALISTS)
     def test_agent_uses_adk_imports(self, agent_name):
@@ -127,8 +126,9 @@ class TestIAMSpecialistStructure:
                             forbidden_imports.append(node.module)
 
         assert has_adk_import, f"{agent_name} must import from google.adk (R1)"
-        assert not forbidden_imports, \
-            f"{agent_name} has forbidden imports (R1 violation): {forbidden_imports}"
+        assert (
+            not forbidden_imports
+        ), f"{agent_name} has forbidden imports (R1 violation): {forbidden_imports}"
 
 
 class TestIAMSpecialistAgentCards:
@@ -242,9 +242,7 @@ class TestIAMSpecialistLazyLoading:
         # Look for module-level assert statements (bad pattern)
         for node in ast.iter_child_nodes(tree):
             if isinstance(node, ast.Assert):
-                pytest.fail(
-                    f"{agent_name} has module-level assert (blocks imports)"
-                )
+                pytest.fail(f"{agent_name} has module-level assert (blocks imports)")
 
     @pytest.mark.parametrize("agent_name", IAM_SPECIALISTS)
     def test_agent_factory_function_exists(self, agent_name):
@@ -263,8 +261,9 @@ class TestIAMSpecialistLazyLoading:
             if isinstance(node, ast.FunctionDef) and node.name in factory_functions:
                 found_functions.add(node.name)
 
-        assert found_functions, \
-            f"{agent_name} must define create_agent() or get_agent() function"
+        assert (
+            found_functions
+        ), f"{agent_name} must define create_agent() or get_agent() function"
 
     @pytest.mark.parametrize("agent_name", IAM_SPECIALISTS)
     def test_app_or_runner_factory_exists(self, agent_name):
@@ -283,8 +282,9 @@ class TestIAMSpecialistLazyLoading:
             if isinstance(node, ast.FunctionDef) and node.name in factory_functions:
                 found_functions.add(node.name)
 
-        assert found_functions, \
-            f"{agent_name} must define create_app() or create_runner() function"
+        assert (
+            found_functions
+        ), f"{agent_name} must define create_app() or create_runner() function"
 
 
 class TestIAMSpecialistDocumentation:
@@ -303,7 +303,9 @@ class TestIAMSpecialistDocumentation:
         ]
 
         has_docs = any(p.exists() for p in doc_options)
-        assert has_docs, f"{agent_name} has no documentation (README, prompts/, or AgentCard)"
+        assert (
+            has_docs
+        ), f"{agent_name} has no documentation (README, prompts/, or AgentCard)"
 
     @pytest.mark.parametrize("agent_name", IAM_SPECIALISTS)
     def test_agent_py_has_docstring(self, agent_name):
@@ -316,4 +318,6 @@ class TestIAMSpecialistDocumentation:
 
         # Check for module docstring
         docstring = ast.get_docstring(tree)
-        assert docstring is not None, f"{agent_name}/agent.py should have a module docstring"
+        assert (
+            docstring is not None
+        ), f"{agent_name}/agent.py should have a module docstring"

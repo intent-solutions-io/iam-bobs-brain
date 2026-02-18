@@ -5,11 +5,11 @@ Provides centralized configuration for target repositories that
 the SWE pipeline and agents can operate on.
 """
 
-import os
-import yaml
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import List, Optional, Dict, Any
+from typing import Dict, List, Optional
+
+import yaml
 
 
 @dataclass
@@ -29,7 +29,9 @@ class RepoConfig:
     id: str
     display_name: str
     description: str
-    local_path: str  # "." for current repo, "external" if not checked out, or relative path
+    local_path: (
+        str  # "." for current repo, "external" if not checked out, or relative path
+    )
     github_owner: str
     github_repo: str
     default_branch: str
@@ -107,47 +109,51 @@ class RepoRegistry:
 
     def _load(self):
         """Load registry from YAML file."""
-        with open(self.config_path, 'r') as f:
+        with open(self.config_path) as f:
             data = yaml.safe_load(f)
 
         # Load repos
-        for repo_data in data.get('repos', []):
+        for repo_data in data.get("repos", []):
             # Parse ARV profile if present
             arv_profile = None
-            arv_data = repo_data.get('arv_profile')
+            arv_data = repo_data.get("arv_profile")
             if arv_data:
                 arv_profile = ARVProfile(
-                    requires_rag=arv_data.get('requires_rag', False),
-                    requires_iam_dept=arv_data.get('requires_iam_dept', False),
-                    requires_tests=arv_data.get('requires_tests', False),
-                    requires_dual_memory=arv_data.get('requires_dual_memory', False)
+                    requires_rag=arv_data.get("requires_rag", False),
+                    requires_iam_dept=arv_data.get("requires_iam_dept", False),
+                    requires_tests=arv_data.get("requires_tests", False),
+                    requires_dual_memory=arv_data.get("requires_dual_memory", False),
                 )
 
             repo = RepoConfig(
-                id=repo_data['id'],
-                display_name=repo_data.get('display_name', repo_data['id']),
-                description=repo_data['description'],
-                local_path=repo_data.get('local_path', 'external'),
-                github_owner=repo_data['github_owner'],
-                github_repo=repo_data['github_repo'],
-                default_branch=repo_data['default_branch'],
-                tags=repo_data.get('tags', []),
-                allow_write=repo_data.get('allow_write', False),
+                id=repo_data["id"],
+                display_name=repo_data.get("display_name", repo_data["id"]),
+                description=repo_data["description"],
+                local_path=repo_data.get("local_path", "external"),
+                github_owner=repo_data["github_owner"],
+                github_repo=repo_data["github_repo"],
+                default_branch=repo_data["default_branch"],
+                tags=repo_data.get("tags", []),
+                allow_write=repo_data.get("allow_write", False),
                 arv_profile=arv_profile,
-                slack_channel=repo_data.get('slack_channel')
+                slack_channel=repo_data.get("slack_channel"),
             )
             self._repos[repo.id] = repo
 
         # Load settings
-        settings_data = data.get('settings', {})
+        settings_data = data.get("settings", {})
         self.settings = RegistrySettings(
-            default_allow_write=settings_data.get('default_allow_write', False),
-            require_explicit_write_permission=settings_data.get('require_explicit_write_permission', True),
-            github_api_rate_limit=settings_data.get('github_api_rate_limit', 100),
-            analysis_file_patterns=settings_data.get('analysis_file_patterns', []),
-            analysis_exclude_patterns=settings_data.get('analysis_exclude_patterns', []),
-            max_file_size_bytes=settings_data.get('max_file_size_bytes', 1048576),
-            max_total_size_bytes=settings_data.get('max_total_size_bytes', 10485760)
+            default_allow_write=settings_data.get("default_allow_write", False),
+            require_explicit_write_permission=settings_data.get(
+                "require_explicit_write_permission", True
+            ),
+            github_api_rate_limit=settings_data.get("github_api_rate_limit", 100),
+            analysis_file_patterns=settings_data.get("analysis_file_patterns", []),
+            analysis_exclude_patterns=settings_data.get(
+                "analysis_exclude_patterns", []
+            ),
+            max_file_size_bytes=settings_data.get("max_file_size_bytes", 1048576),
+            max_total_size_bytes=settings_data.get("max_total_size_bytes", 10485760),
         )
 
     def get_repo_by_id(self, repo_id: str) -> Optional[RepoConfig]:
@@ -266,6 +272,8 @@ if __name__ == "__main__":
     # Show settings
     print("\nRegistry Settings:")
     print(f"  Max file size: {registry.settings.max_file_size_bytes / 1024:.0f}KB")
-    print(f"  Max total size: {registry.settings.max_total_size_bytes / 1024 / 1024:.0f}MB")
+    print(
+        f"  Max total size: {registry.settings.max_total_size_bytes / 1024 / 1024:.0f}MB"
+    )
     print(f"  File patterns: {len(registry.settings.analysis_file_patterns)}")
     print(f"  Exclude patterns: {len(registry.settings.analysis_exclude_patterns)}")

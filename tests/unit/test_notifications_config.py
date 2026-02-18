@@ -4,16 +4,15 @@ Unit tests for notifications configuration module.
 Tests the notification config helpers and feature flag behavior.
 """
 
-import pytest
 import os
 from unittest.mock import patch
 
 from agents.config.notifications import (
+    SlackDestination,
     are_slack_notifications_enabled,
+    get_notification_summary,
     get_swe_slack_destination,
     should_send_slack_notifications,
-    get_notification_summary,
-    SlackDestination
 )
 
 
@@ -37,7 +36,9 @@ class TestSlackDestination:
 
     def test_repr_masks_webhook(self):
         """Test __repr__ masks long webhook URLs."""
-        dest = SlackDestination(webhook_url="https://hooks.slack.com/services/VERYLONGTOKEN123456789")
+        dest = SlackDestination(
+            webhook_url="https://hooks.slack.com/services/VERYLONGTOKEN123456789"
+        )
         repr_str = repr(dest)
         assert "..." in repr_str
         assert "VERYLONGTOKEN" not in repr_str  # Should be truncated
@@ -114,10 +115,10 @@ class TestGetSweSlackDestination:
         """Test webhook is preferred when both are configured."""
         webhook = "https://hooks.slack.com/services/TEST"
         channel = "C12345678"
-        with patch.dict(os.environ, {
-            "SLACK_SWE_CHANNEL_WEBHOOK_URL": webhook,
-            "SLACK_SWE_CHANNEL_ID": channel
-        }):
+        with patch.dict(
+            os.environ,
+            {"SLACK_SWE_CHANNEL_WEBHOOK_URL": webhook, "SLACK_SWE_CHANNEL_ID": channel},
+        ):
             dest = get_swe_slack_destination()
             assert dest is not None
             assert dest.webhook_url == webhook
@@ -139,18 +140,24 @@ class TestShouldSendSlackNotifications:
 
     def test_true_when_enabled_and_webhook_configured(self):
         """Test returns True when enabled and webhook configured."""
-        with patch.dict(os.environ, {
-            "SLACK_NOTIFICATIONS_ENABLED": "true",
-            "SLACK_SWE_CHANNEL_WEBHOOK_URL": "https://hooks.slack.com/services/TEST"
-        }):
+        with patch.dict(
+            os.environ,
+            {
+                "SLACK_NOTIFICATIONS_ENABLED": "true",
+                "SLACK_SWE_CHANNEL_WEBHOOK_URL": "https://hooks.slack.com/services/TEST",
+            },
+        ):
             assert should_send_slack_notifications()
 
     def test_true_when_enabled_and_channel_configured(self):
         """Test returns True when enabled and channel configured."""
-        with patch.dict(os.environ, {
-            "SLACK_NOTIFICATIONS_ENABLED": "true",
-            "SLACK_SWE_CHANNEL_ID": "C12345678"
-        }):
+        with patch.dict(
+            os.environ,
+            {
+                "SLACK_NOTIFICATIONS_ENABLED": "true",
+                "SLACK_SWE_CHANNEL_ID": "C12345678",
+            },
+        ):
             assert should_send_slack_notifications()
 
 
@@ -167,10 +174,13 @@ class TestGetNotificationSummary:
 
     def test_summary_shows_enabled_state(self):
         """Test summary shows when notifications are enabled and configured."""
-        with patch.dict(os.environ, {
-            "SLACK_NOTIFICATIONS_ENABLED": "true",
-            "SLACK_SWE_CHANNEL_WEBHOOK_URL": "https://hooks.slack.com/services/TEST"
-        }):
+        with patch.dict(
+            os.environ,
+            {
+                "SLACK_NOTIFICATIONS_ENABLED": "true",
+                "SLACK_SWE_CHANNEL_WEBHOOK_URL": "https://hooks.slack.com/services/TEST",
+            },
+        ):
             summary = get_notification_summary()
             assert "Slack Enabled: True" in summary
             assert "SlackDestination" in summary

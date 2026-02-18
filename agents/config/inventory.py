@@ -20,14 +20,14 @@ from typing import List, Literal, Optional
 # Type aliases
 Environment = Literal["dev", "staging", "prod"]
 VarCategory = Literal[
-    "core",           # Core GCP/app config
-    "rag",            # Vertex AI Search / RAG
-    "engine",         # Agent Engine topology
-    "features",       # Feature flags (LIVE1-3, etc.)
-    "storage",        # Org GCS storage
+    "core",  # Core GCP/app config
+    "rag",  # Vertex AI Search / RAG
+    "engine",  # Agent Engine topology
+    "features",  # Feature flags (LIVE1-3, etc.)
+    "storage",  # Org GCS storage
     "notifications",  # Slack notifications
-    "github",         # GitHub integration
-    "slack_bot",      # Slack bot (separate from notifications)
+    "github",  # GitHub integration
+    "slack_bot",  # Slack bot (separate from notifications)
 ]
 
 
@@ -709,6 +709,7 @@ ALL_VARS: List[EnvVarSpec] = (
 # HELPER FUNCTIONS
 # ==============================================================================
 
+
 def get_all_vars() -> List[EnvVarSpec]:
     """Get all environment variable specifications."""
     return ALL_VARS
@@ -784,6 +785,7 @@ def get_categories() -> List[VarCategory]:
 # STATS & SUMMARY
 # ==============================================================================
 
+
 def get_inventory_stats() -> dict:
     """
     Get statistics about the configuration inventory.
@@ -832,8 +834,8 @@ if __name__ == "__main__":
 
     # By category
     print("\nBy Category:")
-    for category in stats['categories']:
-        count = stats['by_category'][category]
+    for category in stats["categories"]:
+        count = stats["by_category"][category]
         print(f"  {category}: {count}")
 
     # Show required vars for each env

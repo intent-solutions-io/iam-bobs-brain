@@ -17,13 +17,14 @@ See: 000-docs/254-DR-STND-policy-gates-risk-tiers.md
 
 from dataclasses import dataclass
 from enum import Enum
-from typing import Optional, List
+from typing import List, Optional
 
 from agents.shared_contracts.pipeline_contracts import Mandate
 
 
 class RiskTier(str, Enum):
     """Risk tier levels for operations."""
+
     R0 = "R0"  # Read-only, no side effects
     R1 = "R1"  # Local changes, reversible
     R2 = "R2"  # External writes
@@ -44,6 +45,7 @@ RISK_TIER_DESCRIPTIONS = {
 @dataclass
 class GateResult:
     """Result of a policy gate check."""
+
     allowed: bool
     reason: str
     risk_tier: str
@@ -65,8 +67,7 @@ class PolicyGate:
 
     @staticmethod
     def check_mandate_required(
-        risk_tier: str,
-        mandate: Optional[Mandate] = None
+        risk_tier: str, mandate: Optional[Mandate] = None
     ) -> GateResult:
         """
         Check if a mandate is required for the operation's risk tier.
@@ -81,7 +82,7 @@ class PolicyGate:
                 allowed=True,
                 reason="R0/R1 operations do not require a mandate",
                 risk_tier=risk_tier,
-                gate_name="mandate_required"
+                gate_name="mandate_required",
             )
 
         if mandate is None:
@@ -90,20 +91,18 @@ class PolicyGate:
                 reason=f"R2+ operations require a mandate. Risk tier: {risk_tier}",
                 risk_tier=risk_tier,
                 gate_name="mandate_required",
-                blocking_requirement="mandate"
+                blocking_requirement="mandate",
             )
 
         return GateResult(
             allowed=True,
             reason="Mandate provided for R2+ operation",
             risk_tier=risk_tier,
-            gate_name="mandate_required"
+            gate_name="mandate_required",
         )
 
     @staticmethod
-    def check_mandate_expired(
-        mandate: Optional[Mandate] = None
-    ) -> GateResult:
+    def check_mandate_expired(mandate: Optional[Mandate] = None) -> GateResult:
         """
         Check if mandate has expired.
 
@@ -115,7 +114,7 @@ class PolicyGate:
                 allowed=True,
                 reason="No mandate to check for expiration",
                 risk_tier="R0",
-                gate_name="mandate_expired"
+                gate_name="mandate_expired",
             )
         if mandate.is_expired():
             return GateResult(
@@ -126,19 +125,18 @@ class PolicyGate:
                 ),
                 risk_tier=mandate.risk_tier,
                 gate_name="mandate_expired",
-                blocking_requirement="mandate_expired"
+                blocking_requirement="mandate_expired",
             )
         return GateResult(
             allowed=True,
             reason="Mandate has not expired",
             risk_tier=mandate.risk_tier,
-            gate_name="mandate_expired"
+            gate_name="mandate_expired",
         )
 
     @staticmethod
     def check_approval_required(
-        risk_tier: str,
-        mandate: Optional[Mandate] = None
+        risk_tier: str, mandate: Optional[Mandate] = None
     ) -> GateResult:
         """
         Check if human approval is required and granted.
@@ -154,7 +152,7 @@ class PolicyGate:
                 allowed=True,
                 reason="R0-R2 operations do not require approval",
                 risk_tier=risk_tier,
-                gate_name="approval_required"
+                gate_name="approval_required",
             )
 
         if mandate is None:
@@ -163,7 +161,7 @@ class PolicyGate:
                 reason="R3/R4 operations require a mandate with approval",
                 risk_tier=risk_tier,
                 gate_name="approval_required",
-                blocking_requirement="mandate"
+                blocking_requirement="mandate",
             )
 
         if mandate.is_pending_approval():
@@ -172,7 +170,7 @@ class PolicyGate:
                 reason="Operation pending human approval",
                 risk_tier=risk_tier,
                 gate_name="approval_required",
-                blocking_requirement="approval"
+                blocking_requirement="approval",
             )
 
         if mandate.is_denied():
@@ -181,7 +179,7 @@ class PolicyGate:
                 reason="Operation was denied by approver",
                 risk_tier=risk_tier,
                 gate_name="approval_required",
-                blocking_requirement="approval_denied"
+                blocking_requirement="approval_denied",
             )
 
         if not mandate.is_approved():
@@ -190,20 +188,19 @@ class PolicyGate:
                 reason=f"R3/R4 operations require human approval. State: {mandate.approval_state}",
                 risk_tier=risk_tier,
                 gate_name="approval_required",
-                blocking_requirement="approval"
+                blocking_requirement="approval",
             )
 
         return GateResult(
             allowed=True,
             reason=f"Approved by {mandate.approver_id}",
             risk_tier=risk_tier,
-            gate_name="approval_required"
+            gate_name="approval_required",
         )
 
     @staticmethod
     def check_tool_allowed(
-        tool_name: str,
-        mandate: Optional[Mandate] = None
+        tool_name: str, mandate: Optional[Mandate] = None
     ) -> GateResult:
         """
         Check if a tool is allowed by the mandate's tool_allowlist.
@@ -216,7 +213,7 @@ class PolicyGate:
                 allowed=True,
                 reason="No mandate = no tool restrictions",
                 risk_tier="R0",
-                gate_name="tool_allowed"
+                gate_name="tool_allowed",
             )
 
         if mandate.can_use_tool(tool_name):
@@ -224,7 +221,7 @@ class PolicyGate:
                 allowed=True,
                 reason=f"Tool '{tool_name}' is allowed",
                 risk_tier=mandate.risk_tier,
-                gate_name="tool_allowed"
+                gate_name="tool_allowed",
             )
 
         return GateResult(
@@ -232,13 +229,12 @@ class PolicyGate:
             reason=f"Tool '{tool_name}' not in allowlist: {mandate.tool_allowlist}",
             risk_tier=mandate.risk_tier,
             gate_name="tool_allowed",
-            blocking_requirement="tool_allowlist"
+            blocking_requirement="tool_allowlist",
         )
 
     @staticmethod
     def check_specialist_authorized(
-        specialist_name: str,
-        mandate: Optional[Mandate] = None
+        specialist_name: str, mandate: Optional[Mandate] = None
     ) -> GateResult:
         """
         Check if a specialist is authorized by the mandate.
@@ -250,7 +246,7 @@ class PolicyGate:
                 allowed=True,
                 reason="No mandate = no specialist restrictions",
                 risk_tier="R0",
-                gate_name="specialist_authorized"
+                gate_name="specialist_authorized",
             )
 
         if mandate.can_invoke_specialist(specialist_name):
@@ -258,7 +254,7 @@ class PolicyGate:
                 allowed=True,
                 reason=f"Specialist '{specialist_name}' is authorized",
                 risk_tier=mandate.risk_tier,
-                gate_name="specialist_authorized"
+                gate_name="specialist_authorized",
             )
 
         # Determine the specific blocking reason
@@ -283,7 +279,7 @@ class PolicyGate:
             reason=reason,
             risk_tier=mandate.risk_tier,
             gate_name="specialist_authorized",
-            blocking_requirement=blocking
+            blocking_requirement=blocking,
         )
 
     @classmethod
@@ -292,7 +288,7 @@ class PolicyGate:
         specialist_name: str,
         risk_tier: str = "R0",
         mandate: Optional[Mandate] = None,
-        tools_to_use: Optional[List[str]] = None
+        tools_to_use: Optional[List[str]] = None,
     ) -> List[GateResult]:
         """
         Run all preflight gate checks before invoking a specialist.
@@ -345,7 +341,7 @@ def preflight_check(
     specialist_name: str,
     risk_tier: str = "R0",
     mandate: Optional[Mandate] = None,
-    tools_to_use: Optional[List[str]] = None
+    tools_to_use: Optional[List[str]] = None,
 ) -> List[GateResult]:
     """
     Convenience function for running preflight checks.
@@ -356,5 +352,5 @@ def preflight_check(
         specialist_name=specialist_name,
         risk_tier=risk_tier,
         mandate=mandate,
-        tools_to_use=tools_to_use
+        tools_to_use=tools_to_use,
     )

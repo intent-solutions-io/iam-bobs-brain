@@ -14,13 +14,13 @@ Follows:
 - AgentCard contracts for skill validation
 """
 
-from .types import A2ATask, A2AResult, A2AError
 from .dispatcher import call_specialist, call_specialist_sync, discover_specialists
+from .types import A2AError, A2AResult, A2ATask
 
 __all__ = [
-    "A2ATask",
-    "A2AResult",
     "A2AError",
+    "A2AResult",
+    "A2ATask",
     "call_specialist",  # Async version (use with await)
     "call_specialist_sync",  # Sync wrapper for non-async contexts
     "discover_specialists",

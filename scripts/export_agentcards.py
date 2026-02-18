@@ -9,9 +9,9 @@ Usage:
     python3 scripts/export_agentcards.py
 """
 
+import importlib.util
 import json
 import sys
-import importlib.util
 from pathlib import Path
 
 # Add agents directory to Python path
@@ -21,7 +21,11 @@ sys.path.insert(0, str(repo_root / "agents"))
 # Agent configuration
 AGENTS = [
     {"name": "bob", "module": "bob.a2a_card", "dir": "bob"},
-    {"name": "iam-senior-adk-devops-lead", "module": "a2a_card", "dir": "iam-senior-adk-devops-lead"},
+    {
+        "name": "iam-senior-adk-devops-lead",
+        "module": "a2a_card",
+        "dir": "iam-senior-adk-devops-lead",
+    },
     {"name": "iam_adk", "module": "iam_adk.a2a_card", "dir": "iam_adk"},
     {"name": "iam_issue", "module": "iam_issue.a2a_card", "dir": "iam_issue"},
     {"name": "iam_fix_plan", "module": "iam_fix_plan.a2a_card", "dir": "iam_fix_plan"},
@@ -49,7 +53,9 @@ def export_agent_card(agent_name: str, agent_dir: str) -> None:
             raise FileNotFoundError(f"a2a_card.py not found in {agent_path}")
 
         # Load module using importlib
-        spec = importlib.util.spec_from_file_location(f"{agent_dir}.a2a_card", module_file)
+        spec = importlib.util.spec_from_file_location(
+            f"{agent_dir}.a2a_card", module_file
+        )
         if spec is None or spec.loader is None:
             raise ImportError(f"Could not load spec for {module_file}")
 

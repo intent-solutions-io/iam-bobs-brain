@@ -18,16 +18,14 @@ Related Docs:
 
 import os
 import uuid
-from typing import Dict, Any, Optional, Literal
 from dataclasses import dataclass
+from typing import Any, Dict, Optional
 
 # Import Agent Engine configuration
 from agents.config.agent_engine import (
+    Environment,
     get_agent_engine_config,
-    get_reasoning_engine_id,
     get_spiffe_id,
-    AgentEngineConfig,
-    Environment
 )
 
 
@@ -100,8 +98,7 @@ def get_current_environment() -> Environment:
 
 
 def resolve_agent_engine_endpoint(
-    agent_role: str,
-    env: Optional[Environment] = None
+    agent_role: str, env: Optional[Environment] = None
 ) -> Optional[str]:
     """
     Resolve the full Agent Engine REST endpoint URL for an agent.
@@ -130,7 +127,7 @@ def resolve_agent_engine_endpoint(
 
     # Extract project, location, and engine ID from reasoning_engine_id
     # Format: projects/PROJECT_ID/locations/REGION/reasoningEngines/ID
-    parts = config.reasoning_engine_id.split('/')
+    parts = config.reasoning_engine_id.split("/")
 
     if len(parts) != 6:
         raise ValueError(
@@ -156,7 +153,7 @@ def build_agent_engine_request(
     context: Optional[Dict[str, Any]] = None,
     correlation_id: Optional[str] = None,
     caller_agent_role: Optional[str] = None,
-    env: Optional[Environment] = None
+    env: Optional[Environment] = None,
 ) -> AgentEngineRequest:
     """
     Build a request payload for Vertex AI Agent Engine.
@@ -198,14 +195,12 @@ def build_agent_engine_request(
         session_id=session_id,
         context=context,
         correlation_id=correlation_id,
-        caller_spiffe_id=caller_spiffe_id
+        caller_spiffe_id=caller_spiffe_id,
     )
 
 
 def call_agent_engine(
-    agent_role: str,
-    request: AgentEngineRequest,
-    env: Optional[Environment] = None
+    agent_role: str, request: AgentEngineRequest, env: Optional[Environment] = None
 ) -> AgentEngineResponse:
     """
     Call Vertex AI Agent Engine with a request.
@@ -267,7 +262,7 @@ def call_agent_engine(
             "agent_role": agent_role,
             "endpoint_url": endpoint_url,
             "target_spiffe_id": target_spiffe_id,
-        }
+        },
     )
 
 
@@ -278,7 +273,7 @@ def call_agent_engine_direct(
     context: Optional[Dict[str, Any]] = None,
     correlation_id: Optional[str] = None,
     caller_agent_role: Optional[str] = None,
-    env: Optional[Environment] = None
+    env: Optional[Environment] = None,
 ) -> AgentEngineResponse:
     """
     Convenience function to build request and call Agent Engine in one step.
@@ -313,16 +308,13 @@ def call_agent_engine_direct(
         context=context,
         correlation_id=correlation_id,
         caller_agent_role=caller_agent_role,
-        env=env
+        env=env,
     )
 
     return call_agent_engine(agent_role, request, env=env)
 
 
-def is_agent_available(
-    agent_role: str,
-    env: Optional[Environment] = None
-) -> bool:
+def is_agent_available(agent_role: str, env: Optional[Environment] = None) -> bool:
     """
     Check if an agent is available (deployed to Agent Engine or has local stub).
 
@@ -351,10 +343,8 @@ def is_agent_available(
 # DEBUGGING & TESTING UTILITIES
 # ==============================================================================
 
-def print_agent_engine_info(
-    agent_role: str,
-    env: Optional[Environment] = None
-) -> None:
+
+def print_agent_engine_info(agent_role: str, env: Optional[Environment] = None) -> None:
     """
     Print detailed Agent Engine information for an agent.
 
@@ -375,22 +365,22 @@ def print_agent_engine_info(
 
     if config is None:
         print(f"❌ Agent {agent_role} NOT deployed to Agent Engine in {env}")
-        print(f"   Uses local stub implementation")
+        print("   Uses local stub implementation")
         return
 
     print(f"✅ Agent {agent_role} deployed to Agent Engine")
-    print(f"\nReasoning Engine ID:")
+    print("\nReasoning Engine ID:")
     print(f"  {config.reasoning_engine_id}")
-    print(f"\nRegion:")
+    print("\nRegion:")
     print(f"  {config.region}")
-    print(f"\nSPIFFE ID:")
+    print("\nSPIFFE ID:")
     print(f"  {config.spiffe_id}")
-    print(f"\nREST Endpoint:")
+    print("\nREST Endpoint:")
     endpoint = resolve_agent_engine_endpoint(agent_role, env)
     print(f"  {endpoint}")
 
     if config.notes:
-        print(f"\nNotes:")
+        print("\nNotes:")
         print(f"  {config.notes}")
 
     print(f"{'=' * 60}\n")
@@ -412,9 +402,9 @@ if __name__ == "__main__":
             user_prompt="Audit this repo for ADK compliance",
             correlation_id="test-12345",
             caller_agent_role="foreman",
-            env="staging"
+            env="staging",
         )
-        print(f"\nResponse preview:")
+        print("\nResponse preview:")
         print(response.response[:200] + "...")
     else:
         print("iam-adk not available in staging")

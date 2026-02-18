@@ -4,26 +4,28 @@ Unit tests for agent identity module (252-DR-STND).
 Tests canonical ID resolution, alias mapping, and backwards compatibility.
 """
 
-import pytest
 import warnings
+
+import pytest
+
 from agents.shared_contracts.agent_identity import (
-    # Types
-    AgentTier,
-    AgentDefinition,
+    AGENT_ALIASES,
     # Data
     CANONICAL_AGENTS,
-    AGENT_ALIASES,
     CANONICAL_TO_DIRECTORY,
     DIRECTORY_TO_CANONICAL,
+    AgentDefinition,
+    # Types
+    AgentTier,
     # Functions
     canonicalize,
-    is_canonical,
-    is_valid,
     get_definition,
     get_directory,
     get_spiffe_id,
-    list_canonical_ids,
+    is_canonical,
+    is_valid,
     list_by_tier,
+    list_canonical_ids,
     list_specialists,
 )
 
@@ -64,7 +66,9 @@ class TestCanonicalAgents:
 
     def test_orchestrator_is_tier_2(self):
         """iam-orchestrator is correctly classified as Tier 2."""
-        assert CANONICAL_AGENTS["iam-orchestrator"].tier == AgentTier.TIER_2_ORCHESTRATOR
+        assert (
+            CANONICAL_AGENTS["iam-orchestrator"].tier == AgentTier.TIER_2_ORCHESTRATOR
+        )
 
     def test_specialists_are_tier_3(self):
         """All iam-* specialists are Tier 3."""
@@ -118,7 +122,9 @@ class TestCanonicalize:
             result = canonicalize("iam-compliance")
             assert result == "iam-compliance"
             # No deprecation warning for canonical IDs
-            assert len([x for x in w if issubclass(x.category, DeprecationWarning)]) == 0
+            assert (
+                len([x for x in w if issubclass(x.category, DeprecationWarning)]) == 0
+            )
 
     def test_legacy_id_returns_canonical_with_warning(self):
         """Legacy ID returns canonical ID with deprecation warning."""
@@ -127,7 +133,9 @@ class TestCanonicalize:
             result = canonicalize("iam_adk")
             assert result == "iam-compliance"
             # Should have deprecation warning
-            assert len([x for x in w if issubclass(x.category, DeprecationWarning)]) == 1
+            assert (
+                len([x for x in w if issubclass(x.category, DeprecationWarning)]) == 1
+            )
 
     def test_legacy_id_no_warning_when_disabled(self):
         """Legacy ID returns canonical ID without warning when warn=False."""
@@ -136,7 +144,9 @@ class TestCanonicalize:
             result = canonicalize("iam_adk", warn=False)
             assert result == "iam-compliance"
             # No warning when disabled
-            assert len([x for x in w if issubclass(x.category, DeprecationWarning)]) == 0
+            assert (
+                len([x for x in w if issubclass(x.category, DeprecationWarning)]) == 0
+            )
 
     def test_unknown_id_raises_value_error(self):
         """Unknown ID raises ValueError."""
@@ -155,7 +165,9 @@ class TestCanonicalize:
         ]
         for alias in foreman_aliases:
             result = canonicalize(alias, warn=False)
-            assert result == "iam-orchestrator", f"{alias} should map to iam-orchestrator"
+            assert (
+                result == "iam-orchestrator"
+            ), f"{alias} should map to iam-orchestrator"
 
 
 class TestIsCanonical:
@@ -241,12 +253,20 @@ class TestGetSpiffeId:
     def test_default_spiffe_id(self):
         """Default SPIFFE ID uses default env/region/version."""
         spiffe = get_spiffe_id("iam-compliance")
-        assert "spiffe://intent.solutions/agent/iam-compliance/dev/us-central1/0.1.0" == spiffe
+        assert (
+            "spiffe://intent.solutions/agent/iam-compliance/dev/us-central1/0.1.0"
+            == spiffe
+        )
 
     def test_custom_spiffe_id(self):
         """Custom SPIFFE ID uses provided parameters."""
-        spiffe = get_spiffe_id("iam-compliance", env="prod", region="us-east1", version="1.0.0")
-        assert "spiffe://intent.solutions/agent/iam-compliance/prod/us-east1/1.0.0" == spiffe
+        spiffe = get_spiffe_id(
+            "iam-compliance", env="prod", region="us-east1", version="1.0.0"
+        )
+        assert (
+            "spiffe://intent.solutions/agent/iam-compliance/prod/us-east1/1.0.0"
+            == spiffe
+        )
 
     def test_legacy_id_spiffe(self):
         """Legacy ID generates SPIFFE for canonical equivalent."""

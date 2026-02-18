@@ -4,8 +4,8 @@ Configuration management for ADK docs crawler.
 Loads and validates configuration from environment variables with sensible defaults.
 """
 
-import os
 import logging
+import os
 from dataclasses import dataclass
 from typing import Optional
 
@@ -35,7 +35,7 @@ class CrawlerConfig:
         if self.max_chunk_tokens <= 0:
             raise ValueError("MAX_CHUNK_TOKENS must be positive")
 
-        logger.info(f"Crawler configuration loaded:")
+        logger.info("Crawler configuration loaded:")
         logger.info(f"  Project ID: {self.project_id}")
         logger.info(f"  Docs Bucket: {self.docs_bucket}")
         logger.info(f"  Crawl Delay: {self.crawl_delay_seconds}s")
@@ -91,10 +91,7 @@ def load_config() -> CrawlerConfig:
         raise ValueError(f"MAX_CHUNK_TOKENS must be an integer: {e}")
 
     # Start URL for crawler
-    start_url = os.getenv(
-        "ADK_DOCS_START_URL",
-        "https://google.github.io/adk-docs/"
-    )
+    start_url = os.getenv("ADK_DOCS_START_URL", "https://google.github.io/adk-docs/")
 
     # Temporary directory for intermediate files
     tmp_dir = os.getenv("CRAWLER_TMP_DIR", "./tmp")
@@ -119,6 +116,7 @@ def validate_gcp_credentials() -> bool:
     """
     try:
         from google.auth import default
+
         credentials, project = default()
         logger.info(f"GCP credentials validated. Project: {project}")
         return True

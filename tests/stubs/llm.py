@@ -22,7 +22,6 @@ Usage:
 import os
 from typing import Any, Dict, List, Optional
 
-
 BOB_LLM_MODE = os.getenv("BOB_LLM_MODE", "stub")
 
 
@@ -55,11 +54,13 @@ class StubLLM:
         Otherwise return the default response.
         """
         self._call_count += 1
-        self.call_log.append({
-            "call_number": self._call_count,
-            "prompt": prompt,
-            "kwargs": kwargs,
-        })
+        self.call_log.append(
+            {
+                "call_number": self._call_count,
+                "prompt": prompt,
+                "kwargs": kwargs,
+            }
+        )
 
         # Check for exact match first
         if prompt in self._responses:

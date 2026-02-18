@@ -32,11 +32,10 @@ Exit Codes:
 Part of: AE-DEV-WIREUP / AE3
 """
 
-import os
-import sys
-import asyncio
 import argparse
+import asyncio
 import json
+import sys
 from pathlib import Path
 from typing import Optional
 
@@ -47,7 +46,6 @@ sys.path.insert(0, str(project_root))
 from agents.config.agent_engine import (
     build_agent_config,
     get_current_environment,
-    is_agent_deployed_to_engine,
 )
 from service.a2a_gateway.agent_engine_client import call_agent_engine
 
@@ -114,9 +112,9 @@ async def run_smoke_test(
 
     # Check if dev
     if current_env != "dev":
-        print(f"⚠️  This smoke test is designed for DEV only")
+        print("⚠️  This smoke test is designed for DEV only")
         print(f"   Current environment: {current_env}")
-        print(f"   Set DEPLOYMENT_ENV=dev to run this test")
+        print("   Set DEPLOYMENT_ENV=dev to run this test")
         print()
         return 1
 
@@ -127,14 +125,18 @@ async def run_smoke_test(
     if not agent_config:
         print(f"ℹ️  Agent '{agent_role}' is NOT configured for {current_env}")
         print()
-        print(f"   This is expected if you haven't deployed {agent_role} to Agent Engine yet.")
-        print(f"   To configure:")
-        print(f"     export AGENT_ENGINE_{agent_role.replace('-', '_').upper()}_ID_DEV=your-engine-id")
+        print(
+            f"   This is expected if you haven't deployed {agent_role} to Agent Engine yet."
+        )
+        print("   To configure:")
+        print(
+            f"     export AGENT_ENGINE_{agent_role.replace('-', '_').upper()}_ID_DEV=your-engine-id"
+        )
         print()
         print("✅ Smoke test completed (agent not configured - non-blocking)")
         return 2  # Non-blocking exit code
 
-    print(f"✅ Agent configured:")
+    print("✅ Agent configured:")
     if verbose:
         print(f"   Engine ID: {agent_config.reasoning_engine_id}")
         print(f"   Project: {agent_config.project_id}")
@@ -159,16 +161,16 @@ async def run_smoke_test(
         )
 
         if result.error:
-            print(f"❌ Agent Engine call failed:")
+            print("❌ Agent Engine call failed:")
             print(f"   Error: {result.error}")
             if verbose and result.metadata:
                 print(f"   Metadata: {json.dumps(result.metadata, indent=2)}")
             print()
             return 1
 
-        print(f"✅ Agent Engine response received:")
+        print("✅ Agent Engine response received:")
         print()
-        print(f"Response:")
+        print("Response:")
         print("-" * 80)
         print(result.response[:500])  # First 500 chars
         if len(result.response) > 500:
@@ -205,10 +207,11 @@ async def run_smoke_test(
         return 0
 
     except Exception as e:
-        print(f"❌ Smoke test failed with exception:")
+        print("❌ Smoke test failed with exception:")
         print(f"   {type(e).__name__}: {e}")
         if verbose:
             import traceback
+
             print()
             print("Traceback:")
             traceback.print_exc()

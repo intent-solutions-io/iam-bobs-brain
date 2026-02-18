@@ -5,20 +5,20 @@ This module defines the foreman LlmAgent that orchestrates iam-* specialists.
 Follows ADK Hard Mode patterns with dual memory and SPIFFE ID propagation.
 """
 
+import logging
+import os
+
+from google.adk import Runner
 from google.adk.agents import LlmAgent
 from google.adk.apps import App
-from google.adk import Runner
-from google.adk.sessions import VertexAiSessionService
 from google.adk.memory import VertexAiMemoryBankService
+from google.adk.sessions import VertexAiSessionService
+
 from agents.shared_tools import FOREMAN_TOOLS  # Use shared tools profile
-import os
-import logging
-from typing import Optional, Dict, Any, List
 
 # Configure logging
 logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+    level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 )
 logger = logging.getLogger(__name__)
 
@@ -29,7 +29,7 @@ AGENT_ENGINE_ID = os.getenv("AGENT_ENGINE_ID")
 APP_NAME = os.getenv("APP_NAME", "iam-senior-adk-devops-lead")
 AGENT_SPIFFE_ID = os.getenv(
     "AGENT_SPIFFE_ID",
-    "spiffe://intent.solutions/agent/iam-senior-adk-devops-lead/dev/us-central1/0.1.0"
+    "spiffe://intent.solutions/agent/iam-senior-adk-devops-lead/dev/us-central1/0.1.0",
 )
 
 # AgentCard location (A2A protocol)
@@ -49,7 +49,7 @@ def auto_save_session_to_memory(callback_context=None, **kwargs):
     """
     try:
         # Handle both old (ctx) and new (callback_context) API
-        ctx = callback_context or kwargs.get('ctx')
+        ctx = callback_context or kwargs.get("ctx")
         if ctx is None:
             logger.debug("No callback context provided, skipping memory save")
             return
@@ -74,8 +74,7 @@ def auto_save_session_to_memory(callback_context=None, **kwargs):
                 )
         else:
             logger.warning(
-                "Invocation context not available",
-                extra={"spiffe_id": AGENT_SPIFFE_ID}
+                "Invocation context not available", extra={"spiffe_id": AGENT_SPIFFE_ID}
             )
     except Exception as e:
         logger.error(
@@ -305,8 +304,8 @@ Return structured JSON matching your AgentCard output schema:
 - Validate all specialist outputs before aggregating
 - Maintain correlation IDs for tracing (pipeline_run_id, request_id)
 - Follow department standards documented in Memory Bank
-- Query Memory Bank for Hard Mode rules (R1-R8) when validating specialist outputs""".format(
-        spiffe_id=AGENT_SPIFFE_ID
+- Query Memory Bank for Hard Mode rules (R1-R8) when validating specialist outputs""".replace(
+        "{spiffe_id}", AGENT_SPIFFE_ID
     )
 
     return instruction
@@ -328,8 +327,7 @@ def create_agent() -> LlmAgent:
         LlmAgent: Configured foreman agent instance
     """
     logger.info(
-        f"Creating foreman agent {APP_NAME}",
-        extra={"spiffe_id": AGENT_SPIFFE_ID}
+        f"Creating foreman agent {APP_NAME}", extra={"spiffe_id": AGENT_SPIFFE_ID}
     )
 
     agent = LlmAgent(
@@ -345,8 +343,8 @@ def create_agent() -> LlmAgent:
         extra={
             "spiffe_id": AGENT_SPIFFE_ID,
             "model": "gemini-2.0-flash-exp",
-            "tools_count": 4
-        }
+            "tools_count": 4,
+        },
     )
 
     return agent
@@ -374,8 +372,7 @@ def create_app() -> App:
         - For local testing with dual memory, use create_runner()
     """
     logger.info(
-        "Creating App container for Foreman",
-        extra={"spiffe_id": AGENT_SPIFFE_ID}
+        "Creating App container for Foreman", extra={"spiffe_id": AGENT_SPIFFE_ID}
     )
 
     # Call create_agent() to get instance (cheap operation)
@@ -392,7 +389,7 @@ def create_app() -> App:
         extra={
             "spiffe_id": AGENT_SPIFFE_ID,
             "app_name": APP_NAME,
-        }
+        },
     )
 
     return app_instance
@@ -414,29 +411,21 @@ def create_runner() -> Runner:
             "project_id": PROJECT_ID,
             "location": LOCATION,
             "agent_engine_id": AGENT_ENGINE_ID,
-        }
+        },
     )
 
     # R5: Session Service (short-term cache)
     session_service = VertexAiSessionService(
-        project=PROJECT_ID,
-        location=LOCATION,
-        agent_engine_id=AGENT_ENGINE_ID
+        project=PROJECT_ID, location=LOCATION, agent_engine_id=AGENT_ENGINE_ID
     )
-    logger.info(
-        "✅ Session service initialized",
-        extra={"spiffe_id": AGENT_SPIFFE_ID}
-    )
+    logger.info("✅ Session service initialized", extra={"spiffe_id": AGENT_SPIFFE_ID})
 
     # R5: Memory Bank Service (long-term persistence)
     memory_service = VertexAiMemoryBankService(
-        project=PROJECT_ID,
-        location=LOCATION,
-        agent_engine_id=AGENT_ENGINE_ID
+        project=PROJECT_ID, location=LOCATION, agent_engine_id=AGENT_ENGINE_ID
     )
     logger.info(
-        "✅ Memory Bank service initialized",
-        extra={"spiffe_id": AGENT_SPIFFE_ID}
+        "✅ Memory Bank service initialized", extra={"spiffe_id": AGENT_SPIFFE_ID}
     )
 
     # Get configured agent (Phase 18: now uses create_agent())
@@ -457,7 +446,7 @@ def create_runner() -> Runner:
             "app_name": APP_NAME,
             "has_session_service": True,
             "has_memory_service": True,
-        }
+        },
     )
 
     return runner
@@ -473,7 +462,7 @@ app = create_app()
 
 logger.info(
     "✅ App instance created for Agent Engine deployment (Foreman)",
-    extra={"spiffe_id": AGENT_SPIFFE_ID}
+    extra={"spiffe_id": AGENT_SPIFFE_ID},
 )
 
 
@@ -505,7 +494,7 @@ if __name__ == "__main__":
         runner = create_runner()
         logger.info(
             "🚀 Foreman runner ready (local/CI testing only)",
-            extra={"spiffe_id": AGENT_SPIFFE_ID}
+            extra={"spiffe_id": AGENT_SPIFFE_ID},
         )
 
         # For local testing only

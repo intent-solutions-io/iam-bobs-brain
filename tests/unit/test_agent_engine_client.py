@@ -12,13 +12,16 @@ Test Coverage:
 - Response parsing and metadata
 """
 
-import pytest
-from unittest.mock import Mock, patch, AsyncMock
 import os
 import sys
+from unittest.mock import AsyncMock, Mock, patch
+
+import pytest
 
 # Add project root to path
-project_root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+project_root = os.path.dirname(
+    os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+)
 sys.path.insert(0, project_root)
 
 
@@ -107,7 +110,13 @@ def test_get_gcp_token_failure(mock_default):
 @patch("service.a2a_gateway.agent_engine_client.build_agent_config")
 @patch("service.a2a_gateway.agent_engine_client.get_gcp_token")
 @patch("service.a2a_gateway.agent_engine_client.httpx.AsyncClient")
-async def test_call_agent_engine_success(mock_client_class, mock_get_token, mock_build_config, mock_agent_config, mock_env_vars):
+async def test_call_agent_engine_success(
+    mock_client_class,
+    mock_get_token,
+    mock_build_config,
+    mock_agent_config,
+    mock_env_vars,
+):
     """Test successful Agent Engine call."""
     from service.a2a_gateway.agent_engine_client import call_agent_engine
 
@@ -164,13 +173,17 @@ async def test_call_agent_engine_agent_not_configured(mock_build_config, mock_en
     assert result.response == ""
     assert result.error is not None
     assert "not configured" in result.error
-    assert result.metadata["reason"] == "Agent not configured - set environment variable"
+    assert (
+        result.metadata["reason"] == "Agent not configured - set environment variable"
+    )
 
 
 @pytest.mark.asyncio
 @patch("service.a2a_gateway.agent_engine_client.build_agent_config")
 @patch("service.a2a_gateway.agent_engine_client.get_gcp_token")
-async def test_call_agent_engine_auth_failure(mock_get_token, mock_build_config, mock_agent_config, mock_env_vars):
+async def test_call_agent_engine_auth_failure(
+    mock_get_token, mock_build_config, mock_agent_config, mock_env_vars
+):
     """Test authentication failure."""
     from service.a2a_gateway.agent_engine_client import call_agent_engine
 
@@ -191,10 +204,17 @@ async def test_call_agent_engine_auth_failure(mock_get_token, mock_build_config,
 @patch("service.a2a_gateway.agent_engine_client.build_agent_config")
 @patch("service.a2a_gateway.agent_engine_client.get_gcp_token")
 @patch("service.a2a_gateway.agent_engine_client.httpx.AsyncClient")
-async def test_call_agent_engine_http_error(mock_client_class, mock_get_token, mock_build_config, mock_agent_config, mock_env_vars):
+async def test_call_agent_engine_http_error(
+    mock_client_class,
+    mock_get_token,
+    mock_build_config,
+    mock_agent_config,
+    mock_env_vars,
+):
     """Test HTTP error from Agent Engine."""
-    from service.a2a_gateway.agent_engine_client import call_agent_engine
     import httpx
+
+    from service.a2a_gateway.agent_engine_client import call_agent_engine
 
     mock_build_config.return_value = mock_agent_config
     mock_get_token.return_value = "test-token"
@@ -206,7 +226,9 @@ async def test_call_agent_engine_http_error(mock_client_class, mock_get_token, m
 
     mock_client = AsyncMock()
     mock_client.__aenter__.return_value.post = AsyncMock(
-        side_effect=httpx.HTTPStatusError("Error", request=Mock(), response=mock_response)
+        side_effect=httpx.HTTPStatusError(
+            "Error", request=Mock(), response=mock_response
+        )
     )
     mock_client_class.return_value = mock_client
 
@@ -225,10 +247,17 @@ async def test_call_agent_engine_http_error(mock_client_class, mock_get_token, m
 @patch("service.a2a_gateway.agent_engine_client.build_agent_config")
 @patch("service.a2a_gateway.agent_engine_client.get_gcp_token")
 @patch("service.a2a_gateway.agent_engine_client.httpx.AsyncClient")
-async def test_call_agent_engine_timeout(mock_client_class, mock_get_token, mock_build_config, mock_agent_config, mock_env_vars):
+async def test_call_agent_engine_timeout(
+    mock_client_class,
+    mock_get_token,
+    mock_build_config,
+    mock_agent_config,
+    mock_env_vars,
+):
     """Test timeout error."""
-    from service.a2a_gateway.agent_engine_client import call_agent_engine
     import httpx
+
+    from service.a2a_gateway.agent_engine_client import call_agent_engine
 
     mock_build_config.return_value = mock_agent_config
     mock_get_token.return_value = "test-token"
@@ -261,7 +290,13 @@ async def test_call_agent_engine_timeout(mock_client_class, mock_get_token, mock
 @patch("service.a2a_gateway.agent_engine_client.build_agent_config")
 @patch("service.a2a_gateway.agent_engine_client.get_gcp_token")
 @patch("service.a2a_gateway.agent_engine_client.httpx.AsyncClient")
-async def test_call_agent_engine_headers(mock_client_class, mock_get_token, mock_build_config, mock_agent_config, mock_env_vars):
+async def test_call_agent_engine_headers(
+    mock_client_class,
+    mock_get_token,
+    mock_build_config,
+    mock_agent_config,
+    mock_env_vars,
+):
     """Test request headers include correlation ID and SPIFFE ID."""
     from service.a2a_gateway.agent_engine_client import call_agent_engine
 
@@ -297,7 +332,13 @@ async def test_call_agent_engine_headers(mock_client_class, mock_get_token, mock
 @patch("service.a2a_gateway.agent_engine_client.build_agent_config")
 @patch("service.a2a_gateway.agent_engine_client.get_gcp_token")
 @patch("service.a2a_gateway.agent_engine_client.httpx.AsyncClient")
-async def test_call_agent_engine_payload(mock_client_class, mock_get_token, mock_build_config, mock_agent_config, mock_env_vars):
+async def test_call_agent_engine_payload(
+    mock_client_class,
+    mock_get_token,
+    mock_build_config,
+    mock_agent_config,
+    mock_env_vars,
+):
     """Test request payload includes query, session_id, and context."""
     from service.a2a_gateway.agent_engine_client import call_agent_engine
 
@@ -341,7 +382,9 @@ async def test_call_agent_engine_payload(mock_client_class, mock_get_token, mock
 @patch("service.a2a_gateway.agent_engine_client.build_agent_config")
 @patch("service.a2a_gateway.agent_engine_client.get_gcp_token")
 @patch("service.a2a_gateway.agent_engine_client.httpx.AsyncClient")
-async def test_call_agent_engine_env_override(mock_client_class, mock_get_token, mock_build_config, mock_env_vars):
+async def test_call_agent_engine_env_override(
+    mock_client_class, mock_get_token, mock_build_config, mock_env_vars
+):
     """Test environment can be explicitly overridden."""
     from service.a2a_gateway.agent_engine_client import call_agent_engine
 

@@ -22,26 +22,25 @@ Exit Codes:
 """
 
 import sys
-import json
 from pathlib import Path
-from typing import Dict, Any, List, Tuple
+from typing import Any, Dict, List, Tuple
 
 # Add repo root to path for imports
 REPO_ROOT = Path(__file__).parent.parent
 sys.path.insert(0, str(REPO_ROOT))
 
-from agents.a2a import discover_specialists, A2AError
+from agents.a2a import A2AError, discover_specialists
 from agents.a2a.dispatcher import load_agentcard
 
 
 # Color codes for terminal output
 class Colors:
-    GREEN = '\033[92m'
-    RED = '\033[91m'
-    YELLOW = '\033[93m'
-    BLUE = '\033[94m'
-    RESET = '\033[0m'
-    BOLD = '\033[1m'
+    GREEN = "\033[92m"
+    RED = "\033[91m"
+    YELLOW = "\033[93m"
+    BLUE = "\033[94m"
+    RESET = "\033[0m"
+    BOLD = "\033[1m"
 
 
 def print_header(text: str) -> None:
@@ -96,7 +95,9 @@ def check_agentcard_exists(specialist: str) -> Tuple[bool, str]:
         return False, f"Unexpected error loading AgentCard: {e}"
 
 
-def check_skill_naming(specialist: str, skills: List[Dict[str, Any]]) -> Tuple[bool, List[str]]:
+def check_skill_naming(
+    specialist: str, skills: List[Dict[str, Any]]
+) -> Tuple[bool, List[str]]:
     """
     Check that all skills have valid names per A2A protocol spec.
 
@@ -113,7 +114,7 @@ def check_skill_naming(specialist: str, skills: List[Dict[str, Any]]) -> Tuple[b
         skill_name = skill.get("name", skill.get("skill_id", ""))
 
         if not skill_name:
-            warnings.append(f"Skill missing 'name' field (required by A2A spec)")
+            warnings.append("Skill missing 'name' field (required by A2A spec)")
             continue
 
         # {agent}.{skill} naming is recommended but not required per A2A spec
@@ -155,7 +156,9 @@ def check_skill_schemas(skills: List[Dict[str, Any]]) -> Tuple[bool, List[str]]:
         # Verify output_schema has 'type' field
         output_schema = skill.get("output_schema", {})
         if "type" not in output_schema:
-            violations.append(f"Skill '{skill_name}' output_schema missing 'type' field")
+            violations.append(
+                f"Skill '{skill_name}' output_schema missing 'type' field"
+            )
 
         # Verify input_schema has $schema (JSON Schema draft-07)
         if "$schema" in input_schema:
@@ -180,7 +183,9 @@ def check_skill_schemas(skills: List[Dict[str, Any]]) -> Tuple[bool, List[str]]:
     return len(violations) == 0, violations
 
 
-def check_spiffe_id_compliance(specialist: str, agentcard: Dict[str, Any]) -> Tuple[bool, List[str]]:
+def check_spiffe_id_compliance(
+    specialist: str, agentcard: Dict[str, Any]
+) -> Tuple[bool, List[str]]:
     """
     Check R7 SPIFFE ID compliance.
 
@@ -281,7 +286,7 @@ def run_all_checks() -> bool:
     print_header("CHECK 2: Foreman Discovery")
     success, issues = check_foreman_discovery()
     if success:
-        print_success(f"Foreman can discover all specialists")
+        print_success("Foreman can discover all specialists")
     else:
         print_failure("Foreman discovery issues:")
         for issue in issues:
@@ -302,7 +307,7 @@ def run_all_checks() -> bool:
             if success:
                 print_success(f"  Skill naming: {len(skills)} skills follow convention")
             else:
-                print_failure(f"  Skill naming violations:")
+                print_failure("  Skill naming violations:")
                 for violation in violations:
                     print_failure(f"    - {violation}")
                 all_passed = False
@@ -310,9 +315,11 @@ def run_all_checks() -> bool:
             # Check 4: Skill schemas
             success, violations = check_skill_schemas(skills)
             if success:
-                print_success(f"  Skill schemas: All {len(skills)} skills have valid schemas")
+                print_success(
+                    f"  Skill schemas: All {len(skills)} skills have valid schemas"
+                )
             else:
-                print_failure(f"  Skill schema violations:")
+                print_failure("  Skill schema violations:")
                 for violation in violations:
                     print_failure(f"    - {violation}")
                 all_passed = False
@@ -320,9 +327,11 @@ def run_all_checks() -> bool:
             # Check 5: R7 SPIFFE ID compliance
             success, violations = check_spiffe_id_compliance(specialist, agentcard)
             if success:
-                print_success(f"  R7 SPIFFE ID: Compliant ({agentcard.get('spiffe_id')})")
+                print_success(
+                    f"  R7 SPIFFE ID: Compliant ({agentcard.get('spiffe_id')})"
+                )
             else:
-                print_failure(f"  R7 SPIFFE ID violations:")
+                print_failure("  R7 SPIFFE ID violations:")
                 for violation in violations:
                     print_failure(f"    - {violation}")
                 all_passed = False
@@ -335,7 +344,9 @@ def run_all_checks() -> bool:
     print_header("SUMMARY")
     if all_passed:
         print_success("ALL A2A READINESS CHECKS PASSED ✓")
-        print_info("\nReady for Agent Engine deployment (when infrastructure is available)")
+        print_info(
+            "\nReady for Agent Engine deployment (when infrastructure is available)"
+        )
         return True
     else:
         print_failure("SOME A2A READINESS CHECKS FAILED ✗")
@@ -356,6 +367,7 @@ def main() -> int:
     except Exception as e:
         print(f"\n{Colors.RED}Unexpected error: {e}{Colors.RESET}")
         import traceback
+
         traceback.print_exc()
         return 1
 

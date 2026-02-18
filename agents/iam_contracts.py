@@ -6,8 +6,8 @@ to communicate with each other and with the foreman.
 """
 
 from dataclasses import dataclass, field
-from typing import List, Optional, Literal, Dict, Any
 from datetime import datetime
+from typing import Any, Dict, List, Literal, Optional
 
 
 @dataclass
@@ -18,6 +18,7 @@ class IssueSpec:
     Created by: iam-adk (findings), iam-cleanup (hygiene), foreman (aggregated)
     Consumed by: iam-issue (formatting), iam-fix-plan (planning)
     """
+
     title: str
     description: str
     component: Literal["agents", "service", "infra", "ci", "docs", "general"]
@@ -51,7 +52,7 @@ class IssueSpec:
             "assignees": self.assignees,
             "milestone": self.milestone,
             "notes": self.notes,
-            "created_at": self.created_at.isoformat() if self.created_at else None
+            "created_at": self.created_at.isoformat() if self.created_at else None,
         }
 
 
@@ -63,6 +64,7 @@ class FixPlan:
     Created by: iam-fix-plan
     Consumed by: iam-fix-impl, iam-qa, foreman
     """
+
     summary: str
     impacted_areas: List[str]
     steps: List[str]
@@ -90,7 +92,7 @@ class FixPlan:
             "rollout_notes": self.rollout_notes,
             "dependencies": self.dependencies,
             "rollback_plan": self.rollback_plan,
-            "success_metrics": self.success_metrics
+            "success_metrics": self.success_metrics,
         }
 
 
@@ -102,6 +104,7 @@ class QAVerdict:
     Created by: iam-qa
     Consumed by: iam-doc, foreman, Bob
     """
+
     status: Literal["pass", "fail", "partial", "blocked", "skipped"]
     notes: str
     test_evidence: List[str]
@@ -109,7 +112,9 @@ class QAVerdict:
     # Optional fields
     issue_id: Optional[str] = None
     fix_id: Optional[str] = None
-    test_types: List[str] = field(default_factory=list)  # ["unit", "integration", "e2e"]
+    test_types: List[str] = field(
+        default_factory=list
+    )  # ["unit", "integration", "e2e"]
     coverage_report: Optional[Dict[str, Any]] = None
     performance_impact: Optional[str] = None
     security_review: Optional[str] = None
@@ -129,7 +134,7 @@ class QAVerdict:
             "performance_impact": self.performance_impact,
             "security_review": self.security_review,
             "recommendations": self.recommendations,
-            "blocking_issues": self.blocking_issues
+            "blocking_issues": self.blocking_issues,
         }
 
 
@@ -141,6 +146,7 @@ class AuditReport:
     Created by: iam-adk
     Consumed by: iam-issue, iam-fix-plan, foreman
     """
+
     summary: str
     violations: List[Dict[str, Any]]  # List of violations with details
     compliance_score: float  # 0.0 to 1.0
@@ -164,7 +170,7 @@ class AuditReport:
             "patterns_checked": self.patterns_checked,
             "recommendations": self.recommendations,
             "compliant_areas": self.compliant_areas,
-            "risk_assessment": self.risk_assessment
+            "risk_assessment": self.risk_assessment,
         }
 
 
@@ -176,6 +182,7 @@ class DocumentationUpdate:
     Created by: iam-doc
     Consumed by: foreman, Bob
     """
+
     type: Literal["aar", "readme", "api_doc", "user_guide", "design_doc"]
     title: str
     content: str
@@ -199,7 +206,7 @@ class DocumentationUpdate:
             "related_issues": self.related_issues,
             "sections_updated": self.sections_updated,
             "review_status": self.review_status,
-            "metadata": self.metadata
+            "metadata": self.metadata,
         }
 
 
@@ -211,6 +218,7 @@ class CleanupTask:
     Created by: iam-cleanup
     Consumed by: iam-issue, foreman
     """
+
     type: Literal["dead_code", "unused_deps", "naming", "structure", "duplication"]
     description: str
     affected_files: List[str]
@@ -234,7 +242,7 @@ class CleanupTask:
             "priority": self.priority,
             "estimated_impact": self.estimated_impact,
             "safety_notes": self.safety_notes,
-            "automated": self.automated
+            "automated": self.automated,
         }
 
 
@@ -246,6 +254,7 @@ class IndexEntry:
     Created by: iam-index
     Consumed by: all agents for knowledge retrieval
     """
+
     title: str
     source: str  # File path or URL
     content_type: Literal["code", "doc", "config", "test", "example"]
@@ -269,11 +278,21 @@ class IndexEntry:
             "summary": self.summary,
             "tags": self.tags,
             "keywords": self.keywords,
-            "last_updated": self.last_updated.isoformat() if self.last_updated else None,
+            "last_updated": (
+                self.last_updated.isoformat() if self.last_updated else None
+            ),
             "relevance_score": self.relevance_score,
-            "embeddings": self.embeddings
+            "embeddings": self.embeddings,
         }
 
 
 # Type aliases for clarity
-SpecialistOutput = IssueSpec | FixPlan | QAVerdict | AuditReport | DocumentationUpdate | CleanupTask | IndexEntry
+SpecialistOutput = (
+    IssueSpec
+    | FixPlan
+    | QAVerdict
+    | AuditReport
+    | DocumentationUpdate
+    | CleanupTask
+    | IndexEntry
+)

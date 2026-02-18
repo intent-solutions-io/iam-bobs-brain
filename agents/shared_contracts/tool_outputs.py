@@ -25,7 +25,6 @@ from typing import Any, Dict, List, Literal, Optional
 
 from pydantic import BaseModel, Field, field_validator, model_validator
 
-
 # ============================================================================
 # BASE MODELS
 # ============================================================================
@@ -132,11 +131,14 @@ class ComplianceResult(ToolResult):
         description="Percentage of rules passed (0.0 = all failed, 100.0 = all passed, None on error)",
     )
     risk_level: Optional[Literal["LOW", "MEDIUM", "HIGH", "CRITICAL"]] = Field(
-        default=None, description="Overall risk level based on violation severity (None on error)"
+        default=None,
+        description="Overall risk level based on violation severity (None on error)",
     )
 
     # Override data field with structured compliance data
-    path: Optional[str] = Field(default=None, description="Path that was checked (None on error)")
+    path: Optional[str] = Field(
+        default=None, description="Path that was checked (None on error)"
+    )
     rules_checked: List[str] = Field(
         default_factory=list, description="List of rule IDs checked"
     )
@@ -161,7 +163,10 @@ class ComplianceResult(ToolResult):
                     "success": True,
                     "data": None,
                     "error": None,
-                    "metadata": {"tool_name": "check_patterns", "timestamp": "2025-12-20T15:00:00Z"},
+                    "metadata": {
+                        "tool_name": "check_patterns",
+                        "timestamp": "2025-12-20T15:00:00Z",
+                    },
                     "status": "COMPLIANT",
                     "violations": [],
                     "warnings": [],
@@ -208,7 +213,9 @@ class SearchResult(ToolResult):
 
     query: str = Field(default="", description="Search pattern used")
     path: str = Field(default="", description="Directory path searched")
-    file_pattern: str = Field(default="", description="File glob pattern (e.g., '*.py', '*.md')")
+    file_pattern: str = Field(
+        default="", description="File glob pattern (e.g., '*.py', '*.md')"
+    )
     matches: List[SearchMatch] = Field(
         default_factory=list, description="List of search matches found"
     )
@@ -219,7 +226,8 @@ class SearchResult(ToolResult):
         default=0, ge=0, description="Number of unique files containing matches"
     )
     truncated: bool = Field(
-        default=False, description="Whether results were truncated (match_count > len(matches))"
+        default=False,
+        description="Whether results were truncated (match_count > len(matches))",
     )
 
     @field_validator("file_count")
@@ -238,7 +246,10 @@ class SearchResult(ToolResult):
                     "success": True,
                     "data": None,
                     "error": None,
-                    "metadata": {"tool_name": "search_codebase", "timestamp": "2025-12-20T15:00:00Z"},
+                    "metadata": {
+                        "tool_name": "search_codebase",
+                        "timestamp": "2025-12-20T15:00:00Z",
+                    },
                     "query": "google.adk",
                     "path": "/home/user/project",
                     "file_pattern": "*.py",
@@ -279,9 +290,13 @@ class FileResult(ToolResult):
     """
 
     path: Optional[str] = Field(default=None, description="Absolute file path")
-    content: Optional[str] = Field(default=None, description="File contents as UTF-8 text")
+    content: Optional[str] = Field(
+        default=None, description="File contents as UTF-8 text"
+    )
     size: Optional[int] = Field(default=None, ge=0, description="File size in bytes")
-    lines: Optional[int] = Field(default=None, ge=0, description="Number of lines in file")
+    lines: Optional[int] = Field(
+        default=None, ge=0, description="Number of lines in file"
+    )
     encoding: Literal["utf-8"] = Field(
         default="utf-8", description="Character encoding"
     )
@@ -293,7 +308,10 @@ class FileResult(ToolResult):
                     "success": True,
                     "data": None,
                     "error": None,
-                    "metadata": {"tool_name": "get_file", "timestamp": "2025-12-20T15:00:00Z"},
+                    "metadata": {
+                        "tool_name": "get_file",
+                        "timestamp": "2025-12-20T15:00:00Z",
+                    },
                     "path": "/home/user/project/agents/bob/agent.py",
                     "content": "from google.adk.agents import LlmAgent\n\napp = LlmAgent(...)\n",
                     "size": 512,
@@ -346,9 +364,7 @@ class DependencySummary(BaseModel):
     python_packages: int = Field(
         ge=0, description="Total Python packages (requirements + pyproject)"
     )
-    node_packages: int = Field(
-        ge=0, description="Total Node packages (prod + dev)"
-    )
+    node_packages: int = Field(ge=0, description="Total Node packages (prod + dev)")
     terraform_providers: int = Field(ge=0, description="Total Terraform providers")
 
 
@@ -393,7 +409,10 @@ class DependencyResult(ToolResult):
                     "success": True,
                     "data": None,
                     "error": None,
-                    "metadata": {"tool_name": "analyze_deps", "timestamp": "2025-12-20T15:00:00Z"},
+                    "metadata": {
+                        "tool_name": "analyze_deps",
+                        "timestamp": "2025-12-20T15:00:00Z",
+                    },
                     "path": "/home/user/project",
                     "python": {
                         "requirements_txt": ["google-adk", "pydantic"],
@@ -471,20 +490,17 @@ def create_error_result(
 # ============================================================================
 
 __all__ = [
-    # Base models
-    "ToolResult",
-    # Specific result types
     "ComplianceResult",
-    "Violation",
-    "SearchResult",
-    "SearchMatch",
-    "FileResult",
     "DependencyResult",
-    "PythonDependencies",
-    "NodeDependencies",
-    "TerraformDependencies",
     "DependencySummary",
-    # Helper functions
-    "create_success_result",
+    "FileResult",
+    "NodeDependencies",
+    "PythonDependencies",
+    "SearchMatch",
+    "SearchResult",
+    "TerraformDependencies",
+    "ToolResult",
+    "Violation",
     "create_error_result",
+    "create_success_result",
 ]

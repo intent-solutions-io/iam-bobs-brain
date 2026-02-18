@@ -10,9 +10,8 @@ They do NOT directly call external APIs.
 Status: STUB ONLY - No OpenAPI gateways deployed yet
 """
 
-from typing import Any, Optional, List
 import logging
-import os
+from typing import Any, List, Optional
 
 logger = logging.getLogger(__name__)
 
@@ -20,6 +19,7 @@ logger = logging.getLogger(__name__)
 # ============================================================================
 # OPENAPI TOOLS - Connect to Cloud Run API gateways
 # ============================================================================
+
 
 def get_github_api_tool() -> Optional[Any]:
     """

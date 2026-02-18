@@ -50,9 +50,12 @@ from typing import Optional
 # Lazy import to avoid issues in environments without SDK installed
 try:
     from google.cloud import aiplatform
-    from google.cloud.aiplatform import gapic
+    from google.cloud.aiplatform import gapic  # noqa: F401
 except ImportError as e:
-    print(f"[SMOKE] ERROR: Missing required Google Cloud SDK dependencies: {e}", file=sys.stderr)
+    print(
+        f"[SMOKE] ERROR: Missing required Google Cloud SDK dependencies: {e}",
+        file=sys.stderr,
+    )
     print("[SMOKE] Install with: pip install google-cloud-aiplatform", file=sys.stderr)
     sys.exit(1)
 
@@ -61,7 +64,10 @@ def get_env_var(name: str, required: bool = True) -> Optional[str]:
     """Get environment variable with clear error messaging."""
     value = os.getenv(name)
     if required and not value:
-        print(f"[SMOKE] ERROR: Missing required environment variable: {name}", file=sys.stderr)
+        print(
+            f"[SMOKE] ERROR: Missing required environment variable: {name}",
+            file=sys.stderr,
+        )
         print(f"[SMOKE] Set it with: export {name}=your-value", file=sys.stderr)
         return None
     return value
@@ -87,7 +93,7 @@ def smoke_test_bob_agent_engine_dev() -> int:
         print("[SMOKE] RESULT: FAIL (missing configuration)", file=sys.stderr)
         return 1
 
-    print(f"[SMOKE] Configuration:")
+    print("[SMOKE] Configuration:")
     print(f"[SMOKE]   Project: {project_id}")
     print(f"[SMOKE]   Location: {location}")
     print(f"[SMOKE]   Agent: {agent_name}")
@@ -98,7 +104,7 @@ def smoke_test_bob_agent_engine_dev() -> int:
         aiplatform.init(project=project_id, location=location)
 
         # Connect to the agent
-        print(f"[SMOKE] Connecting to Agent Engine instance...")
+        print("[SMOKE] Connecting to Agent Engine instance...")
         print(f"[SMOKE]   Resource name: {agent_name}")
         print()
 
@@ -107,7 +113,9 @@ def smoke_test_bob_agent_engine_dev() -> int:
         # For now, we'll create a simple health check query
 
         # Create reasoning engine client
-        from google.cloud.aiplatform_v1beta1 import ReasoningEngineExecutionServiceClient
+        from google.cloud.aiplatform_v1beta1 import (
+            ReasoningEngineExecutionServiceClient,
+        )
         from google.cloud.aiplatform_v1beta1.types import QueryReasoningEngineRequest
 
         client = ReasoningEngineExecutionServiceClient(
@@ -117,7 +125,7 @@ def smoke_test_bob_agent_engine_dev() -> int:
         # Create a simple health check query
         test_prompt = 'Health check: respond with a short JSON object {"status":"ok","agent":"bob"}.'
 
-        print(f"[SMOKE] Sending test query...")
+        print("[SMOKE] Sending test query...")
         print(f"[SMOKE]   Prompt: {test_prompt}")
         print()
 
@@ -130,15 +138,19 @@ def smoke_test_bob_agent_engine_dev() -> int:
         response = client.query_reasoning_engine(request=request)
 
         # Extract response content
-        response_text = str(response.output) if hasattr(response, 'output') else str(response)
+        response_text = (
+            str(response.output) if hasattr(response, "output") else str(response)
+        )
 
-        print(f"[SMOKE] Response received:")
+        print("[SMOKE] Response received:")
         print(f"[SMOKE]   {response_text[:200]}...")  # Show first 200 chars
         print()
 
         # Check if response contains expected health check markers
         success_markers = ["status", "ok"]
-        all_present = all(marker.lower() in response_text.lower() for marker in success_markers)
+        all_present = all(
+            marker.lower() in response_text.lower() for marker in success_markers
+        )
 
         if all_present:
             print("[SMOKE] ✅ Health check markers found in response")

@@ -1,0 +1,154 @@
+# Ruff configuration for bobs-brain
+# Matches CI rule set from .github/workflows/ci.yml
+
+target-version = "py310"
+line-length = 120
+
+[lint]
+select = [
+    "E",      # pycodestyle errors
+    "F",      # pyflakes
+    "W",      # pycodestyle warnings
+    "C90",    # mccabe complexity
+    "I",      # isort
+    "N",      # pep8-naming
+    "UP",     # pyupgrade
+    "B",      # flake8-bugbear
+    "A",      # flake8-builtins
+    "C4",     # flake8-comprehensions
+    "T10",    # flake8-debugger
+    "EM",     # flake8-errmsg
+    "ISC",    # flake8-implicit-str-concat
+    "PIE",    # flake8-pie
+    "T20",    # flake8-print
+    "PT",     # flake8-pytest-style
+    "Q",      # flake8-quotes
+    "RSE",    # flake8-raise
+    "RET",    # flake8-return
+    "SIM",    # flake8-simplify
+    "TID",    # flake8-tidy-imports
+    "ARG",    # flake8-unused-arguments
+    "ERA",    # eradicate (commented-out code)
+    "PGH",    # pygrep-hooks
+    "PL",     # pylint
+    "RUF",    # ruff-specific
+]
+
+ignore = [
+    # Line length - handled by formatter
+    "E501",
+    # Security rules not in our select set
+    "S101", "S603", "S607",
+    # Print statements - agents use print for logging/output
+    "T201",
+    # Too-many-* complexity limits - relax for agents with rich logic
+    "PLR0912",  # too-many-branches
+    "PLR0913",  # too-many-arguments
+    "PLR0915",  # too-many-statements
+    "PLR0911",  # too-many-return-statements
+    "C901",     # complex-structure
+    # Magic values - acceptable in test assertions and config
+    "PLR2004",
+    # Trailing comma - auto-fix creates noisy diffs
+    "COM812",
+    # Quote style - let formatter handle
+    "Q000", "Q001",
+    # Import sorting conflicts with isort
+    "ISC001",
+    # Annotations - many files use typing.Optional/List for 3.10 compat
+    "UP006", "UP007", "UP035", "UP045",
+    # Module-level imports after sys.path manipulation (intentional)
+    "E402",
+    # Exception message style - too noisy for existing codebase
+    "EM101", "EM102",
+    # Commented-out code - some is intentional TODOs
+    "ERA001",
+    # Pytest style - existing tests use unittest assertions
+    "PT009", "PT027",
+    # Unnecessary assign before return - readability preference
+    "RET504",
+    # Unused function arguments - callbacks require signatures
+    "ARG001", "ARG002", "ARG003",
+    # Mutable class defaults - pydantic models use this pattern
+    "RUF012",
+    # Ambiguous unicode - some agent prompts use special chars
+    "RUF001",
+    # Global statements - used in lazy-loading pattern
+    "PLW0603", "PLW0602",
+    # Relative imports - used in agent packages
+    "TID252",
+    # Superfluous else - readability preference
+    "RET505", "RET508",
+    # Collapsible if/else - readability preference
+    "SIM102", "PLR5501",
+    # Multiple with statements - readability
+    "SIM117",
+    # Raise without from - existing pattern
+    "B904",
+    # Blanket type ignore - existing pattern
+    "PGH003",
+    # Redefined loop variable - intentional in some cases
+    "PLW2901",
+    # Implicit optional - existing pattern
+    "RUF013",
+    # Import outside top-level - lazy-loading pattern (6767-LAZY)
+    "PLC0415",
+    # Loop variable captured in closure - existing patterns
+    "B023",
+    # Invalid module name (e.g. iam-adk vs iam_adk)
+    "N999",
+    # sys.exit alias
+    "PLR1722",
+    # Yoda conditions - readability preference
+    "SIM300",
+    # Ternary instead of if/else - readability
+    "SIM108",
+    # Needless bool - readability preference
+    "SIM103",
+    # Unnecessary generator for set
+    "C401",
+    # Reimplemented builtin
+    "SIM110",
+    # If-else block instead of dict lookup
+    "SIM116",
+    # Open file with context handler - existing patterns
+    "SIM115",
+    # If with same arms
+    "SIM114",
+    # Double cast
+    "C414",
+    # List comprehension for set
+    "C403",
+    # Implicit string concat across lines
+    "ISC002",
+    # In dict keys
+    "SIM118",
+    # Unused unpacked variable
+    "RUF059",
+    # Pytest parametrize names type
+    "PT006",
+    # Pytest parameter with default
+    "PT028",
+    # Pytest raises too broad
+    "PT011",
+    # Pytest raises ambiguous pattern
+    "RUF043",
+]
+
+[lint.per-file-ignores]
+# Tests can use assertions, prints, magic values
+"tests/**" = ["T201", "PLR2004", "ARG001", "ARG002"]
+# Scripts use prints for CLI output
+"scripts/**" = ["T201"]
+# MCP tools use prints for output
+"mcp/**" = ["T201"]
+# Deploy scripts have complex logic
+"agents/agent_engine/**" = ["T201"]
+# Service gateways use print for logging
+"service/**" = ["T201"]
+
+[lint.isort]
+known-first-party = ["agents", "service", "shared_tools", "shared_contracts"]
+
+[lint.mccabe]
+max-complexity = 15

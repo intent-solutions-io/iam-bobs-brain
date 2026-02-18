@@ -10,14 +10,15 @@ feature flags for safety.
 """
 
 import os
-import json
-import requests
-from dataclasses import dataclass, field
-from typing import List, Optional, Dict, Any
-from pathlib import Path
 
 # Import structured logging (Phase RC2)
 import sys
+from dataclasses import dataclass, field
+from pathlib import Path
+from typing import Any, Dict, List, Optional
+
+import requests
+
 sys.path.insert(0, str(Path(__file__).parent.parent))
 from utils.logging import get_logger
 
@@ -63,17 +64,14 @@ class CreatedIssue:
 
 class GitHubClientError(Exception):
     """Base exception for GitHub client errors."""
-    pass
 
 
 class GitHubAuthError(GitHubClientError):
     """Authentication/authorization error."""
-    pass
 
 
 class GitHubRateLimitError(GitHubClientError):
     """API rate limit exceeded."""
-    pass
 
 
 class GitHubClient:
@@ -89,7 +87,9 @@ class GitHubClient:
     - Create issues
     """
 
-    def __init__(self, token: Optional[str] = None, base_url: str = "https://api.github.com"):
+    def __init__(
+        self, token: Optional[str] = None, base_url: str = "https://api.github.com"
+    ):
         """
         Initialize GitHub client.
 
@@ -102,15 +102,15 @@ class GitHubClient:
         self.session = requests.Session()
 
         # Set headers
-        self.session.headers.update({
-            "Accept": "application/vnd.github+json",
-            "X-GitHub-Api-Version": "2022-11-28"
-        })
+        self.session.headers.update(
+            {
+                "Accept": "application/vnd.github+json",
+                "X-GitHub-Api-Version": "2022-11-28",
+            }
+        )
 
         if self.token:
-            self.session.headers.update({
-                "Authorization": f"Bearer {self.token}"
-            })
+            self.session.headers.update({"Authorization": f"Bearer {self.token}"})
 
     def _request(self, method: str, endpoint: str, **kwargs) -> requests.Response:
         """
@@ -139,19 +139,23 @@ class GitHubClient:
                 logger.log_error(
                     "github_rate_limit_exceeded",
                     endpoint=endpoint,
-                    reset_at=response.headers.get('X-RateLimit-Reset'),
-                    remaining=response.headers.get('X-RateLimit-Remaining')
+                    reset_at=response.headers.get("X-RateLimit-Reset"),
+                    remaining=response.headers.get("X-RateLimit-Remaining"),
                 )
-                raise GitHubRateLimitError(f"GitHub API rate limit exceeded. Reset at: {response.headers.get('X-RateLimit-Reset')}")
+                raise GitHubRateLimitError(
+                    f"GitHub API rate limit exceeded. Reset at: {response.headers.get('X-RateLimit-Reset')}"
+                )
 
             # Check for auth errors
             if response.status_code in (401, 403):
                 logger.log_error(
                     "github_auth_failed",
                     endpoint=endpoint,
-                    status_code=response.status_code
+                    status_code=response.status_code,
                 )
-                raise GitHubAuthError(f"GitHub authentication failed: {response.status_code} - {response.text[:200]}")
+                raise GitHubAuthError(
+                    f"GitHub authentication failed: {response.status_code} - {response.text[:200]}"
+                )
 
             # Raise for other HTTP errors
             response.raise_for_status()
@@ -159,11 +163,7 @@ class GitHubClient:
             return response
 
         except requests.exceptions.RequestException as e:
-            logger.log_error(
-                "github_request_failed",
-                endpoint=endpoint,
-                error=str(e)
-            )
+            logger.log_error("github_request_failed", endpoint=endpoint, error=str(e))
             raise GitHubClientError(f"GitHub API request failed: {e}")
 
     def list_repo_files(
@@ -175,7 +175,7 @@ class GitHubClient:
         recursive: bool = True,
         file_patterns: Optional[List[str]] = None,
         exclude_patterns: Optional[List[str]] = None,
-        max_size_bytes: Optional[int] = None
+        max_size_bytes: Optional[int] = None,
     ) -> List[RepoFile]:
         """
         List files in a repository.
@@ -211,13 +211,19 @@ class GitHubClient:
             # Apply file pattern filters
             if file_patterns:
                 import fnmatch
-                if not any(fnmatch.fnmatch(file_path, pattern) for pattern in file_patterns):
+
+                if not any(
+                    fnmatch.fnmatch(file_path, pattern) for pattern in file_patterns
+                ):
                     continue
 
             # Apply exclude patterns
             if exclude_patterns:
                 import fnmatch
-                if any(fnmatch.fnmatch(file_path, pattern) for pattern in exclude_patterns):
+
+                if any(
+                    fnmatch.fnmatch(file_path, pattern) for pattern in exclude_patterns
+                ):
                     continue
 
             # Apply size filter
@@ -229,18 +235,14 @@ class GitHubClient:
                 type="file",
                 size=item.get("size", 0),
                 sha=item["sha"],
-                download_url=None  # Not provided in tree API
+                download_url=None,  # Not provided in tree API
             )
             files.append(repo_file)
 
         return files
 
     def get_file_content(
-        self,
-        owner: str,
-        repo: str,
-        path: str,
-        ref: str = "main"
+        self, owner: str, repo: str, path: str, ref: str = "main"
     ) -> str:
         """
         Get raw file content from repository.
@@ -265,6 +267,7 @@ class GitHubClient:
 
         # GitHub returns content base64-encoded
         import base64
+
         if "content" in data:
             content = base64.b64decode(data["content"]).decode("utf-8")
             return content
@@ -280,7 +283,7 @@ class GitHubClient:
         exclude_patterns: Optional[List[str]] = None,
         max_file_size: Optional[int] = None,
         max_total_size: Optional[int] = None,
-        fetch_content: bool = False
+        fetch_content: bool = False,
     ) -> RepoTree:
         """
         Get complete repository tree with optional content fetching.
@@ -306,21 +309,18 @@ class GitHubClient:
             recursive=True,
             file_patterns=file_patterns,
             exclude_patterns=exclude_patterns,
-            max_size_bytes=max_file_size
+            max_size_bytes=max_file_size,
         )
 
-        tree = RepoTree(
-            owner=owner,
-            repo=repo,
-            ref=ref,
-            files=[]
-        )
+        tree = RepoTree(owner=owner, repo=repo, ref=ref, files=[])
 
         # Fetch content if requested
         for file in files:
             # Check total size limit
             if max_total_size and tree.total_size + file.size > max_total_size:
-                print(f"⚠️ Stopping at {len(tree.files)} files (total size limit reached)")
+                print(
+                    f"⚠️ Stopping at {len(tree.files)} files (total size limit reached)"
+                )
                 break
 
             if fetch_content:
@@ -349,7 +349,7 @@ class GitHubClient:
             return {
                 "authenticated": False,
                 "message": "No GITHUB_TOKEN provided - using unauthenticated access",
-                "rate_limit": "60 requests/hour"
+                "rate_limit": "60 requests/hour",
             }
 
         try:
@@ -366,21 +366,18 @@ class GitHubClient:
                 "user": user_data.get("login"),
                 "rate_limit_remaining": data["rate"]["remaining"],
                 "rate_limit_total": data["rate"]["limit"],
-                "message": "✅ GitHub authentication successful"
+                "message": "✅ GitHub authentication successful",
             }
 
         except GitHubAuthError as e:
             return {
                 "authenticated": False,
                 "error": str(e),
-                "message": "❌ GitHub authentication failed"
+                "message": "❌ GitHub authentication failed",
             }
 
     def create_issue(
-        self,
-        owner: str,
-        repo: str,
-        payload: Dict[str, Any]
+        self, owner: str, repo: str, payload: Dict[str, Any]
     ) -> CreatedIssue:
         """
         Create a new issue in a GitHub repository.
@@ -430,10 +427,14 @@ class GitHubClient:
                 title=issue_data["title"],
                 state=issue_data["state"],
                 body=issue_data.get("body"),
-                labels=[label["name"] if isinstance(label, dict) else label
-                       for label in issue_data.get("labels", [])],
-                assignees=[user["login"] if isinstance(user, dict) else user
-                          for user in issue_data.get("assignees", [])]
+                labels=[
+                    label["name"] if isinstance(label, dict) else label
+                    for label in issue_data.get("labels", [])
+                ],
+                assignees=[
+                    user["login"] if isinstance(user, dict) else user
+                    for user in issue_data.get("assignees", [])
+                ],
             )
 
         except GitHubAuthError:
@@ -472,9 +473,11 @@ if __name__ == "__main__":
     # Check authentication
     auth_info = client.check_auth()
     print(f"\n{auth_info['message']}")
-    if auth_info['authenticated']:
+    if auth_info["authenticated"]:
         print(f"User: {auth_info['user']}")
-        print(f"Rate Limit: {auth_info['rate_limit_remaining']}/{auth_info['rate_limit_total']}")
+        print(
+            f"Rate Limit: {auth_info['rate_limit_remaining']}/{auth_info['rate_limit_total']}"
+        )
 
     # Try listing files (will fail gracefully if no token)
     try:
@@ -485,7 +488,7 @@ if __name__ == "__main__":
             ref="main",
             file_patterns=["*.md", "*.py"],
             exclude_patterns=["*__pycache__*"],
-            max_size_bytes=100000  # 100KB limit
+            max_size_bytes=100000,  # 100KB limit
         )
 
         print(f"Found {len(files)} files")

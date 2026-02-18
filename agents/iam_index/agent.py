@@ -5,18 +5,17 @@ This module defines the knowledge indexing and retrieval specialist agent
 that manages Vertex AI Search integration and maintains the knowledge base.
 """
 
-from google.adk.agents import LlmAgent
-from google.adk import Runner
-from google.adk.sessions import VertexAiSessionService
-from google.adk.memory import VertexAiMemoryBankService
-import os
 import logging
-from typing import Optional
+import os
+
+from google.adk import Runner
+from google.adk.agents import LlmAgent
+from google.adk.memory import VertexAiMemoryBankService
+from google.adk.sessions import VertexAiSessionService
 
 # Configure logging
 logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+    level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 )
 logger = logging.getLogger(__name__)
 
@@ -26,9 +25,9 @@ LOCATION = os.getenv("LOCATION", "us-central1")
 AGENT_ENGINE_ID = os.getenv("AGENT_ENGINE_ID")
 APP_NAME = os.getenv("APP_NAME", "iam-index")
 AGENT_SPIFFE_ID = os.getenv(
-    "AGENT_SPIFFE_ID",
-    "spiffe://intent.solutions/agent/iam-index/dev/us-central1/0.1.0"
+    "AGENT_SPIFFE_ID", "spiffe://intent.solutions/agent/iam-index/dev/us-central1/0.1.0"
 )
+
 
 def auto_save_session_to_memory(callback_context=None, **kwargs):
     """
@@ -38,7 +37,7 @@ def auto_save_session_to_memory(callback_context=None, **kwargs):
     """
     try:
         # Handle both old (ctx) and new (callback_context) API
-        ctx = callback_context or kwargs.get('ctx')
+        ctx = callback_context or kwargs.get("ctx")
         if ctx is None:
             logger.debug("No callback context provided, skipping memory save")
             return
@@ -54,25 +53,25 @@ def auto_save_session_to_memory(callback_context=None, **kwargs):
                 memory_svc.add_session_to_memory(session)
                 logger.info(
                     f"✅ Saved iam-index session {session.id} to Memory Bank",
-                    extra={"spiffe_id": AGENT_SPIFFE_ID, "session_id": session.id}
+                    extra={"spiffe_id": AGENT_SPIFFE_ID, "session_id": session.id},
                 )
             else:
                 logger.warning(
                     "Memory service or session not available",
-                    extra={"spiffe_id": AGENT_SPIFFE_ID}
+                    extra={"spiffe_id": AGENT_SPIFFE_ID},
                 )
         else:
             logger.warning(
-                "Invocation context not available",
-                extra={"spiffe_id": AGENT_SPIFFE_ID}
+                "Invocation context not available", extra={"spiffe_id": AGENT_SPIFFE_ID}
             )
     except Exception as e:
         logger.error(
             f"Failed to save session to Memory Bank: {e}",
             extra={"spiffe_id": AGENT_SPIFFE_ID},
-            exc_info=True
+            exc_info=True,
         )
         # Never block agent execution
+
 
 def get_agent() -> LlmAgent:
     """
@@ -82,8 +81,7 @@ def get_agent() -> LlmAgent:
         LlmAgent configured with knowledge management tools and dual memory.
     """
     logger.info(
-        f"Creating iam-index agent for {APP_NAME}",
-        extra={"spiffe_id": AGENT_SPIFFE_ID}
+        f"Creating iam-index agent for {APP_NAME}", extra={"spiffe_id": AGENT_SPIFFE_ID}
     )
 
     instruction = f"""You are iam-index, the Knowledge Management Specialist for the ADK/Agent Engineering Department in bobs-brain.
@@ -199,7 +197,7 @@ Remember: You are the **knowledge nexus** - all agents rely on you for accurate,
         name="iam_index",  # Python identifier (no hyphens)
         tools=IAM_INDEX_TOOLS,  # Use shared tools profile
         instruction=instruction,
-        after_agent_callback=auto_save_session_to_memory
+        after_agent_callback=auto_save_session_to_memory,
     )
 
     logger.info(
@@ -208,11 +206,12 @@ Remember: You are the **knowledge nexus** - all agents rely on you for accurate,
             "spiffe_id": AGENT_SPIFFE_ID,
             "model": "gemini-2.0-flash-exp",
             "tools_count": 6,
-            "name": "iam_index"
-        }
+            "name": "iam_index",
+        },
     )
 
     return agent
+
 
 def create_runner() -> Runner:
     """
@@ -225,28 +224,20 @@ def create_runner() -> Runner:
     """
     logger.info(
         "Creating Runner with dual memory for iam-index",
-        extra={"spiffe_id": AGENT_SPIFFE_ID}
+        extra={"spiffe_id": AGENT_SPIFFE_ID},
     )
 
     # R5: Dual memory wiring
-    session_service = VertexAiSessionService(
-        project=PROJECT_ID,
-        location=LOCATION
-    )
+    session_service = VertexAiSessionService(project=PROJECT_ID, location=LOCATION)
 
-    memory_service = VertexAiMemoryBankService(
-        project=PROJECT_ID,
-        location=LOCATION
-    )
+    memory_service = VertexAiMemoryBankService(project=PROJECT_ID, location=LOCATION)
 
     # Create the agent
     agent = get_agent()
 
     # Create Runner with both services
     runner = Runner(
-        agent=agent,
-        session_service=session_service,
-        memory_service=memory_service
+        agent=agent, session_service=session_service, memory_service=memory_service
     )
 
     logger.info(
@@ -254,21 +245,19 @@ def create_runner() -> Runner:
         extra={
             "spiffe_id": AGENT_SPIFFE_ID,
             "has_session_service": True,
-            "has_memory_service": True
-        }
+            "has_memory_service": True,
+        },
     )
 
     return runner
+
 
 # Module-level agent for ADK CLI deployment
 root_agent = get_agent()
 
 logger.info(
     "✅ root_agent created for ADK deployment",
-    extra={
-        "spiffe_id": AGENT_SPIFFE_ID,
-        "agent_name": "iam_index"
-    }
+    extra={"spiffe_id": AGENT_SPIFFE_ID, "agent_name": "iam_index"},
 )
 
 if __name__ == "__main__":
@@ -283,15 +272,12 @@ if __name__ == "__main__":
         logger.warning(
             "⚠️ Running iam-index locally. Production must use "
             "Vertex AI Agent Engine via GitHub Actions (R4).",
-            extra={"spiffe_id": AGENT_SPIFFE_ID}
+            extra={"spiffe_id": AGENT_SPIFFE_ID},
         )
 
     try:
         runner = create_runner()
-        logger.info(
-            "🚀 iam-index runner ready",
-            extra={"spiffe_id": AGENT_SPIFFE_ID}
-        )
+        logger.info("🚀 iam-index runner ready", extra={"spiffe_id": AGENT_SPIFFE_ID})
 
         # For local testing only
         if os.getenv("GITHUB_ACTIONS") != "true":
@@ -303,6 +289,6 @@ if __name__ == "__main__":
         logger.error(
             f"❌ Failed to create iam-index runner: {e}",
             extra={"spiffe_id": AGENT_SPIFFE_ID},
-            exc_info=True
+            exc_info=True,
         )
         sys.exit(1)

@@ -25,30 +25,23 @@ Exit Codes:
 
 import argparse
 import json
+import re
 import sys
 from pathlib import Path
-from typing import Dict, List, Tuple, Any, Optional
-import re
-
+from typing import Dict, List, Optional, Tuple
 
 # ============================================================================
 # VALIDATION RULES (6767 Standards)
 # ============================================================================
 
-REQUIRED_AGENTCARD_FIELDS = [
-    "name",
-    "description",
-    "version",
-    "spiffe_id",
-    "skills"
-]
+REQUIRED_AGENTCARD_FIELDS = ["name", "description", "version", "spiffe_id", "skills"]
 
 REQUIRED_SKILL_FIELDS = [
     "id",  # A2A v0.3.0 uses "id" instead of "skill_id"
     "name",
     "description",
     "input_schema",
-    "output_schema"
+    "output_schema",
 ]
 
 # Skill naming pattern: {department}.{verb}_{noun}
@@ -67,6 +60,7 @@ SPIFFE_ID_PATTERN = re.compile(
 # VALIDATION FUNCTIONS
 # ============================================================================
 
+
 def validate_json_syntax(file_path: Path) -> Tuple[bool, str, Optional[Dict]]:
     """
     Layer 1: Validate JSON syntax.
@@ -74,7 +68,7 @@ def validate_json_syntax(file_path: Path) -> Tuple[bool, str, Optional[Dict]]:
     Returns: (valid, message, parsed_json)
     """
     try:
-        with open(file_path, 'r') as f:
+        with open(file_path) as f:
             data = json.load(f)
         return True, "✅ Valid JSON syntax", data
     except json.JSONDecodeError as e:
@@ -140,7 +134,9 @@ def validate_skills(skills: List[Dict]) -> Tuple[bool, List[str]]:
                         "Define explicit type and properties."
                     )
                 elif "type" not in schema:
-                    errors.append(f"{skill_prefix}.{schema_field}: Missing 'type' field")
+                    errors.append(
+                        f"{skill_prefix}.{schema_field}: Missing 'type' field"
+                    )
 
     return len(errors) == 0, errors
 
@@ -181,7 +177,9 @@ def validate_6767_standards(data: Dict) -> Tuple[bool, List[str]]:
     return len(errors) == 0, errors
 
 
-def validate_agentcard(file_path: Path, check_implementation: bool = False) -> Tuple[bool, List[str]]:
+def validate_agentcard(
+    file_path: Path, check_implementation: bool = False
+) -> Tuple[bool, List[str]]:
     """
     Run all validation layers on an AgentCard.
 
@@ -223,6 +221,7 @@ def validate_agentcard(file_path: Path, check_implementation: bool = False) -> T
 # MAIN EXECUTION
 # ============================================================================
 
+
 def find_all_agentcards(root_dir: Path = Path(".")) -> List[Path]:
     """Find all AgentCard JSON files in agents/ directory."""
     agentcards = []
@@ -244,26 +243,26 @@ def main():
     parser = argparse.ArgumentParser(
         description="Validate A2A AgentCard contracts",
         formatter_class=argparse.RawDescriptionHelpFormatter,
-        epilog=__doc__
+        epilog=__doc__,
     )
 
     parser.add_argument(
         "agentcard_path",
         nargs="?",
         type=Path,
-        help="Path to AgentCard JSON file (e.g., agents/iam-adk/.well-known/agent-card.json)"
+        help="Path to AgentCard JSON file (e.g., agents/iam-adk/.well-known/agent-card.json)",
     )
 
     parser.add_argument(
         "--all",
         action="store_true",
-        help="Validate all AgentCards in agents/ directory"
+        help="Validate all AgentCards in agents/ directory",
     )
 
     parser.add_argument(
         "--check-implementation",
         action="store_true",
-        help="Cross-check AgentCard against agent.py implementation (future)"
+        help="Cross-check AgentCard against agent.py implementation (future)",
     )
 
     args = parser.parse_args()
@@ -282,7 +281,7 @@ def main():
 
     # Validate each AgentCard
     print(f"\n{'='*70}")
-    print(f"A2A Contract Validation")
+    print("A2A Contract Validation")
     print(f"{'='*70}\n")
 
     total_errors = 0
@@ -306,7 +305,7 @@ def main():
 
     # Summary
     print(f"{'='*70}")
-    print(f"Summary")
+    print("Summary")
     print(f"{'='*70}")
 
     passed = sum(1 for _, valid, _ in results if valid)

@@ -9,11 +9,8 @@ This module provides tools for:
 - Proposing cleanup tasks with safety assessments
 """
 
-import os
 import logging
-from typing import List, Dict, Any, Optional
-from pathlib import Path
-import re
+from typing import Any, Dict, List, Optional
 
 logger = logging.getLogger(__name__)
 
@@ -278,9 +275,7 @@ def analyze_structure(
     findings["recommendations"].append(
         "Ensure clear directory structure with consistent organization"
     )
-    findings["recommendations"].append(
-        "Add __init__.py files to all Python packages"
-    )
+    findings["recommendations"].append("Add __init__.py files to all Python packages")
 
     logger.info("Structure analysis complete")
 
@@ -344,7 +339,9 @@ def propose_cleanup_task(
     import uuid
     from datetime import datetime
 
-    task_id = f"cleanup-{datetime.now().strftime('%Y%m%d-%H%M%S')}-{str(uuid.uuid4())[:8]}"
+    task_id = (
+        f"cleanup-{datetime.now().strftime('%Y%m%d-%H%M%S')}-{str(uuid.uuid4())[:8]}"
+    )
 
     task = {
         "task_id": task_id,

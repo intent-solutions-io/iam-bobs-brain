@@ -27,22 +27,24 @@ Usage:
 import logging
 import warnings
 from dataclasses import dataclass
-from typing import Dict, List, Optional, Literal
 from enum import Enum
+from typing import Dict, List
 
 logger = logging.getLogger(__name__)
 
 
 class AgentTier(Enum):
     """Agent hierarchy tiers in Bob's Brain architecture."""
-    TIER_1_UI = 1          # User interface (Bob)
+
+    TIER_1_UI = 1  # User interface (Bob)
     TIER_2_ORCHESTRATOR = 2  # Foreman/scheduler
-    TIER_3_SPECIALIST = 3    # Function workers
+    TIER_3_SPECIALIST = 3  # Function workers
 
 
 @dataclass(frozen=True)
 class AgentDefinition:
     """Canonical agent definition."""
+
     canonical_id: str
     tier: AgentTier
     description: str
@@ -63,7 +65,6 @@ CANONICAL_AGENTS: Dict[str, AgentDefinition] = {
         spiffe_template="spiffe://intent.solutions/agent/bob/{env}/{region}/{version}",
         old_ids=["bob_agent", "bob-agent"],
     ),
-
     # Tier 2: Orchestrator
     "iam-orchestrator": AgentDefinition(
         canonical_id="iam-orchestrator",
@@ -78,7 +79,6 @@ CANONICAL_AGENTS: Dict[str, AgentDefinition] = {
             "foreman",
         ],
     ),
-
     # Tier 3: Specialists
     "iam-compliance": AgentDefinition(
         canonical_id="iam-compliance",
@@ -87,7 +87,6 @@ CANONICAL_AGENTS: Dict[str, AgentDefinition] = {
         spiffe_template="spiffe://intent.solutions/agent/iam-compliance/{env}/{region}/{version}",
         old_ids=["iam_adk", "iam-adk"],
     ),
-
     "iam-triage": AgentDefinition(
         canonical_id="iam-triage",
         tier=AgentTier.TIER_3_SPECIALIST,
@@ -95,7 +94,6 @@ CANONICAL_AGENTS: Dict[str, AgentDefinition] = {
         spiffe_template="spiffe://intent.solutions/agent/iam-triage/{env}/{region}/{version}",
         old_ids=["iam_issue", "iam-issue"],
     ),
-
     "iam-planner": AgentDefinition(
         canonical_id="iam-planner",
         tier=AgentTier.TIER_3_SPECIALIST,
@@ -103,7 +101,6 @@ CANONICAL_AGENTS: Dict[str, AgentDefinition] = {
         spiffe_template="spiffe://intent.solutions/agent/iam-planner/{env}/{region}/{version}",
         old_ids=["iam_fix_plan", "iam-fix-plan"],
     ),
-
     "iam-engineer": AgentDefinition(
         canonical_id="iam-engineer",
         tier=AgentTier.TIER_3_SPECIALIST,
@@ -111,7 +108,6 @@ CANONICAL_AGENTS: Dict[str, AgentDefinition] = {
         spiffe_template="spiffe://intent.solutions/agent/iam-engineer/{env}/{region}/{version}",
         old_ids=["iam_fix_impl", "iam-fix-impl"],
     ),
-
     "iam-qa": AgentDefinition(
         canonical_id="iam-qa",
         tier=AgentTier.TIER_3_SPECIALIST,
@@ -119,7 +115,6 @@ CANONICAL_AGENTS: Dict[str, AgentDefinition] = {
         spiffe_template="spiffe://intent.solutions/agent/iam-qa/{env}/{region}/{version}",
         old_ids=["iam_qa"],  # Already close to canonical
     ),
-
     "iam-docs": AgentDefinition(
         canonical_id="iam-docs",
         tier=AgentTier.TIER_3_SPECIALIST,
@@ -127,7 +122,6 @@ CANONICAL_AGENTS: Dict[str, AgentDefinition] = {
         spiffe_template="spiffe://intent.solutions/agent/iam-docs/{env}/{region}/{version}",
         old_ids=["iam_doc", "iam-doc"],
     ),
-
     "iam-hygiene": AgentDefinition(
         canonical_id="iam-hygiene",
         tier=AgentTier.TIER_3_SPECIALIST,
@@ -135,7 +129,6 @@ CANONICAL_AGENTS: Dict[str, AgentDefinition] = {
         spiffe_template="spiffe://intent.solutions/agent/iam-hygiene/{env}/{region}/{version}",
         old_ids=["iam_cleanup", "iam-cleanup"],
     ),
-
     "iam-index": AgentDefinition(
         canonical_id="iam-index",
         tier=AgentTier.TIER_3_SPECIALIST,
@@ -149,6 +142,7 @@ CANONICAL_AGENTS: Dict[str, AgentDefinition] = {
 # =============================================================================
 # ALIAS MAP (built from CANONICAL_AGENTS)
 # =============================================================================
+
 
 def _build_alias_map() -> Dict[str, str]:
     """Build reverse lookup from old IDs to canonical IDs."""
@@ -185,12 +179,15 @@ CANONICAL_TO_DIRECTORY: Dict[str, str] = {
 }
 
 # Reverse mapping
-DIRECTORY_TO_CANONICAL: Dict[str, str] = {v: k for k, v in CANONICAL_TO_DIRECTORY.items()}
+DIRECTORY_TO_CANONICAL: Dict[str, str] = {
+    v: k for k, v in CANONICAL_TO_DIRECTORY.items()
+}
 
 
 # =============================================================================
 # PUBLIC API
 # =============================================================================
+
 
 def canonicalize(agent_id: str, warn: bool = True) -> str:
     """
@@ -296,10 +293,7 @@ def get_directory(agent_id: str) -> str:
 
 
 def get_spiffe_id(
-    agent_id: str,
-    env: str = "dev",
-    region: str = "us-central1",
-    version: str = "0.1.0"
+    agent_id: str, env: str = "dev", region: str = "us-central1", version: str = "0.1.0"
 ) -> str:
     """
     Generate SPIFFE ID for an agent.
@@ -314,11 +308,7 @@ def get_spiffe_id(
         Formatted SPIFFE ID string
     """
     definition = get_definition(agent_id)
-    return definition.spiffe_template.format(
-        env=env,
-        region=region,
-        version=version
-    )
+    return definition.spiffe_template.format(env=env, region=region, version=version)
 
 
 def list_canonical_ids() -> List[str]:
@@ -329,8 +319,7 @@ def list_canonical_ids() -> List[str]:
 def list_by_tier(tier: AgentTier) -> List[str]:
     """Return list of canonical IDs for a specific tier."""
     return [
-        agent_id for agent_id, defn in CANONICAL_AGENTS.items()
-        if defn.tier == tier
+        agent_id for agent_id, defn in CANONICAL_AGENTS.items() if defn.tier == tier
     ]
 
 
@@ -344,22 +333,19 @@ def list_specialists() -> List[str]:
 # =============================================================================
 
 __all__ = [
-    # Types
-    "AgentTier",
-    "AgentDefinition",
-    # Data
-    "CANONICAL_AGENTS",
     "AGENT_ALIASES",
+    "CANONICAL_AGENTS",
     "CANONICAL_TO_DIRECTORY",
     "DIRECTORY_TO_CANONICAL",
-    # Functions
+    "AgentDefinition",
+    "AgentTier",
     "canonicalize",
-    "is_canonical",
-    "is_valid",
     "get_definition",
     "get_directory",
     "get_spiffe_id",
-    "list_canonical_ids",
+    "is_canonical",
+    "is_valid",
     "list_by_tier",
+    "list_canonical_ids",
     "list_specialists",
 ]

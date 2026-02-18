@@ -8,39 +8,32 @@ Tests:
 - Runner CLI commands
 """
 
-import pytest
-import tempfile
 import json
+import tempfile
 from pathlib import Path
 
+import pytest
+
+from agents.mission_spec.compiler import (
+    ExecutionPlan,
+    PlannedTask,
+    compile_mission,
+)
+from agents.mission_spec.runner import main as runner_main
 from agents.mission_spec.schema import (
-    MissionSpec,
+    MissionMandate,
     MissionScope,
+    MissionSpec,
     RepoScope,
     WorkflowStep,
-    LoopStep,
-    MissionMandate,
-    EvidenceConfig,
-    StepOutput,
-    GateConfig,
-    StepType,
-    GateType,
     load_mission,
     validate_mission,
 )
-from agents.mission_spec.compiler import (
-    MissionCompiler,
-    compile_mission,
-    PlannedTask,
-    ExecutionPlan,
-    CompilerResult,
-)
-from agents.mission_spec.runner import main as runner_main
-
 
 # ============================================================================
 # SCHEMA TESTS
 # ============================================================================
+
 
 class TestMissionSpecSchema:
     """Test MissionSpec schema parsing."""
@@ -48,9 +41,7 @@ class TestMissionSpecSchema:
     def test_minimal_mission_spec(self):
         """Create minimal valid MissionSpec."""
         mission = MissionSpec(
-            mission_id="test-mission",
-            title="Test Mission",
-            intent="Test intent"
+            mission_id="test-mission", title="Test Mission", intent="Test intent"
         )
         assert mission.mission_id == "test-mission"
         assert mission.version == "1"  # Default
@@ -63,11 +54,9 @@ class TestMissionSpecSchema:
             intent="Test intent",
             workflow=[
                 WorkflowStep(
-                    step="analyze",
-                    agent="iam-compliance",
-                    inputs={"target": "agents/"}
+                    step="analyze", agent="iam-compliance", inputs={"target": "agents/"}
                 )
-            ]
+            ],
         )
         assert len(mission.workflow) == 1
         assert mission.workflow[0].agent == "iam-compliance"
@@ -78,9 +67,7 @@ class TestMissionSpecSchema:
             mission_id="test-mission",
             title="Test Mission",
             intent="Test intent",
-            scope=MissionScope(repos=[
-                RepoScope(path=".", ref="main")
-            ])
+            scope=MissionScope(repos=[RepoScope(path=".", ref="main")]),
         )
         assert len(mission.scope.repos) == 1
         # Access the RepoScope object's path attribute
@@ -97,8 +84,8 @@ class TestMissionSpecSchema:
             mandate=MissionMandate(
                 budget_limit=5.0,
                 risk_tier="R2",
-                authorized_specialists=["iam-compliance"]
-            )
+                authorized_specialists=["iam-compliance"],
+            ),
         )
         assert mission.mandate.budget_limit == 5.0
         assert mission.mandate.risk_tier == "R2"
@@ -113,7 +100,7 @@ class TestMissionSpecSchema:
                 WorkflowStep(step="a", agent="iam-compliance"),
                 WorkflowStep(step="b", agent="iam-qa"),
                 WorkflowStep(step="c", agent="iam-compliance"),  # Duplicate
-            ]
+            ],
         )
         agents = mission.get_all_agents()
         assert agents == ["iam-compliance", "iam-qa"]  # Sorted, no duplicates
@@ -128,9 +115,7 @@ class TestMissionValidation:
             mission_id="test-mission",
             title="Test Mission",
             intent="Test intent",
-            workflow=[
-                WorkflowStep(step="analyze", agent="iam-compliance")
-            ]
+            workflow=[WorkflowStep(step="analyze", agent="iam-compliance")],
         )
         errors = validate_mission(mission)
         assert errors == []
@@ -141,7 +126,7 @@ class TestMissionValidation:
             mission_id="test-mission",
             title="Test Mission",
             intent="Test intent",
-            workflow=[]
+            workflow=[],
         )
         errors = validate_mission(mission)
         assert any("workflow must have" in e for e in errors)
@@ -154,11 +139,9 @@ class TestMissionValidation:
             intent="Test intent",
             workflow=[
                 WorkflowStep(
-                    step="analyze",
-                    agent="iam-compliance",
-                    depends_on=["nonexistent"]
+                    step="analyze", agent="iam-compliance", depends_on=["nonexistent"]
                 )
-            ]
+            ],
         )
         errors = validate_mission(mission)
         assert any("unknown step" in e for e in errors)
@@ -169,12 +152,10 @@ class TestMissionValidation:
             mission_id="test-mission",
             title="Test Mission",
             intent="Test intent",
-            workflow=[
-                WorkflowStep(step="analyze", agent="iam-compliance")
-            ],
+            workflow=[WorkflowStep(step="analyze", agent="iam-compliance")],
             mandate=MissionMandate(
                 authorized_specialists=["iam-qa"]  # Missing iam-compliance
-            )
+            ),
         )
         errors = validate_mission(mission)
         assert any("not in authorized_specialists" in e for e in errors)
@@ -219,6 +200,7 @@ workflow:
 # COMPILER TESTS
 # ============================================================================
 
+
 class TestMissionCompiler:
     """Test MissionCompiler."""
 
@@ -228,9 +210,7 @@ class TestMissionCompiler:
             mission_id="test-mission",
             title="Test Mission",
             intent="Test intent",
-            workflow=[
-                WorkflowStep(step="analyze", agent="iam-compliance")
-            ]
+            workflow=[WorkflowStep(step="analyze", agent="iam-compliance")],
         )
         result = compile_mission(mission)
         assert result.success is True
@@ -245,12 +225,8 @@ class TestMissionCompiler:
             intent="Test intent",
             workflow=[
                 WorkflowStep(step="analyze", agent="iam-compliance"),
-                WorkflowStep(
-                    step="triage",
-                    agent="iam-triage",
-                    depends_on=["analyze"]
-                ),
-            ]
+                WorkflowStep(step="triage", agent="iam-triage", depends_on=["analyze"]),
+            ],
         )
         result = compile_mission(mission)
         assert result.success is True
@@ -258,14 +234,18 @@ class TestMissionCompiler:
         # Check execution order respects dependencies
         order = result.plan.execution_order
         analyze_idx = next(
-            i for i, tid in enumerate(order)
-            if any(t.step_name == "analyze" and t.task_id == tid
-                   for t in result.plan.tasks)
+            i
+            for i, tid in enumerate(order)
+            if any(
+                t.step_name == "analyze" and t.task_id == tid for t in result.plan.tasks
+            )
         )
         triage_idx = next(
-            i for i, tid in enumerate(order)
-            if any(t.step_name == "triage" and t.task_id == tid
-                   for t in result.plan.tasks)
+            i
+            for i, tid in enumerate(order)
+            if any(
+                t.step_name == "triage" and t.task_id == tid for t in result.plan.tasks
+            )
         )
         assert analyze_idx < triage_idx
 
@@ -275,13 +255,8 @@ class TestMissionCompiler:
             mission_id="test-mission",
             title="Test Mission",
             intent="Test intent",
-            workflow=[
-                WorkflowStep(step="analyze", agent="iam-compliance")
-            ],
-            mandate=MissionMandate(
-                budget_limit=5.0,
-                risk_tier="R2"
-            )
+            workflow=[WorkflowStep(step="analyze", agent="iam-compliance")],
+            mandate=MissionMandate(budget_limit=5.0, risk_tier="R2"),
         )
         result = compile_mission(mission)
         assert result.success is True
@@ -294,9 +269,7 @@ class TestMissionCompiler:
             mission_id="test-mission",
             title="Test Mission",
             intent="Test intent",
-            workflow=[
-                WorkflowStep(step="analyze", agent="iam-compliance")
-            ]
+            workflow=[WorkflowStep(step="analyze", agent="iam-compliance")],
         )
         result = compile_mission(mission)
         assert result.success is True
@@ -317,7 +290,7 @@ class TestCompilerDeterminism:
             workflow=[
                 WorkflowStep(step="a", agent="iam-compliance"),
                 WorkflowStep(step="b", agent="iam-qa", depends_on=["a"]),
-            ]
+            ],
         )
 
         result1 = compile_mission(mission, seed="fixed-seed")
@@ -325,8 +298,9 @@ class TestCompilerDeterminism:
 
         assert result1.plan.content_hash == result2.plan.content_hash
         assert result1.plan.execution_order == result2.plan.execution_order
-        assert [t.task_id for t in result1.plan.tasks] == \
-               [t.task_id for t in result2.plan.tasks]
+        assert [t.task_id for t in result1.plan.tasks] == [
+            t.task_id for t in result2.plan.tasks
+        ]
 
     def test_different_seed_different_task_ids(self):
         """Different seeds produce different task IDs."""
@@ -334,9 +308,7 @@ class TestCompilerDeterminism:
             mission_id="test-mission",
             title="Test Mission",
             intent="Test intent",
-            workflow=[
-                WorkflowStep(step="analyze", agent="iam-compliance")
-            ]
+            workflow=[WorkflowStep(step="analyze", agent="iam-compliance")],
         )
 
         result1 = compile_mission(mission, seed="seed1")
@@ -354,7 +326,7 @@ class TestCompilerErrors:
             mission_id="test-mission",
             title="Test Mission",
             intent="Test intent",
-            workflow=[]  # Invalid: empty workflow
+            workflow=[],  # Invalid: empty workflow
         )
         result = compile_mission(mission)
         assert result.success is False
@@ -366,9 +338,7 @@ class TestCompilerErrors:
             mission_id="test-mission",
             title="Test Mission",
             intent="Test intent",
-            workflow=[
-                WorkflowStep(step="analyze", agent="iam_adk")  # Legacy ID
-            ]
+            workflow=[WorkflowStep(step="analyze", agent="iam_adk")],  # Legacy ID
         )
         result = compile_mission(mission)
         assert result.success is True
@@ -391,10 +361,10 @@ class TestExecutionPlan:
                     task_id="task-1",
                     step_name="analyze",
                     agent="iam-compliance",
-                    inputs={}
+                    inputs={},
                 )
             ],
-            execution_order=["task-1"]
+            execution_order=["task-1"],
         )
         json_str = plan.to_json()
         data = json.loads(json_str)
@@ -405,6 +375,7 @@ class TestExecutionPlan:
 # ============================================================================
 # RUNNER TESTS
 # ============================================================================
+
 
 class TestRunnerCLI:
     """Test runner CLI commands."""
@@ -460,7 +431,9 @@ workflow:
             f.write(yaml_content)
             f.flush()
 
-            with tempfile.NamedTemporaryFile(mode="w", suffix=".json", delete=False) as out:
+            with tempfile.NamedTemporaryFile(
+                mode="w", suffix=".json", delete=False
+            ) as out:
                 result = runner_main(["compile", f.name, "-o", out.name])
                 assert result == 0
 
@@ -504,7 +477,7 @@ workflow:
             "status": "success",
             "result": {"compliance_status": "COMPLIANT"},
             "error": None,
-            "metadata": {"duration_ms": 100}
+            "metadata": {"duration_ms": 100},
         }
 
         with tempfile.NamedTemporaryFile(mode="w", suffix=".yaml", delete=False) as f:
@@ -513,7 +486,7 @@ workflow:
 
             with patch(
                 "agents.iam_senior_adk_devops_lead.tools.delegation.delegate_to_specialist",
-                return_value=mock_result
+                return_value=mock_result,
             ):
                 result = runner_main(["run", f.name])
                 assert result == 0

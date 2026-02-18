@@ -9,13 +9,13 @@ Usage:
     message_blocks = format_portfolio_completion(portfolio_result, env="dev")
 """
 
-from typing import List, Dict, Any
-from agents.shared_contracts import PortfolioResult, PerRepoResult
+from typing import Any, Dict, List
+
+from agents.shared_contracts import PortfolioResult
 
 
 def format_portfolio_completion(
-    result: PortfolioResult,
-    env: str = "dev"
+    result: PortfolioResult, env: str = "dev"
 ) -> List[Dict[str, Any]]:
     """
     Format a PortfolioResult into Slack Block Kit blocks.
@@ -72,8 +72,8 @@ def _make_header_block(result: PortfolioResult, env: str) -> Dict[str, Any]:
             "text": (
                 f"{emoji} *Portfolio SWE Audit Complete* {env_badge}\n"
                 f"Run ID: `{result.portfolio_run_id[:8]}...`"
-            )
-        }
+            ),
+        },
     }
 
 
@@ -87,9 +87,7 @@ def _make_summary_block(result: PortfolioResult) -> Dict[str, Any]:
 
     duration_str = _format_duration(result.portfolio_duration_seconds)
 
-    summary_text = (
-        f"*Repos:* {result.total_repos_analyzed} analyzed"
-    )
+    summary_text = f"*Repos:* {result.total_repos_analyzed} analyzed"
 
     if result.total_repos_skipped > 0:
         summary_text += f", {result.total_repos_skipped} skipped"
@@ -102,13 +100,7 @@ def _make_summary_block(result: PortfolioResult) -> Dict[str, Any]:
         f"\n*Duration:* {duration_str}"
     )
 
-    return {
-        "type": "section",
-        "text": {
-            "type": "mrkdwn",
-            "text": summary_text
-        }
-    }
+    return {"type": "section", "text": {"type": "mrkdwn", "text": summary_text}}
 
 
 def _make_issue_breakdown_block(result: PortfolioResult) -> Dict[str, Any]:
@@ -117,38 +109,33 @@ def _make_issue_breakdown_block(result: PortfolioResult) -> Dict[str, Any]:
 
     # By severity
     if result.issues_by_severity:
-        severity_text = "\n".join([
-            f"{_severity_emoji(sev)} {sev.title()}: {count}"
-            for sev, count in sorted(
-                result.issues_by_severity.items(),
-                key=lambda x: _severity_order(x[0]),
-                reverse=True
-            )
-        ])
-        fields.append({
-            "type": "mrkdwn",
-            "text": f"*By Severity*\n{severity_text}"
-        })
+        severity_text = "\n".join(
+            [
+                f"{_severity_emoji(sev)} {sev.title()}: {count}"
+                for sev, count in sorted(
+                    result.issues_by_severity.items(),
+                    key=lambda x: _severity_order(x[0]),
+                    reverse=True,
+                )
+            ]
+        )
+        fields.append({"type": "mrkdwn", "text": f"*By Severity*\n{severity_text}"})
 
     # By type
     if result.issues_by_type:
-        type_text = "\n".join([
-            f"• {issue_type.replace('_', ' ').title()}: {count}"
-            for issue_type, count in sorted(
-                result.issues_by_type.items(),
-                key=lambda x: x[1],
-                reverse=True
-            )[:5]  # Top 5 types
-        ])
-        fields.append({
-            "type": "mrkdwn",
-            "text": f"*By Type*\n{type_text}"
-        })
+        type_text = "\n".join(
+            [
+                f"• {issue_type.replace('_', ' ').title()}: {count}"
+                for issue_type, count in sorted(
+                    result.issues_by_type.items(), key=lambda x: x[1], reverse=True
+                )[
+                    :5
+                ]  # Top 5 types
+            ]
+        )
+        fields.append({"type": "mrkdwn", "text": f"*By Type*\n{type_text}"})
 
-    return {
-        "type": "section",
-        "fields": fields
-    }
+    return {"type": "section", "fields": fields}
 
 
 def _make_top_repos_block(result: PortfolioResult) -> Dict[str, Any]:
@@ -156,10 +143,7 @@ def _make_top_repos_block(result: PortfolioResult) -> Dict[str, Any]:
     if not result.repos_by_issue_count:
         return {
             "type": "section",
-            "text": {
-                "type": "mrkdwn",
-                "text": "*Top Repos*\nNo repos to display"
-            }
+            "text": {"type": "mrkdwn", "text": "*Top Repos*\nNo repos to display"},
         }
 
     # Show top 5 repos by issue count
@@ -168,13 +152,7 @@ def _make_top_repos_block(result: PortfolioResult) -> Dict[str, Any]:
         emoji = ":fire:" if i == 1 else f"{i}."
         top_repos_text += f"{emoji} `{repo_id}`: {issue_count} issues\n"
 
-    return {
-        "type": "section",
-        "text": {
-            "type": "mrkdwn",
-            "text": top_repos_text
-        }
-    }
+    return {"type": "section", "text": {"type": "mrkdwn", "text": top_repos_text}}
 
 
 def _make_footer_block(result: PortfolioResult) -> Dict[str, Any]:
@@ -186,27 +164,20 @@ def _make_footer_block(result: PortfolioResult) -> Dict[str, Any]:
         f"<https://github.com/jeremylongshore/bobs-brain|View Project>"
     )
 
-    return {
-        "type": "context",
-        "elements": [
-            {
-                "type": "mrkdwn",
-                "text": footer_text
-            }
-        ]
-    }
+    return {"type": "context", "elements": [{"type": "mrkdwn", "text": footer_text}]}
 
 
 # ============================================================================
 # HELPER FUNCTIONS
 # ============================================================================
 
+
 def _get_env_badge(env: str) -> str:
     """Get a badge for the environment."""
     badges = {
         "dev": ":construction: DEV",
         "staging": ":test_tube: STAGING",
-        "prod": ":rocket: PROD"
+        "prod": ":rocket: PROD",
     }
     return badges.get(env, f"({env.upper()})")
 
@@ -218,20 +189,14 @@ def _severity_emoji(severity: str) -> str:
         "high": ":red_circle:",
         "medium": ":orange_circle:",
         "low": ":yellow_circle:",
-        "info": ":information_source:"
+        "info": ":information_source:",
     }
     return emojis.get(severity.lower(), ":grey_question:")
 
 
 def _severity_order(severity: str) -> int:
     """Get numeric order for severity (for sorting)."""
-    order = {
-        "critical": 5,
-        "high": 4,
-        "medium": 3,
-        "low": 2,
-        "info": 1
-    }
+    order = {"critical": 5, "high": 4, "medium": 3, "low": 2, "info": 1}
     return order.get(severity.lower(), 0)
 
 
@@ -251,9 +216,9 @@ def _format_duration(seconds: float) -> str:
 # ALTERNATIVE FORMAT: SIMPLE TEXT
 # ============================================================================
 
+
 def format_portfolio_completion_simple(
-    result: PortfolioResult,
-    env: str = "dev"
+    result: PortfolioResult, env: str = "dev"
 ) -> str:
     """
     Format a PortfolioResult as simple text (fallback for non-block webhooks).
@@ -285,11 +250,13 @@ def format_portfolio_completion_simple(
     if result.total_repos_errored > 0:
         lines.append(f"  - {result.total_repos_errored} errored")
 
-    lines.extend([
-        "",
-        f"Issues: {result.total_issues_found} found, {result.total_issues_fixed} fixed ({fix_rate:.1f}%)",
-        f"Duration: {duration_str}",
-    ])
+    lines.extend(
+        [
+            "",
+            f"Issues: {result.total_issues_found} found, {result.total_issues_fixed} fixed ({fix_rate:.1f}%)",
+            f"Duration: {duration_str}",
+        ]
+    )
 
     if result.repos_by_issue_count:
         lines.append("")
@@ -302,8 +269,8 @@ def format_portfolio_completion_simple(
 
 if __name__ == "__main__":
     # Quick test/demo
-    from datetime import datetime
     import json
+    from datetime import datetime
 
     # Create a sample PortfolioResult for testing
     sample_result = PortfolioResult(
@@ -319,21 +286,21 @@ if __name__ == "__main__":
             "high": 10,
             "medium": 20,
             "low": 8,
-            "info": 2
+            "info": 2,
         },
         issues_by_type={
             "adk_violation": 15,
             "pattern_drift": 12,
             "security": 8,
-            "tech_debt": 7
+            "tech_debt": 7,
         },
         repos_by_issue_count=[
             ("bobs-brain", 20),
             ("diagnosticpro", 12),
-            ("pipelinepilot", 10)
+            ("pipelinepilot", 10),
         ],
         portfolio_duration_seconds=456.78,
-        timestamp=datetime.now()
+        timestamp=datetime.now(),
     )
 
     # Test Block Kit format

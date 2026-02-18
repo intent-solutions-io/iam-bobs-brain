@@ -13,39 +13,36 @@ See: 000-docs/257-DR-STND-mission-spec-v1.md
 """
 
 from agents.mission_spec.schema import (
-    # Core models
-    MissionSpec,
-    MissionScope,
-    RepoScope,
-    WorkflowStep,
+    EvidenceConfig,
+    GateConfig,
+    GateType,
     LoopStep,
     MissionMandate,
-    EvidenceConfig,
+    MissionScope,
+    # Core models
+    MissionSpec,
+    RepoScope,
     StepOutput,
-    GateConfig,
     # Enums
     StepType,
-    GateType,
+    WorkflowStep,
     # Functions
     load_mission,
     validate_mission,
 )
 
 __all__ = [
-    # Core models
-    "MissionSpec",
-    "MissionScope",
-    "RepoScope",
-    "WorkflowStep",
+    "EvidenceConfig",
+    "GateConfig",
+    "GateType",
     "LoopStep",
     "MissionMandate",
-    "EvidenceConfig",
+    "MissionScope",
+    "MissionSpec",
+    "RepoScope",
     "StepOutput",
-    "GateConfig",
-    # Enums
     "StepType",
-    "GateType",
-    # Functions
+    "WorkflowStep",
     "load_mission",
     "validate_mission",
 ]

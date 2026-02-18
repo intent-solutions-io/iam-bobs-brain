@@ -16,13 +16,13 @@ Enforces:
 - R7: SPIFFE ID propagation in logs
 """
 
-from google.adk.agents import LlmAgent
-from google.adk import Runner
-from google.adk.sessions import VertexAiSessionService
-from google.adk.memory import VertexAiMemoryBankService
-import os
 import logging
-from typing import Optional
+import os
+
+from google.adk import Runner
+from google.adk.agents import LlmAgent
+from google.adk.memory import VertexAiMemoryBankService
+from google.adk.sessions import VertexAiSessionService
 
 # Configure logging
 logging.basicConfig(
@@ -39,6 +39,7 @@ AGENT_SPIFFE_ID = os.getenv(
     "AGENT_SPIFFE_ID",
     "spiffe://intent.solutions/agent/bobs-brain/dev/us-central1/0.8.0",
 )
+
 
 def auto_save_session_to_memory(callback_context=None, **kwargs):
     """
@@ -58,7 +59,7 @@ def auto_save_session_to_memory(callback_context=None, **kwargs):
     """
     try:
         # Handle both old (ctx) and new (callback_context) API
-        ctx = callback_context or kwargs.get('ctx')
+        ctx = callback_context or kwargs.get("ctx")
         if ctx is None:
             logger.debug("No callback context provided, skipping memory save")
             return
@@ -92,6 +93,7 @@ def auto_save_session_to_memory(callback_context=None, **kwargs):
             exc_info=True,
         )
         # Never block agent execution
+
 
 def get_agent() -> LlmAgent:
     """
@@ -301,6 +303,7 @@ When evaluating fixes, be thorough and pragmatic. A good test plan:
 
     return agent
 
+
 def create_runner() -> Runner:
     """
     Create Runner with dual memory wiring (Session + Memory Bank).
@@ -319,7 +322,7 @@ def create_runner() -> Runner:
         Gateway code in service/ MUST NOT import or call this (R3).
     """
     logger.info(
-        f"Creating Runner with dual memory for iam-qa",
+        "Creating Runner with dual memory for iam-qa",
         extra={
             "spiffe_id": AGENT_SPIFFE_ID,
             "project_id": PROJECT_ID,
@@ -364,6 +367,7 @@ def create_runner() -> Runner:
     )
 
     return runner
+
 
 # Create the root agent for ADK CLI deployment
 # ADK CLI expects a variable named 'root_agent' at module level

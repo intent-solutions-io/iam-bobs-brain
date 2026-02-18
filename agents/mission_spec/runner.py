@@ -25,12 +25,12 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
-from agents.mission_spec.schema import load_mission, validate_mission, MissionSpec
-from agents.mission_spec.compiler import compile_mission, CompilerResult, ExecutionPlan, PlannedTask
+from agents.mission_spec.compiler import ExecutionPlan, PlannedTask, compile_mission
+from agents.mission_spec.schema import load_mission, validate_mission
 from agents.shared_contracts.evidence_bundle import (
-    create_evidence_bundle,
     EvidenceBundle,
     ToolCallRecord,
+    create_evidence_bundle,
 )
 
 logger = logging.getLogger(__name__)
@@ -121,7 +121,9 @@ def cmd_dry_run(args: argparse.Namespace) -> int:
         print()
         print(f"Repos: {', '.join(plan.repos) or '(current)'}")
         print(f"Risk Tier: {plan.mandate.get('risk_tier', 'R0')}")
-        print(f"Budget Limit: {plan.mandate.get('budget_limit', 0)} {plan.mandate.get('budget_unit', 'USD')}")
+        print(
+            f"Budget Limit: {plan.mandate.get('budget_limit', 0)} {plan.mandate.get('budget_unit', 'USD')}"
+        )
         print()
         print(f"Total Tasks: {len(plan.tasks)}")
         print(f"Has Loops: {plan.has_loops}")
@@ -136,8 +138,12 @@ def cmd_dry_run(args: argparse.Namespace) -> int:
             loop_info = ""
             if task.loop_name:
                 loop_info = f" [loop: {task.loop_name}, iter: {task.loop_iteration}]"
-            deps = f" (depends: {', '.join(task.depends_on)})" if task.depends_on else ""
-            print(f"  {i}. [{task.task_id}] {task.step_name} -> {task.agent}{loop_info}{deps}")
+            deps = (
+                f" (depends: {', '.join(task.depends_on)})" if task.depends_on else ""
+            )
+            print(
+                f"  {i}. [{task.task_id}] {task.step_name} -> {task.agent}{loop_info}{deps}"
+            )
 
         print()
         print("=" * 60)
@@ -157,14 +163,13 @@ def cmd_dry_run(args: argparse.Namespace) -> int:
     except Exception as e:
         print(f"Error in dry-run: {e}")
         import traceback
+
         traceback.print_exc()
         return 1
 
 
 async def execute_task(
-    task: PlannedTask,
-    context: Dict[str, Any],
-    evidence: EvidenceBundle
+    task: PlannedTask, context: Dict[str, Any], evidence: EvidenceBundle
 ) -> Dict[str, Any]:
     """
     Execute a single task via A2A delegation.
@@ -178,8 +183,10 @@ async def execute_task(
         Task result dict
     """
     # Import delegation at runtime (6767-LAZY pattern)
-    from agents.iam_senior_adk_devops_lead.tools.delegation import delegate_to_specialist
     from agents.a2a.dispatcher import load_agentcard
+    from agents.iam_senior_adk_devops_lead.tools.delegation import (
+        delegate_to_specialist,
+    )
 
     start_time = datetime.now(timezone.utc)
 
@@ -212,7 +219,7 @@ async def execute_task(
                 "mission_id": context.get("mission_id"),
                 "pipeline_run_id": context.get("pipeline_run_id"),
                 "task_id": task.task_id,
-            }
+            },
         )
 
         end_time = datetime.now(timezone.utc)
@@ -221,20 +228,22 @@ async def execute_task(
         # Record in evidence bundle
         evidence.record_task_executed(task.task_id)
         evidence.record_agent_invoked(agent)
-        evidence.record_tool_call(ToolCallRecord(
-            tool_name=skill_id,
-            specialist=agent,
-            timestamp=start_time.isoformat(),
-            duration_ms=duration_ms,
-            success=result.get("status") == "success",
-            input_hash=EvidenceBundle.compute_sha256(
-                json.dumps(task.inputs, sort_keys=True).encode()
-            ),
-            output_hash=EvidenceBundle.compute_sha256(
-                json.dumps(result, sort_keys=True).encode()
-            ),
-            error_message=result.get("error")
-        ))
+        evidence.record_tool_call(
+            ToolCallRecord(
+                tool_name=skill_id,
+                specialist=agent,
+                timestamp=start_time.isoformat(),
+                duration_ms=duration_ms,
+                success=result.get("status") == "success",
+                input_hash=EvidenceBundle.compute_sha256(
+                    json.dumps(task.inputs, sort_keys=True).encode()
+                ),
+                output_hash=EvidenceBundle.compute_sha256(
+                    json.dumps(result, sort_keys=True).encode()
+                ),
+                error_message=result.get("error"),
+            )
+        )
 
         return {
             "task_id": task.task_id,
@@ -250,18 +259,20 @@ async def execute_task(
 
         logger.error(f"Task {task.task_id} failed: {e}")
 
-        evidence.record_tool_call(ToolCallRecord(
-            tool_name=skill_id,
-            specialist=agent,
-            timestamp=start_time.isoformat(),
-            duration_ms=duration_ms,
-            success=False,
-            input_hash=EvidenceBundle.compute_sha256(
-                json.dumps(task.inputs, sort_keys=True).encode()
-            ),
-            output_hash="",
-            error_message=str(e)
-        ))
+        evidence.record_tool_call(
+            ToolCallRecord(
+                tool_name=skill_id,
+                specialist=agent,
+                timestamp=start_time.isoformat(),
+                duration_ms=duration_ms,
+                success=False,
+                input_hash=EvidenceBundle.compute_sha256(
+                    json.dumps(task.inputs, sort_keys=True).encode()
+                ),
+                output_hash="",
+                error_message=str(e),
+            )
+        )
 
         return {
             "task_id": task.task_id,
@@ -272,10 +283,7 @@ async def execute_task(
         }
 
 
-async def run_mission(
-    plan: ExecutionPlan,
-    evidence: EvidenceBundle
-) -> Dict[str, Any]:
+async def run_mission(plan: ExecutionPlan, evidence: EvidenceBundle) -> Dict[str, Any]:
     """
     Execute a compiled mission plan.
 
@@ -319,12 +327,14 @@ async def run_mission(
         if not deps_satisfied and task.depends_on:
             logger.warning(f"Task {task_id} dependencies not satisfied, skipping")
             evidence.record_task_skipped(task_id)
-            results.append({
-                "task_id": task_id,
-                "status": "skipped",
-                "result": None,
-                "error": "Dependencies not satisfied",
-            })
+            results.append(
+                {
+                    "task_id": task_id,
+                    "status": "skipped",
+                    "result": None,
+                    "error": "Dependencies not satisfied",
+                }
+            )
             continue
 
         # Execute the task
@@ -341,7 +351,9 @@ async def run_mission(
         "mission_id": plan.mission_id,
         "tasks_total": len(plan.execution_order),
         "tasks_executed": len([r for r in results if r["status"] == "success"]),
-        "tasks_failed": len([r for r in results if r["status"] in ("error", "failure")]),
+        "tasks_failed": len(
+            [r for r in results if r["status"] in ("error", "failure")]
+        ),
         "tasks_skipped": len([r for r in results if r["status"] == "skipped"]),
         "results": results,
     }
@@ -382,9 +394,7 @@ def cmd_run(args: argparse.Namespace) -> int:
 
         # Step 4: Record results and save evidence
         if execution_result["tasks_failed"] > 0:
-            evidence.mark_failed(
-                f"{execution_result['tasks_failed']} tasks failed"
-            )
+            evidence.mark_failed(f"{execution_result['tasks_failed']} tasks failed")
         else:
             evidence.mark_completed()
 
@@ -415,7 +425,9 @@ def cmd_run(args: argparse.Namespace) -> int:
             print("\nTask Results:")
             for task_result in execution_result["results"]:
                 status_icon = "✓" if task_result["status"] == "success" else "✗"
-                print(f"  {status_icon} [{task_result['task_id']}] {task_result['status']}")
+                print(
+                    f"  {status_icon} [{task_result['task_id']}] {task_result['status']}"
+                )
                 if task_result.get("error"):
                     print(f"    Error: {task_result['error']}")
 
@@ -427,6 +439,7 @@ def cmd_run(args: argparse.Namespace) -> int:
     except Exception as e:
         print(f"Error executing mission: {e}")
         import traceback
+
         traceback.print_exc()
         return 1
 
@@ -434,63 +447,40 @@ def cmd_run(args: argparse.Namespace) -> int:
 def main(argv: Optional[list] = None) -> int:
     """Main entry point for CLI."""
     parser = argparse.ArgumentParser(
-        prog="mission_spec",
-        description="Mission Spec v1 - Declarative Workflow Runner"
+        prog="mission_spec", description="Mission Spec v1 - Declarative Workflow Runner"
     )
     subparsers = parser.add_subparsers(dest="command", help="Available commands")
 
     # validate command
-    validate_parser = subparsers.add_parser(
-        "validate",
-        help="Validate a mission file"
-    )
+    validate_parser = subparsers.add_parser("validate", help="Validate a mission file")
     validate_parser.add_argument(
-        "mission_file",
-        type=str,
-        help="Path to mission YAML file"
+        "mission_file", type=str, help="Path to mission YAML file"
     )
 
     # compile command
     compile_parser = subparsers.add_parser(
-        "compile",
-        help="Compile mission to execution plan"
+        "compile", help="Compile mission to execution plan"
     )
     compile_parser.add_argument(
-        "mission_file",
-        type=str,
-        help="Path to mission YAML file"
+        "mission_file", type=str, help="Path to mission YAML file"
     )
     compile_parser.add_argument(
-        "-o", "--output",
-        type=str,
-        help="Output file for execution plan JSON"
+        "-o", "--output", type=str, help="Output file for execution plan JSON"
     )
 
     # dry-run command
     dryrun_parser = subparsers.add_parser(
-        "dry-run",
-        help="Preview execution without running"
+        "dry-run", help="Preview execution without running"
     )
     dryrun_parser.add_argument(
-        "mission_file",
-        type=str,
-        help="Path to mission YAML file"
+        "mission_file", type=str, help="Path to mission YAML file"
     )
 
     # run command
-    run_parser = subparsers.add_parser(
-        "run",
-        help="Execute the mission"
-    )
+    run_parser = subparsers.add_parser("run", help="Execute the mission")
+    run_parser.add_argument("mission_file", type=str, help="Path to mission YAML file")
     run_parser.add_argument(
-        "mission_file",
-        type=str,
-        help="Path to mission YAML file"
-    )
-    run_parser.add_argument(
-        "-v", "--verbose",
-        action="store_true",
-        help="Show detailed task results"
+        "-v", "--verbose", action="store_true", help="Show detailed task results"
     )
 
     args = parser.parse_args(argv)

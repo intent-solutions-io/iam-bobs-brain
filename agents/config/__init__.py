@@ -3,19 +3,19 @@ Configuration modules for agents.
 """
 
 from .repos import (
+    RegistrySettings,
     RepoConfig,
     RepoRegistry,
-    RegistrySettings,
     get_registry,
     get_repo_by_id,
-    list_repos
+    list_repos,
 )
 
 __all__ = [
-    'RepoConfig',
-    'RepoRegistry',
-    'RegistrySettings',
-    'get_registry',
-    'get_repo_by_id',
-    'list_repos'
+    "RegistrySettings",
+    "RepoConfig",
+    "RepoRegistry",
+    "get_registry",
+    "get_repo_by_id",
+    "list_repos",
 ]

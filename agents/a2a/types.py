@@ -10,9 +10,10 @@ Classes:
 - A2AError: Exception raised for A2A protocol violations
 """
 
-from pydantic import BaseModel, Field
-from typing import Dict, Any, Optional, Literal, List
 from datetime import datetime
+from typing import Any, Dict, List, Literal, Optional
+
+from pydantic import BaseModel, Field
 
 
 class AgentCard(BaseModel):
@@ -33,14 +34,25 @@ class AgentCard(BaseModel):
         default_output_modes: Supported output modes (default: ["text"])
         skills: Agent skills with input/output schemas
     """
+
     name: str = Field(..., description="Agent name")
     version: str = Field(..., description="Agent version")
     url: str = Field(..., description="Agent public URL")
-    description: str = Field(..., description="Agent description (must include SPIFFE ID per R7)")
-    capabilities: List[str] = Field(default_factory=list, description="Agent capabilities")
-    default_input_modes: List[str] = Field(default_factory=lambda: ["text"], description="Supported input modes")
-    default_output_modes: List[str] = Field(default_factory=lambda: ["text"], description="Supported output modes")
-    skills: List[Dict[str, Any]] = Field(default_factory=list, description="Agent skills")
+    description: str = Field(
+        ..., description="Agent description (must include SPIFFE ID per R7)"
+    )
+    capabilities: List[str] = Field(
+        default_factory=list, description="Agent capabilities"
+    )
+    default_input_modes: List[str] = Field(
+        default_factory=lambda: ["text"], description="Supported input modes"
+    )
+    default_output_modes: List[str] = Field(
+        default_factory=lambda: ["text"], description="Supported output modes"
+    )
+    skills: List[Dict[str, Any]] = Field(
+        default_factory=list, description="Agent skills"
+    )
 
 
 class A2ATask(BaseModel):
@@ -58,12 +70,19 @@ class A2ATask(BaseModel):
         spiffe_id: Calling agent's SPIFFE ID (R7 propagation)
         mandate: Optional mandate for budget/authorization tracking (Phase B)
     """
+
     specialist: str = Field(..., description="Target specialist agent name")
     skill_id: str = Field(..., description="Full skill ID from AgentCard")
-    payload: Dict[str, Any] = Field(..., description="Skill input matching input_schema")
-    context: Dict[str, Any] = Field(default_factory=dict, description="Request context/metadata")
+    payload: Dict[str, Any] = Field(
+        ..., description="Skill input matching input_schema"
+    )
+    context: Dict[str, Any] = Field(
+        default_factory=dict, description="Request context/metadata"
+    )
     spiffe_id: Optional[str] = Field(None, description="Caller's SPIFFE ID (R7)")
-    mandate: Optional[Dict[str, Any]] = Field(None, description="Authorization mandate with budget limits (Phase B)")
+    mandate: Optional[Dict[str, Any]] = Field(
+        None, description="Authorization mandate with budget limits (Phase B)"
+    )
 
     class Config:
         json_schema_extra = {
@@ -72,13 +91,10 @@ class A2ATask(BaseModel):
                 "skill_id": "iam_adk.check_adk_compliance",
                 "payload": {
                     "target": "agents/bob/agent.py",
-                    "focus_rules": ["R1", "R5", "R7"]
+                    "focus_rules": ["R1", "R5", "R7"],
                 },
-                "context": {
-                    "request_id": "req_123",
-                    "pipeline_run_id": "pipeline_456"
-                },
-                "spiffe_id": "spiffe://intent.solutions/agent/iam-senior-adk-devops-lead/dev/us-central1/0.10.0"
+                "context": {"request_id": "req_123", "pipeline_run_id": "pipeline_456"},
+                "spiffe_id": "spiffe://intent.solutions/agent/iam-senior-adk-devops-lead/dev/us-central1/0.10.0",
             }
         }
 
@@ -99,13 +115,19 @@ class A2AResult(BaseModel):
         duration_ms: Execution time in milliseconds
         timestamp: ISO 8601 timestamp of completion
     """
-    status: Literal["SUCCESS", "FAILED", "PARTIAL"] = Field(..., description="Execution status")
+
+    status: Literal["SUCCESS", "FAILED", "PARTIAL"] = Field(
+        ..., description="Execution status"
+    )
     specialist: str = Field(..., description="Specialist that executed")
     skill_id: str = Field(..., description="Skill that was invoked")
     result: Optional[Dict[str, Any]] = Field(None, description="Skill output data")
     error: Optional[str] = Field(None, description="Error message if failed")
     duration_ms: Optional[int] = Field(None, description="Execution time in ms")
-    timestamp: str = Field(default_factory=lambda: datetime.utcnow().isoformat(), description="Completion timestamp")
+    timestamp: str = Field(
+        default_factory=lambda: datetime.utcnow().isoformat(),
+        description="Completion timestamp",
+    )
 
     class Config:
         json_schema_extra = {
@@ -117,11 +139,11 @@ class A2AResult(BaseModel):
                     "compliance_report": {
                         "status": "COMPLIANT",
                         "violations": [],
-                        "recommendations": ["Consider adding type hints"]
+                        "recommendations": ["Consider adding type hints"],
                     }
                 },
                 "duration_ms": 1250,
-                "timestamp": "2025-11-22T12:34:56.789Z"
+                "timestamp": "2025-11-22T12:34:56.789Z",
             }
         }
 
@@ -136,7 +158,13 @@ class A2AError(Exception):
     - Input payload doesn't match skill's input_schema shape
     - Specialist execution failure
     """
-    def __init__(self, message: str, specialist: Optional[str] = None, skill_id: Optional[str] = None):
+
+    def __init__(
+        self,
+        message: str,
+        specialist: Optional[str] = None,
+        skill_id: Optional[str] = None,
+    ):
         self.specialist = specialist
         self.skill_id = skill_id
         super().__init__(message)

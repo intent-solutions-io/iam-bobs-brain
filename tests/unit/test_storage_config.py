@@ -4,20 +4,20 @@ Test Org Storage Config Module (LIVE1-GCS)
 Tests configuration helpers for org-wide knowledge hub GCS bucket.
 """
 
-import pytest
 import os
-from unittest.mock import patch
 
 # Add agents to path
 import sys
 from pathlib import Path
+from unittest.mock import patch
+
 sys.path.insert(0, str(Path(__file__).parent.parent.parent / "agents"))
 
 from config.storage import (
     get_org_storage_bucket,
     is_org_storage_write_enabled,
-    make_portfolio_run_summary_path,
     make_portfolio_run_repo_path,
+    make_portfolio_run_summary_path,
     make_swe_agent_run_path,
 )
 

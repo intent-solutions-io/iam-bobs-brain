@@ -9,12 +9,12 @@ These tools enable the foreman to:
 """
 
 from .delegation import delegate_to_specialist
-from .planning import create_task_plan, aggregate_results
+from .planning import aggregate_results, create_task_plan
 from .repository import analyze_repository
 
 __all__ = [
-    "delegate_to_specialist",
-    "create_task_plan",
     "aggregate_results",
     "analyze_repository",
+    "create_task_plan",
+    "delegate_to_specialist",
 ]

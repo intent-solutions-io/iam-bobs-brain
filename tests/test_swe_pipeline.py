@@ -7,44 +7,37 @@ Tests the complete end-to-end pipeline flow with synthetic data.
 
 import os
 import sys
-import json
 import unittest
 from pathlib import Path
-from datetime import datetime
-from unittest.mock import patch, MagicMock
+from unittest.mock import MagicMock, patch
 
 # Add parent directory to path for imports
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
 # Import pipeline components
-from agents.shared_contracts import (
-    PipelineRequest,
-    PipelineResult,
-    IssueSpec,
-    FixPlan,
-    CodeChange,
-    QAVerdict,
-    DocumentationUpdate,
-    CleanupTask,
-    IndexEntry,
-    Severity,
-    IssueType,
-    QAStatus,
-    create_mock_issue,
-    create_mock_fix_plan
-)
-
 # Import orchestrator
 from agents.iam_senior_adk_devops_lead.orchestrator import (
-    run_swe_pipeline,
     iam_adk_analyze,
-    iam_issue_create,
-    iam_fix_plan_create,
-    iam_fix_impl_execute,
-    iam_qa_verify,
     iam_doc_update,
-    iam_cleanup_identify,
-    iam_index_update
+    iam_fix_impl_execute,
+    iam_fix_plan_create,
+    iam_issue_create,
+    iam_qa_verify,
+    run_swe_pipeline,
+)
+from agents.shared_contracts import (
+    CleanupTask,
+    CodeChange,
+    DocumentationUpdate,
+    FixPlan,
+    IndexEntry,
+    IssueSpec,
+    IssueType,
+    PipelineRequest,
+    PipelineResult,
+    QAVerdict,
+    create_mock_fix_plan,
+    create_mock_issue,
 )
 
 
@@ -54,7 +47,10 @@ class TestSWEPipeline(unittest.TestCase):
     def setUp(self):
         """Set up test fixtures."""
         self.test_repo_path = Path(__file__).parent / "data" / "synthetic_repo"
-        self.assertTrue(self.test_repo_path.exists(), f"Test repo not found at {self.test_repo_path}")
+        self.assertTrue(
+            self.test_repo_path.exists(),
+            f"Test repo not found at {self.test_repo_path}",
+        )
 
     @unittest.expectedFailure  # Phase H+: Async A2A infrastructure complete, but requires LLM credentials
     def test_pipeline_end_to_end(self):
@@ -75,7 +71,7 @@ class TestSWEPipeline(unittest.TestCase):
             env="dev",
             max_issues_to_fix=2,
             include_cleanup=True,
-            include_indexing=True
+            include_indexing=True,
         )
 
         # Run pipeline
@@ -100,8 +96,11 @@ class TestSWEPipeline(unittest.TestCase):
 
         # Check that plans were created for issues
         self.assertGreater(len(result.plans), 0, "Should create fix plans")
-        self.assertLessEqual(len(result.plans), request.max_issues_to_fix,
-                            "Should not exceed max_issues_to_fix")
+        self.assertLessEqual(
+            len(result.plans),
+            request.max_issues_to_fix,
+            "Should not exceed max_issues_to_fix",
+        )
 
         # Check plan quality
         for plan in result.plans:
@@ -112,8 +111,9 @@ class TestSWEPipeline(unittest.TestCase):
             self.assertGreater(len(plan.steps), 0, "Plan should have steps")
 
         # Check implementations
-        self.assertEqual(len(result.implementations), len(result.plans),
-                        "Should implement all plans")
+        self.assertEqual(
+            len(result.implementations), len(result.plans), "Should implement all plans"
+        )
 
         for impl in result.implementations:
             self.assertIsInstance(impl, CodeChange)
@@ -122,8 +122,11 @@ class TestSWEPipeline(unittest.TestCase):
             self.assertIsNotNone(impl.change_type)
 
         # Check QA results
-        self.assertEqual(len(result.qa_report), len(result.implementations),
-                        "Should verify all implementations")
+        self.assertEqual(
+            len(result.qa_report),
+            len(result.implementations),
+            "Should verify all implementations",
+        )
 
         for qa in result.qa_report:
             self.assertIsInstance(qa, QAVerdict)
@@ -151,7 +154,9 @@ class TestSWEPipeline(unittest.TestCase):
                 self.assertIsInstance(entry, IndexEntry)
 
         # Check metrics
-        self.assertEqual(result.issues_fixed, min(len(result.plans), request.max_issues_to_fix))
+        self.assertEqual(
+            result.issues_fixed, min(len(result.plans), request.max_issues_to_fix)
+        )
         self.assertGreater(result.pipeline_duration_seconds, 0, "Should track duration")
 
     def test_pipeline_no_issues(self):
@@ -160,12 +165,16 @@ class TestSWEPipeline(unittest.TestCase):
         request = PipelineRequest(
             repo_hint="/nonexistent/clean/repo",
             task_description="Audit perfect code",
-            env="dev"
+            env="dev",
         )
 
         # Mock the analyze function to return no violations
-        with patch('agents.iam_senior_adk_devops_lead.orchestrator.iam_adk_analyze') as mock_analyze:
-            mock_analyze.return_value = MagicMock(violations_found=[], compliance_score=1.0)
+        with patch(
+            "agents.iam_senior_adk_devops_lead.orchestrator.iam_adk_analyze"
+        ) as mock_analyze:
+            mock_analyze.return_value = MagicMock(
+                violations_found=[], compliance_score=1.0
+            )
 
             result = run_swe_pipeline(request)
 
@@ -194,7 +203,7 @@ class TestSWEPipeline(unittest.TestCase):
             task_description="Find tech debt",
             env="dev",
             include_cleanup=True,
-            include_indexing=False  # Disable indexing
+            include_indexing=False,  # Disable indexing
         )
 
         result = run_swe_pipeline(request)
@@ -211,7 +220,7 @@ class TestSWEPipeline(unittest.TestCase):
             repo_hint=str(self.test_repo_path),
             task_description="Staging audit",
             env="staging",
-            max_issues_to_fix=5  # Higher limit for staging
+            max_issues_to_fix=5,  # Higher limit for staging
         )
 
         result = run_swe_pipeline(request)
@@ -266,7 +275,7 @@ class TestSWEPipeline(unittest.TestCase):
         request = PipelineRequest(
             repo_hint=str(self.test_repo_path),
             task_description="Test serialization",
-            env="dev"
+            env="dev",
         )
 
         result = run_swe_pipeline(request)
@@ -299,13 +308,11 @@ class TestPipelineIntegration(unittest.TestCase):
     def test_vertex_search_integration(self):
         """Test integration with Vertex AI Search."""
         # Would test actual Vertex AI Search calls
-        pass
 
     @unittest.skip("Requires actual A2A setup")
     def test_a2a_protocol(self):
         """Test A2A protocol with Agent Engine."""
         # Would test actual A2A communication
-        pass
 
 
 class TestPipelinePerformance(unittest.TestCase):
@@ -319,7 +326,7 @@ class TestPipelinePerformance(unittest.TestCase):
             repo_hint=Path(__file__).parent / "data" / "synthetic_repo",
             task_description="Performance test",
             env="dev",
-            max_issues_to_fix=1
+            max_issues_to_fix=1,
         )
 
         start = time.time()
@@ -327,7 +334,9 @@ class TestPipelinePerformance(unittest.TestCase):
         duration = time.time() - start
 
         # Should complete quickly with stubs
-        self.assertLess(duration, 10, "Pipeline should complete within 10 seconds with stubs")
+        self.assertLess(
+            duration, 10, "Pipeline should complete within 10 seconds with stubs"
+        )
         self.assertAlmostEqual(result.pipeline_duration_seconds, duration, places=1)
 
 
@@ -352,6 +361,7 @@ def run_single_test(test_name: str = None):
 
 if __name__ == "__main__":
     import sys
+
     # Allow running specific test: python test_swe_pipeline.py test_pipeline_end_to_end
     test_name = sys.argv[1] if len(sys.argv) > 1 else None
     success = run_single_test(test_name)

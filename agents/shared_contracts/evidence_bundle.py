@@ -19,12 +19,11 @@ See: 000-docs/255-DR-STND-evidence-bundles-and-audit-export.md
 
 import hashlib
 import json
-import os
-from dataclasses import dataclass, field, asdict
+import uuid
+from dataclasses import asdict, dataclass, field
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Dict, List, Optional
-import uuid
 
 
 def _json_serializer(obj: Any) -> Any:
@@ -37,11 +36,14 @@ def _json_serializer(obj: Any) -> Any:
 @dataclass
 class ArtifactRecord:
     """Record of an artifact in the evidence bundle."""
+
     path: str
     sha256: str
     size_bytes: int
     artifact_type: str  # "file", "log", "output", "checkpoint"
-    created_at: str = field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
+    created_at: str = field(
+        default_factory=lambda: datetime.now(timezone.utc).isoformat()
+    )
 
     def to_dict(self) -> Dict[str, Any]:
         """Convert to dictionary for JSON serialization."""
@@ -51,6 +53,7 @@ class ArtifactRecord:
 @dataclass
 class ToolCallRecord:
     """Record of a tool invocation during execution."""
+
     tool_name: str
     specialist: str
     timestamp: str
@@ -68,6 +71,7 @@ class ToolCallRecord:
 @dataclass
 class UnitTestRecord:
     """Record of a unit test execution during pipeline run."""
+
     test_name: str
     status: str  # "passed", "failed", "skipped", "error"
     duration_ms: int
@@ -90,13 +94,16 @@ class EvidenceBundleManifest:
     - Reproducibility verification
     - Post-mortem analysis
     """
+
     # Identifiers
     bundle_id: str = field(default_factory=lambda: f"evb-{uuid.uuid4().hex[:12]}")
     mission_id: Optional[str] = None  # If run via Mission Spec
     pipeline_run_id: str = field(default_factory=lambda: f"run-{uuid.uuid4().hex[:12]}")
 
     # Timestamps
-    created_at: str = field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
+    created_at: str = field(
+        default_factory=lambda: datetime.now(timezone.utc).isoformat()
+    )
     completed_at: Optional[str] = None
 
     # Mandate snapshot (frozen at execution time)
@@ -156,7 +163,7 @@ class EvidenceBundle:
     def __init__(
         self,
         manifest: Optional[EvidenceBundleManifest] = None,
-        base_path: Optional[Path] = None
+        base_path: Optional[Path] = None,
     ):
         """
         Initialize an evidence bundle.
@@ -251,9 +258,7 @@ class EvidenceBundle:
         return sha256.hexdigest()
 
     def add_artifact_file(
-        self,
-        file_path: Path,
-        artifact_type: str = "file"
+        self, file_path: Path, artifact_type: str = "file"
     ) -> ArtifactRecord:
         """
         Add a file as an artifact and record its hash.
@@ -276,7 +281,7 @@ class EvidenceBundle:
             path=str(file_path),
             sha256=sha256,
             size_bytes=size,
-            artifact_type=artifact_type
+            artifact_type=artifact_type,
         )
         self.record_artifact(record)
         return record
@@ -315,7 +320,7 @@ class EvidenceBundle:
         if not manifest_path.exists():
             raise FileNotFoundError(f"Manifest not found: {manifest_path}")
 
-        with open(manifest_path, "r") as f:
+        with open(manifest_path) as f:
             manifest = EvidenceBundleManifest.from_json(f.read())
 
         bundle = cls(manifest=manifest, base_path=bundle_path.parent.parent)
@@ -333,20 +338,21 @@ class EvidenceBundle:
         for artifact in self.manifest.artifacts:
             path = Path(artifact["path"])
             if not path.exists():
-                failures.append({
-                    "artifact": artifact["path"],
-                    "error": "file_not_found"
-                })
+                failures.append(
+                    {"artifact": artifact["path"], "error": "file_not_found"}
+                )
                 continue
 
             actual_hash = self.compute_file_sha256(path)
             if actual_hash != artifact["sha256"]:
-                failures.append({
-                    "artifact": artifact["path"],
-                    "error": "hash_mismatch",
-                    "expected": artifact["sha256"],
-                    "actual": actual_hash
-                })
+                failures.append(
+                    {
+                        "artifact": artifact["path"],
+                        "error": "hash_mismatch",
+                        "expected": artifact["sha256"],
+                        "actual": actual_hash,
+                    }
+                )
 
         return failures
 
@@ -355,7 +361,7 @@ def create_evidence_bundle(
     mission_id: Optional[str] = None,
     pipeline_run_id: Optional[str] = None,
     mandate_snapshot: Optional[Dict[str, Any]] = None,
-    base_path: Optional[Path] = None
+    base_path: Optional[Path] = None,
 ) -> EvidenceBundle:
     """
     Convenience function to create a new evidence bundle.
@@ -372,6 +378,6 @@ def create_evidence_bundle(
     manifest = EvidenceBundleManifest(
         mission_id=mission_id,
         pipeline_run_id=pipeline_run_id or f"run-{uuid.uuid4().hex[:12]}",
-        mandate_snapshot=mandate_snapshot or {}
+        mandate_snapshot=mandate_snapshot or {},
     )
     return EvidenceBundle(manifest=manifest, base_path=base_path)

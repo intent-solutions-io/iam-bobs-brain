@@ -27,9 +27,8 @@ Example:
             return f"Result: {param}"
 """
 
-from dataclasses import dataclass
-from typing import Dict, List, Optional, Any
 import logging
+from typing import Any, Dict, List, Optional
 
 logger = logging.getLogger(__name__)
 
@@ -37,6 +36,7 @@ logger = logging.getLogger(__name__)
 # ============================================================================
 # EXAMPLE: Creating Custom Function Tools
 # ============================================================================
+
 
 def example_custom_tool(query: str, max_results: int = 10) -> List[Dict[str, Any]]:
     """
@@ -73,6 +73,7 @@ def create_custom_file_tool(base_path: str = "/workspace") -> Any:
     Returns:
         Configured file tool function
     """
+
     def file_tool(operation: str, path: str, content: Optional[str] = None) -> str:
         """
         Custom file operations tool.
@@ -91,7 +92,7 @@ def create_custom_file_tool(base_path: str = "/workspace") -> Any:
 
         if operation == "read":
             try:
-                with open(full_path, 'r') as f:
+                with open(full_path) as f:
                     return f.read()
             except Exception as e:
                 return f"Error reading file: {e}"
@@ -99,7 +100,7 @@ def create_custom_file_tool(base_path: str = "/workspace") -> Any:
             if content is None:
                 return "Error: content required for write operation"
             try:
-                with open(full_path, 'w') as f:
+                with open(full_path, "w") as f:
                     f.write(content)
                 return f"Successfully wrote to {path}"
             except Exception as e:
@@ -119,6 +120,7 @@ def create_custom_file_tool(base_path: str = "/workspace") -> Any:
 # ============================================================================
 # PATTERN: Tool Validation
 # ============================================================================
+
 
 def validate_tool_signature(func: Any) -> bool:
     """
@@ -166,6 +168,7 @@ def validate_tool_signature(func: Any) -> bool:
 # PATTERN: Tool Wrapper for Legacy Functions
 # ============================================================================
 
+
 def wrap_legacy_function(func: Any, description: str) -> Any:
     """
     Wrap a legacy function to make it ADK-compatible.
@@ -195,14 +198,11 @@ def wrap_legacy_function(func: Any, description: str) -> Any:
         try:
             # Filter kwargs to match function signature
             sig = inspect.signature(func)
-            filtered_kwargs = {
-                k: v for k, v in kwargs.items()
-                if k in sig.parameters
-            }
+            filtered_kwargs = {k: v for k, v in kwargs.items() if k in sig.parameters}
             return func(**filtered_kwargs)
         except Exception as e:
             logger.error(f"Error in wrapped tool: {e}")
-            return f"Error: {str(e)}"
+            return f"Error: {e!s}"
 
     # Update docstring
     wrapped_tool.__doc__ = f"""{description}
@@ -223,6 +223,7 @@ def wrap_legacy_function(func: Any, description: str) -> Any:
 # PATTERN: Async Tool Support
 # ============================================================================
 
+
 async def example_async_tool(url: str, timeout: int = 30) -> Dict[str, Any]:
     """
     Example async tool for network operations.
@@ -236,8 +237,9 @@ async def example_async_tool(url: str, timeout: int = 30) -> Dict[str, Any]:
     Returns:
         Response data dictionary
     """
-    import aiohttp
     import asyncio
+
+    import aiohttp
 
     async with aiohttp.ClientSession() as session:
         try:
@@ -245,7 +247,7 @@ async def example_async_tool(url: str, timeout: int = 30) -> Dict[str, Any]:
                 return {
                     "status": response.status,
                     "content": await response.text(),
-                    "headers": dict(response.headers)
+                    "headers": dict(response.headers),
                 }
         except asyncio.TimeoutError:
             return {"error": f"Request timed out after {timeout} seconds"}

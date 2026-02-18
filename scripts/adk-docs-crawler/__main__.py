@@ -8,16 +8,16 @@ Usage:
     make crawl-adk-docs
 """
 
-import sys
-import logging
 import json
+import logging
+import sys
 from pathlib import Path
 
-from .config import load_config, validate_gcp_credentials
-from .adk_docs_crawler import crawl_adk_docs, ADKDocsCrawler
-from .adk_docs_extract import extract_all_documents
 from .adk_docs_chunker import chunk_all_documents
+from .adk_docs_crawler import ADKDocsCrawler
+from .adk_docs_extract import extract_all_documents
 from .adk_docs_uploader import upload_to_gcs
+from .config import load_config, validate_gcp_credentials
 
 
 def setup_logging(verbose: bool = False) -> None:
@@ -30,8 +30,8 @@ def setup_logging(verbose: bool = False) -> None:
     level = logging.DEBUG if verbose else logging.INFO
     logging.basicConfig(
         level=level,
-        format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-        datefmt='%Y-%m-%d %H:%M:%S'
+        format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+        datefmt="%Y-%m-%d %H:%M:%S",
     )
 
 
@@ -43,7 +43,7 @@ def main() -> int:
         Exit code (0 for success, 1 for failure)
     """
     # Parse simple arguments
-    verbose = '--verbose' in sys.argv or '-v' in sys.argv
+    verbose = "--verbose" in sys.argv or "-v" in sys.argv
 
     # Setup logging
     setup_logging(verbose)
@@ -61,7 +61,9 @@ def main() -> int:
         # Validate GCP credentials
         logger.info("\n[2/6] Validating GCP credentials...")
         if not validate_gcp_credentials():
-            logger.error("GCP credentials validation failed. Set GOOGLE_APPLICATION_CREDENTIALS or run 'gcloud auth application-default login'")
+            logger.error(
+                "GCP credentials validation failed. Set GOOGLE_APPLICATION_CREDENTIALS or run 'gcloud auth application-default login'"
+            )
             return 1
 
         # Create tmp directory
@@ -78,7 +80,7 @@ def main() -> int:
             return 1
 
         # Save crawl manifest
-        manifest_path = tmp_dir / 'adk_docs_manifest.json'
+        manifest_path = tmp_dir / "adk_docs_manifest.json"
         crawler.save_manifest(str(manifest_path))
 
         # 4. Extract content
@@ -90,10 +92,10 @@ def main() -> int:
             return 1
 
         # Save documents to tmp
-        docs_path = tmp_dir / 'docs.jsonl'
-        with open(docs_path, 'w', encoding='utf-8') as f:
+        docs_path = tmp_dir / "docs.jsonl"
+        with open(docs_path, "w", encoding="utf-8") as f:
             for doc in documents:
-                f.write(json.dumps(doc, ensure_ascii=False) + '\n')
+                f.write(json.dumps(doc, ensure_ascii=False) + "\n")
         logger.info(f"Documents saved to: {docs_path}")
 
         # 5. Chunk for RAG
@@ -105,15 +107,15 @@ def main() -> int:
             return 1
 
         # Save chunks to tmp
-        chunks_path = tmp_dir / 'chunks.jsonl'
-        with open(chunks_path, 'w', encoding='utf-8') as f:
+        chunks_path = tmp_dir / "chunks.jsonl"
+        with open(chunks_path, "w", encoding="utf-8") as f:
             for chunk in chunks:
-                f.write(json.dumps(chunk, ensure_ascii=False) + '\n')
+                f.write(json.dumps(chunk, ensure_ascii=False) + "\n")
         logger.info(f"Chunks saved to: {chunks_path}")
 
         # 6. Upload to GCS
         logger.info("\n[6/6] Uploading to Google Cloud Storage...")
-        with open(manifest_path, 'r', encoding='utf-8') as f:
+        with open(manifest_path, encoding="utf-8") as f:
             manifest = json.load(f)
 
         gcs_uris = upload_to_gcs(documents, chunks, manifest, config)
@@ -143,5 +145,5 @@ def main() -> int:
         return 1
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     sys.exit(main())

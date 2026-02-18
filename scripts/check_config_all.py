@@ -15,17 +15,15 @@ Exit Codes:
 
 import os
 import sys
-from typing import List, Dict, Tuple, Literal
+from typing import Dict, Tuple
 
 # Add parent directory to path so we can import agents.config
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from agents.config.inventory import (
-    get_all_vars,
-    get_required_vars,
-    get_optional_vars,
     Environment,
     EnvVarSpec,
+    get_all_vars,
 )
 
 

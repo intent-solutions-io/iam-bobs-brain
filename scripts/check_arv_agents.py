@@ -16,11 +16,10 @@ Exit codes:
   1: Violations found
 """
 
-import sys
-import os
-from pathlib import Path
-from typing import List, Tuple, Dict
 import ast
+import sys
+from pathlib import Path
+from typing import Dict, List
 
 # ANSI colors for output
 RED = "\033[91m"
@@ -33,7 +32,9 @@ RESET = "\033[0m"
 class AgentViolation:
     """Represents a violation of agent structure rules."""
 
-    def __init__(self, file_path: str, rule: str, message: str, line_number: int = None):
+    def __init__(
+        self, file_path: str, rule: str, message: str, line_number: int = None
+    ):
         self.file_path = file_path
         self.rule = rule
         self.message = message
@@ -85,31 +86,34 @@ def check_prohibited_imports(file_path: Path, content: str) -> List[AgentViolati
                 for alias in node.names:
                     for prohibited_module, message in prohibited.items():
                         if alias.name.startswith(prohibited_module):
-                            violations.append(AgentViolation(
-                                str(file_path),
-                                "R1-PROHIBITED-IMPORT",
-                                f"{message}: import {alias.name}",
-                                node.lineno
-                            ))
+                            violations.append(
+                                AgentViolation(
+                                    str(file_path),
+                                    "R1-PROHIBITED-IMPORT",
+                                    f"{message}: import {alias.name}",
+                                    node.lineno,
+                                )
+                            )
 
             elif isinstance(node, ast.ImportFrom):
                 if node.module:
                     for prohibited_module, message in prohibited.items():
                         if node.module.startswith(prohibited_module):
-                            violations.append(AgentViolation(
-                                str(file_path),
-                                "R1-PROHIBITED-IMPORT",
-                                f"{message}: from {node.module} import ...",
-                                node.lineno
-                            ))
+                            violations.append(
+                                AgentViolation(
+                                    str(file_path),
+                                    "R1-PROHIBITED-IMPORT",
+                                    f"{message}: from {node.module} import ...",
+                                    node.lineno,
+                                )
+                            )
 
     except SyntaxError as e:
-        violations.append(AgentViolation(
-            str(file_path),
-            "R1-SYNTAX-ERROR",
-            f"Syntax error: {e}",
-            e.lineno
-        ))
+        violations.append(
+            AgentViolation(
+                str(file_path), "R1-SYNTAX-ERROR", f"Syntax error: {e}", e.lineno
+            )
+        )
 
     return violations
 
@@ -137,18 +141,22 @@ def check_adk_imports(file_path: Path, content: str) -> List[AgentViolation]:
         pass
 
     if not has_adk_import:
-        violations.append(AgentViolation(
-            str(file_path),
-            "R1-MISSING-ADK-IMPORT",
-            "No google.adk imports found (agents must use ADK primitives)"
-        ))
+        violations.append(
+            AgentViolation(
+                str(file_path),
+                "R1-MISSING-ADK-IMPORT",
+                "No google.adk imports found (agents must use ADK primitives)",
+            )
+        )
 
     if not has_llm_agent:
-        violations.append(AgentViolation(
-            str(file_path),
-            "R1-MISSING-LLMAGENT",
-            "LlmAgent not imported from google.adk.agents (required for ADK agents)"
-        ))
+        violations.append(
+            AgentViolation(
+                str(file_path),
+                "R1-MISSING-LLMAGENT",
+                "LlmAgent not imported from google.adk.agents (required for ADK agents)",
+            )
+        )
 
     return violations
 
@@ -179,18 +187,22 @@ def check_agent_factory_pattern(file_path: Path, content: str) -> List[AgentViol
         pass
 
     if not has_get_agent:
-        violations.append(AgentViolation(
-            str(file_path),
-            "R1-MISSING-FACTORY",
-            "get_agent() factory function not found (required for agent construction pattern)"
-        ))
+        violations.append(
+            AgentViolation(
+                str(file_path),
+                "R1-MISSING-FACTORY",
+                "get_agent() factory function not found (required for agent construction pattern)",
+            )
+        )
 
     if not has_root_agent:
-        violations.append(AgentViolation(
-            str(file_path),
-            "R1-MISSING-ROOT-AGENT",
-            "root_agent not exported (required for ADK CLI deployment: root_agent = get_agent())"
-        ))
+        violations.append(
+            AgentViolation(
+                str(file_path),
+                "R1-MISSING-ROOT-AGENT",
+                "root_agent not exported (required for ADK CLI deployment: root_agent = get_agent())",
+            )
+        )
 
     return violations
 
@@ -201,22 +213,27 @@ def check_direct_model_calls(file_path: Path, content: str) -> List[AgentViolati
 
     # Patterns that indicate direct model calls
     prohibited_patterns = [
-        ("model.generate_content", "Direct model.generate_content() call (use ADK agent instead)"),
+        (
+            "model.generate_content",
+            "Direct model.generate_content() call (use ADK agent instead)",
+        ),
         ("GenerativeModel", "Direct GenerativeModel usage (use ADK LlmAgent instead)"),
-        ("genai.GenerativeModel", "Direct genai.GenerativeModel usage (use ADK LlmAgent instead)"),
+        (
+            "genai.GenerativeModel",
+            "Direct genai.GenerativeModel usage (use ADK LlmAgent instead)",
+        ),
     ]
 
     for pattern, message in prohibited_patterns:
         if pattern in content:
             # Find line number (simple search, not AST)
-            for i, line in enumerate(content.split('\n'), 1):
+            for i, line in enumerate(content.split("\n"), 1):
                 if pattern in line:
-                    violations.append(AgentViolation(
-                        str(file_path),
-                        "R1-DIRECT-MODEL-CALL",
-                        message,
-                        i
-                    ))
+                    violations.append(
+                        AgentViolation(
+                            str(file_path), "R1-DIRECT-MODEL-CALL", message, i
+                        )
+                    )
                     break
 
     return violations
@@ -229,11 +246,9 @@ def check_agent_file(file_path: Path) -> List[AgentViolation]:
     try:
         content = file_path.read_text()
     except Exception as e:
-        violations.append(AgentViolation(
-            str(file_path),
-            "R1-FILE-ERROR",
-            f"Could not read file: {e}"
-        ))
+        violations.append(
+            AgentViolation(str(file_path), "R1-FILE-ERROR", f"Could not read file: {e}")
+        )
         return violations
 
     # Run all checks
@@ -304,9 +319,9 @@ def main():
     else:
         print(f"{GREEN}✓ All agent files passed ADK compliance checks{RESET}")
         print(f"  - {len(agent_files)} agents checked")
-        print(f"  - No prohibited frameworks detected")
-        print(f"  - ADK imports verified")
-        print(f"  - Factory patterns present")
+        print("  - No prohibited frameworks detected")
+        print("  - ADK imports verified")
+        print("  - Factory patterns present")
         print()
         print(f"{BLUE}{'=' * 70}{RESET}")
         print(f"{GREEN}✅ ARV Check PASSED{RESET}")

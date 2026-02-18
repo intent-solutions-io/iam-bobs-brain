@@ -13,10 +13,10 @@ Usage:
 Part of Phase AE1 - Agent Engine deployment model.
 """
 
-import sys
 import argparse
+import sys
 from pathlib import Path
-from typing import Dict, List
+from typing import Dict
 
 # Add repo root to path
 sys.path.insert(0, str(Path(__file__).parent.parent))
@@ -24,14 +24,12 @@ sys.path.insert(0, str(Path(__file__).parent.parent))
 from agents.config.agent_engine import (
     ALL_ENVIRONMENTS,
     AgentEngineConfig,
-    validate_config
+    validate_config,
 )
 
 
 def print_environment_config(
-    env_name: str,
-    agents: Dict[str, AgentEngineConfig],
-    verbose: bool = False
+    env_name: str, agents: Dict[str, AgentEngineConfig], verbose: bool = False
 ) -> None:
     """
     Print configuration for a single environment.
@@ -54,28 +52,28 @@ def print_environment_config(
 
         if verbose:
             # Verbose: Show all fields
-            print(f"  Reasoning Engine ID:")
+            print("  Reasoning Engine ID:")
             print(f"    {config.reasoning_engine_id}")
-            print(f"  Region:")
+            print("  Region:")
             print(f"    {config.region}")
-            print(f"  SPIFFE ID:")
+            print("  SPIFFE ID:")
             print(f"    {config.spiffe_id}")
 
             if config.notes:
-                print(f"  Notes:")
+                print("  Notes:")
                 # Indent multi-line notes
-                for line in config.notes.split('\n'):
+                for line in config.notes.split("\n"):
                     print(f"    {line}")
         else:
             # Concise: One line per agent
             # Extract just the engine ID from the full resource name
-            engine_id = config.reasoning_engine_id.split('/')[-1]
+            engine_id = config.reasoning_engine_id.split("/")[-1]
             print(f"  Engine ID: {engine_id}")
             print(f"  Region: {config.region}")
 
             # Show special marker for current canonical Bob
             if "CANONICAL" in (config.notes or "").upper():
-                print(f"  ⭐ CURRENT CANONICAL PRODUCTION BOB")
+                print("  ⭐ CURRENT CANONICAL PRODUCTION BOB")
 
 
 def print_summary_table(verbose: bool = False) -> None:
@@ -107,7 +105,7 @@ def print_summary_table(verbose: bool = False) -> None:
         for env in ["dev", "staging", "prod"]:
             if agent_role in ALL_ENVIRONMENTS[env]:
                 config = ALL_ENVIRONMENTS[env][agent_role]
-                engine_id = config.reasoning_engine_id.split('/')[-1]
+                engine_id = config.reasoning_engine_id.split("/")[-1]
 
                 # Special marker for canonical Bob
                 if "CANONICAL" in (config.notes or "").upper():
@@ -169,9 +167,10 @@ def main():
         description="Print Agent Engine configuration for all environments"
     )
     parser.add_argument(
-        "--verbose", "-v",
+        "--verbose",
+        "-v",
         action="store_true",
-        help="Show full details (reasoning engine IDs, SPIFFE IDs, notes)"
+        help="Show full details (reasoning engine IDs, SPIFFE IDs, notes)",
     )
 
     args = parser.parse_args()

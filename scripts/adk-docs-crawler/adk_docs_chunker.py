@@ -5,8 +5,8 @@ Splits documents into semantic chunks suitable for embedding and retrieval.
 Preserves heading context and code blocks.
 """
 
-import logging
 import hashlib
+import logging
 from typing import Dict, List
 
 from .config import CrawlerConfig
@@ -52,15 +52,15 @@ class DocumentChunker:
         Returns:
             List of section chunks
         """
-        text = section['text']
-        code_blocks = section.get('code_blocks', [])
+        text = section["text"]
+        code_blocks = section.get("code_blocks", [])
 
         # If section is small enough, return as-is
         if self.estimate_tokens(text) <= max_tokens:
             return [section]
 
         # Split by paragraphs
-        paragraphs = text.split('\n\n')
+        paragraphs = text.split("\n\n")
         chunks = []
         current_chunk_text = []
         current_token_count = 0
@@ -70,17 +70,19 @@ class DocumentChunker:
 
             # If single paragraph is too large, split by sentences
             if para_tokens > max_tokens:
-                sentences = para.split('. ')
+                sentences = para.split(". ")
                 for sentence in sentences:
                     sentence_tokens = self.estimate_tokens(sentence)
                     if current_token_count + sentence_tokens > max_tokens:
                         # Save current chunk
                         if current_chunk_text:
-                            chunks.append({
-                                'heading_path': section['heading_path'],
-                                'text': '\n\n'.join(current_chunk_text),
-                                'code_blocks': []  # Code blocks stay with first chunk
-                            })
+                            chunks.append(
+                                {
+                                    "heading_path": section["heading_path"],
+                                    "text": "\n\n".join(current_chunk_text),
+                                    "code_blocks": [],  # Code blocks stay with first chunk
+                                }
+                            )
                         current_chunk_text = [sentence]
                         current_token_count = sentence_tokens
                     else:
@@ -91,11 +93,13 @@ class DocumentChunker:
                 if current_token_count + para_tokens > max_tokens:
                     # Save current chunk
                     if current_chunk_text:
-                        chunks.append({
-                            'heading_path': section['heading_path'],
-                            'text': '\n\n'.join(current_chunk_text),
-                            'code_blocks': []
-                        })
+                        chunks.append(
+                            {
+                                "heading_path": section["heading_path"],
+                                "text": "\n\n".join(current_chunk_text),
+                                "code_blocks": [],
+                            }
+                        )
                     current_chunk_text = [para]
                     current_token_count = para_tokens
                 else:
@@ -104,15 +108,17 @@ class DocumentChunker:
 
         # Add remaining text as final chunk
         if current_chunk_text:
-            chunks.append({
-                'heading_path': section['heading_path'],
-                'text': '\n\n'.join(current_chunk_text),
-                'code_blocks': []
-            })
+            chunks.append(
+                {
+                    "heading_path": section["heading_path"],
+                    "text": "\n\n".join(current_chunk_text),
+                    "code_blocks": [],
+                }
+            )
 
         # Attach code blocks to first chunk only
         if chunks and code_blocks:
-            chunks[0]['code_blocks'] = code_blocks
+            chunks[0]["code_blocks"] = code_blocks
 
         logger.debug(f"Split section into {len(chunks)} chunks")
         return chunks
@@ -129,11 +135,10 @@ class DocumentChunker:
         """
         chunks = []
 
-        for section in doc['sections']:
+        for section in doc["sections"]:
             # Split section if too large
             section_chunks = self.split_long_section(
-                section,
-                self.config.max_chunk_tokens
+                section, self.config.max_chunk_tokens
             )
 
             for chunk_section in section_chunks:
@@ -146,16 +151,16 @@ class DocumentChunker:
                 chunk_id = hashlib.sha256(chunk_content.encode()).hexdigest()[:16]
 
                 chunk = {
-                    'chunk_id': chunk_id,
-                    'doc_id': doc['doc_id'],
-                    'url': doc['url'],
-                    'title': doc['title'],
-                    'heading_path': chunk_section['heading_path'],
-                    'text': chunk_section['text'],
-                    'code_blocks': chunk_section.get('code_blocks', []),
-                    'last_crawled_at': doc['last_crawled_at'],
-                    'source_type': doc['source_type'],
-                    'estimated_tokens': self.estimate_tokens(chunk_section['text'])
+                    "chunk_id": chunk_id,
+                    "doc_id": doc["doc_id"],
+                    "url": doc["url"],
+                    "title": doc["title"],
+                    "heading_path": chunk_section["heading_path"],
+                    "text": chunk_section["text"],
+                    "code_blocks": chunk_section.get("code_blocks", []),
+                    "last_crawled_at": doc["last_crawled_at"],
+                    "source_type": doc["source_type"],
+                    "estimated_tokens": self.estimate_tokens(chunk_section["text"]),
                 }
                 chunks.append(chunk)
                 self.chunk_counter += 1

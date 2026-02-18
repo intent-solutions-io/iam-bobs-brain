@@ -14,6 +14,7 @@ Environment toggles (set in .env.test or shell):
 """
 
 import os
+
 import pytest
 
 # ---------------------------------------------------------------------------
@@ -30,6 +31,7 @@ BOB_LLM_MODE = os.getenv("BOB_LLM_MODE", "stub")
 # Marker registration
 # ---------------------------------------------------------------------------
 
+
 def pytest_configure(config):
     """Register additional custom markers."""
     config.addinivalue_line("markers", "e2e: End-to-end tests (critical workflows)")
@@ -40,6 +42,7 @@ def pytest_configure(config):
 # ---------------------------------------------------------------------------
 # Shared fixtures
 # ---------------------------------------------------------------------------
+
 
 @pytest.fixture
 def deterministic_id():
@@ -82,6 +85,7 @@ def mandate_factory():
             mandate = mandate_factory(risk_tier="R2", max_iterations=5)
     """
     from tests.fixtures.factories import make_mandate
+
     return make_mandate
 
 
@@ -94,6 +98,7 @@ def a2a_task_factory():
             task = a2a_task_factory(specialist="iam_adk")
     """
     from tests.fixtures.factories import make_a2a_task
+
     return make_a2a_task
 
 
@@ -106,6 +111,7 @@ def a2a_result_factory():
             result = a2a_result_factory(status="SUCCESS", specialist="iam_qa")
     """
     from tests.fixtures.factories import make_a2a_result
+
     return make_a2a_result
 
 
@@ -113,6 +119,7 @@ def a2a_result_factory():
 def gate_result_factory():
     """Factory for creating GateResult test objects."""
     from tests.fixtures.factories import make_gate_result
+
     return make_gate_result
 
 
@@ -126,6 +133,7 @@ def stub_llm():
             assert stub_llm.call_count == 1
     """
     from tests.stubs.llm import StubLLM
+
     return StubLLM()
 
 
@@ -139,4 +147,5 @@ def stub_agent_engine():
             assert response["status"] == "SUCCESS"
     """
     from tests.stubs.agent_engine import StubAgentEngineClient
+
     return StubAgentEngineClient()

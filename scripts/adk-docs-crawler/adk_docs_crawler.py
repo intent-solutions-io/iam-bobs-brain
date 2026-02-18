@@ -5,13 +5,13 @@ Crawls the ADK documentation site, follows internal links, and extracts raw HTML
 Respects robots.txt and implements rate limiting.
 """
 
-import time
-import logging
 import hashlib
 import json
-from typing import List, Dict, Set, Optional
-from urllib.parse import urljoin, urlparse, urlunparse
+import logging
+import time
 from datetime import datetime
+from typing import Dict, List, Optional, Set
+from urllib.parse import urljoin, urlparse, urlunparse
 
 import requests
 from bs4 import BeautifulSoup
@@ -33,9 +33,11 @@ class ADKDocsCrawler:
         """
         self.config = config
         self.session = requests.Session()
-        self.session.headers.update({
-            'User-Agent': 'Bob-Brain-ADK-Crawler/1.0 (+https://github.com/jeremylongshore/bobs-brain)'
-        })
+        self.session.headers.update(
+            {
+                "User-Agent": "Bob-Brain-ADK-Crawler/1.0 (+https://github.com/jeremylongshore/bobs-brain)"
+            }
+        )
         self.visited_urls: Set[str] = set()
         self.crawled_pages: List[Dict] = []
 
@@ -51,14 +53,16 @@ class ADKDocsCrawler:
         """
         parsed = urlparse(url)
         # Remove fragment and query parameters for normalization
-        normalized = urlunparse((
-            parsed.scheme,
-            parsed.netloc,
-            parsed.path.rstrip('/'),
-            '',  # params
-            '',  # query (remove for deduplication)
-            ''   # fragment
-        ))
+        normalized = urlunparse(
+            (
+                parsed.scheme,
+                parsed.netloc,
+                parsed.path.rstrip("/"),
+                "",  # params
+                "",  # query (remove for deduplication)
+                "",  # fragment
+            )
+        )
         return normalized
 
     def is_valid_url(self, url: str, base_url: str) -> bool:
@@ -76,7 +80,7 @@ class ADKDocsCrawler:
         base_parsed = urlparse(base_url)
 
         # Must be HTTP/HTTPS
-        if parsed.scheme not in ('http', 'https'):
+        if parsed.scheme not in ("http", "https"):
             return False
 
         # Must be same domain and path prefix
@@ -84,15 +88,25 @@ class ADKDocsCrawler:
             return False
 
         # Must start with base path
-        if not parsed.path.startswith(base_parsed.path.rstrip('/')):
+        if not parsed.path.startswith(base_parsed.path.rstrip("/")):
             return False
 
         # Skip common non-content patterns
         skip_patterns = [
-            '.pdf', '.zip', '.tar', '.gz',
-            '.png', '.jpg', '.jpeg', '.gif', '.svg',
-            '.css', '.js', '.json',
-            '/api/', '/download/'
+            ".pdf",
+            ".zip",
+            ".tar",
+            ".gz",
+            ".png",
+            ".jpg",
+            ".jpeg",
+            ".gif",
+            ".svg",
+            ".css",
+            ".js",
+            ".json",
+            "/api/",
+            "/download/",
         ]
         if any(pattern in parsed.path.lower() for pattern in skip_patterns):
             return False
@@ -110,11 +124,11 @@ class ADKDocsCrawler:
         Returns:
             List of absolute URLs
         """
-        soup = BeautifulSoup(html, 'lxml')
+        soup = BeautifulSoup(html, "lxml")
         links = []
 
-        for link in soup.find_all('a', href=True):
-            href = link['href']
+        for link in soup.find_all("a", href=True):
+            href = link["href"]
             # Convert relative to absolute
             absolute_url = urljoin(base_url, href)
 
@@ -141,20 +155,20 @@ class ADKDocsCrawler:
             response.raise_for_status()
 
             # Parse title
-            soup = BeautifulSoup(response.text, 'lxml')
-            title_tag = soup.find('title')
+            soup = BeautifulSoup(response.text, "lxml")
+            title_tag = soup.find("title")
             title = title_tag.get_text(strip=True) if title_tag else url
 
             # Generate document ID
             doc_id = hashlib.sha256(url.encode()).hexdigest()[:16]
 
             return {
-                'doc_id': doc_id,
-                'url': url,
-                'title': title,
-                'html': response.text,
-                'timestamp': datetime.utcnow().isoformat() + 'Z',
-                'status_code': response.status_code,
+                "doc_id": doc_id,
+                "url": url,
+                "title": title,
+                "html": response.text,
+                "timestamp": datetime.utcnow().isoformat() + "Z",
+                "status_code": response.status_code,
             }
 
         except requests.RequestException as e:
@@ -191,7 +205,7 @@ class ADKDocsCrawler:
             self.crawled_pages.append(page_data)
 
             # Extract and queue new links
-            new_links = self.extract_links(page_data['html'], url)
+            new_links = self.extract_links(page_data["html"], url)
             for link in new_links:
                 if link not in self.visited_urls:
                     to_visit.append(link)
@@ -218,21 +232,21 @@ class ADKDocsCrawler:
             output_path: Path to save manifest
         """
         manifest = {
-            'crawl_timestamp': datetime.utcnow().isoformat() + 'Z',
-            'start_url': self.config.start_url,
-            'total_pages': len(self.crawled_pages),
-            'pages': [
+            "crawl_timestamp": datetime.utcnow().isoformat() + "Z",
+            "start_url": self.config.start_url,
+            "total_pages": len(self.crawled_pages),
+            "pages": [
                 {
-                    'doc_id': p['doc_id'],
-                    'url': p['url'],
-                    'title': p['title'],
-                    'timestamp': p['timestamp'],
+                    "doc_id": p["doc_id"],
+                    "url": p["url"],
+                    "title": p["title"],
+                    "timestamp": p["timestamp"],
                 }
                 for p in self.crawled_pages
-            ]
+            ],
         }
 
-        with open(output_path, 'w', encoding='utf-8') as f:
+        with open(output_path, "w", encoding="utf-8") as f:
             json.dump(manifest, f, indent=2, ensure_ascii=False)
 
         logger.info(f"Manifest saved to: {output_path}")

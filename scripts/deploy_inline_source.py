@@ -29,7 +29,7 @@ import argparse
 import os
 import sys
 from pathlib import Path
-from typing import Dict, Optional
+from typing import Dict
 
 # Add repo root to path
 sys.path.insert(0, str(Path(__file__).parent.parent))
@@ -145,8 +145,14 @@ def deploy_with_inline_source(config: Dict) -> str:
 
     # Read telemetry configuration from environment
     # These control observability and tracing for Agent Engine deployments
-    enable_telemetry = os.getenv("GOOGLE_CLOUD_AGENT_ENGINE_ENABLE_TELEMETRY", "true").lower() == "true"
-    capture_message_content = os.getenv("OTEL_INSTRUMENTATION_GENAI_CAPTURE_MESSAGE_CONTENT", "false").lower() == "true"
+    enable_telemetry = (
+        os.getenv("GOOGLE_CLOUD_AGENT_ENGINE_ENABLE_TELEMETRY", "true").lower()
+        == "true"
+    )
+    capture_message_content = (
+        os.getenv("OTEL_INSTRUMENTATION_GENAI_CAPTURE_MESSAGE_CONTENT", "false").lower()
+        == "true"
+    )
 
     print(f"🚀 Deploying {config['agent']} to Vertex AI Agent Engine...")
     print(f"   Environment: {config['environment']}")
@@ -155,25 +161,28 @@ def deploy_with_inline_source(config: Dict) -> str:
     print(f"   Display Name: {config['display_name']}")
     print(f"   Telemetry Enabled: {enable_telemetry}")
     if capture_message_content:
-        print(f"   ⚠️  Message Content Capture: {capture_message_content} (dev-only, may include sensitive data)")
+        print(
+            f"   ⚠️  Message Content Capture: {capture_message_content} (dev-only, may include sensitive data)"
+        )
 
     try:
         # Initialize Vertex AI
         vertexai.init(
-            project=config['project'],
-            location=config['region'],
+            project=config["project"],
+            location=config["region"],
         )
 
         # Import the agent module
         print(f"\n📦 Loading agent from {config['agent_module']}...")
-        module_path, app_name = config['entrypoint'].split('::')
+        module_path, app_name = config["entrypoint"].split("::")
         import importlib
+
         module = importlib.import_module(module_path)
 
         # Get the agent/app object
         if hasattr(module, app_name):
             agent_app = getattr(module, app_name)
-        elif hasattr(module, 'get_agent'):
+        elif hasattr(module, "get_agent"):
             # Fallback: wrap agent in AdkApp
             agent = module.get_agent()
             agent_app = agent_engines.AdkApp(
@@ -181,18 +190,20 @@ def deploy_with_inline_source(config: Dict) -> str:
                 enable_tracing=enable_telemetry,  # Use telemetry config from env
             )
         else:
-            raise ValueError(f"Cannot find '{app_name}' or 'get_agent()' in {module_path}")
+            raise ValueError(
+                f"Cannot find '{app_name}' or 'get_agent()' in {module_path}"
+            )
 
         # Set OTEL env var for message content capture (if enabled)
         # This must be set before agent execution for OpenTelemetry to pick it up
         if capture_message_content:
             os.environ["OTEL_INSTRUMENTATION_GENAI_CAPTURE_MESSAGE_CONTENT"] = "true"
 
-        print(f"✅ Agent loaded successfully")
+        print("✅ Agent loaded successfully")
 
         # Deploy to Agent Engine
-        print(f"\n🔄 Creating reasoning engine on Vertex AI...")
-        print(f"   This may take 2-3 minutes...")
+        print("\n🔄 Creating reasoning engine on Vertex AI...")
+        print("   This may take 2-3 minutes...")
 
         remote_app = agent_engines.create(
             agent_engine=agent_app,
@@ -200,25 +211,28 @@ def deploy_with_inline_source(config: Dict) -> str:
                 "google-cloud-aiplatform[adk,agent_engines]>=1.111",
                 "google-adk>=1.15.1",
             ],
-            display_name=config['display_name'],
-            description=config['description'],
+            display_name=config["display_name"],
+            description=config["description"],
         )
 
         resource_name = remote_app.resource_name
-        print(f"\n✅ Deployment successful!")
+        print("\n✅ Deployment successful!")
         print(f"   Resource Name: {resource_name}")
 
         # Extract reasoning engine ID
-        engine_id = resource_name.split('/')[-1]
+        engine_id = resource_name.split("/")[-1]
         print(f"   Engine ID: {engine_id}")
-        print(f"\n🔍 View in Console:")
-        print(f"   https://console.cloud.google.com/vertex-ai/agent-engine?project={config['project']}")
+        print("\n🔍 View in Console:")
+        print(
+            f"   https://console.cloud.google.com/vertex-ai/agent-engine?project={config['project']}"
+        )
 
         return resource_name
 
     except Exception as e:
         print(f"\n❌ Deployment failed: {e}")
         import traceback
+
         traceback.print_exc()
         sys.exit(1)
 
@@ -243,37 +257,33 @@ Examples:
     export PROJECT_ID=bobs-brain
     export LOCATION=us-central1
     python scripts/deploy_inline_source.py --agent foreman --env dev
-        """
+        """,
     )
 
     parser.add_argument(
         "--agent",
         required=True,
         choices=["bob", "foreman", "iam-adk", "iam-issue"],
-        help="Agent to deploy"
+        help="Agent to deploy",
     )
 
     parser.add_argument(
         "--env",
         required=True,
         choices=["dev", "staging", "prod"],
-        help="Environment to deploy to"
+        help="Environment to deploy to",
     )
 
-    parser.add_argument(
-        "--project",
-        help="GCP project ID (or use PROJECT_ID env var)"
-    )
+    parser.add_argument("--project", help="GCP project ID (or use PROJECT_ID env var)")
 
     parser.add_argument(
-        "--region",
-        help="GCP region (or use LOCATION env var, defaults to us-central1)"
+        "--region", help="GCP region (or use LOCATION env var, defaults to us-central1)"
     )
 
     parser.add_argument(
         "--dry-run",
         action="store_true",
-        help="Validate configuration only, do not deploy"
+        help="Validate configuration only, do not deploy",
     )
 
     args = parser.parse_args()
@@ -285,14 +295,16 @@ Examples:
     print_config(config)
 
     # Dry-run mode: just validate and exit
-    if config['dry_run']:
+    if config["dry_run"]:
         print("✅ Configuration valid (dry-run mode)")
         print("   To deploy for real, remove --dry-run flag")
         sys.exit(0)
 
     # Real deployment
     resource_name = deploy_with_inline_source(config)
-    print(f"\n🎉 Agent {config['agent']} successfully deployed to {config['environment']}")
+    print(
+        f"\n🎉 Agent {config['agent']} successfully deployed to {config['environment']}"
+    )
     print(f"   Resource: {resource_name}")
     sys.exit(0)
 

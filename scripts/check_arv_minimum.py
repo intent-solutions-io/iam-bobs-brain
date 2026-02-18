@@ -20,11 +20,10 @@ Exit codes:
     2 - Error during checks
 """
 
-import os
-import sys
 import argparse
+import sys
 from pathlib import Path
-from typing import List, Tuple, Dict
+from typing import Tuple
 
 # Add repo root to path
 repo_root = Path(__file__).parent.parent
@@ -33,7 +32,8 @@ sys.path.insert(0, str(repo_root / "agents"))
 
 # Import repo registry (PORT2 - for portfolio mode)
 try:
-    from config.repos import list_repos, RepoConfig
+    from config.repos import RepoConfig, list_repos  # noqa: F401
+
     REGISTRY_AVAILABLE = True
 except ImportError as e:
     REGISTRY_AVAILABLE = False
@@ -67,12 +67,13 @@ class ARVMinimumChecker:
 
         # Try to import logging helper
         try:
-            from agents.utils.logging import (
+            from agents.utils.logging import (  # noqa: F401
                 get_logger,
-                log_pipeline_start,
+                log_agent_step,
                 log_pipeline_complete,
-                log_agent_step
+                log_pipeline_start,
             )
+
             self.log("✓ Logging helper imports successfully")
             self.passed.append("Structured logging helper present and importable")
             return True
@@ -99,15 +100,17 @@ class ARVMinimumChecker:
 
             # Test PipelineRequest
             req = PipelineRequest(repo_hint="test", task_description="test")
-            if not hasattr(req, 'pipeline_run_id'):
+            if not hasattr(req, "pipeline_run_id"):
                 self.failed.append("PipelineRequest missing pipeline_run_id field")
                 return False
 
             self.log(f"✓ PipelineRequest has pipeline_run_id: {req.pipeline_run_id}")
 
             # Test PipelineResult (check field exists in dataclass)
-            result_fields = [f.name for f in PipelineResult.__dataclass_fields__.values()]
-            if 'pipeline_run_id' not in result_fields:
+            result_fields = [
+                f.name for f in PipelineResult.__dataclass_fields__.values()
+            ]
+            if "pipeline_run_id" not in result_fields:
                 self.failed.append("PipelineResult missing pipeline_run_id field")
                 return False
 
@@ -130,16 +133,26 @@ class ARVMinimumChecker:
 
         # Find all iam-* agent directories
         # Exclude iam_senior_adk_devops_lead (orchestrator module, not a deployed agent)
-        iam_agents = [d for d in agents_dir.iterdir()
-                     if d.is_dir() and d.name.startswith("iam")
-                     and d.name != "iam_senior_adk_devops_lead"]  # Orchestrator module
+        iam_agents = [
+            d
+            for d in agents_dir.iterdir()
+            if d.is_dir()
+            and d.name.startswith("iam")
+            and d.name != "iam_senior_adk_devops_lead"
+        ]  # Orchestrator module
 
         if not iam_agents:
-            self.warnings.append("No iam-* agent directories found yet (expected for early phases)")
-            self.log("⚠️  No iam-* agents found (expected if agents not yet scaffolded)")
+            self.warnings.append(
+                "No iam-* agent directories found yet (expected for early phases)"
+            )
+            self.log(
+                "⚠️  No iam-* agents found (expected if agents not yet scaffolded)"
+            )
             return True  # Not a failure if we haven't created agents yet
 
-        self.log(f"Found {len(iam_agents)} iam-* agent directories (excluding orchestrator module)")
+        self.log(
+            f"Found {len(iam_agents)} iam-* agent directories (excluding orchestrator module)"
+        )
 
         all_valid = True
         for agent_dir in iam_agents:
@@ -160,6 +173,7 @@ class ARVMinimumChecker:
                 # We can't actually import it without ADK dependencies,
                 # but we can check that it has valid Python syntax
                 import ast
+
                 with open(agent_py) as f:
                     ast.parse(f.read())
                 self.log(f"  ✓ {agent_name}/agent.py has valid syntax")
@@ -182,7 +196,9 @@ class ARVMinimumChecker:
                     break
 
             if not has_docs:
-                self.warnings.append(f"{agent_name}: no documentation found (README, prompts/, or docs/)")
+                self.warnings.append(
+                    f"{agent_name}: no documentation found (README, prompts/, or docs/)"
+                )
                 self.log(f"  ⚠️  {agent_name} has no documentation")
 
             # Check 4: Has test coverage
@@ -204,13 +220,17 @@ class ARVMinimumChecker:
                                 break
 
             if test_files:
-                self.log(f"  ✓ {agent_name} has test coverage: {len(test_files)} test file(s)")
+                self.log(
+                    f"  ✓ {agent_name} has test coverage: {len(test_files)} test file(s)"
+                )
             else:
                 self.warnings.append(f"{agent_name}: no test coverage found")
                 self.log(f"  ⚠️  {agent_name} has no test coverage")
 
         if all_valid and iam_agents:
-            self.passed.append(f"All {len(iam_agents)} iam-* agents meet minimum requirements")
+            self.passed.append(
+                f"All {len(iam_agents)} iam-* agents meet minimum requirements"
+            )
 
         return all_valid
 
@@ -232,8 +252,8 @@ class ARVMinimumChecker:
 
             # Check for logging imports (accept both relative and absolute paths)
             has_logging_import = (
-                "from utils.logging import" in content or
-                "from agents.utils.logging import" in content
+                "from utils.logging import" in content
+                or "from agents.utils.logging import" in content
             )
             if not has_logging_import:
                 self.failed.append("Orchestrator doesn't import logging helper")
@@ -243,7 +263,9 @@ class ARVMinimumChecker:
 
             # Check for correlation ID usage
             if "pipeline_run_id" not in content:
-                self.failed.append("Orchestrator doesn't use pipeline_run_id correlation IDs")
+                self.failed.append(
+                    "Orchestrator doesn't use pipeline_run_id correlation IDs"
+                )
                 return False
 
             self.log("✓ Orchestrator uses pipeline_run_id")
@@ -252,7 +274,7 @@ class ARVMinimumChecker:
             logging_calls = [
                 "log_pipeline_start",
                 "log_pipeline_complete",
-                "log_agent_step"
+                "log_agent_step",
             ]
             for call in logging_calls:
                 if call not in content:
@@ -260,7 +282,9 @@ class ARVMinimumChecker:
                 else:
                     self.log(f"✓ Orchestrator calls {call}")
 
-            self.passed.append("Foreman orchestrator has correlation ID and logging wiring")
+            self.passed.append(
+                "Foreman orchestrator has correlation ID and logging wiring"
+            )
             return True
 
         except Exception as e:
@@ -286,7 +310,9 @@ class ARVMinimumChecker:
         report += f"\n{'✅' if orchestrator_ok else '❌'} Foreman Orchestrator: {'READY' if orchestrator_ok else 'NOT READY'}"
         report += f"\n{'✅' if agents_ok else '⚠️ '} IAM-* Agents: {'READY' if agents_ok else 'ISSUES FOUND'}"
 
-        report += f"\n\n{'✅ ARV MINIMUM MET' if is_ready else '❌ ARV MINIMUM NOT MET'}"
+        report += (
+            f"\n\n{'✅ ARV MINIMUM MET' if is_ready else '❌ ARV MINIMUM NOT MET'}"
+        )
 
         if self.failed:
             report += "\n\n❌ Blocking Issues:"
@@ -337,6 +363,7 @@ class ARVMinimumChecker:
             print(f"\n❌ Error during ARV checks: {e}")
             if self.verbose:
                 import traceback
+
                 traceback.print_exc()
             return 2
 
@@ -374,7 +401,9 @@ def run_portfolio_checks(verbose: bool = False) -> int:
         if external_repos:
             print(f"\n⏭️  Skipping {len(external_repos)} external repositories:")
             for repo in external_repos:
-                print(f"  • {repo.id}: {repo.display_name} (local_path={repo.local_path})")
+                print(
+                    f"  • {repo.id}: {repo.display_name} (local_path={repo.local_path})"
+                )
 
         print()
 
@@ -385,7 +414,7 @@ def run_portfolio_checks(verbose: bool = False) -> int:
     # Run check on current repo
     # (Future: iterate through all local repos if we have multiple)
     print("=" * 70)
-    print(f"CHECKING: bobs-brain (current repository)")
+    print("CHECKING: bobs-brain (current repository)")
     print("=" * 70)
 
     checker = ARVMinimumChecker(verbose=verbose)
@@ -418,17 +447,16 @@ Examples:
 
   # Verbose output
   python scripts/check_arv_minimum.py --verbose
-        """
+        """,
     )
     parser.add_argument(
-        "--verbose", "-v",
-        action="store_true",
-        help="Show detailed output"
+        "--verbose", "-v", action="store_true", help="Show detailed output"
     )
     parser.add_argument(
-        "--portfolio", "-p",
+        "--portfolio",
+        "-p",
         action="store_true",
-        help="Run checks across all local repos (PORT2 feature)"
+        help="Run checks across all local repos (PORT2 feature)",
     )
 
     args = parser.parse_args()

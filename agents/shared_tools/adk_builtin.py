@@ -12,8 +12,8 @@ ADK provides two ways to access tools:
 2. Custom tools via @dataclass and FunctionTool
 """
 
-from typing import Any, Optional, List
 import logging
+from typing import Any
 
 logger = logging.getLogger(__name__)
 
@@ -40,13 +40,13 @@ def get_google_search_tool() -> Any:
         toolset = GoogleSearchToolset()
         logger.info("✅ Loaded ADK GoogleSearchToolset")
         return toolset
-    except ImportError:
+    except Exception:
         # If not available, return a stub
         logger.warning("GoogleSearchToolset not available, using stub")
         return create_tool_stub(
             "google_search",
             "Search the web using Google",
-            "GoogleSearchToolset requires: pip install google-adk[search]"
+            "GoogleSearchToolset requires: pip install google-adk[search]",
         )
 
 
@@ -71,12 +71,12 @@ def get_code_execution_tool() -> Any:
         toolset = CodeExecutionToolset()
         logger.info("✅ Loaded ADK CodeExecutionToolset")
         return toolset
-    except ImportError:
+    except Exception:
         logger.warning("CodeExecutionToolset not available, using stub")
         return create_tool_stub(
             "code_execution",
             "Execute Python code in sandbox",
-            "CodeExecutionToolset requires Agent Engine deployment"
+            "CodeExecutionToolset requires Agent Engine deployment",
         )
 
 
@@ -93,7 +93,7 @@ def get_repo_search_tool_stub() -> Any:
     return create_tool_stub(
         "repo_search",
         "Search across repository code and documentation",
-        "Repository search will be available when codebase is indexed"
+        "Repository search will be available when codebase is indexed",
     )
 
 
@@ -113,8 +113,9 @@ def get_bigquery_toolset() -> Any:
         BigQuery toolset or stub
     """
     try:
-        from google.adk.toolsets import BigQueryToolset
         import os
+
+        from google.adk.toolsets import BigQueryToolset
 
         project_id = os.getenv("PROJECT_ID")
         if project_id:
@@ -126,14 +127,14 @@ def get_bigquery_toolset() -> Any:
             return create_tool_stub(
                 "bigquery",
                 "Execute BigQuery operations",
-                "BigQueryToolset requires PROJECT_ID environment variable"
+                "BigQueryToolset requires PROJECT_ID environment variable",
             )
-    except ImportError:
+    except Exception:
         logger.warning("BigQueryToolset not available")
         return create_tool_stub(
             "bigquery",
             "Execute BigQuery operations",
-            "BigQueryToolset requires: pip install google-adk[bigquery]"
+            "BigQueryToolset requires: pip install google-adk[bigquery]",
         )
 
 
@@ -159,8 +160,9 @@ def get_mcp_toolset() -> Any:
         MCP toolset or stub
     """
     try:
-        from google.adk.toolsets import MCPToolset
         import os
+
+        from google.adk.toolsets import MCPToolset
 
         mcp_server_url = os.getenv("MCP_SERVER_URL")
         if mcp_server_url:
@@ -172,14 +174,14 @@ def get_mcp_toolset() -> Any:
             return create_tool_stub(
                 "mcp",
                 "Connect to MCP servers",
-                "MCPToolset requires MCP_SERVER_URL environment variable"
+                "MCPToolset requires MCP_SERVER_URL environment variable",
             )
-    except ImportError:
+    except Exception:
         logger.warning("MCPToolset not available")
         return create_tool_stub(
             "mcp",
             "Connect to MCP servers",
-            "MCPToolset requires: pip install google-adk[mcp]"
+            "MCPToolset requires: pip install google-adk[mcp]",
         )
 
 
@@ -197,6 +199,7 @@ def create_tool_stub(name: str, description: str, note: str) -> Any:
     Returns:
         A callable stub that returns a TODO message
     """
+
     def stub_tool(**kwargs) -> str:
         """Stub implementation."""
         message = f"[STUB] {name}: {note}"
@@ -214,6 +217,7 @@ def create_tool_stub(name: str, description: str, note: str) -> Any:
 # ADK TOOLSET IMPORTS (when available)
 # ============================================================================
 
+
 def get_vertex_ai_search_toolset_stub() -> Any:
     """
     Get the Vertex AI Search toolset (currently stubbed).
@@ -227,7 +231,7 @@ def get_vertex_ai_search_toolset_stub() -> Any:
     return create_tool_stub(
         "vertex_ai_search",
         "Search using Vertex AI semantic search",
-        "Vertex AI Search requires datastore configuration"
+        "Vertex AI Search requires datastore configuration",
     )
 
 
@@ -244,7 +248,7 @@ def get_gcs_toolset_stub() -> Any:
     return create_tool_stub(
         "gcs",
         "Manage Google Cloud Storage objects",
-        "GCS toolset requires bucket permissions"
+        "GCS toolset requires bucket permissions",
     )
 
 

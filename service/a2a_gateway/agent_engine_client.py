@@ -23,21 +23,24 @@ Usage:
     )
 """
 
+import logging
 import os
 import sys
-import logging
-import httpx
-from typing import Optional, Dict, Any
 from dataclasses import dataclass
+from typing import Any, Dict, Optional
+
+import httpx
 
 # Add project root to path for imports
-project_root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+project_root = os.path.dirname(
+    os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+)
 sys.path.insert(0, project_root)
 
 from agents.config.agent_engine import (
     build_agent_config,
-    get_reasoning_engine_url,
     get_current_environment,
+    get_reasoning_engine_url,
 )
 
 logger = logging.getLogger(__name__)
@@ -46,6 +49,7 @@ logger = logging.getLogger(__name__)
 @dataclass
 class AgentEngineResponse:
     """Response from Agent Engine."""
+
     response: str
     session_id: Optional[str] = None
     metadata: Optional[Dict[str, Any]] = None
@@ -66,7 +70,9 @@ def get_gcp_token() -> str:
         from google.auth import default
         from google.auth.transport.requests import Request
 
-        credentials, _ = default(scopes=["https://www.googleapis.com/auth/cloud-platform"])
+        credentials, _ = default(
+            scopes=["https://www.googleapis.com/auth/cloud-platform"]
+        )
 
         # Refresh token if needed
         if not credentials.valid:
@@ -203,13 +209,15 @@ async def call_agent_engine(
         response_metadata = result.get("metadata", {})
 
         # Add our tracking metadata
-        response_metadata.update({
-            "agent_role": agent_role,
-            "env": env,
-            "engine_id": agent_config.reasoning_engine_id,
-            "spiffe_id": agent_config.spiffe_id,
-            "correlation_id": correlation_id,
-        })
+        response_metadata.update(
+            {
+                "agent_role": agent_role,
+                "env": env,
+                "engine_id": agent_config.reasoning_engine_id,
+                "spiffe_id": agent_config.spiffe_id,
+                "correlation_id": correlation_id,
+            }
+        )
 
         logger.info(
             f"✅ Agent Engine response received from {agent_role}",
@@ -229,7 +237,9 @@ async def call_agent_engine(
         )
 
     except httpx.HTTPStatusError as e:
-        error_msg = f"Agent Engine HTTP error: {e.response.status_code} - {e.response.text}"
+        error_msg = (
+            f"Agent Engine HTTP error: {e.response.status_code} - {e.response.text}"
+        )
         logger.error(
             error_msg,
             extra={
@@ -270,7 +280,7 @@ async def call_agent_engine(
         )
 
     except Exception as e:
-        error_msg = f"Agent Engine call failed: {str(e)}"
+        error_msg = f"Agent Engine call failed: {e!s}"
         logger.error(
             error_msg,
             extra={

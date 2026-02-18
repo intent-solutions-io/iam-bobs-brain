@@ -24,44 +24,50 @@ Skip if not deployed:
 """
 
 import os
-import pytest
 import subprocess
 import sys
 from pathlib import Path
 from typing import Optional
+
+import pytest
 
 # Repository root
 REPO_ROOT = Path(__file__).parent.parent.parent
 
 # Check if GCP libraries available
 try:
-    import google.cloud.aiplatform
+    import google.cloud.aiplatform  # noqa: F401
+
     GCP_AVAILABLE = True
-except ImportError:
+except Exception:
     GCP_AVAILABLE = False
 
 # Check if deployed (has required env vars)
-DEPLOYED = all([
-    os.getenv("PROJECT_ID"),
-    os.getenv("AGENT_ENGINE_ID"),
-])
+DEPLOYED = all(
+    [
+        os.getenv("PROJECT_ID"),
+        os.getenv("AGENT_ENGINE_ID"),
+    ]
+)
 
 # Pytest markers
 requires_deployment = pytest.mark.skipif(
     not DEPLOYED,
-    reason="Requires deployed agent (set PROJECT_ID and AGENT_ENGINE_ID env vars)"
+    reason="Requires deployed agent (set PROJECT_ID and AGENT_ENGINE_ID env vars)",
 )
 
 requires_gcp = pytest.mark.skipif(
     not GCP_AVAILABLE,
-    reason="Requires google-cloud-aiplatform (pip install google-cloud-aiplatform)"
+    reason="Requires google-cloud-aiplatform (pip install google-cloud-aiplatform)",
 )
 
 
 class TestAgentEngineSmoke:
     """Smoke tests for deployed agents."""
 
-    def _run_smoke_test(self, agent_name: str, agent_engine_id: Optional[str] = None) -> subprocess.CompletedProcess:
+    def _run_smoke_test(
+        self, agent_name: str, agent_engine_id: Optional[str] = None
+    ) -> subprocess.CompletedProcess:
         """
         Run smoke test script and return result.
 
@@ -75,7 +81,8 @@ class TestAgentEngineSmoke:
         cmd = [
             sys.executable,
             str(REPO_ROOT / "scripts" / "smoke_test_agent_engine.py"),
-            "--agent", agent_name,
+            "--agent",
+            agent_name,
         ]
 
         # Add optional parameters
@@ -86,10 +93,7 @@ class TestAgentEngineSmoke:
         env = os.environ.copy()
 
         result = subprocess.run(
-            cmd,
-            env=env,
-            capture_output=True,
-            text=True
+            cmd, check=False, env=env, capture_output=True, text=True
         )
 
         return result
@@ -108,7 +112,9 @@ class TestAgentEngineSmoke:
             print(f"\nSmoke test stdout:\n{result.stdout}")
             print(f"\nSmoke test stderr:\n{result.stderr}")
 
-        assert result.returncode == 0, f"Smoke test failed with exit code {result.returncode}"
+        assert (
+            result.returncode == 0
+        ), f"Smoke test failed with exit code {result.returncode}"
 
     @requires_deployment
     @requires_gcp
@@ -125,21 +131,30 @@ class TestAgentEngineSmoke:
             print(f"\nSmoke test stdout:\n{result.stdout}")
             print(f"\nSmoke test stderr:\n{result.stderr}")
 
-        assert result.returncode == 0, f"Smoke test failed with exit code {result.returncode}"
+        assert (
+            result.returncode == 0
+        ), f"Smoke test failed with exit code {result.returncode}"
 
     def test_smoke_test_script_exists(self):
         """Verify smoke test script exists and is executable."""
         script_path = REPO_ROOT / "scripts" / "smoke_test_agent_engine.py"
 
         assert script_path.exists(), f"Smoke test script not found at {script_path}"
-        assert os.access(script_path, os.X_OK), f"Smoke test script not executable: {script_path}"
+        assert os.access(
+            script_path, os.X_OK
+        ), f"Smoke test script not executable: {script_path}"
 
     def test_smoke_test_script_help(self):
         """Verify smoke test script shows help without errors."""
         result = subprocess.run(
-            [sys.executable, str(REPO_ROOT / "scripts" / "smoke_test_agent_engine.py"), "--help"],
+            [
+                sys.executable,
+                str(REPO_ROOT / "scripts" / "smoke_test_agent_engine.py"),
+                "--help",
+            ],
+            check=False,
             capture_output=True,
-            text=True
+            text=True,
         )
 
         assert result.returncode == 0, "Smoke test script --help failed"
@@ -162,10 +177,15 @@ class TestSmokeTestConfiguration:
 
         # Run with --help to avoid actual invocation
         result = subprocess.run(
-            [sys.executable, str(REPO_ROOT / "scripts" / "smoke_test_agent_engine.py"), "--help"],
+            [
+                sys.executable,
+                str(REPO_ROOT / "scripts" / "smoke_test_agent_engine.py"),
+                "--help",
+            ],
+            check=False,
             env=env,
             capture_output=True,
-            text=True
+            text=True,
         )
 
         assert result.returncode == 0, "Script failed to read environment variables"
@@ -177,10 +197,16 @@ class TestSmokeTestConfiguration:
         env.pop("PROJECT_ID", None)  # Remove if present
 
         result = subprocess.run(
-            [sys.executable, str(REPO_ROOT / "scripts" / "smoke_test_agent_engine.py"), "--agent", "bob"],
+            [
+                sys.executable,
+                str(REPO_ROOT / "scripts" / "smoke_test_agent_engine.py"),
+                "--agent",
+                "bob",
+            ],
+            check=False,
             env=env,
             capture_output=True,
-            text=True
+            text=True,
         )
 
         # Should exit with error code 2 (configuration error)

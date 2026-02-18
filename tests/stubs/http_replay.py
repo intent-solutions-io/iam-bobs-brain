@@ -29,8 +29,9 @@ from contextlib import contextmanager
 from typing import Any, Dict, Optional
 
 try:
-    import respx
     import httpx
+    import respx
+
     HAS_RESPX = True
 except ImportError:
     HAS_RESPX = False
@@ -39,8 +40,7 @@ except ImportError:
 def _require_respx():
     if not HAS_RESPX:
         raise ImportError(
-            "respx is required for HTTP replay. "
-            "Install with: pip install respx"
+            "respx is required for HTTP replay. " "Install with: pip install respx"
         )
 
 

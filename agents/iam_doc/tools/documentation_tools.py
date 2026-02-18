@@ -8,11 +8,10 @@ This module provides tools for:
 - Managing 000-docs/ documentation structure
 """
 
-import os
 import logging
-from typing import List, Dict, Any, Optional
 from datetime import datetime
 from pathlib import Path
+from typing import Any, Dict, List, Optional
 
 logger = logging.getLogger(__name__)
 
@@ -170,7 +169,7 @@ def update_readme(
             }
 
         # Read existing content
-        with open(path, "r") as f:
+        with open(path) as f:
             content = f.read()
 
         # Find section
@@ -201,7 +200,7 @@ def update_readme(
         if append:
             # Append to existing section
             updated_lines = (
-                lines[: section_end]
+                lines[:section_end]
                 + [new_content]
                 + (lines[section_end:] if section_end < len(lines) else [])
             )
@@ -231,7 +230,7 @@ def update_readme(
         return {
             "success": False,
             "updated_path": readme_path,
-            "changes_made": f"Error: {str(e)}",
+            "changes_made": f"Error: {e!s}",
         }
 
 

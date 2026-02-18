@@ -6,15 +6,15 @@ GitHub-compatible issue content.
 """
 
 from .formatting_tools import (
+    create_github_issue_body,
     format_issue_markdown,
     generate_issue_labels,
     validate_issue_spec,
-    create_github_issue_body,
 )
 
 __all__ = [
+    "create_github_issue_body",
     "format_issue_markdown",
     "generate_issue_labels",
     "validate_issue_spec",
-    "create_github_issue_body",
 ]

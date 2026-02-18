@@ -39,13 +39,11 @@ Exit Codes:
 Part of: SLACK-ENDTOEND-DEV / S3
 """
 
-import sys
 import argparse
 import json
+import sys
 import time
-import hmac
-import hashlib
-from typing import Dict, Any, Optional
+from typing import Any, Dict, Optional
 from urllib.parse import urljoin
 
 try:
@@ -94,7 +92,9 @@ def print_result(test_name: str, passed: bool, details: str = ""):
         print(f"     {details}")
 
 
-def test_health_endpoint(base_url: str, verbose: bool = False) -> tuple[bool, Optional[Dict[str, Any]]]:
+def test_health_endpoint(
+    base_url: str, verbose: bool = False
+) -> tuple[bool, Optional[Dict[str, Any]]]:
     """
     Test the /health endpoint.
 
@@ -114,7 +114,7 @@ def test_health_endpoint(base_url: str, verbose: bool = False) -> tuple[bool, Op
         health_data = response.json()
 
         if verbose:
-            print(f"Health Response:")
+            print("Health Response:")
             print(json.dumps(health_data, indent=2))
 
         # Check required fields
@@ -148,9 +148,7 @@ def test_health_endpoint(base_url: str, verbose: bool = False) -> tuple[bool, Op
 
         # Check if Slack is disabled
         if not health_data.get("slack_bot_enabled"):
-            print(
-                "\n⚠️  Note: Slack bot is DISABLED (SLACK_BOB_ENABLED=false)"
-            )
+            print("\n⚠️  Note: Slack bot is DISABLED (SLACK_BOB_ENABLED=false)")
             print(
                 "     This is expected in secure environments. Set SLACK_BOB_ENABLED=true for full testing."
             )
@@ -159,29 +157,23 @@ def test_health_endpoint(base_url: str, verbose: bool = False) -> tuple[bool, Op
         if not health_data.get("config_valid"):
             missing = health_data.get("missing_vars", [])
             print(f"\n⚠️  Note: Config is INVALID. Missing: {', '.join(missing)}")
-            print(
-                "     Set required env vars for full testing (see .env.example)."
-            )
+            print("     Set required env vars for full testing (see .env.example).")
 
         return True, health_data
 
     except httpx.ConnectError:
-        print_result(
-            "Service connection", False, f"Could not connect to {base_url}"
-        )
+        print_result("Service connection", False, f"Could not connect to {base_url}")
         print(
             "\n⚠️  Service not running. Start with: uvicorn service.slack_webhook.main:app"
         )
         return False, None
 
     except httpx.HTTPStatusError as e:
-        print_result(
-            "Health endpoint", False, f"HTTP {e.response.status_code}"
-        )
+        print_result("Health endpoint", False, f"HTTP {e.response.status_code}")
         return False, None
 
     except Exception as e:
-        print_result("Health endpoint", False, f"Error: {str(e)}")
+        print_result("Health endpoint", False, f"Error: {e!s}")
         return False, None
 
 
@@ -248,7 +240,7 @@ def test_slack_event(
 
         if verbose:
             print(f"Sending event to: {url}")
-            print(f"Event payload:")
+            print("Event payload:")
             print(json.dumps(event, indent=2))
 
         response = httpx.post(
@@ -260,36 +252,28 @@ def test_slack_event(
         result = response.json()
 
         if verbose:
-            print(f"\nResponse:")
+            print("\nResponse:")
             print(json.dumps(result, indent=2))
 
         # Check response
         if result.get("ok"):
             print_result("Slack event accepted", True)
-            print(
-                "\n⚠️  Note: This test only validates that the event was accepted."
-            )
-            print(
-                "     Check Cloud Run logs to see if Bob responded successfully."
-            )
-            print(
-                "     For full end-to-end validation, check Slack workspace."
-            )
+            print("\n⚠️  Note: This test only validates that the event was accepted.")
+            print("     Check Cloud Run logs to see if Bob responded successfully.")
+            print("     For full end-to-end validation, check Slack workspace.")
             return True
         else:
             print_result("Slack event processing", False, f"Response: {result}")
             return False
 
     except httpx.HTTPStatusError as e:
-        print_result(
-            "Slack event", False, f"HTTP {e.response.status_code}"
-        )
+        print_result("Slack event", False, f"HTTP {e.response.status_code}")
         if verbose:
             print(f"Response: {e.response.text}")
         return False
 
     except Exception as e:
-        print_result("Slack event", False, f"Error: {str(e)}")
+        print_result("Slack event", False, f"Error: {e!s}")
         return False
 
 
@@ -334,7 +318,7 @@ def test_url_verification(base_url: str, verbose: bool = False) -> bool:
             return False
 
     except Exception as e:
-        print_result("URL verification", False, f"Error: {str(e)}")
+        print_result("URL verification", False, f"Error: {e!s}")
         return False
 
 
@@ -342,7 +326,7 @@ def main():
     """Run all smoke tests."""
     args = parse_args()
 
-    print(f"\n🧪 Slack Webhook Dev Smoke Test")
+    print("\n🧪 Slack Webhook Dev Smoke Test")
     print(f"   Service URL: {args.url}")
     print(f"   Mode: {'Health check only' if args.health_only else 'Full tests'}")
 

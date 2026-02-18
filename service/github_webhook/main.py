@@ -24,14 +24,14 @@ Environment Variables:
 Phase H: Universal Autonomous AI Crew - Event Triggers
 """
 
-import os
-import logging
 import hashlib
 import hmac
-from typing import Dict, Any, Optional
-from fastapi import FastAPI, HTTPException, Request, Header
-from fastapi.responses import JSONResponse
+import logging
+import os
+from typing import Any, Dict
+
 import httpx
+from fastapi import FastAPI, Header, HTTPException, Request
 
 # Configure logging
 logging.basicConfig(
@@ -106,9 +106,7 @@ def verify_github_signature(body: bytes, signature: str) -> bool:
 
     expected_signature = (
         "sha256="
-        + hmac.new(
-            GITHUB_WEBHOOK_SECRET.encode(), body, hashlib.sha256
-        ).hexdigest()
+        + hmac.new(GITHUB_WEBHOOK_SECRET.encode(), body, hashlib.sha256).hexdigest()
     )
 
     # Compare signatures (constant-time)
@@ -120,7 +118,9 @@ def verify_github_signature(body: bytes, signature: str) -> bool:
 # ============================================================================
 
 
-def get_target_agent_and_prompt(event_type: str, action: str, payload: Dict[str, Any]) -> tuple[str, str]:
+def get_target_agent_and_prompt(
+    event_type: str, action: str, payload: Dict[str, Any]
+) -> tuple[str, str]:
     """
     Determine which agent to route to and build the prompt.
 
@@ -139,10 +139,12 @@ def get_target_agent_and_prompt(event_type: str, action: str, payload: Dict[str,
         title = issue.get("title", "")
         body = issue.get("body", "") or ""
         number = issue.get("number", 0)
-        labels = [l.get("name", "") for l in issue.get("labels", [])]
+        labels = [label.get("name", "") for label in issue.get("labels", [])]
 
         if action == "opened":
-            return "iam-orchestrator", f"""
+            return (
+                "iam-orchestrator",
+                f"""
 New GitHub issue opened in {repo}:
 
 Issue #{number}: {title}
@@ -154,19 +156,23 @@ Please analyze this issue and:
 1. Triage for priority and type
 2. Identify which specialist(s) should handle it
 3. Create a plan for resolution
-"""
+""",
+            )
 
         if action == "labeled":
             label_name = payload.get("label", {}).get("name", "")
             if label_name in ["bug", "critical", "urgent"]:
-                return "iam-orchestrator", f"""
+                return (
+                    "iam-orchestrator",
+                    f"""
 Issue #{number} in {repo} was labeled as '{label_name}':
 
 Title: {title}
 Current labels: {', '.join(labels)}
 
 Please prioritize and create a fix plan for this {label_name}.
-"""
+""",
+                )
 
     # Pull request events
     if event_type == "pull_request":
@@ -179,7 +185,9 @@ Please prioritize and create a fix plan for this {label_name}.
         base_branch = pr.get("base", {}).get("ref", "unknown")
 
         if action == "opened":
-            return "iam-orchestrator", f"""
+            return (
+                "iam-orchestrator",
+                f"""
 New pull request opened in {repo}:
 
 PR #{number}: {title}
@@ -191,17 +199,21 @@ Please:
 1. Review for ADK compliance and Hard Mode rules
 2. Check for test coverage
 3. Validate documentation updates if needed
-"""
+""",
+            )
 
         if action == "synchronize":  # New commits pushed
-            return "iam-orchestrator", f"""
+            return (
+                "iam-orchestrator",
+                f"""
 PR #{number} in {repo} was updated with new commits:
 
 Title: {title}
 Branch: {head_branch} → {base_branch}
 
 Please re-run compliance checks on the updated code.
-"""
+""",
+            )
 
     # Push events (to main branch)
     if event_type == "push":
@@ -210,12 +222,13 @@ Please re-run compliance checks on the updated code.
         commits = payload.get("commits", [])
 
         if ref in ["refs/heads/main", "refs/heads/master"]:
-            commit_messages = "\n".join([
-                f"- {c.get('message', '').split(chr(10))[0]}"
-                for c in commits[:5]
-            ])
+            commit_messages = "\n".join(
+                [f"- {c.get('message', '').split(chr(10))[0]}" for c in commits[:5]]
+            )
 
-            return "iam-orchestrator", f"""
+            return (
+                "iam-orchestrator",
+                f"""
 New push to {ref} in {repo}:
 
 Recent commits:
@@ -225,16 +238,20 @@ Please:
 1. Run ADK compliance audit
 2. Check for any pattern violations
 3. Update knowledge index if needed
-"""
+""",
+            )
 
     # Default: Route to foreman for triage
-    return "iam-orchestrator", f"""
+    return (
+        "iam-orchestrator",
+        f"""
 GitHub event received: {event_type}.{action}
 
 Repository: {payload.get('repository', {}).get('full_name', 'unknown')}
 
 Please analyze this event and determine appropriate action.
-"""
+""",
+    )
 
 
 # ============================================================================
@@ -304,7 +321,7 @@ async def github_webhook(
         )
 
         # Query Agent Engine via A2A gateway
-        response = await route_to_agent(
+        _response = await route_to_agent(
             agent_role=agent_role,
             prompt=prompt,
             context={
@@ -312,7 +329,7 @@ async def github_webhook(
                 "github_action": action,
                 "delivery_id": x_github_delivery,
                 "repository": payload.get("repository", {}).get("full_name"),
-            }
+            },
         )
 
         return {
@@ -331,9 +348,7 @@ async def github_webhook(
 
 
 async def route_to_agent(
-    agent_role: str,
-    prompt: str,
-    context: Dict[str, Any]
+    agent_role: str, prompt: str, context: Dict[str, Any]
 ) -> Dict[str, Any]:
     """
     Route request to agent via A2A gateway.
@@ -417,7 +432,9 @@ async def health() -> Dict[str, Any]:
         dict: Service health status and configuration
     """
     return {
-        "status": "healthy" if (not GITHUB_WEBHOOK_ENABLED or config_valid) else "degraded",
+        "status": (
+            "healthy" if (not GITHUB_WEBHOOK_ENABLED or config_valid) else "degraded"
+        ),
         "service": "github-webhook",
         "version": "0.1.0",
         "github_webhook_enabled": GITHUB_WEBHOOK_ENABLED,

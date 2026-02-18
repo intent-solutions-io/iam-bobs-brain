@@ -8,9 +8,9 @@ This tool enables Bob to perform intelligent semantic searches that
 understand meaning and context, not just keyword matching.
 """
 
-import os
 import logging
-from typing import Optional
+import os
+
 from google.cloud import discoveryengine_v1 as discoveryengine
 
 logger = logging.getLogger(__name__)
@@ -266,13 +266,13 @@ def get_vertex_search_status() -> str:
 
         # Format status
         result = [
-            f"📊 **Vertex AI Search Status**\n\n",
+            "📊 **Vertex AI Search Status**\n\n",
             f"**Datastore:** {datastore.display_name}\n",
             f"**ID:** {DATASTORE_ID}\n",
             f"**Project:** {PROJECT_ID}\n",
             f"**Location:** {LOCATION}\n",
             f"**Content Config:** {datastore.content_config}\n",
-            f"**Status:** ✅ Active\n\n",
+            "**Status:** ✅ Active\n\n",
         ]
 
         # Try to get document count (requires additional API call)
@@ -284,16 +284,16 @@ def get_vertex_search_status() -> str:
                 data_store=DATASTORE_ID,
                 branch="default_branch",
             )
-            documents = doc_client.list_documents(parent=parent, page_size=1)
+            _documents = doc_client.list_documents(parent=parent, page_size=1)
             # Note: Getting exact count requires iterating all results
-            result.append(f"**Documents:** Indexed (use GCP Console for exact count)\n")
-        except:
-            result.append(f"**Documents:** Status unknown (check GCP Console)\n")
+            result.append("**Documents:** Indexed (use GCP Console for exact count)\n")
+        except Exception:
+            result.append("**Documents:** Status unknown (check GCP Console)\n")
 
         result.append(
-            f"\n💡 **Next Steps:**\n"
-            f"- Search: `search_vertex_ai('your query')`\n"
-            f"- View in Console: https://console.cloud.google.com/gen-app-builder/engines\n"
+            "\n💡 **Next Steps:**\n"
+            "- Search: `search_vertex_ai('your query')`\n"
+            "- View in Console: https://console.cloud.google.com/gen-app-builder/engines\n"
         )
 
         return "".join(result)
@@ -312,4 +312,4 @@ def get_vertex_search_status() -> str:
 
 
 # Tool metadata for ADK agent integration
-__all__ = ["search_vertex_ai", "get_vertex_search_status"]
+__all__ = ["get_vertex_search_status", "search_vertex_ai"]

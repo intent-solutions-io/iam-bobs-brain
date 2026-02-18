@@ -7,7 +7,8 @@ Enforces R7: SPIFFE ID must be included in card metadata.
 """
 
 import os
-from typing import List, Dict, Any, Optional
+from typing import Any, Dict, List
+
 from pydantic import BaseModel, Field
 
 
@@ -17,14 +18,25 @@ class AgentCard(BaseModel):
 
     Represents Bob's identity, capabilities, and skills.
     """
+
     name: str = Field(..., description="Agent name")
     version: str = Field(..., description="Agent version")
     url: str = Field(..., description="Agent public URL")
-    description: str = Field(..., description="Agent description (must include SPIFFE ID per R7)")
-    capabilities: List[str] = Field(default_factory=list, description="Agent capabilities")
-    default_input_modes: List[str] = Field(default_factory=lambda: ["text"], description="Supported input modes")
-    default_output_modes: List[str] = Field(default_factory=lambda: ["text"], description="Supported output modes")
-    skills: List[Dict[str, Any]] = Field(default_factory=list, description="Agent skills")
+    description: str = Field(
+        ..., description="Agent description (must include SPIFFE ID per R7)"
+    )
+    capabilities: List[str] = Field(
+        default_factory=list, description="Agent capabilities"
+    )
+    default_input_modes: List[str] = Field(
+        default_factory=lambda: ["text"], description="Supported input modes"
+    )
+    default_output_modes: List[str] = Field(
+        default_factory=lambda: ["text"], description="Supported output modes"
+    )
+    skills: List[Dict[str, Any]] = Field(
+        default_factory=list, description="Agent skills"
+    )
 
 
 def get_agent_card() -> AgentCard:
@@ -43,7 +55,10 @@ def get_agent_card() -> AgentCard:
     app_name = os.getenv("APP_NAME", "bobs-brain")
     app_version = os.getenv("APP_VERSION", "0.10.0")
     public_url = os.getenv("PUBLIC_URL", "https://bob.intent.solutions")
-    spiffe_id = os.getenv("AGENT_SPIFFE_ID", "spiffe://intent.solutions/agent/bobs-brain/dev/us-central1/0.10.0")
+    spiffe_id = os.getenv(
+        "AGENT_SPIFFE_ID",
+        "spiffe://intent.solutions/agent/bobs-brain/dev/us-central1/0.10.0",
+    )
 
     # Description with SPIFFE ID (R7 requirement)
     description = f"""Bob's Brain - Expert Google ADK Agent
@@ -67,7 +82,7 @@ Bob has access to comprehensive ADK documentation and can provide expert guidanc
         "documentation_search",
         "code_examples",
         "deployment_guidance",
-        "architecture_review"
+        "architecture_review",
     ]
 
     # Skills (specific tasks Bob can perform)
@@ -82,13 +97,13 @@ Bob has access to comprehensive ADK documentation and can provide expert guidanc
                 "properties": {
                     "question": {
                         "type": "string",
-                        "description": "Question about Google ADK"
+                        "description": "Question about Google ADK",
                     },
                     "context": {
                         "type": "string",
-                        "description": "Additional context (optional)"
-                    }
-                }
+                        "description": "Additional context (optional)",
+                    },
+                },
             },
             "output_schema": {
                 "type": "object",
@@ -96,15 +111,15 @@ Bob has access to comprehensive ADK documentation and can provide expert guidanc
                 "properties": {
                     "answer": {
                         "type": "string",
-                        "description": "Expert answer with code examples and references"
+                        "description": "Expert answer with code examples and references",
                     },
                     "references": {
                         "type": "array",
                         "items": {"type": "string"},
-                        "description": "Relevant documentation references"
-                    }
-                }
-            }
+                        "description": "Relevant documentation references",
+                    },
+                },
+            },
         },
         {
             "skill_id": "bob.search_adk_docs",
@@ -114,16 +129,13 @@ Bob has access to comprehensive ADK documentation and can provide expert guidanc
                 "type": "object",
                 "required": ["query"],
                 "properties": {
-                    "query": {
-                        "type": "string",
-                        "description": "Search query"
-                    },
+                    "query": {"type": "string", "description": "Search query"},
                     "max_results": {
                         "type": "integer",
                         "default": 5,
-                        "description": "Maximum results to return"
-                    }
-                }
+                        "description": "Maximum results to return",
+                    },
+                },
             },
             "output_schema": {
                 "type": "object",
@@ -136,12 +148,12 @@ Bob has access to comprehensive ADK documentation and can provide expert guidanc
                             "properties": {
                                 "title": {"type": "string"},
                                 "content": {"type": "string"},
-                                "source": {"type": "string"}
-                            }
-                        }
+                                "source": {"type": "string"},
+                            },
+                        },
                     }
-                }
-            }
+                },
+            },
         },
         {
             "skill_id": "bob.provide_deployment_guidance",
@@ -153,13 +165,13 @@ Bob has access to comprehensive ADK documentation and can provide expert guidanc
                 "properties": {
                     "deployment_scenario": {
                         "type": "string",
-                        "description": "Description of what needs to be deployed"
+                        "description": "Description of what needs to be deployed",
                     },
                     "current_setup": {
                         "type": "string",
-                        "description": "Current environment setup (optional)"
-                    }
-                }
+                        "description": "Current environment setup (optional)",
+                    },
+                },
             },
             "output_schema": {
                 "type": "object",
@@ -168,16 +180,16 @@ Bob has access to comprehensive ADK documentation and can provide expert guidanc
                     "steps": {
                         "type": "array",
                         "items": {"type": "string"},
-                        "description": "Step-by-step deployment instructions"
+                        "description": "Step-by-step deployment instructions",
                     },
                     "commands": {
                         "type": "array",
                         "items": {"type": "string"},
-                        "description": "Exact commands to run"
-                    }
-                }
-            }
-        }
+                        "description": "Exact commands to run",
+                    },
+                },
+            },
+        },
     ]
 
     return AgentCard(
@@ -188,7 +200,7 @@ Bob has access to comprehensive ADK documentation and can provide expert guidanc
         capabilities=capabilities,
         default_input_modes=["text"],
         default_output_modes=["text"],
-        skills=skills
+        skills=skills,
     )
 
 
@@ -203,7 +215,10 @@ def get_agent_card_dict() -> Dict[str, Any]:
     card_dict = card.model_dump()
 
     # Add explicit SPIFFE ID field (R7 requirement)
-    spiffe_id = os.getenv("AGENT_SPIFFE_ID", "spiffe://intent.solutions/agent/bobs-brain/dev/us-central1/0.10.0")
+    spiffe_id = os.getenv(
+        "AGENT_SPIFFE_ID",
+        "spiffe://intent.solutions/agent/bobs-brain/dev/us-central1/0.10.0",
+    )
     card_dict["spiffe_id"] = spiffe_id
 
     return card_dict

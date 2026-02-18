@@ -18,32 +18,40 @@ Enforces:
 - Security: No credentials or secrets in tool definitions
 """
 
-from typing import List, Any
 import logging
+from typing import Any, List
 
 logger = logging.getLogger(__name__)
 
 # Import tool constructors
 from .adk_builtin import (
-    get_google_search_tool,
-    get_code_execution_tool,
-    get_repo_search_tool_stub,
     get_bigquery_toolset,
+    get_code_execution_tool,
+    get_google_search_tool,
     get_mcp_toolset,
+    get_repo_search_tool_stub,
+)
+from .api_registry import (
+    get_mcp_toolset as get_registry_mcp_toolset,
 )
 
+# Import API Registry for dynamic MCP tool discovery
+from .api_registry import (
+    get_tools_for_agent,
+    is_registry_available,
+)
 from .custom_tools import (
     get_adk_docs_tools,
-    get_vertex_search_tools,
     get_analysis_tools,
+    get_cleanup_tools,
+    get_delegation_tools,
+    get_documentation_tools,
+    get_implementation_tools,
+    get_indexing_tools,
     get_issue_management_tools,
     get_planning_tools,
-    get_implementation_tools,
     get_qa_tools,
-    get_documentation_tools,
-    get_cleanup_tools,
-    get_indexing_tools,
-    get_delegation_tools,
+    get_vertex_search_tools,
 )
 
 # Import org knowledge hub Vertex Search tools
@@ -51,14 +59,6 @@ from .vertex_search import (
     get_bob_vertex_search_tool,
     get_foreman_vertex_search_tool,
 )
-
-# Import API Registry for dynamic MCP tool discovery
-from .api_registry import (
-    get_tools_for_agent,
-    get_mcp_toolset as get_registry_mcp_toolset,
-    is_registry_available,
-)
-
 
 # ============================================================================
 # TOOL PROFILES - Define which tools each agent can access
@@ -86,7 +86,9 @@ def _load_mcp_tools(agent_name: str) -> List[Any]:
     try:
         mcp_tools = get_tools_for_agent(agent_name)
         if mcp_tools:
-            logger.info(f"✅ Loaded {len(mcp_tools)} MCP tools for {agent_name} from registry")
+            logger.info(
+                f"✅ Loaded {len(mcp_tools)} MCP tools for {agent_name} from registry"
+            )
         return mcp_tools
     except Exception as e:
         logger.warning(f"Could not load MCP tools for {agent_name}: {e}")
@@ -381,30 +383,31 @@ IAM_INDEX_TOOLS = get_iam_index_tools()
 
 # Export functions for dynamic loading
 __all__ = [
-    # Tool getters
-    "get_bob_tools",
-    "get_foreman_tools",
-    "get_iam_adk_tools",
-    "get_iam_issue_tools",
-    "get_iam_fix_plan_tools",
-    "get_iam_fix_impl_tools",
-    "get_iam_qa_tools",
-    "get_iam_doc_tools",
-    "get_iam_cleanup_tools",
-    "get_iam_index_tools",
-    # Direct profiles
     "BOB_TOOLS",
     "FOREMAN_TOOLS",
     "IAM_ADK_TOOLS",
-    "IAM_ISSUE_TOOLS",
-    "IAM_FIX_PLAN_TOOLS",
-    "IAM_FIX_IMPL_TOOLS",
-    "IAM_QA_TOOLS",
-    "IAM_DOC_TOOLS",
     "IAM_CLEANUP_TOOLS",
+    "IAM_DOC_TOOLS",
+    "IAM_FIX_IMPL_TOOLS",
+    "IAM_FIX_PLAN_TOOLS",
     "IAM_INDEX_TOOLS",
-    # API Registry exports
-    "get_tools_for_agent",
+    "IAM_ISSUE_TOOLS",
+    "IAM_QA_TOOLS",
+    "get_bigquery_toolset",
+    "get_bob_tools",
+    "get_code_execution_tool",
+    "get_foreman_tools",
+    "get_iam_adk_tools",
+    "get_iam_cleanup_tools",
+    "get_iam_doc_tools",
+    "get_iam_fix_impl_tools",
+    "get_iam_fix_plan_tools",
+    "get_iam_index_tools",
+    "get_iam_issue_tools",
+    "get_iam_qa_tools",
+    "get_mcp_toolset",
     "get_registry_mcp_toolset",
+    "get_repo_search_tool_stub",
+    "get_tools_for_agent",
     "is_registry_available",
 ]

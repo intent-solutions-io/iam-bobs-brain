@@ -10,24 +10,19 @@ via GitHub REST API with safety gates:
 Phase: LIVE3B/LIVE3C-GITHUB-ISSUES (G2)
 """
 
-import sys
-import os
 import logging
-from pathlib import Path
-from typing import Dict, List, Optional, Any, Tuple
-from datetime import datetime
+import os
+import sys
 from dataclasses import dataclass
+from pathlib import Path
+from typing import Any, Dict, List, Optional
 
 # Add parent directory for imports
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from shared_contracts import IssueSpec, Severity, IssueType
-from config.github_features import (
-    get_github_mode,
-    GitHubMode,
-    load_github_feature_config,
-    can_create_issues_for_repo
-)
+from config.github_features import GitHubMode, get_github_mode
+
+from shared_contracts import IssueSpec, IssueType, Severity
 
 logger = logging.getLogger(__name__)
 
@@ -35,6 +30,7 @@ logger = logging.getLogger(__name__)
 @dataclass
 class IssueCreationResult:
     """Result of attempting to create a GitHub issue."""
+
     success: bool
     mode: str  # "disabled", "dry_run", or "real"
     issue_number: Optional[int] = None
@@ -58,7 +54,7 @@ def get_severity_labels(severity: Severity) -> List[str]:
         Severity.HIGH: ["severity: high", "priority: high"],
         Severity.MEDIUM: ["severity: medium", "priority: normal"],
         Severity.LOW: ["severity: low", "priority: low"],
-        Severity.INFO: ["info", "documentation"]
+        Severity.INFO: ["info", "documentation"],
     }
     return severity_map.get(severity, ["severity: unknown"])
 
@@ -80,7 +76,7 @@ def get_issue_type_labels(issue_type: IssueType) -> List[str]:
         IssueType.PERFORMANCE: ["performance", "optimization"],
         IssueType.TECH_DEBT: ["technical-debt", "refactor"],
         IssueType.MISSING_DOC: ["documentation", "enhancement"],
-        IssueType.CONFIG_ERROR: ["configuration", "bug"]
+        IssueType.CONFIG_ERROR: ["configuration", "bug"],
     }
     return type_map.get(issue_type, ["enhancement"])
 
@@ -128,7 +124,9 @@ def format_issue_body(issue: IssueSpec) -> str:
     body_parts.append(f"- **Type:** {issue.type.value}\n")
     body_parts.append(f"- **Severity:** {issue.severity.value}\n")
     body_parts.append(f"- **Detected By:** {issue.detected_by}\n")
-    body_parts.append(f"- **Created:** {issue.created_at.strftime('%Y-%m-%d %H:%M:%S')}\n")
+    body_parts.append(
+        f"- **Created:** {issue.created_at.strftime('%Y-%m-%d %H:%M:%S')}\n"
+    )
 
     if issue.tags:
         body_parts.append(f"- **Tags:** {', '.join(issue.tags)}\n")
@@ -144,7 +142,7 @@ def format_issue_body(issue: IssueSpec) -> str:
 def issue_spec_to_github_payload(
     issue: IssueSpec,
     assignees: Optional[List[str]] = None,
-    milestone: Optional[int] = None
+    milestone: Optional[int] = None,
 ) -> Dict[str, Any]:
     """
     Convert IssueSpec to GitHub issue API payload.
@@ -167,14 +165,10 @@ def issue_spec_to_github_payload(
         labels.extend(issue.tags)
 
     # Remove duplicates and empty labels
-    labels = list(set(l for l in labels if l))
+    labels = list(set(label for label in labels if label))
 
     # Build payload
-    payload = {
-        "title": issue.title,
-        "body": format_issue_body(issue),
-        "labels": labels
-    }
+    payload = {"title": issue.title, "body": format_issue_body(issue), "labels": labels}
 
     # Optional fields
     if assignees:
@@ -189,7 +183,7 @@ def issue_spec_to_github_payload(
 def batch_issue_specs_to_payloads(
     issues: List[IssueSpec],
     assignees: Optional[List[str]] = None,
-    milestone: Optional[int] = None
+    milestone: Optional[int] = None,
 ) -> List[Dict[str, Any]]:
     """
     Convert multiple IssueSpecs to GitHub issue payloads.
@@ -203,8 +197,7 @@ def batch_issue_specs_to_payloads(
         List of GitHub issue payloads
     """
     return [
-        issue_spec_to_github_payload(issue, assignees, milestone)
-        for issue in issues
+        issue_spec_to_github_payload(issue, assignees, milestone) for issue in issues
     ]
 
 
@@ -223,14 +216,14 @@ def preview_issue_payload(payload: Dict[str, Any]) -> str:
     lines.append(f"Title: {payload['title']}")
     lines.append(f"Labels: {', '.join(payload['labels'])}")
 
-    if 'assignees' in payload:
+    if "assignees" in payload:
         lines.append(f"Assignees: {', '.join(payload['assignees'])}")
 
-    if 'milestone' in payload:
+    if "milestone" in payload:
         lines.append(f"Milestone: #{payload['milestone']}")
 
     lines.append("-" * 60)
-    lines.append(payload['body'])
+    lines.append(payload["body"])
     lines.append("=" * 60)
 
     return "\n".join(lines)
@@ -242,7 +235,7 @@ def create_github_issue(
     github_owner: str,
     github_repo: str,
     assignees: Optional[List[str]] = None,
-    milestone: Optional[int] = None
+    milestone: Optional[int] = None,
 ) -> IssueCreationResult:
     """
     Create a GitHub issue from IssueSpec with safety gates.
@@ -277,13 +270,13 @@ def create_github_issue(
     mode = get_github_mode(repo_id)
 
     logger.info(
-        f"GitHub issue creation attempt",
+        "GitHub issue creation attempt",
         extra={
             "repo_id": repo_id,
             "github_repo": f"{github_owner}/{github_repo}",
             "issue_id": issue.id,
-            "mode": mode.value
-        }
+            "mode": mode.value,
+        },
     )
 
     # Generate GitHub payload
@@ -292,40 +285,38 @@ def create_github_issue(
     # MODE: DISABLED
     if mode == GitHubMode.DISABLED:
         logger.info(
-            f"GitHub issue creation DISABLED",
+            "GitHub issue creation DISABLED",
             extra={
                 "repo_id": repo_id,
-                "reason": "Feature flag off or repo not in allowlist"
-            }
+                "reason": "Feature flag off or repo not in allowlist",
+            },
         )
         return IssueCreationResult(
             success=False,
             mode="disabled",
-            error="GitHub issue creation is disabled for this repository"
+            error="GitHub issue creation is disabled for this repository",
         )
 
     # MODE: DRY_RUN
     if mode == GitHubMode.DRY_RUN:
         logger.info(
-            f"📝 DRY-RUN: Would create GitHub issue",
+            "📝 DRY-RUN: Would create GitHub issue",
             extra={
                 "repo": f"{github_owner}/{github_repo}",
                 "title": issue.title,
                 "labels": payload["labels"],
-                "issue_id": issue.id
-            }
+                "issue_id": issue.id,
+            },
         )
 
         # Log the full payload for inspection
         logger.debug(
             f"DRY-RUN payload:\n{preview_issue_payload(payload)}",
-            extra={"repo_id": repo_id}
+            extra={"repo_id": repo_id},
         )
 
         return IssueCreationResult(
-            success=True,
-            mode="dry_run",
-            dry_run_payload=payload
+            success=True, mode="dry_run", dry_run_payload=payload
         )
 
     # MODE: REAL - Create actual GitHub issue
@@ -339,7 +330,7 @@ def create_github_issue(
             return IssueCreationResult(
                 success=False,
                 mode="real",
-                error="GITHUB_TOKEN environment variable not set"
+                error="GITHUB_TOKEN environment variable not set",
             )
 
         # GitHub API endpoint
@@ -349,24 +340,19 @@ def create_github_issue(
         headers = {
             "Authorization": f"token {github_token}",
             "Accept": "application/vnd.github+json",
-            "X-GitHub-Api-Version": "2022-11-28"
+            "X-GitHub-Api-Version": "2022-11-28",
         }
 
         logger.warning(
-            f"🚨 Creating REAL GitHub issue",
+            "🚨 Creating REAL GitHub issue",
             extra={
                 "repo": f"{github_owner}/{github_repo}",
                 "title": issue.title,
-                "api_url": api_url
-            }
+                "api_url": api_url,
+            },
         )
 
-        response = requests.post(
-            api_url,
-            headers=headers,
-            json=payload,
-            timeout=30.0
-        )
+        response = requests.post(api_url, headers=headers, json=payload, timeout=30.0)
 
         # Check response
         if response.status_code == 201:
@@ -381,54 +367,46 @@ def create_github_issue(
                     "repo": f"{github_owner}/{github_repo}",
                     "issue_number": issue_number,
                     "issue_url": issue_url,
-                    "issue_id": issue.id
-                }
+                    "issue_id": issue.id,
+                },
             )
 
             return IssueCreationResult(
                 success=True,
                 mode="real",
                 issue_number=issue_number,
-                issue_url=issue_url
+                issue_url=issue_url,
             )
         else:
             # API error
             error_msg = f"GitHub API returned {response.status_code}: {response.text}"
             logger.error(
-                f"Failed to create GitHub issue",
+                "Failed to create GitHub issue",
                 extra={
                     "repo": f"{github_owner}/{github_repo}",
                     "status_code": response.status_code,
-                    "error": response.text
-                }
+                    "error": response.text,
+                },
             )
 
-            return IssueCreationResult(
-                success=False,
-                mode="real",
-                error=error_msg
-            )
+            return IssueCreationResult(success=False, mode="real", error=error_msg)
 
     except ImportError:
-        logger.error("requests library not installed (required for real GitHub API calls)")
+        logger.error(
+            "requests library not installed (required for real GitHub API calls)"
+        )
         return IssueCreationResult(
-            success=False,
-            mode="real",
-            error="requests library not installed"
+            success=False, mode="real", error="requests library not installed"
         )
 
     except Exception as e:
         logger.error(
             f"Exception during GitHub issue creation: {e}",
             exc_info=True,
-            extra={"repo": f"{github_owner}/{github_repo}"}
+            extra={"repo": f"{github_owner}/{github_repo}"},
         )
 
-        return IssueCreationResult(
-            success=False,
-            mode="real",
-            error=str(e)
-        )
+        return IssueCreationResult(success=False, mode="real", error=str(e))
 
 
 def batch_create_github_issues(
@@ -437,7 +415,7 @@ def batch_create_github_issues(
     github_owner: str,
     github_repo: str,
     assignees: Optional[List[str]] = None,
-    milestone: Optional[int] = None
+    milestone: Optional[int] = None,
 ) -> List[IssueCreationResult]:
     """
     Create multiple GitHub issues with safety gates.
@@ -462,7 +440,7 @@ def batch_create_github_issues(
             github_owner=github_owner,
             github_repo=github_repo,
             assignees=assignees,
-            milestone=milestone
+            milestone=milestone,
         )
         results.append(result)
 
@@ -481,9 +459,7 @@ if __name__ == "__main__":
 
     # Convert to GitHub payload
     payload = issue_spec_to_github_payload(
-        issue,
-        assignees=["jeremylongshore"],
-        milestone=1
+        issue, assignees=["jeremylongshore"], milestone=1
     )
 
     # Preview
@@ -493,4 +469,5 @@ if __name__ == "__main__":
     # Show raw JSON
     print("\nRaw JSON Payload:")
     import json
+
     print(json.dumps(payload, indent=2))

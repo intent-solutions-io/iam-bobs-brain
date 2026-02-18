@@ -4,17 +4,19 @@ Unit tests for Slack formatter module.
 Tests the conversion of PortfolioResult to Slack Block Kit format.
 """
 
-import pytest
 from datetime import datetime
-from agents.shared_contracts import PortfolioResult, PerRepoResult
+
+import pytest
+
 from agents.notifications.slack_formatter import (
-    format_portfolio_completion,
-    format_portfolio_completion_simple,
+    _format_duration,
     _get_env_badge,
     _severity_emoji,
     _severity_order,
-    _format_duration
+    format_portfolio_completion,
+    format_portfolio_completion_simple,
 )
+from agents.shared_contracts import PortfolioResult
 
 
 @pytest.fixture
@@ -33,26 +35,26 @@ def sample_portfolio_result():
             "high": 10,
             "medium": 20,
             "low": 8,
-            "info": 2
+            "info": 2,
         },
         issues_by_type={
             "adk_violation": 15,
             "pattern_drift": 12,
             "security": 8,
-            "tech_debt": 7
+            "tech_debt": 7,
         },
         repos_by_issue_count=[
             ("bobs-brain", 20),
             ("diagnosticpro", 12),
-            ("pipelinepilot", 10)
+            ("pipelinepilot", 10),
         ],
         repos_by_compliance_score=[
             ("diagnosticpro", 0.7),
             ("bobs-brain", 0.8),
-            ("pipelinepilot", 0.9)
+            ("pipelinepilot", 0.9),
         ],
         portfolio_duration_seconds=456.78,
-        timestamp=datetime(2025, 11, 20, 12, 30, 45)
+        timestamp=datetime(2025, 11, 20, 12, 30, 45),
     )
 
 
@@ -98,7 +100,9 @@ class TestFormatPortfolioCompletion:
         """Test contains issue breakdown by severity and type."""
         blocks = format_portfolio_completion(sample_portfolio_result, env="dev")
         # Find section with fields (issue breakdown)
-        field_sections = [b for b in blocks if b.get("type") == "section" and "fields" in b]
+        field_sections = [
+            b for b in blocks if b.get("type") == "section" and "fields" in b
+        ]
         assert len(field_sections) > 0
 
     def test_contains_top_repos(self, sample_portfolio_result):
@@ -110,7 +114,10 @@ class TestFormatPortfolioCompletion:
                 texts.append(block["text"]["text"])
         combined_text = " ".join(texts)
         # Top repos section should exist when there are multiple repos
-        assert "Top Repos" in combined_text or len(sample_portfolio_result.repos_by_issue_count) > 0
+        assert (
+            "Top Repos" in combined_text
+            or len(sample_portfolio_result.repos_by_issue_count) > 0
+        )
 
     def test_contains_footer(self, sample_portfolio_result):
         """Test contains footer with timestamp."""
@@ -155,8 +162,12 @@ class TestFormatPortfolioCompletionSimple:
 
     def test_contains_env(self, sample_portfolio_result):
         """Test contains environment name."""
-        text_dev = format_portfolio_completion_simple(sample_portfolio_result, env="dev")
-        text_prod = format_portfolio_completion_simple(sample_portfolio_result, env="prod")
+        text_dev = format_portfolio_completion_simple(
+            sample_portfolio_result, env="dev"
+        )
+        text_prod = format_portfolio_completion_simple(
+            sample_portfolio_result, env="prod"
+        )
         assert "DEV" in text_dev
         assert "PROD" in text_prod
 
@@ -215,7 +226,7 @@ class TestEdgeCases:
             total_issues_found=0,
             total_issues_fixed=0,
             portfolio_duration_seconds=100.0,
-            timestamp=datetime.now()
+            timestamp=datetime.now(),
         )
         blocks = format_portfolio_completion(result, env="dev")
         assert isinstance(blocks, list)
@@ -230,7 +241,7 @@ class TestEdgeCases:
             total_issues_found=5,
             total_issues_fixed=3,
             portfolio_duration_seconds=50.0,
-            timestamp=datetime.now()
+            timestamp=datetime.now(),
         )
         blocks = format_portfolio_completion(result, env="dev")
         assert isinstance(blocks, list)
@@ -246,7 +257,7 @@ class TestEdgeCases:
             total_issues_found=10,
             total_issues_fixed=5,
             portfolio_duration_seconds=200.0,
-            timestamp=datetime.now()
+            timestamp=datetime.now(),
         )
         blocks = format_portfolio_completion(result, env="dev")
         texts = []

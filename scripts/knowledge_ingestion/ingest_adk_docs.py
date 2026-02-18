@@ -8,14 +8,15 @@ to be used as grounding knowledge for Bob's Brain agents.
 Target Bucket: bob-vertex-agent-datastore or appropriate Vertex AI storage
 """
 
-import os
 import json
-import hashlib
-from datetime import datetime
-from typing import Dict, List, Optional
 import logging
+import os
+from datetime import datetime
+from typing import Dict
 
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+logging.basicConfig(
+    level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
+)
 logger = logging.getLogger(__name__)
 
 # ADK Documentation URLs to ingest
@@ -25,52 +26,50 @@ ADK_DOCS_URLS = [
         "url": "https://google.github.io/adk-docs/tools/",
         "category": "tools",
         "title": "ADK Tools Overview",
-        "description": "Main tools documentation for Google ADK"
+        "description": "Main tools documentation for Google ADK",
     },
     {
         "url": "https://google.github.io/adk-docs/tools/built-in-tools/",
         "category": "tools",
         "title": "ADK Built-in Tools",
-        "description": "Pre-built tools available in ADK including GoogleSearchToolset, BigQueryToolset, etc."
+        "description": "Pre-built tools available in ADK including GoogleSearchToolset, BigQueryToolset, etc.",
     },
-
     # Custom Tools Documentation
     {
         "url": "https://google.github.io/adk-docs/tools-custom/",
         "category": "custom-tools",
         "title": "ADK Custom Tools",
-        "description": "How to create custom tools for ADK agents"
+        "description": "How to create custom tools for ADK agents",
     },
     {
         "url": "https://google.github.io/adk-docs/tools-custom/function-tools/",
         "category": "custom-tools",
         "title": "ADK Function Tools",
-        "description": "Creating function-based custom tools with proper signatures"
+        "description": "Creating function-based custom tools with proper signatures",
     },
     {
         "url": "https://google.github.io/adk-docs/tools-custom/mcp-tools/",
         "category": "custom-tools",
         "title": "ADK MCP Tools",
-        "description": "Model Context Protocol tools for external integrations"
+        "description": "Model Context Protocol tools for external integrations",
     },
-
     # Google Cloud Integrations
     {
         "url": "https://google.github.io/adk-docs/tools/google-cloud/mcp-toolbox-for-databases/",
         "category": "gcp-tools",
         "title": "MCP Toolbox for Databases",
-        "description": "Database integration tools via MCP for CloudSQL, Firestore, BigQuery, etc."
+        "description": "Database integration tools via MCP for CloudSQL, Firestore, BigQuery, etc.",
     },
-
     # Additional Research Papers
     {
         "url": "https://arxiv.org/pdf/2201.11903",
         "category": "research",
         "title": "Chain-of-Thought Prompting Research",
         "description": "Research paper on chain-of-thought prompting techniques",
-        "filename": "chain_of_thought_prompting_2201.11903.pdf"
-    }
+        "filename": "chain_of_thought_prompting_2201.11903.pdf",
+    },
 ]
+
 
 def create_metadata(doc_info: Dict) -> Dict:
     """Create metadata for document storage."""
@@ -82,15 +81,20 @@ def create_metadata(doc_info: Dict) -> Dict:
         "ingestion_timestamp": datetime.utcnow().isoformat(),
         "content_hash": "",  # Will be filled after downloading
         "file_type": "pdf" if doc_info["url"].endswith(".pdf") else "html",
-        "agent_relevance": ["bob", "iam-adk", "iam-index"],  # Agents that need this knowledge
+        "agent_relevance": [
+            "bob",
+            "iam-adk",
+            "iam-index",
+        ],  # Agents that need this knowledge
         "tags": [
             "adk",
             "google-adk",
             "vertex-ai",
             "agent-development-kit",
-            doc_info["category"]
-        ]
+            doc_info["category"],
+        ],
     }
+
 
 def prepare_storage_structure():
     """Prepare the directory structure for storing documents."""
@@ -103,6 +107,7 @@ def prepare_storage_structure():
     logger.info(f"Created storage structure in {base_dir}/")
     return base_dir
 
+
 def generate_manifest():
     """Generate a manifest file for all documents to be ingested."""
     manifest = {
@@ -110,14 +115,14 @@ def generate_manifest():
         "created": datetime.utcnow().isoformat(),
         "purpose": "ADK documentation grounding for Bob's Brain agents",
         "target_bucket": "bobs-brain-knowledge",  # Using existing knowledge bucket
-        "documents": []
+        "documents": [],
     }
 
     for doc in ADK_DOCS_URLS:
         doc_entry = {
             **doc,
             "metadata": create_metadata(doc),
-            "storage_path": f"adk-docs/{doc['category']}/{doc.get('filename', doc['title'].lower().replace(' ', '_') + '.html')}"
+            "storage_path": f"adk-docs/{doc['category']}/{doc.get('filename', doc['title'].lower().replace(' ', '_') + '.html')}",
         }
         manifest["documents"].append(doc_entry)
 
@@ -127,6 +132,7 @@ def generate_manifest():
 
     logger.info(f"Generated manifest with {len(manifest['documents'])} documents")
     return manifest
+
 
 def create_download_script():
     """Create a shell script to download all documents."""
@@ -172,6 +178,7 @@ echo "3. Upload to GCS bucket: bob-vertex-agent-datastore"
     os.chmod("knowledge_store/download.sh", 0o755)
     logger.info("Created download script: knowledge_store/download.sh")
 
+
 def create_upload_script():
     """Create a script to upload documents to GCS."""
     script_content = """#!/bin/bash
@@ -206,6 +213,7 @@ echo "Documents available at: gs://$BUCKET_NAME/adk-grounding/"
     os.chmod("knowledge_store/upload_to_gcs.sh", 0o755)
     logger.info("Created upload script: knowledge_store/upload_to_gcs.sh")
 
+
 def main():
     """Main execution function."""
     logger.info("Starting ADK documentation ingestion preparation...")
@@ -221,9 +229,9 @@ def main():
     create_upload_script()
 
     # Summary
-    print("\n" + "="*60)
+    print("\n" + "=" * 60)
     print("ADK Documentation Ingestion Prepared!")
-    print("="*60)
+    print("=" * 60)
     print(f"\n📁 Storage structure created in: {base_dir}/")
     print(f"📄 Manifest with {len(manifest['documents'])} documents")
     print("📥 Download script: knowledge_store/download.sh")
@@ -235,6 +243,7 @@ def main():
     print("3. Run upload script to push to GCS")
     print("4. Configure Vertex AI Search to index the bucket")
     print("5. Wire agents to use grounded search")
+
 
 if __name__ == "__main__":
     main()

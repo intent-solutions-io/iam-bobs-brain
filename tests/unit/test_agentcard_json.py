@@ -11,18 +11,25 @@ Tests foreman (iam-senior-adk-devops-lead) and specialist (iam-adk) AgentCards.
 """
 
 import json
-import pytest
 from pathlib import Path
+
+import pytest
 
 
 def load_agentcard(agent_name: str) -> dict:
     """Load AgentCard JSON from agent directory."""
-    agentcard_path = Path(__file__).parent.parent.parent / "agents" / agent_name / ".well-known" / "agent-card.json"
+    agentcard_path = (
+        Path(__file__).parent.parent.parent
+        / "agents"
+        / agent_name
+        / ".well-known"
+        / "agent-card.json"
+    )
 
     if not agentcard_path.exists():
         pytest.skip(f"AgentCard not found for {agent_name}: {agentcard_path}")
 
-    with open(agentcard_path, "r") as f:
+    with open(agentcard_path) as f:
         return json.load(f)
 
 
@@ -52,7 +59,9 @@ class TestForemanAgentCard:
 
         assert spiffe_id.startswith("spiffe://intent.solutions/agent/")
         # SPIFFE ID uses hyphenated canonical name
-        assert "iam-senior-adk-devops-lead" in spiffe_id or "iam-orchestrator" in spiffe_id
+        assert (
+            "iam-senior-adk-devops-lead" in spiffe_id or "iam-orchestrator" in spiffe_id
+        )
 
     def test_skills_array_not_empty(self):
         """AgentCard has at least one skill defined."""
@@ -73,7 +82,9 @@ class TestForemanAgentCard:
             assert "input_schema" in skill
             assert "output_schema" in skill
 
-    @pytest.mark.xfail(reason="Contract references ($comment) not yet implemented - future feature")
+    @pytest.mark.xfail(
+        reason="Contract references ($comment) not yet implemented - future feature"
+    )
     def test_contract_references_present(self):
         """AgentCard includes $comment references to contracts in shared_contracts.py."""
         card = load_agentcard("iam_senior_adk_devops_lead")
@@ -92,8 +103,9 @@ class TestForemanAgentCard:
                 assert "shared_contracts.py" in skill["output_schema"]["$comment"]
 
         # At least the main skill should have contract references
-        assert found_input_comment or found_output_comment, \
-            "No contract references ($comment) found in skill schemas"
+        assert (
+            found_input_comment or found_output_comment
+        ), "No contract references ($comment) found in skill schemas"
 
     def test_orchestrate_workflow_skill_exists(self):
         """Primary orchestration skill is defined."""
@@ -106,7 +118,9 @@ class TestForemanAgentCard:
             "orchestrate" in sid or "workflow" in sid or "delegate" in sid
             for sid in skill_ids
         )
-        assert has_orchestration_skill, f"No orchestration skill found. Skills: {skill_ids}"
+        assert (
+            has_orchestration_skill
+        ), f"No orchestration skill found. Skills: {skill_ids}"
 
 
 class TestSpecialistAgentCard:
@@ -145,13 +159,17 @@ class TestSpecialistAgentCard:
         card = load_agentcard("iam_adk")
 
         for skill in card["skills"]:
-            assert "id" in skill  # Changed from skill_id to id for A2A v0.3.0 compliance
+            assert (
+                "id" in skill
+            )  # Changed from skill_id to id for A2A v0.3.0 compliance
             assert "name" in skill
             assert "description" in skill
             assert "input_schema" in skill
             assert "output_schema" in skill
 
-    @pytest.mark.xfail(reason="Contract references ($comment) not yet implemented - future feature")
+    @pytest.mark.xfail(
+        reason="Contract references ($comment) not yet implemented - future feature"
+    )
     def test_contract_references_present(self):
         """AgentCard includes $comment references to AnalysisReport/IssueSpec contracts."""
         card = load_agentcard("iam_adk")
@@ -166,8 +184,9 @@ class TestSpecialistAgentCard:
                     found_reference = True
                     assert "shared_contracts.py" in comment
 
-        assert found_reference, \
-            "No AnalysisReport/IssueSpec contract reference found in skill output schemas"
+        assert (
+            found_reference
+        ), "No AnalysisReport/IssueSpec contract reference found in skill output schemas"
 
     def test_check_adk_compliance_skill_exists(self):
         """Primary ADK compliance checking skill is defined."""
@@ -175,7 +194,9 @@ class TestSpecialistAgentCard:
 
         # Skill IDs use directory prefix: iam_adk.{skill}
         skill_ids = [skill["id"] for skill in card["skills"]]
-        assert "iam_adk.check_adk_compliance" in skill_ids, f"Skill not found. Skills: {skill_ids}"
+        assert (
+            "iam_adk.check_adk_compliance" in skill_ids
+        ), f"Skill not found. Skills: {skill_ids}"
 
     @pytest.mark.xfail(reason="Tags field not yet implemented - future feature")
     def test_specialist_tags(self):
@@ -189,7 +210,9 @@ class TestSpecialistAgentCard:
 class TestAgentCardConsistency:
     """Cross-agent consistency tests."""
 
-    @pytest.mark.xfail(reason="Authentication field not yet implemented - future feature")
+    @pytest.mark.xfail(
+        reason="Authentication field not yet implemented - future feature"
+    )
     def test_both_agentcards_have_authentication(self):
         """Both agents define authentication requirements."""
         foreman_card = load_agentcard("iam_senior_adk_devops_lead")
@@ -213,7 +236,9 @@ class TestAgentCardConsistency:
         assert foreman_card["dependencies"]["framework"] == "google-adk"
         assert specialist_card["dependencies"]["framework"] == "google-adk"
 
-    @pytest.mark.xfail(reason="Authorization/allowed_callers not yet implemented - future feature")
+    @pytest.mark.xfail(
+        reason="Authorization/allowed_callers not yet implemented - future feature"
+    )
     def test_specialist_can_only_be_called_by_foreman(self):
         """Specialist authorization allows only foreman to call it."""
         specialist_card = load_agentcard("iam_adk")
@@ -224,7 +249,10 @@ class TestAgentCardConsistency:
 
         # Should have at least foreman in allowed callers
         foreman_pattern = "spiffe://intent.solutions/agent/iam-senior-adk-devops-lead"
-        has_foreman_access = any(foreman_pattern in caller for caller in allowed_callers)
+        has_foreman_access = any(
+            foreman_pattern in caller for caller in allowed_callers
+        )
 
-        assert has_foreman_access, \
-            "Specialist must allow foreman (iam-senior-adk-devops-lead) in allowed_callers"
+        assert (
+            has_foreman_access
+        ), "Specialist must allow foreman (iam-senior-adk-devops-lead) in allowed_callers"

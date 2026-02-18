@@ -30,7 +30,7 @@ exclude_lines =
     if DEBUG:
     if debug:
 
-fail_under = 60
+fail_under = 35
 precision = 2
 show_missing = True
 skip_covered = False

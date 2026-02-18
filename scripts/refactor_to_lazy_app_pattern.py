@@ -10,8 +10,8 @@ Usage:
     python3 scripts/refactor_to_lazy_app_pattern.py agents/iam_issue/agent.py
 """
 
-import sys
 import re
+import sys
 from pathlib import Path
 
 
@@ -32,42 +32,46 @@ def refactor_agent_file(file_path: Path) -> None:
         # Find docstring closing and add note before it
         content = re.sub(
             r'(""")\n\nfrom google.adk',
-            r'\1\n\nLAZY-LOADING PATTERN (6774):\n'
-            r'- Uses create_agent() for lazy agent instantiation\n'
-            r'- Uses create_app() to wrap in App for Agent Engine\n'
-            r'- Exposes module-level `app` (not agent!)\n'
-            r'- No import-time validation or heavy work\n\1\n\nfrom google.adk',
-            content
+            r"\1\n\nLAZY-LOADING PATTERN (6774):\n"
+            r"- Uses create_agent() for lazy agent instantiation\n"
+            r"- Uses create_app() to wrap in App for Agent Engine\n"
+            r"- Exposes module-level `app` (not agent!)\n"
+            r"- No import-time validation or heavy work\n\1\n\nfrom google.adk",
+            content,
         )
 
     # 2. Add App to imports if not present
-    if "from google.adk import Runner" in content and "from google.adk import App" not in content:
+    if (
+        "from google.adk import Runner" in content
+        and "from google.adk import App" not in content
+    ):
         content = content.replace(
-            "from google.adk import Runner",
-            "from google.adk import App, Runner"
+            "from google.adk import Runner", "from google.adk import App, Runner"
         )
 
     # 3. Remove import-time environment validation
     # Pattern: if not PROJECT_ID: raise ValueError(...)
-    validation_pattern = r'\n# Validate required environment variables\n(?:if not \w+:\n    raise ValueError\([^\)]+\)\n)+'
+    validation_pattern = r"\n# Validate required environment variables\n(?:if not \w+:\n    raise ValueError\([^\)]+\)\n)+"
     if re.search(validation_pattern, content):
         # Add comment instead
         content = re.sub(
             validation_pattern,
-            '\n# Note: Environment validation moved to create_agent() (lazy loading)\n',
-            content
+            "\n# Note: Environment validation moved to create_agent() (lazy loading)\n",
+            content,
         )
 
     # 4. Rename get_agent() to create_agent() and add validation
     if "def get_agent() -> LlmAgent:" in content:
         # Find get_agent function and rename
-        content = content.replace("def get_agent() -> LlmAgent:", "def create_agent() -> LlmAgent:")
+        content = content.replace(
+            "def get_agent() -> LlmAgent:", "def create_agent() -> LlmAgent:"
+        )
 
         # Update docstring
         content = re.sub(
             r'(def create_agent\(\) -> LlmAgent:\n    """\n    Create and configure the LlmAgent\.)',
-            r'\1\n\n    This function is called lazily by create_app() on first use.\n    Do NOT call this at module import time.',
-            content
+            r"\1\n\n    This function is called lazily by create_app() on first use.\n    Do NOT call this at module import time.",
+            content,
         )
 
         # Add validation at start of create_agent()
@@ -75,11 +79,11 @@ def refactor_agent_file(file_path: Path) -> None:
         create_agent_match = re.search(
             r'def create_agent\(\) -> LlmAgent:.*?"""\n(    logger\.info)',
             content,
-            re.DOTALL
+            re.DOTALL,
         )
         if create_agent_match:
             # Insert validation before first logger.info
-            validation_code = '''    # ✅ Validation happens here (lazy, not at import)
+            validation_code = """    # ✅ Validation happens here (lazy, not at import)
     if not PROJECT_ID:
         raise ValueError("PROJECT_ID environment variable is required")
     if not LOCATION:
@@ -87,13 +91,19 @@ def refactor_agent_file(file_path: Path) -> None:
     if not AGENT_ENGINE_ID:
         raise ValueError("AGENT_ENGINE_ID environment variable is required")
 
-'''
-            content = content[:create_agent_match.start(1)] + validation_code + content[create_agent_match.start(1):]
+"""
+            content = (
+                content[: create_agent_match.start(1)]
+                + validation_code
+                + content[create_agent_match.start(1) :]
+            )
 
     # 5. Add create_app() function after create_agent()
     if "def create_app() -> App:" not in content:
         # Find end of create_agent() function
-        create_agent_end = re.search(r'(    return agent\n\n)\ndef create_runner', content)
+        create_agent_end = re.search(
+            r"(    return agent\n\n)\ndef create_runner", content
+        )
         if create_agent_end:
             create_app_code = '''
 def create_app() -> App:
@@ -162,7 +172,11 @@ def create_app() -> App:
 # ============================================================================
 
 '''
-            content = content[:create_agent_end.end(1)] + create_app_code + content[create_agent_end.end(1):]
+            content = (
+                content[: create_agent_end.end(1)]
+                + create_app_code
+                + content[create_agent_end.end(1) :]
+            )
 
     # 6. Mark create_runner() as DEPRECATED
     if "DEPRECATED:" not in content and "def create_runner() -> Runner:" in content:
@@ -170,12 +184,12 @@ def create_app() -> App:
         content = re.sub(
             r'def create_runner\(\) -> Runner:\n    """\n    Create Runner',
             r'def create_runner() -> Runner:\n    """\n    Create Runner',
-            content
+            content,
         )
         content = re.sub(
             r'(def create_runner\(\) -> Runner:\n    """\n    Create Runner[^\n]+\n\n)',
-            r'\1    DEPRECATED: Use create_app() instead for Agent Engine deployment.\n    This function is kept for backwards compatibility with older deployment scripts.\n\n',
-            content
+            r"\1    DEPRECATED: Use create_app() instead for Agent Engine deployment.\n    This function is kept for backwards compatibility with older deployment scripts.\n\n",
+            content,
         )
 
         # Add deprecation log
@@ -183,18 +197,21 @@ def create_app() -> App:
             r'(def create_runner\(\) -> Runner:.*?"""\n)(    logger\.info)',
             r'\1    logger.warning(\n        "⚠️  create_runner() is deprecated. Use create_app() instead.",\n        extra={"spiffe_id": AGENT_SPIFFE_ID}\n    )\n\n\2',
             content,
-            flags=re.DOTALL
+            flags=re.DOTALL,
         )
 
     # 7. Fix calls to get_agent() inside create_runner()
     content = content.replace("agent = get_agent()", "agent = create_agent()")
 
     # 8. Replace module-level root_agent with app
-    if "root_agent = get_agent()" in content or "root_agent = create_agent()" in content:
+    if (
+        "root_agent = get_agent()" in content
+        or "root_agent = create_agent()" in content
+    ):
         # Replace entire section
         content = re.sub(
-            r'# Create the root agent.*?\)\n',
-            '''# ============================================================================
+            r"# Create the root agent.*?\)\n",
+            """# ============================================================================
 # AGENT ENGINE ENTRYPOINT (6774 Pattern)
 # ============================================================================
 
@@ -207,9 +224,9 @@ logger.info(
     extra={"spiffe_id": AGENT_SPIFFE_ID}
 )
 
-''',
+""",
             content,
-            flags=re.DOTALL
+            flags=re.DOTALL,
         )
 
     # 9. Update __main__ block
@@ -219,12 +236,12 @@ logger.info(
             r'(if __name__ == "__main__":.*?)try:\n        runner = create_runner\(\)\n        logger\.info\(\n            "🚀 Agent Engine runner ready"',
             r'\1try:\n        # Use new App pattern\n        logger.info(\n            "🚀 Testing App-based deployment"',
             content,
-            flags=re.DOTALL
+            flags=re.DOTALL,
         )
 
         content = re.sub(
             r'        logger\.info\(\n            "🚀 Testing App-based deployment"[^\n]+\n        \)\n',
-            r'''        logger.info(
+            r"""        logger.info(
             "🚀 Testing App-based deployment",
             extra={"spiffe_id": AGENT_SPIFFE_ID},
         )
@@ -234,15 +251,15 @@ logger.info(
             "✅ App instance ready for Agent Engine",
             extra={"spiffe_id": AGENT_SPIFFE_ID}
         )
-''',
-            content
+""",
+            content,
         )
 
         # Update local test message
         content = re.sub(
-            r'Local test mode - Runner created but not started\.\s+In production, Agent Engine manages the runner lifecycle\.',
-            'Local test mode - App created successfully. In production, Agent Engine manages the app lifecycle.',
-            content
+            r"Local test mode - Runner created but not started\.\s+In production, Agent Engine manages the runner lifecycle\.",
+            "Local test mode - App created successfully. In production, Agent Engine manages the app lifecycle.",
+            content,
         )
 
         # Update error message

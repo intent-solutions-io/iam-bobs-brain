@@ -6,7 +6,6 @@ These tools help convert FixPlan specifications into working code with tests.
 
 import json
 import logging
-from typing import Dict, Any
 
 logger = logging.getLogger(__name__)
 
@@ -65,18 +64,17 @@ Remember:
                 "Implement code changes",
                 "Add error handling",
                 "Write unit tests",
-                "Validate compliance"
-            ]
+                "Validate compliance",
+            ],
         }
 
         return json.dumps(result)
 
     except Exception as e:
         logger.error(f"Error in implement_fix_step: {e}", exc_info=True)
-        return json.dumps({
-            "status": "error",
-            "message": f"Failed to process step: {str(e)}"
-        })
+        return json.dumps(
+            {"status": "error", "message": f"Failed to process step: {e!s}"}
+        )
 
 
 def validate_implementation(validation_data: str) -> str:
@@ -122,23 +120,24 @@ def validate_implementation(validation_data: str) -> str:
             "steps_count": len(plan_steps),
             "files_modified": len(impl_files),
             "issues": issues,
-            "recommendations": [
-                "Ensure all FixPlan steps are implemented",
-                "Remove any TODO or FIXME comments",
-                "Add comprehensive error handling",
-                "Include SPIFFE ID in all logs",
-                "Write unit tests for all changes"
-            ] if issues else []
+            "recommendations": (
+                [
+                    "Ensure all FixPlan steps are implemented",
+                    "Remove any TODO or FIXME comments",
+                    "Add comprehensive error handling",
+                    "Include SPIFFE ID in all logs",
+                    "Write unit tests for all changes",
+                ]
+                if issues
+                else []
+            ),
         }
 
         return json.dumps(result)
 
     except Exception as e:
         logger.error(f"Error in validate_implementation: {e}", exc_info=True)
-        return json.dumps({
-            "status": "error",
-            "message": f"Validation failed: {str(e)}"
-        })
+        return json.dumps({"status": "error", "message": f"Validation failed: {e!s}"})
 
 
 def generate_unit_tests(code_data: str) -> str:
@@ -162,13 +161,16 @@ def generate_unit_tests(code_data: str) -> str:
         file_path = data.get("file_path", "")
         functions = data.get("functions", [])
         classes = data.get("classes", [])
-        scenarios = data.get("test_scenarios", [])
 
         # Generate test file path
         if "agents/" in file_path:
-            test_path = file_path.replace("agents/", "tests/unit/").replace(".py", "_test.py")
+            test_path = file_path.replace("agents/", "tests/unit/").replace(
+                ".py", "_test.py"
+            )
         else:
-            test_path = f"tests/unit/{file_path.split('/')[-1].replace('.py', '_test.py')}"
+            test_path = (
+                f"tests/unit/{file_path.split('/')[-1].replace('.py', '_test.py')}"
+            )
 
         # Build test template
         test_template = f'''"""
@@ -248,18 +250,17 @@ class Test{cls}:
                 "Add edge case tests",
                 "Test error conditions",
                 "Mock external dependencies",
-                "Aim for 85%+ coverage"
-            ]
+                "Aim for 85%+ coverage",
+            ],
         }
 
         return json.dumps(result)
 
     except Exception as e:
         logger.error(f"Error in generate_unit_tests: {e}", exc_info=True)
-        return json.dumps({
-            "status": "error",
-            "message": f"Test generation failed: {str(e)}"
-        })
+        return json.dumps(
+            {"status": "error", "message": f"Test generation failed: {e!s}"}
+        )
 
 
 def check_compliance(compliance_data: str) -> str:
@@ -279,54 +280,71 @@ def check_compliance(compliance_data: str) -> str:
         data = json.loads(compliance_data)
         file_path = data.get("file_path", "")
         contents = data.get("file_contents", "")
-        component = data.get("component", "")
 
         violations = []
 
         # R1: Check for alternative frameworks
-        if any(framework in contents for framework in ["langchain", "crewai", "autogen"]):
-            violations.append({
-                "rule": "R1",
-                "description": "Alternative framework detected (must use google-adk)",
-                "severity": "critical"
-            })
+        if any(
+            framework in contents for framework in ["langchain", "crewai", "autogen"]
+        ):
+            violations.append(
+                {
+                    "rule": "R1",
+                    "description": "Alternative framework detected (must use google-adk)",
+                    "severity": "critical",
+                }
+            )
 
         # R3: Check for Runner in gateways
-        if "service/" in file_path and "Runner" in contents and "from google.adk import Runner" in contents:
-            violations.append({
-                "rule": "R3",
-                "description": "Runner import detected in gateway code",
-                "severity": "critical"
-            })
+        if (
+            "service/" in file_path
+            and "Runner" in contents
+            and "from google.adk import Runner" in contents
+        ):
+            violations.append(
+                {
+                    "rule": "R3",
+                    "description": "Runner import detected in gateway code",
+                    "severity": "critical",
+                }
+            )
 
         # R5: Check for dual memory in agents
         if "agents/" in file_path and "agent.py" in file_path:
             if "VertexAiSessionService" not in contents:
-                violations.append({
-                    "rule": "R5",
-                    "description": "Missing VertexAiSessionService",
-                    "severity": "high"
-                })
+                violations.append(
+                    {
+                        "rule": "R5",
+                        "description": "Missing VertexAiSessionService",
+                        "severity": "high",
+                    }
+                )
             if "VertexAiMemoryBankService" not in contents:
-                violations.append({
-                    "rule": "R5",
-                    "description": "Missing VertexAiMemoryBankService",
-                    "severity": "high"
-                })
+                violations.append(
+                    {
+                        "rule": "R5",
+                        "description": "Missing VertexAiMemoryBankService",
+                        "severity": "high",
+                    }
+                )
             if "after_agent_callback" not in contents:
-                violations.append({
-                    "rule": "R5",
-                    "description": "Missing after_agent_callback",
-                    "severity": "high"
-                })
+                violations.append(
+                    {
+                        "rule": "R5",
+                        "description": "Missing after_agent_callback",
+                        "severity": "high",
+                    }
+                )
 
         # R7: Check for SPIFFE ID in logs
         if "logger." in contents and "SPIFFE" not in contents:
-            violations.append({
-                "rule": "R7",
-                "description": "Logging without SPIFFE ID in extras",
-                "severity": "medium"
-            })
+            violations.append(
+                {
+                    "rule": "R7",
+                    "description": "Logging without SPIFFE ID in extras",
+                    "severity": "medium",
+                }
+            )
 
         compliance_score = 1.0 - (len(violations) / 8.0)  # 8 total rules
 
@@ -336,21 +354,24 @@ def check_compliance(compliance_data: str) -> str:
             "violations": violations,
             "checks_passed": 8 - len(violations),
             "checks_total": 8,
-            "recommendations": [
-                "Fix all critical violations immediately",
-                "Address high severity issues",
-                "Review and fix medium severity issues"
-            ] if violations else ["All compliance checks passed"]
+            "recommendations": (
+                [
+                    "Fix all critical violations immediately",
+                    "Address high severity issues",
+                    "Review and fix medium severity issues",
+                ]
+                if violations
+                else ["All compliance checks passed"]
+            ),
         }
 
         return json.dumps(result)
 
     except Exception as e:
         logger.error(f"Error in check_compliance: {e}", exc_info=True)
-        return json.dumps({
-            "status": "error",
-            "message": f"Compliance check failed: {str(e)}"
-        })
+        return json.dumps(
+            {"status": "error", "message": f"Compliance check failed: {e!s}"}
+        )
 
 
 def document_implementation(doc_data: str) -> str:
@@ -391,7 +412,7 @@ def document_implementation(doc_data: str) -> str:
 {chr(10).join(f"{i+1}. {d}" for i, d in enumerate(decisions)) if decisions else "None"}
 
 ## Known Limitations
-{chr(10).join(f"- {l}" for l in limitations) if limitations else "None"}
+{chr(10).join(f"- {item}" for item in limitations) if limitations else "None"}
 
 ## QA Testing Recommendations
 {chr(10).join(f"{i+1}. {r}" for i, r in enumerate(qa_recs)) if qa_recs else "Run standard test suite"}
@@ -412,15 +433,14 @@ def document_implementation(doc_data: str) -> str:
             "recommendations": [
                 "Include this in implementation PR",
                 "Share with QA team",
-                "Update relevant docs in 000-docs/"
-            ]
+                "Update relevant docs in 000-docs/",
+            ],
         }
 
         return json.dumps(result)
 
     except Exception as e:
         logger.error(f"Error in document_implementation: {e}", exc_info=True)
-        return json.dumps({
-            "status": "error",
-            "message": f"Documentation failed: {str(e)}"
-        })
+        return json.dumps(
+            {"status": "error", "message": f"Documentation failed: {e!s}"}
+        )

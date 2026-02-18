@@ -36,18 +36,18 @@ repo_root = Path(__file__).parent.parent
 sys.path.insert(0, str(repo_root))
 
 from agents.config.features import (
-    get_current_environment,
-    get_all_flags,
-    get_enabled_flags,
-    LIVE_RAG_BOB_ENABLED,
-    LIVE_RAG_FOREMAN_ENABLED,
-    ENGINE_MODE_FOREMAN_TO_IAM_ADK,
-    ENGINE_MODE_FOREMAN_TO_IAM_ISSUE,
-    ENGINE_MODE_FOREMAN_TO_IAM_FIX,
-    SLACK_SWE_PIPELINE_MODE_ENABLED,
     AGENT_ENGINE_BOB_NEXT_GEN_ENABLED,
     AGENT_ENGINE_BOB_NEXT_GEN_PERCENT,
     BLUE_GREEN_SHADOW_TRAFFIC_ENABLED,
+    ENGINE_MODE_FOREMAN_TO_IAM_ADK,
+    ENGINE_MODE_FOREMAN_TO_IAM_FIX,
+    ENGINE_MODE_FOREMAN_TO_IAM_ISSUE,
+    LIVE_RAG_BOB_ENABLED,
+    LIVE_RAG_FOREMAN_ENABLED,
+    SLACK_SWE_PIPELINE_MODE_ENABLED,
+    get_all_flags,
+    get_current_environment,
+    get_enabled_flags,
 )
 
 
@@ -112,7 +112,11 @@ class ARVEngineFlagsChecker:
         if self.verbose:
             print("\n📋 All Feature Flags:")
             for name, value in all_flags.items():
-                status = "✅ ENABLED" if (value is True or (isinstance(value, int) and value > 0)) else "⬜ DISABLED"
+                status = (
+                    "✅ ENABLED"
+                    if (value is True or (isinstance(value, int) and value > 0))
+                    else "⬜ DISABLED"
+                )
                 print(f"  {name}: {value} ({status})")
             print()
 
@@ -133,14 +137,18 @@ class ARVEngineFlagsChecker:
         enabled = get_enabled_flags()
 
         if env != "prod":
-            self.log_info(f"Environment is {env} (not prod) - skipping strict prod checks")
+            self.log_info(
+                f"Environment is {env} (not prod) - skipping strict prod checks"
+            )
             return True
 
         if not enabled:
             self.log_info("✅ Production is SAFE: All flags disabled")
             return True
 
-        self.log_info(f"Production has {len(enabled)} enabled flag(s): {', '.join(enabled)}")
+        self.log_info(
+            f"Production has {len(enabled)} enabled flag(s): {', '.join(enabled)}"
+        )
 
         # Check 1: RAG flags in prod
         if LIVE_RAG_BOB_ENABLED or LIVE_RAG_FOREMAN_ENABLED:
@@ -153,7 +161,11 @@ class ARVEngineFlagsChecker:
             )
 
         # Check 2: Engine mode flags in prod
-        if ENGINE_MODE_FOREMAN_TO_IAM_ADK or ENGINE_MODE_FOREMAN_TO_IAM_ISSUE or ENGINE_MODE_FOREMAN_TO_IAM_FIX:
+        if (
+            ENGINE_MODE_FOREMAN_TO_IAM_ADK
+            or ENGINE_MODE_FOREMAN_TO_IAM_ISSUE
+            or ENGINE_MODE_FOREMAN_TO_IAM_FIX
+        ):
             # Engine mode can be enabled in prod IF:
             # - Agents are deployed to Agent Engine
             # - A2A adapter is configured correctly
@@ -233,7 +245,7 @@ class ARVEngineFlagsChecker:
         # (Would need to query other environments to validate full progression)
         if env == "prod" and enabled:
             self.log_info(
-                f"Production has flags enabled - ensure they were validated in staging first"
+                "Production has flags enabled - ensure they were validated in staging first"
             )
 
         # Check canary progression
@@ -276,7 +288,11 @@ class ARVEngineFlagsChecker:
                 )
 
         # Check Agent Engine prerequisites
-        if ENGINE_MODE_FOREMAN_TO_IAM_ADK or ENGINE_MODE_FOREMAN_TO_IAM_ISSUE or ENGINE_MODE_FOREMAN_TO_IAM_FIX:
+        if (
+            ENGINE_MODE_FOREMAN_TO_IAM_ADK
+            or ENGINE_MODE_FOREMAN_TO_IAM_ISSUE
+            or ENGINE_MODE_FOREMAN_TO_IAM_FIX
+        ):
             # Would need to check if agents are deployed to Agent Engine
             # For now, just log info
             self.log_info(
