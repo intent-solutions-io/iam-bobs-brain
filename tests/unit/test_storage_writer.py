@@ -22,10 +22,14 @@ if repo_root not in sys.path:
 # This ensures relative imports work correctly
 # Skip entire module if dependencies (google-cloud-storage, etc.) are unavailable
 try:
+    from agents import iam_senior_adk_devops_lead as _parent_module
     from agents.iam_senior_adk_devops_lead import storage_writer
     from agents.shared_contracts import PerRepoResult, PortfolioResult
 
-    # Register the module under the path that @patch decorators expect
+    # Register the parent module and submodule under the paths that @patch decorators expect.
+    # Both are needed so unittest.mock can resolve dotted paths like
+    # "iam_senior_adk_devops_lead.storage_writer.GCS_AVAILABLE".
+    sys.modules["iam_senior_adk_devops_lead"] = _parent_module
     sys.modules["iam_senior_adk_devops_lead.storage_writer"] = storage_writer
 except Exception:
     pytest.skip(
