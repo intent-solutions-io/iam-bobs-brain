@@ -28,6 +28,7 @@ try:
 
     GCS_AVAILABLE = True
 except Exception:
+    storage = None  # type: ignore[assignment]
     GCS_AVAILABLE = False
 
 # Import config helpers
