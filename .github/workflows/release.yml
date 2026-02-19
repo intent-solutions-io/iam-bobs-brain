@@ -100,9 +100,9 @@ jobs:
         run: |
           PREV="${{ steps.prev.outputs.prev }}"
           PREV="${PREV#v}"
-          IFS=. read -r MA MI PA <<EOF
-          $PREV
-EOF
+          MA=$(echo "$PREV" | cut -d. -f1)
+          MI=$(echo "$PREV" | cut -d. -f2)
+          PA=$(echo "$PREV" | cut -d. -f3)
           case "${{ steps.bump.outputs.type }}" in
             major) MA=$((MA+1)); MI=0; PA=0 ;;
             minor) MI=$((MI+1)); PA=0 ;;
