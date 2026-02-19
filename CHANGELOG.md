@@ -1,3 +1,48 @@
+# Release v2.1.0
+
+**Release Date**: 2026-02-19
+
+## Changes since v2.0.0
+
+- chore: release v2.1.0 [skip ci] (4f4667c)
+- chore: audit scripts, archive dead code, fix release.yml, update CLAUDE.md (3d1bf78)
+- fix(ci): resolve pre-existing lint and test failures (#64) (f37aff5)
+- fix(ci): resolve empty PROJECT_ID in inline deploy workflow (fbcfe06)
+- feat: testing harness, CI gates, and stub providers (#62) (894cf48)
+- merge: resolve doc conflicts with main (accept main's versions) (2ba11ed)
+- fix(tests): address minor review feedback from CodeRabbit and Gemini (4915ef4)
+- fix(tests): deepcopy stub responses, move TESTING.md to 000-docs (R6) (81b722c)
+- fix(ci): make pip-audit blocking, mark bandit non-blocking for pre-existing findings (8caa2a0)
+- fix(ci): switch to ruff, fix coverage module, add pip-audit (0806842)
+- feat(tests): add A2AResult factory and new conftest fixtures (f9b459d)
+- feat(tests): add stub providers for LLM, Agent Engine, and HTTP replay (5857968)
+- fix: close 4 risk tier enforcement gaps in policy gates and dispatcher (#61) (9d72047)
+- docs(000-docs): add language identifier to fenced code block (4de2953)
+- docs(000-docs): fix canonical document count (28 → 29), add missing inventory doc (68a87bc)
+- docs(000-docs): fix remaining 6767 references flagged by CodeRabbit (78c4838)
+- docs(000-docs): fix repetitive document headers and stale catalog refs (414dfa2)
+- docs(changelog): add unreleased section for recent changes (4cc3e71)
+- docs(claude): update all 6767 references to 000-* prefix (doc-filing v4.3) (5fcbdb2)
+- docs(readme): fix identity crisis, update to doc-filing v4.3 references (e9a7076)
+- docs(000-docs): migrate 28 canonical files from 6767-* to 000-* prefix (doc-filing v4.3) (1dac271)
+- docs(claude): fix incorrect make targets, add test infra and service layout (f0ab79d)
+- docs(claude): improve CLAUDE.md with better test commands and agent creation guide (0071bb0)
+- test(iam): add comprehensive test coverage for all IAM specialists (#58) (4bf296b)
+- test(iam): add comprehensive test coverage for all IAM specialists (e192a70)
+- feat: agent callback updates and mission spec skill_id support (#57) (93c45de)
+- Merge pull request #56 from intent-solutions-io/fix/readme-alignment (02bbbfc)
+- docs(readme): align with v2.0.0 changes and fix issues (ee76087)
+- Merge pull request #55 from intent-solutions-io/feature/enable-mcp-deployment (0d00f68)
+- test: fix test warnings and failures (83d6e6b)
+- feat(infra): add MCP server config to staging/prod tfvars (7993ac4)
+- fix(tests): cleanup broken tests and fix skill ID field (#54) (4078b8f)
+- feat(a2a): implement Phase H+ async A2A dispatch (#53) (e982160)
+- feat: Phase H - Universal Autonomous AI Crew (#52) (56ba6a3)
+- docs(readme): update for v2.0.0 Vision Alignment GA (7e87208)
+- bd sync: 2026-01-03 01:25:49 (5c30c59)
+
+---
+
 # Changelog
 
 All notable changes to this project will be documented in this file.
