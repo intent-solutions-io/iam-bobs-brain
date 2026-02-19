@@ -31,11 +31,10 @@ This is the **live** guide for Claude Code when working in the `bobs-brain` repo
 
 ## 📋 TL;DR for DevOps (Quick Reference)
 
-**Current Status (v2.0.0 - Vision Alignment GA):**
-- **Version**: v2.0.0 – Enterprise Controls + ADK Compliance Department
-- **Phase**: Vision Alignment Complete (Phases D, E, F, G)
+**Current Status (v6.1.0):**
+- **Version**: v6.1.0
 - **Deployment**: Infrastructure ready, Terraform + GitHub Actions for all deployments (R4 compliance)
-- **New in v2.0.0**: Canonical agent IDs, enterprise controls, Mission Spec v1
+- **Key milestones**: Canonical agent IDs, enterprise controls, Mission Spec v1, testing harness, CI gates
 
 **Key Documents:**
 - **Standards Catalog**: `000-docs/000-DR-INDEX-bobs-brain-standards-catalog.md` (START HERE for all canonical standards)
@@ -238,10 +237,19 @@ agents/
 ├── iam_qa/                       # Tier 3: QA validator
 ├── iam_doc/                      # Tier 3: Documentation writer
 ├── iam_cleanup/                  # Tier 3: Repo cleanup
-└── iam_index/                    # Tier 3: Knowledge indexing
-
-shared_tools/                     # Shared tool implementations
-shared_contracts/                 # JSON schemas for agent communication
+├── iam_index/                    # Tier 3: Knowledge indexing
+│
+├── a2a/                          # A2A protocol implementation
+├── agent_engine/                 # Agent Engine integration/config
+├── arv/                          # Agent Readiness Verification
+├── config/                       # Configuration management
+├── mission_spec/                 # Mission Spec workflow engine
+├── notifications/                # Notification system
+├── tools/                        # Shared utility tools
+├── utils/                        # Utility functions
+├── workflows/                    # Workflow management
+├── shared_tools/                 # Shared tool implementations
+└── shared_contracts/             # JSON schemas for agent communication
 
 service/                          # Cloud Run gateway proxies (R3: no Runner here)
 ├── slack_webhook/                # Slack events → Agent Engine REST API
@@ -447,6 +455,9 @@ Each agent also needs:
 **Pytest markers** (use with `-m` flag):
 - `unit` - Fast tests, no external dependencies
 - `integration` - May require GCP/Agent Engine
+- `e2e` - End-to-end tests (critical user workflows)
+- `smoke` - Smoke tests (post-deploy health checks)
+- `contract` - Contract tests (schema and A2A validation)
 - `slack` - Requires Slack webhook
 - `slow` - Tests taking >5 seconds
 - `mcp` - MCP server tests
@@ -608,19 +619,14 @@ ls 000-docs/127-*
 
 ## 5. Changelog / Maintenance
 
-**Last Update:** 2026-02-13
+**Last Update:** 2026-02-19
 
 **Recent Changes:**
-- **Doc-Filing v4.3 Migration**: All 28 `6767-*` canonical docs renamed to `000-*` prefix
-- **Identity Alignment**: README/CLAUDE.md updated to reflect ADK compliance focus (not "general-purpose orchestrator")
-- **Vision Alignment GA (v2.0.0)**: Enterprise controls + ADK compliance department
-  - **Phase D**: Canonical agent identity system with backwards-compatible aliases
-  - **Phase E**: Enterprise controls (risk tiers R0-R4, policy gates, evidence bundles)
-  - **Phase F**: Mission Spec v1 (declarative workflow-as-code)
-  - **Phase G**: GA finalization, docs 252-257, 260 (AAR)
-  - 103 new unit tests (303 total)
-- **New Standards**: 252 (Agent Identity), 253 (Mandates), 254 (Policy Gates), 255 (Evidence), 257 (Mission Spec)
-- Previous: Phase 26 (v0.14.0) - Repository cleanup, branch archival
+- **v6.1.0**: Scripts audit and cleanup — archived 11 dead/superseded/migration scripts, fixed Makefile targets, updated CLAUDE.md accuracy
+- **v6.1.0**: CI lint and test fixes (PR #64) — storage_writer skip guards, coverage threshold, mypy continue-on-error
+- **v5.0.0-sovereign**: Testing harness, CI gates, nox multi-version testing
+- **v2.0.0**: Vision Alignment GA — enterprise controls, canonical agent IDs, Mission Spec v1
+- **Standards**: 252 (Agent Identity), 253 (Mandates), 254 (Policy Gates), 255 (Evidence), 257 (Mission Spec)
 
 **Maintenance Policy:**
 - **DON'T overcrowd CLAUDE.md** - it's a pointer doc, not a knowledge base
