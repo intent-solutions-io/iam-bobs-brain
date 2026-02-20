@@ -238,7 +238,7 @@ agents/
 ├── iam_doc/                      # Tier 3: Documentation writer
 ├── iam_cleanup/                  # Tier 3: Repo cleanup
 ├── iam_index/                    # Tier 3: Knowledge indexing
-│
+│                                 # --- Infrastructure/utility directories ---
 ├── a2a/                          # A2A protocol implementation
 ├── agent_engine/                 # Agent Engine integration/config
 ├── arv/                          # Agent Readiness Verification
