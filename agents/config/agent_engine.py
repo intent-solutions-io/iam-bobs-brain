@@ -17,7 +17,7 @@ Environment Variables:
 - AGENT_ENGINE_FOREMAN_ID_DEV: Foreman's Engine ID in dev
 - AGENT_ENGINE_BOB_ID_STAGING: Bob's Engine ID in staging
 - AGENT_ENGINE_BOB_ID_PROD: Bob's Engine ID in prod
-- (Additional agents: AGENT_ENGINE_{AGENT}_{ENV})
+- (Additional agents: AGENT_ENGINE_{AGENT}_ID_{ENV})
 
 Related Docs:
 - 000-docs/6767-101-AT-ARCH-agent-engine-topology-and-envs.md
@@ -120,7 +120,7 @@ def get_agent_engine_id(
     Get Agent Engine ID for a specific agent role and environment.
 
     Checks environment variables in this order:
-    1. AGENT_ENGINE_{AGENT}_{ENV} (e.g., AGENT_ENGINE_BOB_DEV)
+    1. AGENT_ENGINE_{AGENT}_ID_{ENV} (e.g., AGENT_ENGINE_BOB_ID_DEV)
     2. Falls back to hardcoded defaults for known agents
 
     Args:
@@ -131,7 +131,7 @@ def get_agent_engine_id(
         Engine ID or None if not configured
 
     Examples:
-        >>> os.environ["AGENT_ENGINE_BOB_DEV"] = "12345"
+        >>> os.environ["AGENT_ENGINE_BOB_ID_DEV"] = "12345"
         >>> get_agent_engine_id("bob", "dev")
         "12345"
 
@@ -143,7 +143,7 @@ def get_agent_engine_id(
 
     # Normalize agent role for env var (replace dashes with underscores, uppercase)
     agent_var_name = agent_role.replace("-", "_").upper()
-    env_var_name = f"AGENT_ENGINE_{agent_var_name}_{env.upper()}"
+    env_var_name = f"AGENT_ENGINE_{agent_var_name}_ID_{env.upper()}"
 
     engine_id = _get_env_var(env_var_name)
     if engine_id:
@@ -237,7 +237,7 @@ def build_agent_config(
         AgentEngineConfig if engine ID is configured, None otherwise
 
     Examples:
-        >>> os.environ["AGENT_ENGINE_BOB_DEV"] = "12345"
+        >>> os.environ["AGENT_ENGINE_BOB_ID_DEV"] = "12345"
         >>> config = build_agent_config("bob", "dev")
         >>> print(config.get_full_resource_name())
         "projects/my-project/locations/us-central1/reasoningEngines/12345"
@@ -401,7 +401,7 @@ def validate_config(env: Optional[Environment] = None) -> None:
     if not configured_agents:
         raise ValueError(
             f"No agents configured for {env} environment. "
-            f"Set at least AGENT_ENGINE_BOB_{env.upper()} environment variable."
+            f"Set at least AGENT_ENGINE_BOB_ID_{env.upper()} environment variable."
         )
 
     print(f"✅ Agent Engine configuration valid for {env}")
@@ -448,7 +448,7 @@ if __name__ == "__main__":
         print(f"  No agents configured for {env} environment")
         print()
         print("  Set environment variables like:")
-        print(f"    export AGENT_ENGINE_BOB_{env.upper()}=your-engine-id")
+        print(f"    export AGENT_ENGINE_BOB_ID_{env.upper()}=your-engine-id")
     else:
         for role, config in agents.items():
             print(f"  {role}:")
