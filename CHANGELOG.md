@@ -1,3 +1,14 @@
+# Release v2.1.1
+
+**Release Date**: 2026-02-20
+
+## Changes since v2.1.0
+
+- chore: release v2.1.1 [skip ci] (f3745d9)
+- fix: address PR #65 review feedback (#66) (66ed03d)
+
+---
+
 # Release v2.1.0
 
 **Release Date**: 2026-02-19
