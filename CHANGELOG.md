@@ -1,3 +1,14 @@
+# Release v2.1.2
+
+**Release Date**: 2026-02-20
+
+## Changes since v2.1.1
+
+- chore: release v2.1.2 [skip ci] (12d6011)
+- fix(config): align AGENT_ENGINE env var convention to _ID_ pattern (#67) (e1b3efe)
+
+---
+
 # Release v2.1.1
 
 **Release Date**: 2026-02-20
