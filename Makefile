@@ -432,7 +432,7 @@ deploy-inline-staging-execute: check-inline-deploy-ready ## MANUAL ONLY: Execute
 
 smoke-bob-agent-engine-dev: ## Run dev smoke test against Bob's Agent Engine instance
 	@echo "$(BLUE)🚦 Running Bob Agent Engine dev smoke test...$(NC)"
-	@echo "$(YELLOW)ℹ️  Requires AGENT_ENGINE_BOB_DEV to be set after dev deployment$(NC)"
+	@echo "$(YELLOW)ℹ️  Requires AGENT_ENGINE_BOB_ID_DEV to be set after dev deployment$(NC)"
 	@$(PYTHON) scripts/run_agent_engine_dev_smoke.py
 	@echo ""
 

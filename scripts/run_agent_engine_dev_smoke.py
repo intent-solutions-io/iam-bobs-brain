@@ -15,7 +15,7 @@ This is a DEV-ONLY smoke test. It validates that:
 
 Requirements:
 - DEPLOYMENT_ENV=dev
-- AGENT_ENGINE_BOB_DEV set (or another agent configured)
+- AGENT_ENGINE_BOB_ID_DEV set (or another agent configured)
 - GCP Application Default Credentials (gcloud auth application-default login)
 - Agent Engine deployed and accessible
 
@@ -130,7 +130,7 @@ async def run_smoke_test(
         )
         print("   To configure:")
         print(
-            f"     export AGENT_ENGINE_{agent_role.replace('-', '_').upper()}_DEV=your-engine-id"
+            f"     export AGENT_ENGINE_{agent_role.replace('-', '_').upper()}_ID_DEV=your-engine-id"
         )
         print()
         print("✅ Smoke test completed (agent not configured - non-blocking)")
