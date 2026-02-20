@@ -1,3 +1,14 @@
+# Release v2.1.3
+
+**Release Date**: 2026-02-20
+
+## Changes since v2.1.2
+
+- chore: release v2.1.3 [skip ci] (04932e1)
+- fix(docs): update stale env var and script refs in standards doc (#68) (a6b10b7)
+
+---
+
 # Release v2.1.2
 
 **Release Date**: 2026-02-20
