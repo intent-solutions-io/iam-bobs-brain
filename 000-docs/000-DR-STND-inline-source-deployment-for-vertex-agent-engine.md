@@ -507,20 +507,20 @@ Phase 5 establishes the **smoke test validation** for deployed Agent Engine inst
 
 ### Smoke Test Script
 
-**Location**: `scripts/smoke_test_bob_agent_engine_dev.py`
+**Location**: `scripts/run_agent_engine_dev_smoke.py`
 
 **Purpose**: Validates that the inline-deployed Bob agent on Vertex AI Agent Engine is responding correctly to basic health check queries.
 
 **Requirements**:
 - Run AFTER a successful dev deployment via inline source
-- Requires `BOB_AGENT_ENGINE_NAME_DEV` environment variable set to full Agent Engine resource name
+- Requires `AGENT_ENGINE_BOB_ID_DEV` environment variable set to the Agent Engine ID
 - Uses Vertex AI Agent Engine SDK for connectivity
 
 **Environment Variables**:
 ```bash
 export GCP_PROJECT_ID=your-project-id
 export GCP_LOCATION=us-central1  # Optional, defaults to us-central1
-export BOB_AGENT_ENGINE_NAME_DEV=projects/YOUR_PROJECT/locations/us-central1/reasoningEngines/YOUR_AGENT_ID
+export AGENT_ENGINE_BOB_ID_DEV=YOUR_AGENT_ENGINE_ID
 ```
 
 **Smoke Test Flow**:
@@ -539,7 +539,7 @@ export BOB_AGENT_ENGINE_NAME_DEV=projects/YOUR_PROJECT/locations/us-central1/rea
 **Usage**:
 ```bash
 # Direct execution
-python scripts/smoke_test_bob_agent_engine_dev.py
+python scripts/run_agent_engine_dev_smoke.py --agent bob
 
 # Via Makefile (recommended)
 make smoke-bob-agent-engine-dev
@@ -580,7 +580,7 @@ make smoke-bob-agent-engine-dev
    - `gcp_location`: us-central1 (default)
 5. Monitor workflow execution
 6. Copy Agent Engine resource name from workflow output
-7. Set `BOB_AGENT_ENGINE_NAME_DEV` environment variable
+7. Set `AGENT_ENGINE_BOB_ID_DEV` environment variable
 8. Run smoke test: `make smoke-bob-agent-engine-dev`
 
 **Workflow Guards**:
@@ -612,7 +612,7 @@ make deploy-inline-dev-execute
 1. Copy Agent Engine resource name from deployment output
 2. Set environment variable:
    ```bash
-   export BOB_AGENT_ENGINE_NAME_DEV=projects/.../locations/.../reasoningEngines/...
+   export AGENT_ENGINE_BOB_ID_DEV=your-engine-id
    ```
 3. Run smoke test:
    ```bash
@@ -624,7 +624,7 @@ make deploy-inline-dev-execute
 **Checklist**:
 - [ ] Deployment succeeded (Agent Engine resource created)
 - [ ] Agent resource name captured
-- [ ] `BOB_AGENT_ENGINE_NAME_DEV` environment variable set
+- [ ] `AGENT_ENGINE_BOB_ID_DEV` environment variable set
 - [ ] Smoke test executed: `make smoke-bob-agent-engine-dev`
 - [ ] Smoke test result: PASS
 - [ ] Agent Engine console shows agent as active
@@ -643,9 +643,9 @@ make deploy-inline-dev-execute
 
 **Smoke Test Failures**:
 
-1. **"Missing required environment variable: BOB_AGENT_ENGINE_NAME_DEV"**
-   - Cause: Environment variable not set
-   - Fix: Export variable with full Agent Engine resource name
+1. **"Agent not configured"**
+   - Cause: `AGENT_ENGINE_BOB_ID_DEV` environment variable not set
+   - Fix: `export AGENT_ENGINE_BOB_ID_DEV=your-engine-id`
 
 2. **"Failed to connect to agent"**
    - Cause: Invalid resource name or agent not deployed
@@ -683,7 +683,7 @@ Phase 5 adds smoke test validation and dev deployment documentation:
 ### References
 
 **Scripts**:
-- Smoke Test: `scripts/smoke_test_bob_agent_engine_dev.py`
+- Smoke Test: `scripts/run_agent_engine_dev_smoke.py`
 - Deploy: `agents/agent_engine/deploy_inline_source.py`
 - ARV Check: `scripts/check_inline_deploy_ready.py`
 
