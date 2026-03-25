@@ -468,12 +468,12 @@ gh workflow run portfolio-swe.yml \
 - ✅ Multi-repo ARV checks
 - ✅ Automated audits (nightly at 2 AM UTC)
 - ✅ JSON/Markdown export
-- ✅ GCS storage for historical results (v2.1.4+)
+- ✅ GCS storage for historical results (v2.1.5+)
 - 📐 Slack notifications (coming soon)
 - 📐 GitHub issue creation (coming soon)
 
 **Roadmap:**
-- **LIVE1-GCS (v2.1.4):** ✅ Complete - GCS org-wide storage
+- **LIVE1-GCS (v2.1.5):** ✅ Complete - GCS org-wide storage
 - **LIVE-BQ (Future):** BigQuery analytics integration
 - **LIVE2 (Planned):** Vertex AI Search RAG + Agent Engine calls (dev-only)
 - **LIVE3 (Planned):** Slack notifications + GitHub issue creation
@@ -482,7 +482,7 @@ gh workflow run portfolio-swe.yml \
 
 ## 🗄️ Org-Wide Storage
 
-**New in v2.1.4** - All your portfolio audit results stored in one place for easy querying and analytics.
+**New in v2.1.5** - All your portfolio audit results stored in one place for easy querying and analytics.
 
 ### What It Does
 
@@ -987,9 +987,9 @@ gcloud ai agent-engines list --region=us-central1
 
 ## 📊 Project Status
 
-**Current Version:** v2.1.4 – Vision Alignment GA (Enterprise Controls + ADK Compliance Department)
+**Current Version:** v2.1.5 – Vision Alignment GA (Enterprise Controls + ADK Compliance Department)
 
-**What's New in v2.1.4:**
+**What's New in v2.1.5:**
 - ✅ **Canonical Agent IDs**: `bob`, `iam-orchestrator`, `iam-compliance`, etc. with backwards-compatible aliases
 - ✅ **Enterprise Controls**: Risk tiers R0-R4, policy gates, tool allowlists
 - ✅ **Evidence Bundles**: Complete audit trails with manifest + hashing
@@ -1011,7 +1011,7 @@ gcloud ai agent-engines list --region=us-central1
 - ✅ 8 specialist agents (iam-compliance, iam-triage, iam-planner, etc.)
 - ✅ Canonical doc suite (28 standards, now 000-* prefix)
 
-**Standards (v2.1.4):**
+**Standards (v2.1.5):**
 - `252-DR-STND-agent-identity-standard.md` - Canonical IDs
 - `253-DR-STND-mandates-budgets-approvals.md` - Enterprise controls
 - `254-DR-STND-policy-gates-risk-tiers.md` - R0-R4 enforcement
@@ -1027,7 +1027,7 @@ gcloud ai agent-engines list --region=us-central1
 
 ---
 
-## 🔧 What Was Wrong and What We Fixed (v2.1.4)
+## 🔧 What Was Wrong and What We Fixed (v2.1.5)
 
 Before Hard Mode, Bob's Brain had typical agent repo problems:
 
