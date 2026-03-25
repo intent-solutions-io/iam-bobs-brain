@@ -1,3 +1,14 @@
+# Release v2.1.4
+
+**Release Date**: 2026-03-25
+
+## Changes since v2.1.3
+
+- chore: release v2.1.4 [skip ci] (26376f4)
+- chore: add GitHub Sponsors funding button (cdef547)
+
+---
+
 # Release v2.1.3
 
 **Release Date**: 2026-02-20
