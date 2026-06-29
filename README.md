@@ -1,5 +1,16 @@
 # 🤖 Bob's Brain
 
+> ## ❄️ FROZEN — v1 (ADK era). Superseded by [`bobs-brain-v2`](https://github.com/jeremylongshore/bobs-brain-v2).
+>
+> This repository is the **v1 reference artifact**: a production-grade Google **ADK + Vertex AI
+> Agent Engine** agent department. Its Hard Mode constitution (R1 ADK-only, R2 Vertex runtime,
+> R5 Vertex memory) *mandates* Google. It is preserved as honest evidence of the ADK era and is
+> **no longer under active development**.
+>
+> The successor — **[`bobs-brain-v2`](https://github.com/jeremylongshore/bobs-brain-v2)** — is a
+> greenfield, **BYOK any-provider, zero-Google-by-default** governed agent (Pydantic AI + LiteLLM),
+> governed by the Intent Eval Platform attestation kernel. New work happens there.
+
 <div align="center">
 
 [![Python 3.12+](https://img.shields.io/badge/python-3.12+-blue.svg)](https://www.python.org/downloads/)
