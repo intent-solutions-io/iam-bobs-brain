@@ -1,3 +1,14 @@
+# Release v2.1.6
+
+**Release Date**: 2026-07-15
+
+## Changes since v2.1.5
+
+- chore: release v2.1.6 [skip ci] (b880f8a)
+- docs: Intent Agent Model (IAM) naming — Bob ADK runtime (87559c1)
+
+---
+
 # Release v2.1.5
 
 **Release Date**: 2026-03-25
