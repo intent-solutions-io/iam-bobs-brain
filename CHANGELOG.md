@@ -108,6 +108,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Changed
+- **Repository renamed** into the Intent Agent Model (IAM) Bob family taxonomy on GitHub.
+  IAM = Intent Agent Model (not Identity and Access Management). GitHub redirects from the former name remain active.
+
+
+### Changed
 
 - **Doc-Filing v4.3 Migration**: Renamed all 28 `6767-*` canonical docs to `000-*` prefix
 - **Identity Alignment**: Updated README and CLAUDE.md to accurately describe ADK/Vertex compliance department (not "general-purpose orchestrator")

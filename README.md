@@ -1,5 +1,18 @@
 # 🤖 Bob's Brain
 
+> **Intent Agent Model (IAM)** — *not* Identity and Access Management.  
+> Bob is the **reference implementation family** for IAM. These repos are different **runtimes** of the same model, not separate products.
+>
+> | Repo | Runtime | Status |
+> |------|---------|--------|
+> | [`iam-bob-adk`](https://github.com/jeremylongshore/iam-bob-adk) | Google ADK | Historical V1 |
+> | [`iam-bob-pydantic`](https://github.com/jeremylongshore/iam-bob-pydantic) | Pydantic AI + LiteLLM (BYOK, MCP) | Historical V2 |
+> | [`iam-bob-langgraph`](https://github.com/jeremylongshore/iam-bob-langgraph) | LangGraph | Reserved (not built) |
+> | [`iam-bob-intendant`](https://github.com/jeremylongshore/iam-bob-intendant) | Operational worker (AGP-composed) | Live automation |
+>
+> **Formerly** `jeremylongshore/iam-bob-adk` (GitHub redirects).
+
+
 <div align="center">
 
 [![Python 3.12+](https://img.shields.io/badge/python-3.12+-blue.svg)](https://www.python.org/downloads/)
