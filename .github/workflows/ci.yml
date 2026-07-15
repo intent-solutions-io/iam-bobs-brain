@@ -177,7 +177,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: ['3.10', '3.11']
+        python-version: ['3.11', '3.12']
 
     steps:
       - uses: actions/checkout@v4
@@ -208,7 +208,7 @@ jobs:
           OTEL_TRACES_EXPORTER: none
 
       - name: Enforce coverage threshold (>= 35%)
-        if: matrix.python-version == '3.11'
+        if: matrix.python-version == '3.12'
         run: |
           coverage report --fail-under=35
 
@@ -220,7 +220,7 @@ jobs:
           BOB_STUB_EXTERNAL: "1"
 
       - name: Upload coverage
-        if: matrix.python-version == '3.11'
+        if: matrix.python-version == '3.12'
         uses: codecov/codecov-action@v4
         with:
           file: ./coverage.xml
