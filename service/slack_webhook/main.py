@@ -17,6 +17,7 @@ Environment Variables:
 - LOCATION: GCP region
 - AGENT_ENGINE_ID: Agent Engine instance ID
 - PORT: Service port (default 8080)
+- BIND_HOST: Direct-execution bind host (default 127.0.0.1; containers set theirs)
 - SLACK_SWE_PIPELINE_MODE: Routing mode (local|engine) - Phase AE2
 - A2A_GATEWAY_URL: A2A gateway URL (for engine mode) - Phase AE2
 """
@@ -45,6 +46,7 @@ PROJECT_ID = os.getenv("PROJECT_ID")
 LOCATION = os.getenv("LOCATION")
 AGENT_ENGINE_ID = os.getenv("AGENT_ENGINE_ID")
 PORT = int(os.getenv("PORT", "8080"))
+BIND_HOST = os.getenv("BIND_HOST", "127.0.0.1")
 
 # A2A Gateway URL (SLACK-ENDTOEND-DEV: S2)
 # Preferred routing: Slack → a2a_gateway → Agent Engine
@@ -463,4 +465,4 @@ if __name__ == "__main__":
         },
     )
 
-    uvicorn.run(app, host="0.0.0.0", port=PORT, log_level="info")
+    uvicorn.run(app, host=BIND_HOST, port=PORT, log_level="info")

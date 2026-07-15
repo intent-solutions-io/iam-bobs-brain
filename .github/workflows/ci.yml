@@ -13,7 +13,7 @@ name: CI - Hard Mode
 # - Code quality, tests, security, Terraform, docs, structure
 #
 # Deployment workflows MUST depend on this workflow's success.
-# Badge: [![CI](https://github.com/jeremylongshore/bobs-brain/workflows/CI%20-%20Hard%20Mode/badge.svg)](https://github.com/jeremylongshore/bobs-brain/actions/workflows/ci.yml)
+# Badge: [![CI](https://github.com/jeremylongshore/iam-bob-adk/workflows/CI%20-%20Hard%20Mode/badge.svg)](https://github.com/jeremylongshore/iam-bob-adk/actions/workflows/ci.yml)
 
 on:
   push:
@@ -177,7 +177,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: ['3.10', '3.11']
+        python-version: ['3.11', '3.12']
 
     steps:
       - uses: actions/checkout@v4
@@ -208,7 +208,7 @@ jobs:
           OTEL_TRACES_EXPORTER: none
 
       - name: Enforce coverage threshold (>= 35%)
-        if: matrix.python-version == '3.11'
+        if: matrix.python-version == '3.12'
         run: |
           coverage report --fail-under=35
 
@@ -220,7 +220,7 @@ jobs:
           BOB_STUB_EXTERNAL: "1"
 
       - name: Upload coverage
-        if: matrix.python-version == '3.11'
+        if: matrix.python-version == '3.12'
         uses: codecov/codecov-action@v4
         with:
           file: ./coverage.xml
@@ -244,7 +244,6 @@ jobs:
 
       - name: Run Bandit security scan
         run: bandit -r agents/ service/ -ll -i
-        continue-on-error: true  # Pre-existing findings in agents/service; TODO: fix and make blocking
 
       - name: Audit dependencies for vulnerabilities
         run: pip-audit --strict

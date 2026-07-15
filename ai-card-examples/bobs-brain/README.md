@@ -2,7 +2,7 @@
 
 **Status:** Production-grade multi-agent system  
 **Tech Stack:** Google ADK 1.18.0, Vertex AI Agent Engine, A2A Protocol 0.3.0  
-**Repository:** https://github.com/jeremylongshore/bobs-brain
+**Repository:** https://github.com/jeremylongshore/iam-bob-adk
 
 ---
 
@@ -135,7 +135,7 @@ spiffe://intent.solutions/agent/bobs-brain/prod/us-central1/0.12.0
 
 ## Links
 
-- **Repository:** https://github.com/jeremylongshore/bobs-brain
+- **Repository:** https://github.com/jeremylongshore/iam-bob-adk
 - **Documentation:** See `000-docs/` directory
 - **Master Index:** `000-docs/6767-DR-INDEX-bobs-brain-standards-catalog.md`
 - **Hard Mode Spec:** `000-docs/6767-DR-STND-adk-agent-engine-spec-and-hardmode-rules.md`

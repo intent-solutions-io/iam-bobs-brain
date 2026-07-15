@@ -343,6 +343,6 @@ agents/iam-adk/
 ## Contact
 
 - **Owner:** iam-senior-adk-devops-lead
-- **Repository:** https://github.com/jeremylongshore/bobs-brain
+- **Repository:** https://github.com/jeremylongshore/iam-bob-adk
 - **Version:** 0.8.0
 - **Last Updated:** 2025-11-19

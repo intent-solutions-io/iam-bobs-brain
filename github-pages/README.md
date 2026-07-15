@@ -52,15 +52,15 @@ The version badge is currently hardcoded to `v0.9.0`. When updating the VERSION 
 
 All links point to the current repository structure:
 
-- **GitHub Repository:** https://github.com/jeremylongshore/bobs-brain
-- **Documentation:** https://github.com/jeremylongshore/bobs-brain/tree/main/000-docs
-- **README:** https://github.com/jeremylongshore/bobs-brain/blob/main/README.md
-- **CLAUDE.md:** https://github.com/jeremylongshore/bobs-brain/blob/main/CLAUDE.md
-- **CHANGELOG:** https://github.com/jeremylongshore/bobs-brain/blob/main/CHANGELOG.md
-- **DevOps Playbook:** https://github.com/jeremylongshore/bobs-brain/blob/main/000-docs/120-AA-AUDT-appaudit-devops-playbook.md
-- **LIVE3 Guide:** https://github.com/jeremylongshore/bobs-brain/blob/main/000-docs/121-DR-GUIDE-live3-dev-smoke-test.md
-- **Issues:** https://github.com/jeremylongshore/bobs-brain/issues
-- **License:** https://github.com/jeremylongshore/bobs-brain/blob/main/LICENSE
+- **GitHub Repository:** https://github.com/jeremylongshore/iam-bob-adk
+- **Documentation:** https://github.com/jeremylongshore/iam-bob-adk/tree/main/000-docs
+- **README:** https://github.com/jeremylongshore/iam-bob-adk/blob/main/README.md
+- **CLAUDE.md:** https://github.com/jeremylongshore/iam-bob-adk/blob/main/CLAUDE.md
+- **CHANGELOG:** https://github.com/jeremylongshore/iam-bob-adk/blob/main/CHANGELOG.md
+- **DevOps Playbook:** https://github.com/jeremylongshore/iam-bob-adk/blob/main/000-docs/120-AA-AUDT-appaudit-devops-playbook.md
+- **LIVE3 Guide:** https://github.com/jeremylongshore/iam-bob-adk/blob/main/000-docs/121-DR-GUIDE-live3-dev-smoke-test.md
+- **Issues:** https://github.com/jeremylongshore/iam-bob-adk/issues
+- **License:** https://github.com/jeremylongshore/iam-bob-adk/blob/main/LICENSE
 - **Intent Solutions:** https://intentsolutions.io
 - **Google ADK:** https://cloud.google.com/vertex-ai/docs/agent-development-kit
 - **Vertex AI Agent Engine:** https://cloud.google.com/vertex-ai/docs/agent-engine

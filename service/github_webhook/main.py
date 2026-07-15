@@ -20,6 +20,7 @@ Environment Variables:
 - PROJECT_ID: GCP project ID
 - DEPLOYMENT_ENV: Deployment environment (dev/prod)
 - PORT: Service port (default 8080)
+- BIND_HOST: Direct-execution bind host (default 127.0.0.1; containers set theirs)
 
 Phase H: Universal Autonomous AI Crew - Event Triggers
 """
@@ -46,6 +47,7 @@ A2A_GATEWAY_URL = os.getenv("A2A_GATEWAY_URL")
 PROJECT_ID = os.getenv("PROJECT_ID")
 DEPLOYMENT_ENV = os.getenv("DEPLOYMENT_ENV", "dev")
 PORT = int(os.getenv("PORT", "8080"))
+BIND_HOST = os.getenv("BIND_HOST", "127.0.0.1")
 
 
 # Validate required environment variables
@@ -474,4 +476,4 @@ if __name__ == "__main__":
         },
     )
 
-    uvicorn.run(app, host="0.0.0.0", port=PORT, log_level="info")
+    uvicorn.run(app, host=BIND_HOST, port=PORT, log_level="info")

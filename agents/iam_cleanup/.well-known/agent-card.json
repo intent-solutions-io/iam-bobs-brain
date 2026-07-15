@@ -15,7 +15,7 @@
     "organization": "Intent Solutions",
     "url": "https://intent.solutions"
   },
-  "documentation_url": "https://github.com/jeremylongshore/bobs-brain",
+  "documentation_url": "https://github.com/jeremylongshore/iam-bob-adk",
   "icon_url": null,
   "capabilities": [
     "dead_code_detection",

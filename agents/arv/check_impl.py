@@ -6,6 +6,7 @@ Each function executes a check and returns an ArvResult.
 """
 
 import os
+import shlex
 import subprocess
 
 from agents.arv.spec import ArvCheck, ArvResult, Environment
@@ -93,10 +94,13 @@ def run_check(check: ArvCheck, env: Environment, verbose: bool = False) -> ArvRe
         check_env["DEPLOYMENT_ENV"] = env
 
         # Run the command
+        command = shlex.split(check.command)
+        if not command:
+            raise ValueError("ARV check command must not be empty")
+
         result = subprocess.run(
-            check.command,
+            command,
             check=False,
-            shell=True,
             capture_output=True,
             text=True,
             timeout=300,  # 5 minute timeout

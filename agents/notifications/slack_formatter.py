@@ -161,7 +161,7 @@ def _make_footer_block(result: PortfolioResult) -> Dict[str, Any]:
 
     footer_text = (
         f"Completed at {timestamp_str} | "
-        f"<https://github.com/jeremylongshore/bobs-brain|View Project>"
+        f"<https://github.com/jeremylongshore/iam-bob-adk|View Project>"
     )
 
     return {"type": "context", "elements": [{"type": "mrkdwn", "text": footer_text}]}

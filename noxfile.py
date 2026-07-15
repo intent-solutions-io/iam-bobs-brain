@@ -5,7 +5,7 @@ This file defines test sessions for running pytest across multiple Python versio
 linting, type checking, and MCP-specific tests. Follows Google Analytics MCP patterns.
 
 Sessions:
-- tests: Run pytest on Python 3.10, 3.11, 3.12, 3.13
+- tests: Run pytest on Python 3.11, 3.12, 3.13
 - lint: Run ruff and black checks
 - typecheck: Run mypy on agents/ and mcp/
 - tests_mcp: Run MCP-specific tests
@@ -33,7 +33,7 @@ nox.options.reuse_existing_virtualenvs = True
 nox.options.error_on_external_run = False
 
 # Python versions to test (aligned with ADK requirements)
-PYTHON_VERSIONS = ["3.10", "3.11", "3.12", "3.13"]
+PYTHON_VERSIONS = ["3.11", "3.12", "3.13"]
 DEFAULT_PYTHON = "3.12"  # Bob's Brain currently uses Python 3.12
 
 
@@ -163,6 +163,7 @@ def tests_mcp(session):
 
     # Check if mcp/ directory exists
     import os
+
     if os.path.exists("mcp/"):
         session.run(
             "pytest",
@@ -416,7 +417,8 @@ def arv(session):
     session.run(
         "python",
         "scripts/run_arv_department.py",
-        "--env", "dev",
+        "--env",
+        "dev",
         *session.posargs,
     )
 
@@ -462,7 +464,8 @@ def tests_e2e(session):
         "-v",
         "--color=yes",
         "--tb=long",
-        "-m", "e2e",
+        "-m",
+        "e2e",
         *session.posargs,
     )
 
@@ -488,7 +491,8 @@ def tests_smoke(session):
         "-v",
         "--color=yes",
         "--tb=short",
-        "-m", "smoke",
+        "-m",
+        "smoke",
         *session.posargs,
     )
 
@@ -514,7 +518,8 @@ def tests_contract(session):
         "-v",
         "--color=yes",
         "--tb=short",
-        "-m", "contract",
+        "-m",
+        "contract",
         *session.posargs,
     )
 
@@ -536,8 +541,8 @@ def clean(session):
     """
     session.log("Cleaning up generated files and caches")
 
-    import shutil
     import pathlib
+    import shutil
 
     patterns = [
         "**/__pycache__",

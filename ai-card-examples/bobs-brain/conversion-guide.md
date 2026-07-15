@@ -392,7 +392,7 @@ diff <(jq -S 'keys' agent-card-a2a.json) <(jq -S '.services.a2a.protocolSpecific
 
 ## Questions?
 
-- **Repository:** https://github.com/jeremylongshore/bobs-brain
+- **Repository:** https://github.com/jeremylongshore/iam-bob-adk
 - **Issues:** https://github.com/Agent-Card/ai-card/issues
 - **Contact:** jeremy@intentsolutions.io
 
