@@ -241,7 +241,7 @@ Deploy via GitHub Actions (enforced by R4):
 git push origin main
 
 # Manual trigger for specific environments
-# Go to: https://github.com/jeremylongshore/bobs-brain/actions
+# Go to: https://github.com/jeremylongshore/iam-bob-adk/actions
 # Run "Deploy to Vertex AI Agent Engine"
 ```
 

@@ -1,4 +1,4 @@
-# 🤖 Bob's Brain
+# iam-bob-adk — Google ADK reference implementation of the Intent Agent Model
 
 > **Intent Agent Model (IAM)** — *not* Identity and Access Management.  
 > Bob is the **reference implementation family** for IAM. These repos are different **runtimes** of the same model, not separate products.
@@ -323,8 +323,8 @@ If drift check fails, the entire pipeline stops. No tests run. No deployment hap
 
 ```bash
 # Get the code
-git clone https://github.com/intent-solutions-io/bobs-brain.git
-cd bobs-brain
+git clone https://github.com/jeremylongshore/iam-bob-adk.git
+cd iam-bob-adk
 
 # Set up Python environment
 python3 -m venv .venv
@@ -1118,8 +1118,8 @@ Just keep the license notice and don't blame us if things break. 😊
 ## 🔗 Resources
 
 **This Project:**
-- [GitHub Repository](https://github.com/intent-solutions-io/bobs-brain)
-- [Release Notes](https://github.com/intent-solutions-io/bobs-brain/releases)
+- [GitHub Repository](https://github.com/jeremylongshore/iam-bob-adk)
+- [Release Notes](https://github.com/jeremylongshore/iam-bob-adk/releases)
 - [Documentation](000-docs/)
 
 **Foundation Template:**
@@ -1141,6 +1141,6 @@ Just keep the license notice and don't blame us if things break. 😊
 
 **Built with ❤️ using Google ADK**
 
-[⭐ Star us on GitHub](https://github.com/intent-solutions-io/bobs-brain) • [📖 Read the docs](000-docs/) • [💬 Join the discussion](https://github.com/intent-solutions-io/bobs-brain/discussions)
+[⭐ Star us on GitHub](https://github.com/jeremylongshore/iam-bob-adk) • [📖 Read the docs](000-docs/) • [💬 Join the discussion](https://github.com/jeremylongshore/iam-bob-adk/discussions)
 
 </div>

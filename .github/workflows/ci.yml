@@ -13,7 +13,7 @@ name: CI - Hard Mode
 # - Code quality, tests, security, Terraform, docs, structure
 #
 # Deployment workflows MUST depend on this workflow's success.
-# Badge: [![CI](https://github.com/jeremylongshore/bobs-brain/workflows/CI%20-%20Hard%20Mode/badge.svg)](https://github.com/jeremylongshore/bobs-brain/actions/workflows/ci.yml)
+# Badge: [![CI](https://github.com/jeremylongshore/iam-bob-adk/workflows/CI%20-%20Hard%20Mode/badge.svg)](https://github.com/jeremylongshore/iam-bob-adk/actions/workflows/ci.yml)
 
 on:
   push:
