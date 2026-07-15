@@ -10,7 +10,7 @@
 > | [`iam-bob-langgraph`](https://github.com/jeremylongshore/iam-bob-langgraph) | LangGraph | Reserved (not built) |
 > | [`iam-bob-intendant`](https://github.com/jeremylongshore/iam-bob-intendant) | Operational worker (AGP-composed) | Live automation |
 >
-> **Formerly** `jeremylongshore/iam-bob-adk` (GitHub redirects).
+> **Formerly** `jeremylongshore/iam-bobs-brain` (GitHub redirects).
 
 
 <div align="center">
