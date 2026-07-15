@@ -1,3 +1,14 @@
+# Release v2.1.8
+
+**Release Date**: 2026-07-15
+
+## Changes since v2.1.7
+
+- chore: release v2.1.8 [skip ci] (8d4a585)
+- fix(iam): reconcile ADK identity and harden security gates (#70) (dc9a80a)
+
+---
+
 # Release v2.1.7
 
 **Release Date**: 2026-07-15
