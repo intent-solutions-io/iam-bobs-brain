@@ -1,3 +1,14 @@
+# Release v2.1.7
+
+**Release Date**: 2026-07-15
+
+## Changes since v2.1.6
+
+- chore: release v2.1.7 [skip ci] (c7fbad1)
+- docs: fix former-name note (iam-bobs-brain) (7b6fc8e)
+
+---
+
 # Release v2.1.6
 
 **Release Date**: 2026-07-15
