@@ -28,7 +28,7 @@ class ArvCheck:
         description: Human-readable description
         category: Logical grouping
         required: Whether this check is required for the environment
-        command: Shell command or script to execute
+        command: Command line to execute directly, without a shell
         required_when: Optional condition (e.g., "LIVE_RAG_BOB_ENABLED=true")
         envs: Environments where this check applies
     """

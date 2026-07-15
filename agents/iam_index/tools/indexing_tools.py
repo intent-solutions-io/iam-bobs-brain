@@ -264,7 +264,9 @@ def generate_index_entry(
             content_type = "doc"  # Default to doc
 
         # Generate a simple entry ID
-        entry_id = hashlib.md5(f"{title}{source}".encode()).hexdigest()[:12]
+        entry_id = hashlib.md5(
+            f"{title}{source}".encode(), usedforsecurity=False
+        ).hexdigest()[:12]
 
         # Create IndexEntry
         entry = IndexEntry(
