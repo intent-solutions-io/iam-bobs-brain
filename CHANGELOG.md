@@ -1,3 +1,14 @@
+# Release v2.1.9
+
+**Release Date**: 2026-08-25
+
+## Changes since v2.1.8
+
+- chore: release v2.1.9 [skip ci] (0f00e1f)
+- docs(readme): add the Ko-fi support badge (6712f1f)
+
+---
+
 # Release v2.1.8
 
 **Release Date**: 2026-07-15
