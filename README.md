@@ -19,6 +19,7 @@
 [![Google ADK](https://img.shields.io/badge/Google-ADK-4285F4.svg)](https://cloud.google.com/vertex-ai/docs/agent-development-kit)
 [![Agent Engine](https://img.shields.io/badge/Vertex%20AI-Agent%20Engine-4285F4.svg)](https://cloud.google.com/vertex-ai/docs/agent-engine)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+<a href="https://ko-fi.com/U5S225PTME"><img src="https://ko-fi.com/img/githubbutton_sm.svg" alt="ko-fi"></a>
 
 **ADK/Vertex compliance department with enterprise-grade orchestration infrastructure.**
 
